@@ -170,9 +170,20 @@ public class ItemFreeRunners extends ArmorItem implements ISpecialGear, IItemHUD
     @MethodsReturnNonnullByDefault
     protected static class FreeRunnerMaterial extends BaseSpecialArmorMaterial {
 
+
+        @Override
+        public int getDamageReductionAmount(EquipmentSlotType slotType) {
+            return 0;
+        }
+
         @Override
         public String getName() {
             return Mekanism.MODID + ":free_runners";
+        }
+
+        @Override
+        public float getToughness() {
+            return 0;
         }
     }
 }

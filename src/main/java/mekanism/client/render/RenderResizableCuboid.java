@@ -3,9 +3,12 @@ package mekanism.client.render;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import java.util.Arrays;
+
+import mekanism.api.backport.Vector3i;
 import mekanism.client.render.MekanismRenderer.Model3D;
 import mekanism.common.util.EnumUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Matrix3f;
 import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Vector3d;
 import net.minecraft.client.renderer.Vector3f;
@@ -14,6 +17,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.Direction.AxisDirection;
+import net.minecraft.util.math.Vec3i;
 
 
 /**
@@ -52,7 +56,7 @@ public class RenderResizableCuboid {
         throw new RuntimeException("Was given a null axis! That was probably not intentional, consider this a bug! (Vector = " + vector + ")");
     }
 
-    public void renderCube(Model3D cube, MatrixStack matrix, IVertexBuilder buffer, int argb, int overlay) {
+    public void renderCube(Model3D cube, MatrixStack matrix, IVertexBuilder buffer, int argb, int light, int overlay) {
         float red = MekanismRenderer.getRed(argb);
         float green = MekanismRenderer.getGreen(argb);
         float blue = MekanismRenderer.getBlue(argb);
@@ -120,13 +124,13 @@ public class RenderResizableCuboid {
     }
 
     private void renderPoint(Matrix4f matrix4f, Matrix3f normal, IVertexBuilder buffer, Direction face, Axis u, Axis v, float other, float[] uv, float[] xyz,
-          boolean minU, boolean minV, float red, float green, float blue, float alpha, int light, int overlay) {
+                             boolean minU, boolean minV, float red, float green, float blue, float alpha, int light, int overlay) {
         int U_ARRAY = minU ? U_MIN : U_MAX;
         int V_ARRAY = minV ? V_MIN : V_MAX;
         Vector3f vertex = withValue(VEC_ZERO, u, xyz[U_ARRAY]);
         vertex = withValue(vertex, v, xyz[V_ARRAY]);
         vertex = withValue(vertex, face.getAxis(), other);
-        Vector3i normalForFace = face.getDirectionVec();
+        Vec3i normalForFace = face.getDirectionVec();
         //TODO: Figure out how and why this works, it gives about the same brightness as we used to have but I don't understand why/how
         float adjustment = 2.5F;
         Vector3f norm = new Vector3f(normalForFace.getX() + adjustment, normalForFace.getY() + adjustment, normalForFace.getZ() + adjustment);

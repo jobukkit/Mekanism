@@ -8,8 +8,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import mekanism.tools.common.IHasRepairType;
 import mekanism.tools.common.ToolsLang;
-import mekanism.tools.common.item.attribute.AttributeCache;
-import mekanism.tools.common.item.attribute.IAttributeRefresher;
 import mekanism.tools.common.material.MaterialCreator;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -63,13 +61,6 @@ public class ItemMekanismSword extends SwordItem implements IHasRepairType {
     public boolean isDamageable() {
         return getTier().getMaxUses() > 0;
     }
-
-
-    /*@Override
-    public void addToBuilder(ImmutableMultimap.Builder<Attribute, AttributeModifier> builder) {
-        builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", getAttackDamage(), Operation.ADDITION));
-        builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", material.getSwordAtkSpeed(), Operation.ADDITION));
-    }*/
 
     @Nonnull
     @Override

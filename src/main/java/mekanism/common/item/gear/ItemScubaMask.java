@@ -58,8 +58,18 @@ public class ItemScubaMask extends ArmorItem implements ISpecialGear {
     protected static class ScubaMaskMaterial extends BaseSpecialArmorMaterial {
 
         @Override
+        public int getDamageReductionAmount(EquipmentSlotType slotType) {
+            return 0;
+        }
+
+        @Override
         public String getName() {
             return Mekanism.MODID + ":scuba_mask";
+        }
+
+        @Override
+        public float getToughness() {
+            return 0;
         }
     }
 }

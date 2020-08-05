@@ -140,5 +140,17 @@ public class ItemScubaTank extends ItemGasArmor implements IItemHUDProvider, IMo
         public String getName() {
             return Mekanism.MODID + ":scuba_tank";
         }
+
+
+        @Override
+        public int getDamageReductionAmount(EquipmentSlotType slotType) {
+            return 0;
+        }
+
+
+        @Override
+        public float getToughness() {
+            return 0;
+        }
     }
 }

@@ -8,8 +8,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import mekanism.tools.common.IHasRepairType;
 import mekanism.tools.common.ToolsLang;
-import mekanism.tools.common.item.attribute.AttributeCache;
-import mekanism.tools.common.item.attribute.IAttributeRefresher;
 import mekanism.tools.common.material.MaterialCreator;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
