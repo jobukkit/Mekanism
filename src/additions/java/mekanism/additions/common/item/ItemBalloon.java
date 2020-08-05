@@ -3,6 +3,7 @@ package mekanism.additions.common.item;
 import java.util.List;
 import javax.annotation.Nonnull;
 import mekanism.additions.common.entity.EntityBalloon;
+import mekanism.api.backport.Vector3i;
 import mekanism.api.text.EnumColor;
 import mekanism.api.text.TextComponentUtil;
 import mekanism.common.lib.math.Pos3D;
@@ -102,7 +103,7 @@ public class ItemBalloon extends Item {
 
     @Nonnull
     @Override
-    public ActionResultType itemInteractionForEntity(@Nonnull ItemStack stack, PlayerEntity player, @Nonnull LivingEntity entity, @Nonnull Hand hand) {
+    public boolean itemInteractionForEntity(@Nonnull ItemStack stack, PlayerEntity player, @Nonnull LivingEntity entity, @Nonnull Hand hand) {
         if (player.isSneaking()) {
             if (!player.world.isRemote) {
                 AxisAlignedBB bound = new AxisAlignedBB(entity.getPosX() - 0.2, entity.getPosY() - 0.5, entity.getPosZ() - 0.2,
@@ -110,15 +111,15 @@ public class ItemBalloon extends Item {
                 List<EntityBalloon> balloonsNear = player.world.getEntitiesWithinAABB(EntityBalloon.class, bound);
                 for (EntityBalloon balloon : balloonsNear) {
                     if (balloon.latchedEntity == entity) {
-                        return ActionResultType.SUCCESS;
+                        return true;
                     }
                 }
                 player.world.addEntity(new EntityBalloon(entity, color));
                 stack.shrink(1);
             }
-            return ActionResultType.SUCCESS;
+            return true;
         }
-        return ActionResultType.PASS;
+        return false;
     }
 
     public class DispenserBehavior extends DefaultDispenseItemBehavior {
@@ -149,7 +150,7 @@ public class ItemBalloon extends Item {
                 }
             }
             if (!latched) {
-                Pos3D pos = Pos3D.create(sourcePos).translate(0, -0.5, 0);
+                Pos3D pos = Pos3D.create(new Vector3i(sourcePos)).translate(0, -0.5, 0);
                 switch (side) {
                     case DOWN:
                         pos = pos.translate(0, -2.5, 0);

@@ -113,7 +113,7 @@ public class GenHandler {
 
     private static boolean placeFeature(@Nullable ConfiguredFeature<?, ?> feature, ServerWorld world, Random random, BlockPos blockPos) {
         if (feature != null) {
-            feature.func_236265_a_(world, world.func_241112_a_(), world.getChunkProvider().getChunkGenerator(), random, blockPos);
+            feature.place(world, world.getChunkProvider().getChunkGenerator(), random, blockPos);
             return true;
         }
         return false;

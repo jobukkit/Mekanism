@@ -1,7 +1,6 @@
 package mekanism.client.gui.qio;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.Nonnull;
+
 import mekanism.client.gui.GuiMekanismTile;
 import mekanism.client.gui.element.custom.GuiQIOFrequencyDataScreen;
 import mekanism.client.gui.element.tab.GuiQIOFrequencyTab;
@@ -30,9 +29,9 @@ public class GuiQIODriveArray extends GuiMekanismTile<TileEntityQIODriveArray, M
     }
 
     @Override
-    protected void drawForegroundText(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        renderTitleText(matrix);
-        drawString(matrix, MekanismLang.INVENTORY.translate(), 8, (getYSize() - 96) + 2, titleTextColor());
-        super.drawForegroundText(matrix, mouseX, mouseY);
+    protected void drawForegroundText(int mouseX, int mouseY) {
+        renderTitleText();
+        drawString( MekanismLang.INVENTORY.translate(), 8, (getYSize() - 96) + 2, titleTextColor());
+        super.drawForegroundText( mouseX, mouseY);
     }
 }

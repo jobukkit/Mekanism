@@ -1,7 +1,6 @@
 package mekanism.client.gui.robit;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.Nonnull;
+
 import mekanism.client.gui.element.progress.GuiProgress;
 import mekanism.client.gui.element.progress.ProgressType;
 import mekanism.common.MekanismLang;
@@ -24,10 +23,10 @@ public class GuiRobitSmelting extends GuiRobit<SmeltingRobitContainer> {
     }
 
     @Override
-    protected void drawForegroundText(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        drawString(matrix, MekanismLang.ROBIT_SMELTING.translate(), 8, 6, titleTextColor());
-        drawString(matrix, MekanismLang.INVENTORY.translate(), 8, getYSize() - 93, titleTextColor());
-        super.drawForegroundText(matrix, mouseX, mouseY);
+    protected void drawForegroundText(int mouseX, int mouseY) {
+        drawString( MekanismLang.ROBIT_SMELTING.translate(), 8, 6, titleTextColor());
+        drawString( MekanismLang.INVENTORY.translate(), 8, getYSize() - 93, titleTextColor());
+        super.drawForegroundText( mouseX, mouseY);
     }
 
     @Override

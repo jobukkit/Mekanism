@@ -1,6 +1,5 @@
 package mekanism.common;
 
-import javax.annotation.Nullable;
 import mekanism.api.Action;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.energy.IEnergyContainer;
@@ -16,14 +15,9 @@ import mekanism.common.content.gear.mekasuit.ModuleMekaSuit.ModuleGravitationalM
 import mekanism.common.content.gear.mekasuit.ModuleMekaSuit.ModuleHydraulicPropulsionUnit;
 import mekanism.common.content.gear.mekasuit.ModuleMekaSuit.ModuleInhalationPurificationUnit;
 import mekanism.common.entity.EntityFlame;
-import mekanism.common.item.gear.ItemFlamethrower;
-import mekanism.common.item.gear.ItemFreeRunners;
+import mekanism.common.item.gear.*;
 import mekanism.common.item.gear.ItemFreeRunners.FreeRunnerMode;
-import mekanism.common.item.gear.ItemJetpack;
 import mekanism.common.item.gear.ItemJetpack.JetpackMode;
-import mekanism.common.item.gear.ItemMekaSuitArmor;
-import mekanism.common.item.gear.ItemScubaMask;
-import mekanism.common.item.gear.ItemScubaTank;
 import mekanism.common.registries.MekanismGases;
 import mekanism.common.util.ChemicalUtil;
 import mekanism.common.util.MekanismUtils;
@@ -39,14 +33,16 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+
+import javax.annotation.Nullable;
 
 public class CommonPlayerTickHandler {
 
@@ -121,7 +117,7 @@ public class CommonPlayerTickHandler {
         if (isJetpackOn(player)) {
             ItemStack stack = player.getItemStackFromSlot(EquipmentSlotType.CHEST);
             JetpackMode mode = getJetpackMode(stack);
-            Vector3d motion = player.getMotion();
+            Vec3d motion = player.getMotion();
             if (mode == JetpackMode.NORMAL) {
                 player.setMotion(motion.getX(), Math.min(motion.getY() + 0.15D, 0.5D), motion.getZ());
             } else if (mode == JetpackMode.HOVER) {

@@ -1,7 +1,5 @@
 package mekanism.client.gui.element.bar;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.Nullable;
 import mekanism.api.chemical.IChemicalTank;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
@@ -23,6 +21,8 @@ import mekanism.common.capabilities.chemical.dynamic.IPigmentTracker;
 import mekanism.common.capabilities.chemical.dynamic.ISlurryTracker;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.util.text.ITextComponent;
+
+import javax.annotation.Nullable;
 
 public class GuiMergedChemicalBar<HANDLER extends IGasTracker & IInfusionTracker & IPigmentTracker & ISlurryTracker> extends GuiBar<IBarInfoHandler> implements
       IJEIIngredientHelper {
@@ -78,10 +78,10 @@ public class GuiMergedChemicalBar<HANDLER extends IGasTracker & IInfusionTracker
     }
 
     @Override
-    protected void renderBarOverlay(MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
+    protected void renderBarOverlay(int mouseX, int mouseY, float partialTicks) {
         GuiChemicalBar<?, ?> currentBar = getCurrentBarNoFallback();
         if (currentBar != null) {
-            currentBar.drawBackground(matrix, mouseX, mouseY, partialTicks);
+            currentBar.drawBackground(mouseX, mouseY, partialTicks);
         }
     }
 

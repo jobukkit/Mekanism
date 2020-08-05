@@ -567,8 +567,8 @@ public abstract class TileEntityMekanism extends CapabilityTileEntity implements
     }
 
     @Override
-    public void read(@Nonnull BlockState state, @Nonnull CompoundNBT nbtTags) {
-        super.read(state, nbtTags);
+    public void read(@Nonnull CompoundNBT nbtTags) {
+        super.read(nbtTags);
         redstone = nbtTags.getBoolean(NBTConstants.REDSTONE);
         for (ITileComponent component : components) {
             component.read(nbtTags);
@@ -695,8 +695,8 @@ public abstract class TileEntityMekanism extends CapabilityTileEntity implements
     }
 
     @Override
-    public void handleUpdateTag(BlockState state, @Nonnull CompoundNBT tag) {
-        super.handleUpdateTag(state, tag);
+    public void handleUpdateTag(@Nonnull CompoundNBT tag) {
+        super.handleUpdateTag(tag);
         for (ITileComponent component : components) {
             component.readFromUpdateTag(tag);
         }

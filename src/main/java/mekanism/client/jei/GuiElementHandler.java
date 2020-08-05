@@ -82,8 +82,8 @@ public class GuiElementHandler implements IGuiContainerHandler<GuiMekanism> {
     }
 
     @Override
-    public Collection<IGuiClickableArea> getGuiClickableAreas(GuiMekanism genericGui, double mouseX, double mouseY) {
-        GuiMekanism<?> gui = (GuiMekanism<?>) genericGui;
+    public Collection<IGuiClickableArea> getGuiClickableAreas(GuiMekanism genericGui) {
+        /*GuiMekanism<?> gui = (GuiMekanism<?>) genericGui;
         //Make mouseX and mouseY not be relative
         mouseX += gui.getGuiLeft();
         mouseY += gui.getGuiTop();
@@ -93,7 +93,8 @@ public class GuiElementHandler implements IGuiContainerHandler<GuiMekanism> {
             return getGuiClickableArea(gui.children(), mouseX, mouseY);
         }
         //Otherwise check the elements of the window
-        return getGuiClickableArea(guiWindow.children(), mouseX, mouseY);
+        return getGuiClickableArea(guiWindow.children(), mouseX, mouseY);*/
+        return Collections.emptyList();
     }
 
     private Collection<IGuiClickableArea> getGuiClickableArea(List<? extends IGuiEventListener> children, double mouseX, double mouseY) {

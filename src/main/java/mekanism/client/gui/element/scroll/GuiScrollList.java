@@ -1,7 +1,6 @@
 package mekanism.client.gui.element.scroll;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.Nonnull;
+
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.GuiElement;
 import mekanism.client.gui.element.GuiScalableElement;
@@ -35,26 +34,26 @@ public abstract class GuiScrollList extends GuiScrollableElement {
 
     public abstract void clearSelection();
 
-    protected abstract void renderElements(MatrixStack matrix, int mouseX, int mouseY, float partialTicks);
+    protected abstract void renderElements(int mouseX, int mouseY, float partialTicks);
 
     @Override
-    public void drawBackground(@Nonnull MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
-        super.drawBackground(matrix, mouseX, mouseY, partialTicks);
+    public void drawBackground(int mouseX, int mouseY, float partialTicks) {
+        super.drawBackground( mouseX, mouseY, partialTicks);
         //Draw the background
-        background.render(matrix, mouseX, mouseY, partialTicks);
-        background.drawBackground(matrix, mouseX, mouseY, partialTicks);
+        background.render(mouseX, mouseY, partialTicks);
+        background.drawBackground(mouseX, mouseY, partialTicks);
         GuiElement.minecraft.textureManager.bindTexture(getResource());
         //Draw Scroll
         //Top border
-        blit(matrix, barX - 1, barY - 1, 0, 0, TEXTURE_WIDTH, 1, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+        blit(barX - 1, barY - 1, 0, 0, TEXTURE_WIDTH, 1, TEXTURE_WIDTH, TEXTURE_HEIGHT);
         //Middle border
-        blit(matrix, barX - 1, barY, 6, maxBarHeight, 0, 1, TEXTURE_WIDTH, 1, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+        blit(barX - 1, barY, 6, maxBarHeight, 0, 1, TEXTURE_WIDTH, 1, TEXTURE_WIDTH, TEXTURE_HEIGHT);
         //Bottom border
-        blit(matrix, barX - 1, y + maxBarHeight + 2, 0, 0, TEXTURE_WIDTH, 1, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+        blit(barX - 1, y + maxBarHeight + 2, 0, 0, TEXTURE_WIDTH, 1, TEXTURE_WIDTH, TEXTURE_HEIGHT);
         //Scroll bar
-        blit(matrix, barX, barY + getScroll(), 0, 2, barWidth, barHeight, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+        blit(barX, barY + getScroll(), 0, 2, barWidth, barHeight, TEXTURE_WIDTH, TEXTURE_HEIGHT);
         //Draw the elements
-        renderElements(matrix, mouseX, mouseY, partialTicks);
+        renderElements(mouseX, mouseY, partialTicks);
     }
 
     @Override

@@ -36,9 +36,7 @@ import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.util.EnumUtils;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -46,8 +44,6 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -272,7 +268,7 @@ public class MekanismRenderer {
         return LightTexture.packLight(Math.max(blockLight, glow), Math.max(skyLight, glow));
     }
 
-    public static void renderColorOverlay(MatrixStack matrix, int x, int y, int width, int height, int color) {
+    public static void renderColorOverlay(int x, int y, int width, int height, int color) {
         float r = (color >> 24 & 255) / 255.0F;
         float g = (color >> 16 & 255) / 255.0F;
         float b = (color >> 8 & 255) / 255.0F;
@@ -285,11 +281,10 @@ public class MekanismRenderer {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
         bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-        Matrix4f matrix4f = matrix.getLast().getMatrix();
-        bufferbuilder.pos(matrix4f, width, y, 0).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(matrix4f, x, y, 0).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(matrix4f, x, height, 0).color(r, g, b, a).endVertex();
-        bufferbuilder.pos(matrix4f, width, height, 0).color(r, g, b, a).endVertex();
+        bufferbuilder.pos(width, y, 0).color(r, g, b, a).endVertex();
+        bufferbuilder.pos(x, y, 0).color(r, g, b, a).endVertex();
+        bufferbuilder.pos(x, height, 0).color(r, g, b, a).endVertex();
+        bufferbuilder.pos(width, height, 0).color(r, g, b, a).endVertex();
         tessellator.draw();
         RenderSystem.shadeModel(GL11.GL_FLAT);
         RenderSystem.disableBlend();
@@ -379,9 +374,9 @@ public class MekanismRenderer {
             Mekanism.logger.error("Failed to parse primary color atlas.");
             return;
         }
-        for (int i = 0; i < colors.length; i++) {
+        /*for (int i = 0; i < colors.length; i++) {
             colors[i].setColorFromAtlas(parsed.get(i).rgbArray());
-        }
+        }*/
     }
 
     private static <CHEMICAL extends Chemical<CHEMICAL>> void addChemicalSprites(TextureStitchEvent.Pre event, IForgeRegistry<CHEMICAL> chemicalRegistry) {

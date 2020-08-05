@@ -1,7 +1,5 @@
 package mekanism.client.gui.element.button;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.Nonnull;
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.GuiElement;
 import net.minecraft.client.Minecraft;
@@ -55,9 +53,9 @@ public class MekanismButton extends GuiElement {
     }
 
     @Override
-    public void renderToolTip(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
+    public void renderToolTip(int mouseX, int mouseY) {
         if (onHover != null) {
-            onHover.onHover(this, matrix, mouseX, mouseY);
+            onHover.onHover(this, mouseX, mouseY);
         }
     }
 

@@ -3,12 +3,6 @@ package mekanism.api.recipes.inputs.chemical;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import javax.annotation.Nonnull;
 import mekanism.api.JsonConstants;
 import mekanism.api.annotations.NonNull;
 import mekanism.api.chemical.Chemical;
@@ -16,7 +10,10 @@ import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.recipes.inputs.TagResolverHelper;
 import mekanism.api.recipes.inputs.chemical.ChemicalIngredientDeserializer.IngredientType;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
+
+import javax.annotation.Nonnull;
+import java.util.*;
 
 public abstract class ChemicalStackIngredient<CHEMICAL extends Chemical<CHEMICAL>, STACK extends ChemicalStack<CHEMICAL>> implements
       IChemicalStackIngredient<CHEMICAL, STACK> {
@@ -82,10 +79,10 @@ public abstract class ChemicalStackIngredient<CHEMICAL extends Chemical<CHEMICAL
           ChemicalStackIngredient<CHEMICAL, STACK> {
 
         @Nonnull
-        private final ITag<CHEMICAL> tag;
+        private final Tag<CHEMICAL> tag;
         private final long amount;
 
-        public TaggedIngredient(@Nonnull ITag<CHEMICAL> tag, long amount) {
+        public TaggedIngredient(@Nonnull Tag<CHEMICAL> tag, long amount) {
             this.tag = tag;
             this.amount = amount;
         }

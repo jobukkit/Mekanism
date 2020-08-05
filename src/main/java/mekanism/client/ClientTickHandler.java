@@ -52,7 +52,7 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.InputEvent.MouseScrollEvent;
@@ -224,7 +224,7 @@ public class ClientTickHandler {
 
             if (isJetpackActive(minecraft.player)) {
                 JetpackMode mode = getJetpackMode(chestStack);
-                Vector3d motion = minecraft.player.getMotion();
+                Vec3d motion = minecraft.player.getMotion();
                 if (mode == JetpackMode.NORMAL) {
                     minecraft.player.setMotion(motion.getX(), Math.min(motion.getY() + 0.15D, 0.5D), motion.getZ());
                     minecraft.player.fallDistance = 0.0F;

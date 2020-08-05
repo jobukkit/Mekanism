@@ -1,8 +1,6 @@
 package mekanism.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.Arrays;
-import javax.annotation.Nonnull;
+
 import mekanism.api.math.FloatingLong;
 import mekanism.client.gui.element.GuiElementHolder;
 import mekanism.client.gui.element.GuiInnerScreen;
@@ -20,6 +18,8 @@ import mekanism.common.tile.multiblock.TileEntityInductionCasing;
 import mekanism.common.util.text.EnergyDisplay;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.text.ITextComponent;
+
+import java.util.Arrays;
 
 public class GuiInductionMatrix extends GuiMekanismTile<TileEntityInductionCasing, MekanismTileContainer<TileEntityInductionCasing>> {
 
@@ -63,10 +63,10 @@ public class GuiInductionMatrix extends GuiMekanismTile<TileEntityInductionCasin
     }
 
     @Override
-    protected void drawForegroundText(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
+    protected void drawForegroundText(int mouseX, int mouseY) {
         ITextComponent name = MekanismLang.MATRIX.translate();
-        drawTitleText(matrix, name, 6);
-        drawString(matrix, MekanismLang.INVENTORY.translate(), 8, (getYSize() - 94) + 2, titleTextColor());
-        super.drawForegroundText(matrix, mouseX, mouseY);
+        drawTitleText(name, 6);
+        drawString(MekanismLang.INVENTORY.translate(), 8, (getYSize() - 94) + 2, titleTextColor());
+        super.drawForegroundText(mouseX, mouseY);
     }
 }

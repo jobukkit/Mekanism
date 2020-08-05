@@ -14,12 +14,12 @@ import mekanism.common.tile.TileEntityBin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
 
 @ParametersAreNonnullByDefault
@@ -109,7 +109,7 @@ public class RenderBin extends MekanismTileEntityRenderer<TileEntityBin> {
 
         FontRenderer font = renderDispatcher.getFontRenderer();
 
-        int requiredWidth = Math.max(font.func_238414_a_(text), 1);
+        int requiredWidth = Math.max(font.getStringWidth(text.getFormattedText()), 1);
         int requiredHeight = font.FONT_HEIGHT + 2;
         float scaler = 0.4F;
         float scaleX = displayWidth / requiredWidth;
@@ -123,7 +123,7 @@ public class RenderBin extends MekanismTileEntityRenderer<TileEntityBin> {
         int realWidth = (int) Math.floor(displayWidth / scale);
         int offsetX = (realWidth - requiredWidth) / 2;
         int offsetY = (realHeight - requiredHeight) / 2;
-        font.func_238416_a_(TextComponentUtil.build(EnumColor.WHITE, text), offsetX - realWidth / 2, 1 + offsetY - realHeight / 2, overlayLight,
+        font.renderString(TextComponentUtil.build(EnumColor.WHITE, text).getFormattedText(), offsetX - realWidth / 2, 1 + offsetY - realHeight / 2, overlayLight,
               false, matrix.getLast().getMatrix(), renderer, false, 0, MekanismRenderer.FULL_LIGHT);
         matrix.pop();
     }

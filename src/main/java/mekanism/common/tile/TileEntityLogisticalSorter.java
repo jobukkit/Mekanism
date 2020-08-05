@@ -142,8 +142,8 @@ public class TileEntityLogisticalSorter extends TileEntityMekanism implements IS
     }
 
     @Override
-    public void read(@Nonnull BlockState state, @Nonnull CompoundNBT nbtTags) {
-        super.read(state, nbtTags);
+    public void read(@Nonnull CompoundNBT nbtTags) {
+        super.read(nbtTags);
         setConfigurationData(nbtTags);
     }
 

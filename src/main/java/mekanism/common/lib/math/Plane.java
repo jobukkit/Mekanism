@@ -1,9 +1,10 @@
 package mekanism.common.lib.math;
 
-import java.util.Random;
+import mekanism.api.backport.Vector3d;
 import mekanism.common.lib.math.voxel.VoxelCuboid;
 import mekanism.common.lib.math.voxel.VoxelCuboid.CuboidSide;
-import net.minecraft.util.math.vector.Vector3d;
+
+import java.util.Random;
 
 // can add to this as we see necessary
 public class Plane {

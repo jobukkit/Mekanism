@@ -64,7 +64,7 @@ public class Attributes {
 
         @Override
         public void adjustProperties(Block.Properties props) {
-            props.setLightLevel(state -> light);
+            props.lightValue(light);
         }
     }
 }

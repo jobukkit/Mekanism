@@ -256,12 +256,12 @@ public class TileEntityTeleporter extends TileEntityMekanism implements IChunkLo
         } else {
             target = coord.getPos().offset(teleporter.frameDirection);
         }
-        if (entity.world.func_234923_W_() == coord.dimension) {
+        if (entity.world.getDimension().getType() == coord.dimension) {
             entity.setPositionAndUpdate(target.getX() + 0.5, target.getY(), target.getZ() + 0.5);
         } else {
             ServerWorld newWorld = ((ServerWorld) teleporter.getWorld()).getServer().getWorld(coord.dimension);
             if (newWorld != null) {
-                entity.changeDimension(newWorld, new ITeleporter() {
+                entity.changeDimension(newWorld.getDimension().getType(), new ITeleporter() {
                     @Override
                     public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {
                         Entity repositionedEntity = repositionEntity.apply(false);
@@ -281,7 +281,7 @@ public class TileEntityTeleporter extends TileEntityMekanism implements IChunkLo
     @Nonnull
     public static FloatingLong calculateEnergyCost(Entity entity, Coord4D coords) {
         FloatingLong energyCost = MekanismConfig.usage.teleporterBase.get();
-        if (entity.world.func_234923_W_() == coords.dimension) {
+        if (entity.world.getDimension().getType() == coords.dimension) {
             energyCost = energyCost.add(MekanismConfig.usage.teleporterDistance.get().multiply(Math.sqrt(entity.getDistanceSq(coords.getX(), coords.getY(), coords.getZ()))));
         } else {
             energyCost = energyCost.add(MekanismConfig.usage.teleporterDimensionPenalty.get());
@@ -480,8 +480,8 @@ public class TileEntityTeleporter extends TileEntityMekanism implements IChunkLo
     }
 
     @Override
-    public void handleUpdateTag(BlockState state, @Nonnull CompoundNBT tag) {
-        super.handleUpdateTag(state, tag);
+    public void handleUpdateTag(@Nonnull CompoundNBT tag) {
+        super.handleUpdateTag(tag);
         NBTUtils.setBooleanIfPresent(tag, NBTConstants.RENDERING, value -> shouldRender = value);
         if (tag.contains(NBTConstants.COLOR)) {
             color = EnumColor.byIndexStatic(tag.getInt(NBTConstants.COLOR));

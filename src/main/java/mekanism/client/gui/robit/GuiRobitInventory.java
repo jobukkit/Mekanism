@@ -1,7 +1,6 @@
 package mekanism.client.gui.robit;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.Nonnull;
+
 import mekanism.common.MekanismLang;
 import mekanism.common.inventory.container.entity.robit.InventoryRobitContainer;
 import net.minecraft.entity.player.PlayerInventory;
@@ -15,10 +14,10 @@ public class GuiRobitInventory extends GuiRobit<InventoryRobitContainer> {
     }
 
     @Override
-    protected void drawForegroundText(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        drawString(matrix, MekanismLang.ROBIT_INVENTORY.translate(), 8, 6, titleTextColor());
-        drawString(matrix, MekanismLang.INVENTORY.translate(), 8, getYSize() - 93, titleTextColor());
-        super.drawForegroundText(matrix, mouseX, mouseY);
+    protected void drawForegroundText(int mouseX, int mouseY) {
+        drawString( MekanismLang.ROBIT_INVENTORY.translate(), 8, 6, titleTextColor());
+        drawString( MekanismLang.INVENTORY.translate(), 8, getYSize() - 93, titleTextColor());
+        super.drawForegroundText( mouseX, mouseY);
     }
 
     @Override

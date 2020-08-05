@@ -1,13 +1,14 @@
 package mekanism.common.network;
 
-import java.util.function.Supplier;
+import mekanism.api.backport.Vector3d;
 import mekanism.client.render.RenderTickHandler;
 import mekanism.common.lib.effect.BoltEffect;
 import mekanism.common.lib.effect.BoltEffect.BoltRenderInfo;
 import mekanism.common.lib.effect.BoltEffect.SpawnFunction;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
+
+import java.util.function.Supplier;
 
 public class PacketLightningRender {
 

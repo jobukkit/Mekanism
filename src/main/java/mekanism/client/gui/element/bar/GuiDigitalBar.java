@@ -1,7 +1,6 @@
 package mekanism.client.gui.element.bar;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.Nonnull;
+
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.bar.GuiBar.IBarInfoHandler;
 import mekanism.common.util.MekanismUtils;
@@ -18,15 +17,15 @@ public class GuiDigitalBar extends GuiBar<IBarInfoHandler> {
     }
 
     @Override
-    protected void renderBarOverlay(MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
+    protected void renderBarOverlay(int mouseX, int mouseY, float partialTicks) {
     }
 
     @Override
-    public void drawBackground(@Nonnull MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
+    public void drawBackground(int mouseX, int mouseY, float partialTicks) {
         //Render the bar
         minecraft.textureManager.bindTexture(DIGITAL_BAR);
-        blit(matrix, x, y, width, height, 1, 0, 1, 1, texWidth, texHeight);
-        blit(matrix, x + 1, y + 1, width - 2, 6, 1, 1, 1, 1, texWidth, texHeight);
-        blit(matrix, x + 1, y + 1, calculateScaled(getHandler().getLevel(), width - 2), 6, 0, 0, 1, 1, texWidth, texHeight);
+        blit(x, y, width, height, 1, 0, 1, 1, texWidth, texHeight);
+        blit(x + 1, y + 1, width - 2, 6, 1, 1, 1, 1, texWidth, texHeight);
+        blit(x + 1, y + 1, calculateScaled(getHandler().getLevel(), width - 2), 6, 0, 0, 1, 1, texWidth, texHeight);
     }
 }

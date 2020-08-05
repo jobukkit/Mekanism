@@ -1,9 +1,6 @@
 package mekanism.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Nonnull;
+
 import mekanism.client.gui.element.GuiElementHolder;
 import mekanism.client.gui.element.GuiInnerScreen;
 import mekanism.client.gui.element.button.MovableFilterButton;
@@ -11,11 +8,7 @@ import mekanism.client.gui.element.scroll.GuiScrollBar;
 import mekanism.common.Mekanism;
 import mekanism.common.MekanismLang;
 import mekanism.common.base.TagCache;
-import mekanism.common.content.filter.IFilter;
-import mekanism.common.content.filter.IItemStackFilter;
-import mekanism.common.content.filter.IMaterialFilter;
-import mekanism.common.content.filter.IModIDFilter;
-import mekanism.common.content.filter.ITagFilter;
+import mekanism.common.content.filter.*;
 import mekanism.common.inventory.container.tile.MekanismTileContainer;
 import mekanism.common.lib.HashList;
 import mekanism.common.network.PacketGuiInteract;
@@ -25,6 +18,9 @@ import mekanism.common.tile.interfaces.ITileFilterHolder;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class GuiFilterHolder<FILTER extends IFilter<?>, TILE extends TileEntityMekanism & ITileFilterHolder<FILTER>, CONTAINER extends MekanismTileContainer<TILE>>
       extends GuiMekanismTile<TILE, CONTAINER> {
@@ -92,8 +88,8 @@ public abstract class GuiFilterHolder<FILTER extends IFilter<?>, TILE extends Ti
     protected abstract List<ItemStack> getTagStacks(String tagName);
 
     @Override
-    protected void drawForegroundText(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        super.drawForegroundText(matrix, mouseX, mouseY);
-        drawString(matrix, MekanismLang.INVENTORY.translate(), 8, (getYSize() - 94) + 2, titleTextColor());
+    protected void drawForegroundText(int mouseX, int mouseY) {
+        super.drawForegroundText(mouseX, mouseY);
+        drawString(MekanismLang.INVENTORY.translate(), 8, (getYSize() - 94) + 2, titleTextColor());
     }
 }

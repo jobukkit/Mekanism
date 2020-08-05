@@ -3,6 +3,8 @@ package mekanism.client.model.baked;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import mekanism.api.backport.Vector3d;
 import mekanism.client.model.MekanismModelCache;
 import mekanism.client.render.lib.QuadTransformation;
 import mekanism.client.render.lib.QuadUtils;
@@ -11,7 +13,6 @@ import mekanism.common.tile.qio.TileEntityQIODriveArray;
 import mekanism.common.tile.qio.TileEntityQIODriveArray.DriveStatus;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.client.model.data.IModelData;
 
 public class DriveArrayBakedModel extends ExtensionBakedModel<byte[]> {

@@ -1,11 +1,6 @@
 package mekanism.client.gui.element.gauge;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
 import mekanism.api.text.EnumColor;
 import mekanism.client.gui.GuiMekanismTile;
 import mekanism.client.gui.IGuiWrapper;
@@ -21,6 +16,11 @@ import mekanism.common.tile.interfaces.ISideConfiguration;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public abstract class GuiGauge<T> extends GuiTexturedElement {
 
@@ -53,31 +53,31 @@ public abstract class GuiGauge<T> extends GuiTexturedElement {
     }
 
     @Override
-    public void drawBackground(@Nonnull MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
-        super.drawBackground(matrix, mouseX, mouseY, partialTicks);
+    public void drawBackground(int mouseX, int mouseY, float partialTicks) {
+        super.drawBackground(mouseX, mouseY, partialTicks);
         GaugeInfo color = getGaugeColor();
-        renderExtendedTexture(matrix, color.getResourceLocation(), color.getSideWidth(), color.getSideHeight());
+        renderExtendedTexture(color.getResourceLocation(), color.getSideWidth(), color.getSideHeight());
         if (!dummy) {
-            renderContents(matrix);
+            renderContents();
         }
     }
 
-    public void renderContents(MatrixStack matrix) {
+    public void renderContents() {
         int scale = getScaledLevel();
         TextureAtlasSprite icon = getIcon();
         if (scale > 0 && icon != null) {
             applyRenderColor();
-            drawTiledSprite(matrix, x + 1, y + 1, height - 2, width - 2, scale, icon);
+            drawTiledSprite(x + 1, y + 1, height - 2, width - 2, scale, icon);
             MekanismRenderer.resetColor();
         }
         //Draw the bar overlay
         minecraft.textureManager.bindTexture(getResource());
         GaugeOverlay gaugeOverlay = gaugeType.getGaugeOverlay();
-        blit(matrix, x + 1, y + 1, getWidth() - 2, getHeight() - 2, 0, 0, gaugeOverlay.getWidth(), gaugeOverlay.getHeight(), gaugeOverlay.getWidth(), gaugeOverlay.getHeight());
+        blit(x + 1, y + 1, getWidth() - 2, getHeight() - 2, 0, 0, gaugeOverlay.getWidth(), gaugeOverlay.getHeight(), gaugeOverlay.getWidth(), gaugeOverlay.getHeight());
     }
 
     @Override
-    public void renderToolTip(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
+    public void renderToolTip(int mouseX, int mouseY) {
         ItemStack stack = minecraft.player.inventory.getItemStack();
         EnumColor color = gaugeType.getGaugeInfo().getColor();
         if (!stack.isEmpty() && stack.getItem() instanceof ItemConfigurator && color != null) {
@@ -96,9 +96,9 @@ public abstract class GuiGauge<T> extends GuiTexturedElement {
                         }
                     }
                     if (dataType == null) {
-                        guiObj.displayTooltip(matrix, MekanismLang.GENERIC_PARENTHESIS.translateColored(color, color.getName()), mouseX, mouseY);
+                        guiObj.displayTooltip(MekanismLang.GENERIC_PARENTHESIS.translateColored(color, color.getName()), mouseX, mouseY);
                     } else {
-                        guiObj.displayTooltip(matrix, MekanismLang.GENERIC_WITH_PARENTHESIS.translateColored(color, dataType, color.getName()), mouseX, mouseY);
+                        guiObj.displayTooltip(MekanismLang.GENERIC_WITH_PARENTHESIS.translateColored(color, dataType, color.getName()), mouseX, mouseY);
                     }
                 }
             }
@@ -108,7 +108,7 @@ public abstract class GuiGauge<T> extends GuiTexturedElement {
                 list.add(getLabel());
             }
             list.addAll(getTooltipText());
-            guiObj.displayTooltips(matrix, list, mouseX, mouseY);
+            guiObj.displayTooltips(list, mouseX, mouseY);
         }
     }
 

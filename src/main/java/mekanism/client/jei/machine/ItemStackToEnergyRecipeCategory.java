@@ -60,19 +60,19 @@ public class ItemStackToEnergyRecipeCategory extends BaseRecipeCategory<ItemStac
     }
 
     @Override
-    public void draw(ItemStackToEnergyRecipe recipe, MatrixStack matrix, double mouseX, double mouseY) {
-        super.draw(recipe, matrix, mouseX, mouseY);
+    public void draw(ItemStackToEnergyRecipe recipe, double mouseX, double mouseY) {
+        super.draw(recipe, mouseX, mouseY);
         if (!recipe.getOutputDefinition().isZero()) {
             //Manually draw the contents of the recipe
-            gauge.renderContents(matrix);
+            gauge.renderContents();
         }
     }
 
     @Override
-    public List<ITextComponent> getTooltipStrings(ItemStackToEnergyRecipe recipe, double mouseX, double mouseY) {
+    public List<String> getTooltipStrings(ItemStackToEnergyRecipe recipe, double mouseX, double mouseY) {
         if (gauge.isMouseOver(mouseX, mouseY) && !recipe.getOutputDefinition().isZero()) {
             //Manually add the tooltip showing the amounts if the mouse is over the energy gauge
-            return Collections.singletonList(EnergyDisplay.of(recipe.getOutputDefinition()).getTextComponent());
+            return Collections.singletonList(EnergyDisplay.of(recipe.getOutputDefinition()).getTextComponent().getFormattedText());
         }
         return Collections.emptyList();
     }

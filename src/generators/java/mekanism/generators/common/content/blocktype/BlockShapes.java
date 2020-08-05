@@ -3,11 +3,11 @@ package mekanism.generators.common.content.blocktype;
 import static mekanism.common.util.VoxelShapeUtils.setShape;
 import static net.minecraft.block.Block.makeCuboidShape;
 
+import mekanism.api.backport.Vector3d;
 import mekanism.common.util.EnumUtils;
 import mekanism.common.util.VoxelShapeUtils;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.vector.Vector3d;
 
 public final class BlockShapes {
 

@@ -1,10 +1,9 @@
 package mekanism.client.gui.element.button;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
-import javax.annotation.Nonnull;
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.render.MekanismRenderer;
 import mekanism.common.util.MekanismUtils;
@@ -21,12 +20,12 @@ public class FilterSelectButton extends MekanismButton {
     private final boolean down;
 
     public FilterSelectButton(IGuiWrapper gui, int x, int y, boolean down, Runnable onPress, IHoverable onHover) {
-        super(gui, x, y, 11, 7, StringTextComponent.EMPTY, onPress, onHover);
+        super(gui, x, y, 11, 7, new StringTextComponent(""), onPress, onHover);
         this.down = down;
     }
 
     @Override
-    public void drawBackground(@Nonnull MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
+    public void drawBackground(int mouseX, int mouseY, float partialTicks) {
         if (resetColorBeforeRender()) {
             MekanismRenderer.resetColor();
         }
@@ -38,7 +37,7 @@ public class FilterSelectButton extends MekanismButton {
         int x = getButtonX();
         int y = getButtonY();
         MekanismRenderer.bindTexture(ARROWS);
-        blit(matrix, x, y, isMouseOverCheckWindows(mouseX, mouseY) ? width : 0, down ? 7 : 0, width, height, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+        blit(x, y, isMouseOverCheckWindows(mouseX, mouseY) ? width : 0, down ? 7 : 0, width, height, TEXTURE_WIDTH, TEXTURE_HEIGHT);
         RenderSystem.disableBlend();
     }
 

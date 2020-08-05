@@ -1,8 +1,5 @@
 package mekanism.common;
 
-import java.lang.ref.WeakReference;
-import java.util.function.Supplier;
-import javax.annotation.Nullable;
 import mekanism.client.ClientProxy;
 import mekanism.common.base.MekFakePlayer;
 import net.minecraft.entity.player.PlayerEntity;
@@ -10,10 +7,15 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
+
+import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
+import java.util.function.Supplier;
 
 /**
  * Common proxy for the Mekanism mod.
@@ -48,7 +50,7 @@ public class CommonProxy {
 
     public double getReach(PlayerEntity player) {
         if (player instanceof ServerPlayerEntity) {
-            return player.getAttribute(net.minecraftforge.common.ForgeMod.REACH_DISTANCE.get()).getValue();
+            return player.getAttribute(PlayerEntity.REACH_DISTANCE).getValue();
         }
         return 0;
     }
@@ -71,6 +73,6 @@ public class CommonProxy {
 
     @Nullable
     public World tryGetMainWorld() {
-        return ServerLifecycleHooks.getCurrentServer().func_241755_D_();
+        return ServerLifecycleHooks.getCurrentServer().getWorld(DimensionType.OVERWORLD);
     }
 }

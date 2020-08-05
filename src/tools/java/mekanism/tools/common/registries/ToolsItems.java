@@ -30,7 +30,7 @@ public class ToolsItems {
     public static final ItemRegistryObject<ItemMekanismPaxel> IRON_PAXEL = registerPaxel(ItemTier.IRON);
     public static final ItemRegistryObject<ItemMekanismPaxel> DIAMOND_PAXEL = registerPaxel(ItemTier.DIAMOND);
     public static final ItemRegistryObject<ItemMekanismPaxel> GOLD_PAXEL = registerPaxel(ItemTier.GOLD);
-    public static final ItemRegistryObject<ItemMekanismPaxel> NETHERITE_PAXEL = registerPaxel(ItemTier.NETHERITE);
+    //public static final ItemRegistryObject<ItemMekanismPaxel> NETHERITE_PAXEL = registerPaxel(ItemTier.NETHERITE);
 
     public static final ItemRegistryObject<ItemMekanismPickaxe> BRONZE_PICKAXE = registerPickaxe(MekanismToolsConfig.tools.bronze);
     public static final ItemRegistryObject<ItemMekanismAxe> BRONZE_AXE = registerAxe(MekanismToolsConfig.tools.bronze);
@@ -161,9 +161,6 @@ public class ToolsItems {
 
     private static Item.Properties getBaseProperties(BaseMekanismMaterial material) {
         Item.Properties properties = ItemDeferredRegister.getMekBaseProperties();
-        if (!material.burnsInFire()) {
-            properties = properties.isBurnable();
-        }
         return properties;
     }
 }

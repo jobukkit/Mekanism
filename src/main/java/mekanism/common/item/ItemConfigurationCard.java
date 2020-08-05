@@ -66,7 +66,7 @@ public class ItemConfigurationCard extends Item {
                             setData(stack, data);
                             player.sendMessage(MekanismLang.LOG_FORMAT.translateColored(EnumColor.DARK_BLUE, MekanismLang.MEKANISM,
                                   MekanismLang.CONFIG_CARD_GOT.translateColored(EnumColor.GRAY, EnumColor.INDIGO,
-                                        TextComponentUtil.translate(data.getString(NBTConstants.DATA_TYPE)))), Util.DUMMY_UUID);
+                                        TextComponentUtil.translate(data.getString(NBTConstants.DATA_TYPE)))));
                         }
                         return ActionResultType.SUCCESS;
                     }
@@ -84,10 +84,10 @@ public class ItemConfigurationCard extends Item {
                             }
                             player.sendMessage(MekanismLang.LOG_FORMAT.translateColored(EnumColor.DARK_BLUE, MekanismLang.MEKANISM,
                                   MekanismLang.CONFIG_CARD_SET.translateColored(EnumColor.DARK_GREEN, EnumColor.INDIGO,
-                                        TextComponentUtil.translate(getDataType(stack)))), Util.DUMMY_UUID);
+                                        TextComponentUtil.translate(getDataType(stack)))));
                         } else {
                             player.sendMessage(MekanismLang.LOG_FORMAT.translateColored(EnumColor.DARK_BLUE, MekanismLang.MEKANISM,
-                                  MekanismLang.CONFIG_CARD_UNEQUAL.translateColored(EnumColor.RED)), Util.DUMMY_UUID);
+                                  MekanismLang.CONFIG_CARD_UNEQUAL.translateColored(EnumColor.RED)));
                         }
                         return ActionResultType.SUCCESS;
                     }

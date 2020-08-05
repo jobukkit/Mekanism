@@ -1,16 +1,17 @@
 package mekanism.client.gui.element;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.List;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.jei.interfaces.IJEIRecipeArea;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.MekanismUtils.ResourceType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.function.Supplier;
 
 public class GuiInnerScreen extends GuiScalableElement implements IJEIRecipeArea<GuiInnerScreen> {
 
@@ -71,8 +72,8 @@ public class GuiInnerScreen extends GuiScalableElement implements IJEIRecipeArea
     }
 
     @Override
-    public void renderForeground(MatrixStack matrix, int mouseX, int mouseY) {
-        super.renderForeground(matrix, mouseX, mouseY);
+    public void renderForeground(int mouseX, int mouseY) {
+        super.renderForeground(mouseX, mouseY);
 
         if (renderStrings != null) {
             List<ITextComponent> list = renderStrings.get();
@@ -82,25 +83,25 @@ public class GuiInnerScreen extends GuiScalableElement implements IJEIRecipeArea
                 startY = relativeY + getHeight() / 2F - totalHeight / 2F;
             }
             for (ITextComponent text : renderStrings.get()) {
-                drawText(matrix, text, relativeX + padding, startY);
+                drawText(text, relativeX + padding, startY);
                 startY += 8 + spacing;
             }
         }
     }
 
     @Override
-    public void renderToolTip(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        super.renderToolTip(matrix, mouseX, mouseY);
+    public void renderToolTip(int mouseX, int mouseY) {
+        super.renderToolTip(mouseX, mouseY);
         if (tooltipStrings != null) {
             List<ITextComponent> list = tooltipStrings.get();
             if (list != null && !list.isEmpty()) {
-                displayTooltips(matrix, list, mouseX, mouseY);
+                displayTooltips(list, mouseX, mouseY);
             }
         }
     }
 
-    private void drawText(MatrixStack matrix, ITextComponent text, float x, float y) {
-        drawScaledTextScaledBound(matrix, text, x, y, screenTextColor(), getWidth() - padding * 2, textScale);
+    private void drawText(ITextComponent text, float x, float y) {
+        drawScaledTextScaledBound(text, x, y, screenTextColor(), getWidth() - padding * 2, textScale);
     }
 
     @Nonnull

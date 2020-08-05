@@ -1,8 +1,7 @@
 package mekanism.client.gui.element;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+
 import com.mojang.blaze3d.systems.RenderSystem;
-import java.util.function.Supplier;
 import mekanism.client.gui.GuiMekanism;
 import mekanism.client.gui.GuiUtils;
 import mekanism.client.gui.IGuiWrapper;
@@ -12,6 +11,8 @@ import mekanism.common.inventory.container.IEmptyContainer;
 import mekanism.common.lib.Color;
 import net.minecraft.inventory.container.Container;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.function.Supplier;
 
 public class GuiWindow extends GuiTexturedElement {
 
@@ -86,18 +87,18 @@ public class GuiWindow extends GuiTexturedElement {
     }
 
     @Override
-    public void renderBackgroundOverlay(MatrixStack matrix, int mouseX, int mouseY) {
+    public void renderBackgroundOverlay(int mouseX, int mouseY) {
         if (isFocusOverlay()) {
-            MekanismRenderer.renderColorOverlay(matrix, 0, 0, minecraft.getMainWindow().getScaledWidth(), minecraft.getMainWindow().getScaledHeight(), OVERLAY_COLOR.rgba());
+            MekanismRenderer.renderColorOverlay(0, 0, minecraft.getMainWindow().getScaledWidth(), minecraft.getMainWindow().getScaledHeight(), OVERLAY_COLOR.rgba());
         } else {
             RenderSystem.color4f(1, 1, 1, 0.75F);
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
-            GuiUtils.renderBackgroundTexture(matrix, GuiMekanism.SHADOW, 4, 4, getButtonX() - 3, getButtonY() - 3, getButtonWidth() + 6, getButtonHeight() + 6, 256, 256);
+            GuiUtils.renderBackgroundTexture(GuiMekanism.SHADOW, 4, 4, getButtonX() - 3, getButtonY() - 3, getButtonWidth() + 6, getButtonHeight() + 6, 256, 256);
             MekanismRenderer.resetColor();
         }
         minecraft.textureManager.bindTexture(getResource());
-        renderBackgroundTexture(matrix, getResource(), 4, 4);
+        renderBackgroundTexture(getResource(), 4, 4);
     }
 
     @Override
@@ -125,11 +126,11 @@ public class GuiWindow extends GuiTexturedElement {
         }
     }
 
-    public void renderBlur(MatrixStack matrix) {
+    public void renderBlur() {
         RenderSystem.color4f(1, 1, 1, 0.3F);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        GuiUtils.renderBackgroundTexture(matrix, GuiMekanism.BLUR, 4, 4, relativeX, relativeY, width, height, 256, 256);
+        GuiUtils.renderBackgroundTexture(GuiMekanism.BLUR, 4, 4, relativeX, relativeY, width, height, 256, 256);
         MekanismRenderer.resetColor();
     }
 
@@ -137,7 +138,7 @@ public class GuiWindow extends GuiTexturedElement {
         children.forEach(GuiElement::onWindowClose);
         guiObj.removeWindow(this);
         if (guiObj instanceof GuiMekanism) {
-            ((GuiMekanism<?>) guiObj).setListener(null);
+            ((GuiMekanism<?>) guiObj).setFocused(null);
         }
         if (closeListener != null) {
             closeListener.run();

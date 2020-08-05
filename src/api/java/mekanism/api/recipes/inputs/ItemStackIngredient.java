@@ -4,22 +4,21 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import mekanism.api.JsonConstants;
+import mekanism.api.annotations.NonNull;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.IItemProvider;
+import net.minecraft.util.JSONUtils;
+import net.minecraftforge.common.crafting.NBTIngredient;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import mekanism.api.JsonConstants;
-import mekanism.api.annotations.NonNull;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.JSONUtils;
-import net.minecraftforge.common.crafting.NBTIngredient;
 
 public abstract class ItemStackIngredient implements InputIngredient<@NonNull ItemStack> {
 
@@ -43,13 +42,13 @@ public abstract class ItemStackIngredient implements InputIngredient<@NonNull It
         return from(new ItemStack(item), amount);
     }
 
-    public static ItemStackIngredient from(@Nonnull ITag<Item> itemTag) {
+    /*public static ItemStackIngredient from(@Nonnull ITag<Item> itemTag) {
         return from(itemTag, 1);
     }
 
     public static ItemStackIngredient from(@Nonnull ITag<Item> itemTag, int amount) {
         return from(Ingredient.fromTag(itemTag), amount);
-    }
+    }*/
 
     public static ItemStackIngredient from(@Nonnull Ingredient ingredient) {
         return from(ingredient, 1);

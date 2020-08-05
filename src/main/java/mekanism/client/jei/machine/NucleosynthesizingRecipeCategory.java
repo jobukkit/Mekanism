@@ -80,9 +80,9 @@ public class NucleosynthesizingRecipeCategory extends BaseRecipeCategory<Nucleos
     }
 
     @Override
-    public List<ITextComponent> getTooltipStrings(NucleosynthesizingRecipe recipe, double mouseX, double mouseY) {
+    public List<String> getTooltipStrings(NucleosynthesizingRecipe recipe, double mouseX, double mouseY) {
         if (mouseX >= 5 - 3 && mouseX < 5 + getWidth() - 6 - 3 && mouseY >= 88 - 12 && mouseY < 98 - 12) {
-            return Collections.singletonList(MekanismLang.TICKS_REQUIRED.translate(recipe.getDuration()));
+            return Collections.singletonList(MekanismLang.TICKS_REQUIRED.translate(recipe.getDuration()).getFormattedText());
         }
         return Collections.emptyList();
     }

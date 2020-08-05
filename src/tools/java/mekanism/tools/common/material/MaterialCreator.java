@@ -41,7 +41,6 @@ public class MaterialCreator extends BaseMekanismMaterial {
     private final CachedIntValue harvestLevel;
     private final CachedIntValue enchantability;
     public final CachedFloatValue toughness;
-    public final CachedFloatValue knockbackResistance;
     private final CachedIntValue bootDurability;
     private final CachedIntValue leggingDurability;
     private final CachedIntValue chestplateDurability;
@@ -113,8 +112,6 @@ public class MaterialCreator extends BaseMekanismMaterial {
               .defineInRange(toolKey + "Enchantability", materialDefaults.getCommonEnchantability(), 0, Integer.MAX_VALUE));
         toughness = CachedFloatValue.wrap(config, builder.comment("Base armor toughness value of " + toolKey + " armor.")
               .defineInRange(toolKey + "Toughness", materialDefaults.getToughness(), 0, Float.MAX_VALUE));
-        knockbackResistance = CachedFloatValue.wrap(config, builder.comment("Base armor knockback resistance value of " + toolKey + " armor.")
-              .defineInRange(toolKey + "KnockbackResistance", materialDefaults.getKnockbackResistance(), 0, Float.MAX_VALUE));
         bootDurability = CachedIntValue.wrap(config, builder.comment("Maximum durability of " + toolKey + " boots.")
               .defineInRange(toolKey + "BootDurability", materialDefaults.getDurability(EquipmentSlotType.FEET), 1, Integer.MAX_VALUE));
         leggingDurability = CachedIntValue.wrap(config, builder.comment("Maximum durability of " + toolKey + " leggings.")
@@ -309,10 +306,5 @@ public class MaterialCreator extends BaseMekanismMaterial {
     @Override
     public int getPaxelEnchantability() {
         return paxelEnchantability.get();
-    }
-
-    @Override
-    public float getKnockbackResistance() {
-        return knockbackResistance.get();
     }
 }

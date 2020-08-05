@@ -24,7 +24,7 @@ public class NOOPDrawable implements IDrawable {
     }
 
     @Override
-    public void draw(MatrixStack matrix, int xOffset, int yOffset) {
+    public void draw(int xOffset, int yOffset) {
         //NO-OP
     }
 }

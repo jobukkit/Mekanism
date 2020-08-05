@@ -1,7 +1,6 @@
 package mekanism.client.gui.element.filter.miner;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.function.Consumer;
+
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.GuiElement;
 import mekanism.client.gui.element.button.MekanismImageButton;
@@ -22,6 +21,8 @@ import mekanism.common.util.text.BooleanStateDisplay.YesNo;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.SoundEvents;
 
+import java.util.function.Consumer;
+
 public interface GuiMinerFilterHelper extends GuiFilterHelper<TileEntityDigitalMiner> {
 
     default void addMinerDefaults(IGuiWrapper gui, MinerFilter<?> filter, int slotOffset, Consumer<GuiElement> childAdder) {
@@ -32,7 +33,7 @@ public interface GuiMinerFilterHelper extends GuiFilterHelper<TileEntityDigitalM
               }));
         childAdder.accept(new MekanismImageButton(gui, gui.getLeft() + getRelativeX() + 148, gui.getTop() + getRelativeY() + 45, 14, 16,
               MekanismUtils.getResource(ResourceType.GUI_BUTTON, "exclamation.png"), () -> filter.requireStack = !filter.requireStack,
-              (onHover, matrix, xAxis, yAxis) -> gui.displayTooltip(matrix, MekanismLang.MINER_REQUIRE_REPLACE.translate(YesNo.of(filter.requireStack)), xAxis, yAxis)));
+              (onHover, xAxis, yAxis) -> gui.displayTooltip(MekanismLang.MINER_REQUIRE_REPLACE.translate(YesNo.of(filter.requireStack)), xAxis, yAxis)));
     }
 
     @Override
@@ -40,10 +41,10 @@ public interface GuiMinerFilterHelper extends GuiFilterHelper<TileEntityDigitalM
         return new GuiMinerFilerSelect(gui, tile);
     }
 
-    default void renderReplaceStack(MatrixStack matrix, IGuiWrapper gui, MinerFilter<?> filter) {
+    default void renderReplaceStack(IGuiWrapper gui, MinerFilter<?> filter) {
         if (!filter.replaceStack.isEmpty()) {
             gui.getItemRenderer().zLevel += 200;
-            gui.renderItem(matrix, filter.replaceStack, getRelativeX() + 149, getRelativeY() + 19);
+            gui.renderItem(filter.replaceStack, getRelativeX() + 149, getRelativeY() + 19);
             gui.getItemRenderer().zLevel -= 200;
         }
     }

@@ -38,6 +38,7 @@ import net.minecraft.block.ILiquidContainer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
@@ -187,7 +188,7 @@ public class TileEntityFluidicPlenisher extends TileEntityMekanism implements IC
         if (world.isAirBlock(pos)) {
             return true;
         }
-        FluidState currentFluidState = world.getFluidState(pos);
+        IFluidState currentFluidState = world.getFluidState(pos);
         if (!currentFluidState.isEmpty()) {
             //There is currently a fluid in the spot
             if (currentFluidState.isSource()) {
@@ -236,8 +237,8 @@ public class TileEntityFluidicPlenisher extends TileEntityMekanism implements IC
     }
 
     @Override
-    public void read(@Nonnull BlockState state, @Nonnull CompoundNBT nbtTags) {
-        super.read(state, nbtTags);
+    public void read(@Nonnull CompoundNBT nbtTags) {
+        super.read(nbtTags);
         operatingTicks = nbtTags.getInt(NBTConstants.PROGRESS);
         finishedCalc = nbtTags.getBoolean(NBTConstants.FINISHED);
         if (nbtTags.contains(NBTConstants.ACTIVE_NODES, NBT.TAG_LIST)) {
@@ -259,8 +260,7 @@ public class TileEntityFluidicPlenisher extends TileEntityMekanism implements IC
         activeNodes.clear();
         usedNodes.clear();
         finishedCalc = false;
-        player.sendMessage(MekanismLang.LOG_FORMAT.translateColored(EnumColor.DARK_BLUE, MekanismLang.MEKANISM, MekanismLang.PLENISHER_RESET.translateColored(EnumColor.GRAY)),
-              Util.DUMMY_UUID);
+        player.sendMessage(MekanismLang.LOG_FORMAT.translateColored(EnumColor.DARK_BLUE, MekanismLang.MEKANISM, MekanismLang.PLENISHER_RESET.translateColored(EnumColor.GRAY)));
         return ActionResultType.SUCCESS;
     }
 

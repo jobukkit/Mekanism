@@ -1,5 +1,6 @@
 package mekanism.tools.common.item;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import java.util.List;
@@ -17,10 +18,10 @@ import mekanism.tools.common.registries.ToolsItems;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.AttributeModifier.Operation;
-import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
@@ -31,16 +32,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class ItemMekanismArmor extends ArmorItem implements IHasRepairType, IAttributeRefresher {
+public class ItemMekanismArmor extends ArmorItem implements IHasRepairType {
 
     private final MaterialCreator material;
-    private final AttributeCache attributeCache;
-    private final boolean makesPiglinsNeutral;
 
     public ItemMekanismArmor(MaterialCreator material, EquipmentSlotType slot, Item.Properties properties, boolean makesPiglinsNeutral) {
         super(material, slot, properties);
         this.material = material;
-        this.makesPiglinsNeutral = makesPiglinsNeutral;
         CachedIntValue armorConfig;
         if (slot == EquipmentSlotType.FEET) {
             armorConfig = material.bootArmor;
@@ -53,7 +51,6 @@ public class ItemMekanismArmor extends ArmorItem implements IHasRepairType, IAtt
         } else {
             throw new IllegalArgumentException("Invalid slot type for armor");
         }
-        this.attributeCache = new AttributeCache(this, material.toughness, material.knockbackResistance, armorConfig);
     }
 
     @Override
@@ -72,11 +69,6 @@ public class ItemMekanismArmor extends ArmorItem implements IHasRepairType, IAtt
         return super.getArmorModel(entityLiving, itemStack, armorSlot, _default);
     }
 
-    @Override
-    public boolean makesPiglinsNeutral(@Nonnull ItemStack stack, @Nonnull LivingEntity wearer) {
-        return makesPiglinsNeutral;
-    }
-
     @Nonnull
     @Override
     public Ingredient getRepairMaterial() {
@@ -89,12 +81,8 @@ public class ItemMekanismArmor extends ArmorItem implements IHasRepairType, IAtt
     }
 
     @Override
-    public float func_234657_f_() {
+    public float getToughness() {
         return getArmorMaterial().getToughness();
-    }
-
-    public float getKnockbackResistance() {
-        return getArmorMaterial().getKnockbackResistance();
     }
 
     @Override
@@ -114,15 +102,13 @@ public class ItemMekanismArmor extends ArmorItem implements IHasRepairType, IAtt
      */
     @Nonnull
     @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(@Nonnull EquipmentSlotType slot, @Nonnull ItemStack stack) {
-        return slot == getEquipmentSlot() ? attributeCache.getAttributes() : ImmutableMultimap.of();
-    }
-
-    @Override
-    public void addToBuilder(ImmutableMultimap.Builder<Attribute, AttributeModifier> builder) {
-        UUID modifier = ARMOR_MODIFIERS[getEquipmentSlot().getIndex()];
-        builder.put(Attributes.ARMOR, new AttributeModifier(modifier, "Armor modifier", getDamageReduceAmount(), Operation.ADDITION));
-        builder.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(modifier, "Armor toughness", func_234657_f_(), Operation.ADDITION));
-        builder.put(Attributes.KNOCKBACK_RESISTANCE, new AttributeModifier(modifier, "Armor knockback resistance", getKnockbackResistance(), Operation.ADDITION));
+    public Multimap<String, AttributeModifier> getAttributeModifiers(@Nonnull EquipmentSlotType slot) {
+        Multimap<String, AttributeModifier> attributes = HashMultimap.create();
+        if (slot == getEquipmentSlot()) {
+            UUID modifier = ARMOR_MODIFIERS[slot.getIndex()];
+            attributes.put(SharedMonsterAttributes.ARMOR.getName(), new AttributeModifier(modifier, "Armor modifier", getDamageReduceAmount(), AttributeModifier.Operation.ADDITION));
+            attributes.put(SharedMonsterAttributes.ARMOR_TOUGHNESS.getName(), new AttributeModifier(modifier, "Armor toughness", getToughness(), Operation.ADDITION));
+        }
+        return attributes;
     }
 }

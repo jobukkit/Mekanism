@@ -1,9 +1,6 @@
 package mekanism.common.util;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.UnaryOperator;
+import mekanism.api.backport.Vector3d;
 import mekanism.common.Mekanism;
 import net.minecraft.block.Block;
 import net.minecraft.util.Direction;
@@ -12,7 +9,11 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.shapes.IBooleanFunction;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.math.vector.Vector3d;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.UnaryOperator;
 
 public final class VoxelShapeUtils {
 
@@ -394,7 +395,7 @@ public final class VoxelShapeUtils {
         List<VoxelShape> rotatedPieces = new ArrayList<>();
         List<AxisAlignedBB> sourceBoundingBoxes = shape.toBoundingBoxList();
         for (AxisAlignedBB sourceBoundingBox : sourceBoundingBoxes) {
-            rotatedPieces.add(VoxelShapes.create(sourceBoundingBox.offset(translation)));
+            rotatedPieces.add(VoxelShapes.create(sourceBoundingBox.offset(translation.toVec())));
         }
         return combine(rotatedPieces);
     }

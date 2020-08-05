@@ -1,22 +1,23 @@
 package mekanism.api.chemical.slurry;
 
-import java.util.Objects;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.ChemicalBuilder;
 import net.minecraft.item.Item;
-import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Objects;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class SlurryBuilder extends ChemicalBuilder<Slurry, SlurryBuilder> {
 
     @Nullable
-    private ITag<Item> oreTag;
+    private Tag<Item> oreTag;
 
     protected SlurryBuilder(ResourceLocation texture) {
         super(texture);
@@ -35,16 +36,16 @@ public class SlurryBuilder extends ChemicalBuilder<Slurry, SlurryBuilder> {
     }
 
     public SlurryBuilder ore(ResourceLocation oreTagLocation) {
-        return ore(ItemTags.makeWrapperTag(Objects.requireNonNull(oreTagLocation).toString()));
+        return ore(new ItemTags.Wrapper(Objects.requireNonNull(oreTagLocation)));
     }
 
-    public SlurryBuilder ore(ITag<Item> oreTag) {
+    public SlurryBuilder ore(Tag<Item> oreTag) {
         this.oreTag = Objects.requireNonNull(oreTag);
         return this;
     }
 
     @Nullable
-    public ITag<Item> getOreTag() {
+    public Tag<Item> getOreTag() {
         return oreTag;
     }
 }

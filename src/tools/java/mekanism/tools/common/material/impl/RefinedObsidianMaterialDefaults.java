@@ -132,9 +132,4 @@ public class RefinedObsidianMaterialDefaults extends BaseMekanismMaterial {
     public Ingredient getCommonRepairMaterial() {
         return Ingredient.fromTag(MekanismTags.Items.INGOTS_REFINED_OBSIDIAN);
     }
-
-    @Override
-    public float getKnockbackResistance() {
-        return 0.1F;
-    }
 }

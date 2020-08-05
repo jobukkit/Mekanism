@@ -1,14 +1,6 @@
 package mekanism.common.tile.machine;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.Action;
 import mekanism.api.IConfigCardAccess.ISpecialConfigData;
 import mekanism.api.NBTConstants;
@@ -44,13 +36,16 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.*;
 
 //TODO - V11: Make this support other tag types, such as fluids
 public class TileEntityOredictionificator extends TileEntityConfigurableMachine implements ISpecialConfigData, ISustainedData, ITileFilterHolder<OredictionificatorFilter> {
@@ -151,8 +146,8 @@ public class TileEntityOredictionificator extends TileEntityConfigurableMachine 
     }
 
     @Override
-    public void read(@Nonnull BlockState state, @Nonnull CompoundNBT nbtTags) {
-        super.read(state, nbtTags);
+    public void read(@Nonnull CompoundNBT nbtTags) {
+        super.read(nbtTags);
         setConfigurationData(nbtTags);
     }
 
@@ -244,7 +239,7 @@ public class TileEntityOredictionificator extends TileEntityConfigurableMachine 
     public static class OredictionificatorFilter extends BaseFilter<OredictionificatorFilter> {
 
         private ResourceLocation filterLocation;
-        private ITag<Item> filterTag;
+        private Tag<Item> filterTag;
         @Nonnull
         private Item selectedOutput = Items.AIR;
 
@@ -264,12 +259,7 @@ public class TileEntityOredictionificator extends TileEntityConfigurableMachine 
 
         private void setFilterLocation(ResourceLocation location) {
             filterLocation = location;
-            if (ItemTags.getCollection().getRegisteredTags().contains(filterLocation)) {
-                filterTag = ItemTags.makeWrapperTag(filterLocation.toString());
-            } else {
-                //If the filter doesn't exist (because we loaded a tag that is no longer valid), then just set the filter to being empty
-                filterTag = Tag.func_241284_a_();
-            }
+            filterTag = new ItemTags.Wrapper(filterLocation);
         }
 
         public boolean filterMatches(ResourceLocation location) {

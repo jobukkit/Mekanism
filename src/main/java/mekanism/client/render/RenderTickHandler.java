@@ -1,6 +1,7 @@
 package mekanism.client.render;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -58,9 +59,9 @@ import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.RenderType;
+import mekanism.api.backport.Vector3d;
+
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
@@ -76,9 +77,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult.Type;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector4f;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.DrawHighlightEvent;
@@ -126,7 +124,7 @@ public class RenderTickHandler {
         MatrixStack matrix = event.getMatrixStack();
         matrix.push();
         // here we translate based on the inverse position of the client viewing camera to get back to 0, 0, 0
-        Vector3d camVec = minecraft.gameRenderer.getActiveRenderInfo().getProjectedView();
+        Vector3d camVec = new Vector3d(minecraft.gameRenderer.getActiveRenderInfo().getProjectedView());
         matrix.translate(-camVec.x, -camVec.y, -camVec.z);
         IRenderTypeBuffer.Impl renderer = minecraft.getRenderTypeBuffers().getBufferSource();
         boltRenderer.render(minecraft.getRenderPartialTicks(), matrix, renderer);
@@ -149,10 +147,9 @@ public class RenderTickHandler {
                 int x = event.getWindow().getScaledWidth() / 2 - 91;
                 int y = event.getWindow().getScaledHeight() - ForgeIngameGui.left_height + 2;
                 int length = (int) Math.round(stored.divide(capacity).doubleValue() * 79);
-                MatrixStack matrix = event.getMatrixStack();
-                GuiUtils.renderExtendedTexture(matrix, GuiBar.BAR, 2, 2, x, y, 81, 6);
+                GuiUtils.renderExtendedTexture(GuiBar.BAR, 2, 2, x, y, 81, 6);
                 minecraft.getTextureManager().bindTexture(POWER_BAR);
-                AbstractGui.blit(matrix, x + 1, y + 1, length, 4, 0, 0, length, 4, 79, 4);
+                AbstractGui.blit(x + 1, y + 1, length, 4, 0, 0, length, 4, 79, 4);
                 minecraft.getTextureManager().bindTexture(ForgeIngameGui.GUI_ICONS_LOCATION);
                 ForgeIngameGui.left_height += 8;
             }
@@ -181,20 +178,19 @@ public class RenderTickHandler {
                 boolean alignLeft = MekanismConfig.client.alignHUDLeft.get();
                 MainWindow window = event.getWindow();
                 int y = window.getScaledHeight();
-                MatrixStack matrix = event.getMatrixStack();
-                matrix.push();
-                matrix.scale(HUD_SCALE, HUD_SCALE, HUD_SCALE);
+                RenderSystem.pushMatrix();
+                RenderSystem.scalef(HUD_SCALE, HUD_SCALE, HUD_SCALE);
                 for (Map.Entry<EquipmentSlotType, List<ITextComponent>> entry : renderStrings.entrySet()) {
                     for (ITextComponent text : entry.getValue()) {
-                        drawString(window, matrix, text, alignLeft, (int) (y * (1 / HUD_SCALE)) - start, 0xc8c8c8);
+                        drawString(window, text, alignLeft, (int) (y * (1 / HUD_SCALE)) - start, 0xc8c8c8);
                         start -= 9;
                     }
                     start -= 2;
                 }
-                matrix.pop();
+                RenderSystem.popMatrix();
 
                 if (minecraft.player.getItemStackFromSlot(EquipmentSlotType.HEAD).getItem() instanceof ItemMekaSuitArmor) {
-                    hudRenderer.renderHUD(matrix, event.getPartialTicks());
+                    hudRenderer.renderHUD(event.getPartialTicks());
                 }
             }
         }
@@ -208,13 +204,13 @@ public class RenderTickHandler {
                 World world = minecraft.player.world;
                 //TODO: Check if we have another matrix stack we should use
                 MatrixStack matrix = new MatrixStack();
-                renderStatusBar(matrix, player);
+                renderStatusBar(player);
                 //Traverse active jetpacks and do animations
                 for (UUID uuid : Mekanism.playerState.getActiveJetpacks()) {
                     PlayerEntity p = world.getPlayerByUuid(uuid);
                     if (p != null) {
                         Pos3D playerPos = new Pos3D(p).translate(0, p.getEyeHeight(), 0);
-                        Vector3d playerMotion = p.getMotion();
+                        Vector3d playerMotion = new Vector3d(p.getMotion());
                         float random = (world.rand.nextFloat() - 0.5F) * 0.1F;
                         Pos3D vLeft = new Pos3D(-0.43, -0.55, -0.54).rotatePitch(p.isCrouching() ? 20 : 0).rotateYaw(p.renderYawOffset);
                         renderJetpackSmoke(world, playerPos.translate(vLeft, playerMotion), vLeft.scale(0.2).translate(playerMotion, vLeft.scale(random)));
@@ -230,8 +226,8 @@ public class RenderTickHandler {
                     for (UUID uuid : Mekanism.playerState.getActiveScubaMasks()) {
                         PlayerEntity p = world.getPlayerByUuid(uuid);
                         if (p != null && p.isInWater()) {
-                            Pos3D vec = new Pos3D(0.4, 0.4, 0.4).multiply(p.getLook(1)).translate(0, -0.2, 0);
-                            Pos3D motion = vec.scale(0.2).translate(p.getMotion());
+                            Pos3D vec = new Pos3D(0.4, 0.4, 0.4).multiply(new Vector3d(p.getLook(1))).translate(0, -0.2, 0);
+                            Pos3D motion = vec.scale(0.2).translate(new Vector3d(p.getMotion()));
                             Pos3D v = new Pos3D(p).translate(0, p.getEyeHeight(), 0).translate(vec);
                             world.addParticle((BasicParticleType) MekanismParticleTypes.SCUBA_BUBBLE.getParticleType(), v.x, v.y, v.z, motion.x, motion.y + 0.2, motion.z);
                         }
@@ -243,7 +239,7 @@ public class RenderTickHandler {
                             if (!currentItem.isEmpty() && currentItem.getItem() instanceof ItemFlamethrower && ChemicalUtil.hasGas(currentItem)) {
                                 Pos3D flameVec;
                                 if (player == p && minecraft.gameSettings.thirdPersonView == 0) {
-                                    flameVec = new Pos3D(1, 1, 1).multiply(p.getLook(1)).rotateYaw(5).translate(0, p.getEyeHeight() - 0.1, 0);
+                                    flameVec = new Pos3D(1, 1, 1).multiply(new Vector3d(p.getLook(1))).rotateYaw(5).translate(0, p.getEyeHeight() - 0.1, 0);
                                 } else {
                                     double flameXCoord = -0.2;
                                     double flameYCoord = 1;
@@ -254,8 +250,8 @@ public class RenderTickHandler {
                                     }
                                     flameVec = new Pos3D(flameXCoord, flameYCoord, flameZCoord).rotateYaw(p.renderYawOffset);
                                 }
-                                Vector3d motion = p.getMotion();
-                                Pos3D flameMotion = new Pos3D(motion.getX(), p.isOnGround() ? 0 : motion.getY(), motion.getZ());
+                                Vector3d motion = new Vector3d(p.getMotion());
+                                Pos3D flameMotion = new Pos3D(motion.getX(), p.onGround ? 0 : motion.getY(), motion.getZ());
                                 Pos3D playerPos = new Pos3D(p);
                                 Pos3D mergedVec = playerPos.translate(flameVec);
                                 world.addParticle((BasicParticleType) MekanismParticleTypes.JETPACK_FLAME.getParticleType(),
@@ -278,7 +274,7 @@ public class RenderTickHandler {
                         if (severity > RadiationManager.BASELINE) {
                             int effect = (int) (prevRadiation * 255);
                             int color = (0x701E1E << 8) + effect;
-                            MekanismRenderer.renderColorOverlay(matrix, 0, 0, minecraft.getMainWindow().getScaledWidth(), minecraft.getMainWindow().getScaledHeight(), color);
+                            MekanismRenderer.renderColorOverlay(0, 0, minecraft.getMainWindow().getScaledWidth(), minecraft.getMainWindow().getScaledHeight(), color);
                         }
                     });
                 }
@@ -333,7 +329,7 @@ public class RenderTickHandler {
                     }
                     if (renderWireFrame != null) {
                         matrix.push();
-                        Vector3d viewPosition = info.getProjectedView();
+                        Vector3d viewPosition = new Vector3d(info.getProjectedView());
                         matrix.translate(actualPos.getX() - viewPosition.x, actualPos.getY() - viewPosition.y, actualPos.getZ() - viewPosition.z);
                         renderWireFrame.render(renderer.getBuffer(RenderType.getLines()), matrix, 0, 0, 0, 0.4F);
                         matrix.pop();
@@ -366,7 +362,7 @@ public class RenderTickHandler {
                         Direction face = rayTraceResult.getFace();
                         DataType dataType = config.getDataType(type, RelativeSide.fromDirections(configurable.getOrientation(), face));
                         if (dataType != null) {
-                            Vector3d viewPosition = info.getProjectedView();
+                            Vector3d viewPosition = new Vector3d(info.getProjectedView());
                             matrix.push();
                             matrix.translate(pos.getX() - viewPosition.x, pos.getY() - viewPosition.y, pos.getZ() - viewPosition.z);
                             MekanismRenderer.renderObject(getOverlayModel(face, type), matrix, renderer.getBuffer(MekanismRenderType.resizableCuboid()),
@@ -384,7 +380,7 @@ public class RenderTickHandler {
     }
 
     private void renderQuadsWireFrame(BlockState state, IVertexBuilder buffer, Matrix4f matrix, Random rand, float red, float green, float blue,
-          float alpha) {
+                                      float alpha) {
         List<Vertex[]> allVertices = cachedWireFrames.computeIfAbsent(state, s -> {
             IBakedModel bakedModel = Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(s);
             //TODO: Eventually we may want to add support for Model data
@@ -425,7 +421,7 @@ public class RenderTickHandler {
         return vector4f;
     }
 
-    private void renderStatusBar(MatrixStack matrix, @Nonnull PlayerEntity player) {
+    private void renderStatusBar(@Nonnull PlayerEntity player) {
         //TODO: use vanilla status bar text? Note, the vanilla status bar text stays a lot longer than we have our message
         // display for, so we would need to somehow modify it. This can be done via ATs but does cause it to always appear
         // to be more faded in color, and blinks to full color just before disappearing
@@ -438,7 +434,7 @@ public class RenderTickHandler {
                         int x = minecraft.getMainWindow().getScaledWidth();
                         int y = minecraft.getMainWindow().getScaledHeight();
                         int color = Color.rgbad(1, 1, 1, modeSwitchTimer / 100F).argb();
-                        minecraft.fontRenderer.func_238422_b_(matrix, scrollTextComponent, x / 2 - minecraft.fontRenderer.func_238414_a_(scrollTextComponent) / 2, y - 60, color);
+                        minecraft.fontRenderer.drawString(scrollTextComponent.getFormattedText(), x / 2 - minecraft.fontRenderer.getStringWidth(scrollTextComponent.getFormattedText()) / 2, y - 60, color);
                     }
                 }
             }
@@ -451,14 +447,14 @@ public class RenderTickHandler {
         world.addParticle((BasicParticleType) MekanismParticleTypes.JETPACK_SMOKE.getParticleType(), pos.x, pos.y, pos.z, motion.x, motion.y, motion.z);
     }
 
-    private void drawString(MainWindow window, MatrixStack matrix, ITextComponent text, boolean leftSide, int y, int color) {
+    private void drawString(MainWindow window, ITextComponent text, boolean leftSide, int y, int color) {
         FontRenderer font = minecraft.fontRenderer;
         // Note that we always offset by 2 pixels when left or right aligned
         if (leftSide) {
-            font.func_238407_a_(matrix, text, 2, y, color);
+            font.drawString(text.getFormattedText(), 2, y, color);
         } else {
-            int width = font.func_238414_a_(text) + 2;
-            font.func_238407_a_(matrix, text, window.getScaledWidth() - width, y, color);
+            int width = font.getStringWidth(text.getString()) + 2;
+            font.drawString(text.getFormattedText(), window.getScaledWidth() - width, y, color);
         }
     }
 

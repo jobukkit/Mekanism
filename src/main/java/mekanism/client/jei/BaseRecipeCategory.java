@@ -94,9 +94,9 @@ public abstract class BaseRecipeCategory<RECIPE> implements IRecipeCategory<RECI
     }
 
     @Override
-    public void draw(RECIPE recipe, MatrixStack matrix, double mouseX, double mouseY) {
-        guiElements.forEach(e -> e.render(matrix, (int) mouseX, (int) mouseY, 0));
-        guiElements.forEach(e -> e.drawBackground(matrix, (int) mouseX, (int) mouseY, 0));
+    public void draw(RECIPE recipe, double mouseX, double mouseY) {
+        guiElements.forEach(e -> e.render((int) mouseX, (int) mouseY, 0));
+        guiElements.forEach(e -> e.drawBackground((int) mouseX, (int) mouseY, 0));
     }
 
     @Override

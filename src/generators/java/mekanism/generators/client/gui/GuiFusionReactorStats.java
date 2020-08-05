@@ -1,9 +1,5 @@
 package mekanism.generators.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.text.NumberFormat;
-import java.util.Arrays;
-import javax.annotation.Nonnull;
 import mekanism.api.text.EnumColor;
 import mekanism.client.gui.element.tab.GuiEnergyTab;
 import mekanism.common.MekanismLang;
@@ -17,6 +13,9 @@ import mekanism.generators.common.GeneratorsLang;
 import mekanism.generators.common.tile.fusion.TileEntityFusionReactorController;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.text.ITextComponent;
+
+import java.text.NumberFormat;
+import java.util.Arrays;
 
 public class GuiFusionReactorStats extends GuiFusionReactorInfo {
 
@@ -38,32 +37,32 @@ public class GuiFusionReactorStats extends GuiFusionReactorInfo {
     }
 
     @Override
-    protected void drawForegroundText(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        drawTitleText(matrix, GeneratorsLang.FUSION_REACTOR.translate(), 5);
+    protected void drawForegroundText(int mouseX, int mouseY) {
+        drawTitleText(GeneratorsLang.FUSION_REACTOR.translate(), 5);
         if (tile.getMultiblock().isFormed()) {
-            drawString(matrix, GeneratorsLang.REACTOR_PASSIVE.translateColored(EnumColor.DARK_GREEN), 6, 26, titleTextColor());
-            drawTextScaledBound(matrix, GeneratorsLang.REACTOR_MIN_INJECTION.translate(tile.getMultiblock().getMinInjectionRate(false)), 16, 36, titleTextColor(), 156);
-            drawTextScaledBound(matrix, GeneratorsLang.REACTOR_IGNITION.translate(MekanismUtils.getTemperatureDisplay(tile.getMultiblock().getIgnitionTemperature(false),
+            drawString(GeneratorsLang.REACTOR_PASSIVE.translateColored(EnumColor.DARK_GREEN), 6, 26, titleTextColor());
+            drawTextScaledBound(GeneratorsLang.REACTOR_MIN_INJECTION.translate(tile.getMultiblock().getMinInjectionRate(false)), 16, 36, titleTextColor(), 156);
+            drawTextScaledBound(GeneratorsLang.REACTOR_IGNITION.translate(MekanismUtils.getTemperatureDisplay(tile.getMultiblock().getIgnitionTemperature(false),
                   TemperatureUnit.KELVIN, true)), 16, 46, titleTextColor(), 156);
-            drawTextScaledBound(matrix, GeneratorsLang.REACTOR_MAX_PLASMA.translate(MekanismUtils.getTemperatureDisplay(tile.getMultiblock().getMaxPlasmaTemperature(false),
+            drawTextScaledBound(GeneratorsLang.REACTOR_MAX_PLASMA.translate(MekanismUtils.getTemperatureDisplay(tile.getMultiblock().getMaxPlasmaTemperature(false),
                   TemperatureUnit.KELVIN, true)), 16, 56, titleTextColor(), 156);
-            drawTextScaledBound(matrix, GeneratorsLang.REACTOR_MAX_CASING.translate(MekanismUtils.getTemperatureDisplay(tile.getMultiblock().getMaxCasingTemperature(false),
+            drawTextScaledBound(GeneratorsLang.REACTOR_MAX_CASING.translate(MekanismUtils.getTemperatureDisplay(tile.getMultiblock().getMaxCasingTemperature(false),
                   TemperatureUnit.KELVIN, true)), 16, 66, titleTextColor(), 156);
-            drawTextScaledBound(matrix, GeneratorsLang.REACTOR_PASSIVE_RATE.translate(EnergyDisplay.of(tile.getMultiblock().getPassiveGeneration(false, false))),
+            drawTextScaledBound(GeneratorsLang.REACTOR_PASSIVE_RATE.translate(EnergyDisplay.of(tile.getMultiblock().getPassiveGeneration(false, false))),
                   16, 76, titleTextColor(), 156);
 
-            drawString(matrix, GeneratorsLang.REACTOR_ACTIVE.translateColored(EnumColor.DARK_BLUE), 6, 92, titleTextColor());
-            drawTextScaledBound(matrix, GeneratorsLang.REACTOR_MIN_INJECTION.translate(tile.getMultiblock().getMinInjectionRate(true)), 16, 102, titleTextColor(), 156);
-            drawTextScaledBound(matrix, GeneratorsLang.REACTOR_IGNITION.translate(MekanismUtils.getTemperatureDisplay(tile.getMultiblock().getIgnitionTemperature(true),
+            drawString(GeneratorsLang.REACTOR_ACTIVE.translateColored(EnumColor.DARK_BLUE), 6, 92, titleTextColor());
+            drawTextScaledBound(GeneratorsLang.REACTOR_MIN_INJECTION.translate(tile.getMultiblock().getMinInjectionRate(true)), 16, 102, titleTextColor(), 156);
+            drawTextScaledBound(GeneratorsLang.REACTOR_IGNITION.translate(MekanismUtils.getTemperatureDisplay(tile.getMultiblock().getIgnitionTemperature(true),
                   TemperatureUnit.KELVIN, true)), 16, 112, titleTextColor(), 156);
-            drawTextScaledBound(matrix, GeneratorsLang.REACTOR_MAX_PLASMA.translate(MekanismUtils.getTemperatureDisplay(tile.getMultiblock().getMaxPlasmaTemperature(true),
+            drawTextScaledBound(GeneratorsLang.REACTOR_MAX_PLASMA.translate(MekanismUtils.getTemperatureDisplay(tile.getMultiblock().getMaxPlasmaTemperature(true),
                   TemperatureUnit.KELVIN, true)), 16, 122, titleTextColor(), 156);
-            drawTextScaledBound(matrix, GeneratorsLang.REACTOR_MAX_CASING.translate(MekanismUtils.getTemperatureDisplay(tile.getMultiblock().getMaxCasingTemperature(true),
+            drawTextScaledBound(GeneratorsLang.REACTOR_MAX_CASING.translate(MekanismUtils.getTemperatureDisplay(tile.getMultiblock().getMaxCasingTemperature(true),
                   TemperatureUnit.KELVIN, true)), 16, 132, titleTextColor(), 156);
-            drawTextScaledBound(matrix, GeneratorsLang.REACTOR_PASSIVE_RATE.translate(EnergyDisplay.of(tile.getMultiblock().getPassiveGeneration(true, false))),
+            drawTextScaledBound(GeneratorsLang.REACTOR_PASSIVE_RATE.translate(EnergyDisplay.of(tile.getMultiblock().getPassiveGeneration(true, false))),
                   16, 142, titleTextColor(), 156);
-            drawTextScaledBound(matrix, GeneratorsLang.REACTOR_STEAM_PRODUCTION.translate(nf.format(tile.getMultiblock().getSteamPerTick(false))), 16, 152, titleTextColor(), 156);
+            drawTextScaledBound(GeneratorsLang.REACTOR_STEAM_PRODUCTION.translate(nf.format(tile.getMultiblock().getSteamPerTick(false))), 16, 152, titleTextColor(), 156);
         }
-        super.drawForegroundText(matrix, mouseX, mouseY);
+        super.drawForegroundText(mouseX, mouseY);
     }
 }

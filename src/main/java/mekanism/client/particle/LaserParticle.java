@@ -5,24 +5,20 @@ import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import mekanism.common.lib.math.Pos3D;
 import mekanism.common.particle.LaserParticleData;
-import net.minecraft.client.particle.IAnimatedSprite;
-import net.minecraft.client.particle.IParticleFactory;
-import net.minecraft.client.particle.IParticleRenderType;
-import net.minecraft.client.particle.SpriteTexturedParticle;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.particle.*;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Quaternion;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
 
 public class LaserParticle extends SpriteTexturedParticle {
@@ -56,7 +52,7 @@ public class LaserParticle extends SpriteTexturedParticle {
     private final Direction direction;
     private final float halfLength;
 
-    private LaserParticle(ClientWorld world, Pos3D start, Pos3D end, Direction dir, float energyScale) {
+    private LaserParticle(World world, Pos3D start, Pos3D end, Direction dir, float energyScale) {
         super(world, (start.x + end.x) / 2D, (start.y + end.y) / 2D, (start.z + end.z) / 2D);
         maxAge = 5;
         particleRed = 1;
@@ -70,7 +66,7 @@ public class LaserParticle extends SpriteTexturedParticle {
 
     @Override
     public void renderParticle(@Nonnull IVertexBuilder vertexBuilder, ActiveRenderInfo renderInfo, float partialTicks) {
-        Vector3d view = renderInfo.getProjectedView();
+        Vec3d view = renderInfo.getProjectedView();
         float newX = (float) (MathHelper.lerp(partialTicks, prevPosX, posX) - view.getX());
         float newY = (float) (MathHelper.lerp(partialTicks, prevPosY, posY) - view.getY());
         float newZ = (float) (MathHelper.lerp(partialTicks, prevPosZ, posZ) - view.getZ());
@@ -122,12 +118,13 @@ public class LaserParticle extends SpriteTexturedParticle {
         }
 
         @Override
-        public LaserParticle makeParticle(LaserParticleData data, @Nonnull ClientWorld world, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public LaserParticle makeParticle(LaserParticleData data, World world, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
             Pos3D start = new Pos3D(x, y, z);
             Pos3D end = start.translate(data.direction, data.distance);
             LaserParticle particleLaser = new LaserParticle(world, start, end, data.direction, data.energyScale);
             particleLaser.selectSpriteRandomly(this.spriteSet);
             return particleLaser;
         }
+
     }
 }

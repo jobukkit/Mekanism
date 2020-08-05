@@ -89,7 +89,7 @@ public abstract class TileEntityBasicLaser extends TileEntityMekanism {
             Pos3D from = Pos3D.create(this).centre().translate(direction, 0.501);
             Pos3D to = from.translate(direction, MekanismConfig.general.laserRange.get() - 0.002);
             PlayerEntity dummy = Mekanism.proxy.getDummyPlayer((ServerWorld) world, new BlockPos(from)).get();
-            BlockRayTraceResult result = world.rayTraceBlocks(new RayTraceContext(from, to, BlockMode.COLLIDER, FluidMode.NONE, dummy));
+            BlockRayTraceResult result = world.rayTraceBlocks(new RayTraceContext(from.toVec(), to.toVec(), BlockMode.COLLIDER, FluidMode.NONE, dummy));
             if (result.getType() != Type.MISS) {
                 to = new Pos3D(result.getHitVec());
             }
@@ -105,7 +105,7 @@ public abstract class TileEntityBasicLaser extends TileEntityMekanism {
                 setEmittingRedstone(true);
                 //Sort the entities in order of which one is closest to the laser
                 Pos3D finalFrom = from;
-                hitEntities.sort(Comparator.comparing(entity -> entity.getDistanceSq(finalFrom)));
+                hitEntities.sort(Comparator.comparing(entity -> entity.getDistanceSq(finalFrom.toVec())));
                 FloatingLong energyPerDamage = MekanismConfig.general.laserEnergyPerDamage.get();
                 for (Entity entity : hitEntities) {
                     if (entity.isInvulnerableTo(MekanismDamageSource.LASER)) {
@@ -297,8 +297,8 @@ public abstract class TileEntityBasicLaser extends TileEntityMekanism {
     }
 
     @Override
-    public void read(@Nonnull BlockState state, @Nonnull CompoundNBT nbtTags) {
-        super.read(state, nbtTags);
+    public void read(@Nonnull CompoundNBT nbtTags) {
+        super.read(nbtTags);
         NBTUtils.setFloatingLongIfPresent(nbtTags, NBTConstants.LAST_FIRED, value -> lastFired = value);
     }
 
@@ -319,8 +319,8 @@ public abstract class TileEntityBasicLaser extends TileEntityMekanism {
     }
 
     @Override
-    public void handleUpdateTag(BlockState state, @Nonnull CompoundNBT tag) {
-        super.handleUpdateTag(state, tag);
+    public void handleUpdateTag(@Nonnull CompoundNBT tag) {
+        super.handleUpdateTag(tag);
         NBTUtils.setFloatingLongIfPresent(tag, NBTConstants.LAST_FIRED, fired -> lastFired = fired);
     }
 

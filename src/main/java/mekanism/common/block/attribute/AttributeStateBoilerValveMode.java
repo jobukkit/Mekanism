@@ -56,7 +56,7 @@ public class AttributeStateBoilerValveMode extends AttributeState {
 
         @Nonnull
         @Override
-        public String getString() {
+        public String getName() {
             return name;
         }
 

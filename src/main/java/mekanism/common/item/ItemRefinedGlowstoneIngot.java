@@ -9,9 +9,4 @@ public class ItemRefinedGlowstoneIngot extends Item {
     public ItemRefinedGlowstoneIngot(Item.Properties properties) {
         super(properties);
     }
-
-    @Override
-    public boolean isPiglinCurrency(@Nonnull ItemStack stack) {
-        return true;
-    }
 }

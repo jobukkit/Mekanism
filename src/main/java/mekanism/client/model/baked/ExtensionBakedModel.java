@@ -124,7 +124,7 @@ public class ExtensionBakedModel<T> implements IBakedModel {
         return cache.getUnchecked(key);
     }
 
-    @Override
+    /*@Override
     public boolean isLayered() {
         return original.isLayered();
     }
@@ -140,7 +140,7 @@ public class ExtensionBakedModel<T> implements IBakedModel {
             }
             return layerModels;
         });
-    }
+    }*/
 
     protected ExtensionBakedModel<T> wrapModel(IBakedModel model) {
         return new ExtensionBakedModel<>(model);

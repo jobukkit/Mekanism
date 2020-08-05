@@ -1,18 +1,6 @@
 package mekanism.api.recipes.inputs.chemical;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.IntFunction;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
+import com.google.gson.*;
 import mekanism.api.JsonConstants;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
@@ -27,15 +15,22 @@ import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
 import mekanism.api.recipes.inputs.chemical.ChemicalStackIngredient.MultiIngredient;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.IntFunction;
 
 /**
  * Internal helper class used to reduce the additional code needed to deserialize different types of chemical stack ingredients
  */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+//@ParametersAreNonnullByDefault
+//@MethodsReturnNonnullByDefault
 @SuppressWarnings("Convert2Diamond")//The types cannot properly be inferred
 public class ChemicalIngredientDeserializer<CHEMICAL extends Chemical<CHEMICAL>, STACK extends ChemicalStack<CHEMICAL>,
       INGREDIENT extends IChemicalStackIngredient<CHEMICAL, STACK>> {
@@ -143,7 +138,7 @@ public class ChemicalIngredientDeserializer<CHEMICAL extends Chemical<CHEMICAL>,
                 throw new JsonSyntaxException("Expected amount to be greater than zero.");
             }
             ResourceLocation resourceLocation = new ResourceLocation(JSONUtils.getString(jsonObject, JsonConstants.TAG));
-            ITag<CHEMICAL> tag = tags.getCollection().get(resourceLocation);
+            Tag<CHEMICAL> tag = tags.getCollection().get(resourceLocation);
             if (tag == null) {
                 throw new JsonSyntaxException("Unknown " + name + " tag '" + resourceLocation + "'");
             }
@@ -204,7 +199,7 @@ public class ChemicalIngredientDeserializer<CHEMICAL extends Chemical<CHEMICAL>,
     public interface TagIngredientCreator<CHEMICAL extends Chemical<CHEMICAL>, STACK extends ChemicalStack<CHEMICAL>,
           INGREDIENT extends IChemicalStackIngredient<CHEMICAL, STACK>> {
 
-        INGREDIENT create(ITag<CHEMICAL> tag, long amount);
+        INGREDIENT create(Tag<CHEMICAL> tag, long amount);
     }
 
     public enum IngredientType {

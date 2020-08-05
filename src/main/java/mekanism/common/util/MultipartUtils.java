@@ -1,15 +1,14 @@
 package mekanism.common.util;
 
-import java.util.Collection;
+import mekanism.api.backport.Vector3d;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.*;
 import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.vector.Vector3d;
 import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.Collection;
 
 public final class MultipartUtils {
 
@@ -26,7 +25,7 @@ public final class MultipartUtils {
         float f6 = f1 * f3;
         double d3 = 5.0D;
         if (entity instanceof ServerPlayerEntity) {
-            d3 = ((ServerPlayerEntity) entity).getAttribute(net.minecraftforge.common.ForgeMod.REACH_DISTANCE.get()).getValue();
+            d3 = ((ServerPlayerEntity) entity).getAttribute(PlayerEntity.REACH_DISTANCE).getValue();
         }
         Vector3d end = start.add(f5 * d3, f4 * d3, f6 * d3);
         return Pair.of(start, end);
@@ -38,7 +37,7 @@ public final class MultipartUtils {
         int i = -1;
         for (VoxelShape shape : boxes) {
             if (shape != null) {
-                BlockRayTraceResult result = shape.rayTrace(start, end, pos);
+                BlockRayTraceResult result = shape.rayTrace(start.toVec(), end.toVec(), pos);
                 if (result != null) {
                     result.subHit = i;
                     result.hitInfo = null;
@@ -70,7 +69,7 @@ public final class MultipartUtils {
         }
 
         public double squareDistanceTo(Vector3d vec) {
-            return hit.getHitVec().squareDistanceTo(vec);
+            return hit.getHitVec().squareDistanceTo(new Vec3d(vec.x, vec.y, vec.z));
         }
     }
 }

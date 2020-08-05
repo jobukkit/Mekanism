@@ -1,13 +1,13 @@
 package mekanism.client.gui.element;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
+
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.common.inventory.GuiComponents.IToggleEnum;
 import mekanism.common.registries.MekanismSounds;
 import net.minecraft.client.audio.SimpleSound;
+
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class GuiDigitalIconToggle<TYPE extends Enum<TYPE> & IToggleEnum<TYPE>> extends GuiInnerScreen {
 
@@ -24,11 +24,11 @@ public class GuiDigitalIconToggle<TYPE extends Enum<TYPE> & IToggleEnum<TYPE>> e
     }
 
     @Override
-    public void drawBackground(@Nonnull MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
-        super.drawBackground(matrix, mouseX, mouseY, partialTicks);
+    public void drawBackground(int mouseX, int mouseY, float partialTicks) {
+        super.drawBackground(mouseX, mouseY, partialTicks);
         TYPE type = typeSupplier.get();
         minecraft.textureManager.bindTexture(type.getIcon());
-        blit(matrix, x + 3, y + 3, 0, 0, width - 6, height - 6, 6, 6);
+        blit(x + 3, y + 3, 0, 0, width - 6, height - 6, 6, 6);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class GuiDigitalIconToggle<TYPE extends Enum<TYPE> & IToggleEnum<TYPE>> e
     }
 
     @Override
-    public void renderToolTip(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        displayTooltip(matrix, typeSupplier.get().getTooltip(), mouseX, mouseY);
+    public void renderToolTip(int mouseX, int mouseY) {
+        displayTooltip(typeSupplier.get().getTooltip(), mouseX, mouseY);
     }
 }

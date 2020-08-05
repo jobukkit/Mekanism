@@ -1,9 +1,9 @@
 package mekanism.client.gui.machine;
 
+
 import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.Arrays;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
+import com.mojang.blaze3d.systems.RenderSystem;
+import mekanism.api.backport.Vector3d;
 import mekanism.client.gui.GuiConfigurableTile;
 import mekanism.client.gui.element.GuiInnerScreen;
 import mekanism.client.gui.element.bar.GuiBar.IBarInfoHandler;
@@ -32,8 +32,10 @@ import mekanism.common.util.text.TextUtils;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
+
+import java.util.Arrays;
+import java.util.function.Supplier;
 
 public class GuiAntiprotonicNucleosynthesizer extends GuiConfigurableTile<TileEntityAntiprotonicNucleosynthesizer, MekanismTileContainer<TileEntityAntiprotonicNucleosynthesizer>> {
 
@@ -81,17 +83,17 @@ public class GuiAntiprotonicNucleosynthesizer extends GuiConfigurableTile<TileEn
     }
 
     @Override
-    protected void drawForegroundText(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        drawString(matrix, tile.getName(), (getXSize() / 2) - (getStringWidth(tile.getName()) / 2), 6, titleTextColor());
-        drawString(matrix, MekanismLang.INVENTORY.translate(), 8, (getYSize() - 96) + 3, titleTextColor());
-        drawTextScaledBound(matrix, MekanismLang.PROCESS_RATE.translate(TextUtils.getPercent(tile.getProcessRate())), 48, 76, screenTextColor(), 100);
-        super.drawForegroundText(matrix, mouseX, mouseY);
-        matrix.push();
-        matrix.translate(0, 0, 100);
+    protected void drawForegroundText(int mouseX, int mouseY) {
+        drawString(tile.getName(), (getXSize() / 2) - (getStringWidth(tile.getName()) / 2), 6, titleTextColor());
+        drawString(MekanismLang.INVENTORY.translate(), 8, (getYSize() - 96) + 3, titleTextColor());
+        drawTextScaledBound(MekanismLang.PROCESS_RATE.translate(TextUtils.getPercent(tile.getProcessRate())), 48, 76, screenTextColor(), 100);
+        super.drawForegroundText(mouseX, mouseY);
+        RenderSystem.pushMatrix();
+        RenderSystem.translatef(0, 0, 100);
         IRenderTypeBuffer.Impl renderer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
         bolt.update(this, boltSupplier.get(), MekanismRenderer.getPartialTick());
-        bolt.render(MekanismRenderer.getPartialTick(), matrix, renderer);
+        bolt.render(MekanismRenderer.getPartialTick(), new MatrixStack(), renderer);
         renderer.finish(MekanismRenderType.MEK_LIGHTNING);
-        matrix.pop();
+        RenderSystem.popMatrix();
     }
 }

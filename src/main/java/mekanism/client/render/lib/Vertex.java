@@ -1,10 +1,10 @@
 package mekanism.client.render.lib;
 
+import mekanism.api.backport.Vector3d;
 import mekanism.common.lib.Color;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
-import net.minecraft.util.math.vector.Vector3d;
 
 public class Vertex {
 

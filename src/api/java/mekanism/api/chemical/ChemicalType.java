@@ -1,10 +1,6 @@
 package mekanism.api.chemical;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import java.util.Map;
-import java.util.function.Predicate;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.NBTConstants;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.infuse.InfuseType;
@@ -13,11 +9,15 @@ import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.recipes.inputs.chemical.GasStackIngredient;
 import mekanism.api.recipes.inputs.chemical.IChemicalStackIngredient;
 import mekanism.api.recipes.inputs.chemical.InfusionStackIngredient;
-import mekanism.api.recipes.inputs.chemical.PigmentStackIngredient;
 import mekanism.api.recipes.inputs.chemical.SlurryStackIngredient;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.IStringSerializable;
 import net.minecraftforge.common.util.Constants.NBT;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Map;
+import java.util.function.Predicate;
 
 //TODO: Make the chemicals know their own chemical type
 public enum ChemicalType implements IStringSerializable {
@@ -30,7 +30,7 @@ public enum ChemicalType implements IStringSerializable {
 
     static {
         for (ChemicalType type : values()) {
-            nameToType.put(type.getString(), type);
+            nameToType.put(type.getName(), type);
         }
     }
 
@@ -44,7 +44,7 @@ public enum ChemicalType implements IStringSerializable {
 
     @Nonnull
     @Override
-    public String getString() {
+    public String getName() {
         return name;
     }
 
@@ -53,7 +53,7 @@ public enum ChemicalType implements IStringSerializable {
     }
 
     public void write(@Nonnull CompoundNBT nbt) {
-        nbt.putString(NBTConstants.CHEMICAL_TYPE, getString());
+        nbt.putString(NBTConstants.CHEMICAL_TYPE, getName());
     }
 
     @Nullable
@@ -91,9 +91,9 @@ public enum ChemicalType implements IStringSerializable {
             return GAS;
         } else if (ingredient instanceof InfusionStackIngredient) {
             return INFUSION;
-        } else if (ingredient instanceof PigmentStackIngredient) {
+        } /*else if (ingredient instanceof PigmentStackIngredient) {
             return PIGMENT;
-        } else if (ingredient instanceof SlurryStackIngredient) {
+        } */else if (ingredient instanceof SlurryStackIngredient) {
             return SLURRY;
         }
         throw new IllegalStateException("Unknown chemical ingredient type");

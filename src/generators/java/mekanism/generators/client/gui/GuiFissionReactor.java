@@ -1,9 +1,5 @@
 package mekanism.generators.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.Arrays;
-import java.util.Collections;
-import javax.annotation.Nonnull;
 import mekanism.api.text.EnumColor;
 import mekanism.client.gui.GuiMekanismTile;
 import mekanism.client.gui.element.GuiBigLight;
@@ -31,6 +27,9 @@ import mekanism.generators.common.network.PacketGeneratorsGuiInteract.Generators
 import mekanism.generators.common.tile.fission.TileEntityFissionReactorCasing;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.text.ITextComponent;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 public class GuiFissionReactor extends GuiMekanismTile<TileEntityFissionReactorCasing, EmptyTileContainer<TileEntityFissionReactorCasing>> {
 
@@ -103,13 +102,13 @@ public class GuiFissionReactor extends GuiMekanismTile<TileEntityFissionReactorC
     }
 
     @Override
-    protected void drawForegroundText(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
+    protected void drawForegroundText(int mouseX, int mouseY) {
         updateButtons();
 
-        drawTitleText(matrix, GeneratorsLang.FISSION_REACTOR.translate(), 5);
-        drawString(matrix, MekanismLang.TEMPERATURE_LONG.translate(""), 6, 95, titleTextColor());
-        drawString(matrix, GeneratorsLang.FISSION_HEAT_GRAPH.translate(), 6, 118, titleTextColor());
-        super.drawForegroundText(matrix, mouseX, mouseY);
+        drawTitleText(GeneratorsLang.FISSION_REACTOR.translate(), 5);
+        drawString(MekanismLang.TEMPERATURE_LONG.translate(""), 6, 95, titleTextColor());
+        drawString(GeneratorsLang.FISSION_HEAT_GRAPH.translate(), 6, 118, titleTextColor());
+        super.drawForegroundText(mouseX, mouseY);
     }
 
     @Override

@@ -1,49 +1,45 @@
 package mekanism.api.text;
 
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.text.*;
 import net.minecraftforge.fluids.FluidStack;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TextComponentUtil {
 
-    public static IFormattableTextComponent getFormattableComponent(ITextComponent component) {
-        return component instanceof IFormattableTextComponent ? (IFormattableTextComponent) component : component.deepCopy();
+    public static ITextComponent getFormattableComponent(ITextComponent component) {
+        return component instanceof ITextComponent ? (ITextComponent) component : component.deepCopy();
     }
 
-    public static IFormattableTextComponent build(Object... components) {
+    public static ITextComponent build(Object... components) {
         //TODO: Verify that just appending them to the first text component works properly.
         // My suspicion is we will need to chain downwards and append it that way so that the formatting matches
         // from call to call without resetting back to
-        IFormattableTextComponent result = null;
-        Style cachedStyle = Style.EMPTY;
+        ITextComponent result = null;
+        Style cachedStyle = new Style();
         for (Object component : components) {
             if (component == null) {
                 //If the component doesn't exist just skip it
                 continue;
             }
-            IFormattableTextComponent current = null;
+            ITextComponent current = null;
             if (component instanceof IHasTextComponent) {
                 current = getFormattableComponent(((IHasTextComponent) component).getTextComponent());
             } else if (component instanceof IHasTranslationKey) {
                 current = translate(((IHasTranslationKey) component).getTranslationKey());
             } else if (component instanceof EnumColor) {
-                cachedStyle = cachedStyle.setColor(((EnumColor) component).getColor());
+                cachedStyle = cachedStyle.setColor(((EnumColor) component).textFormatting);
             } else if (component instanceof ITextComponent) {
                 //Just append if a text component is being passed
                 current = getFormattableComponent((ITextComponent) component);
             } else if (component instanceof TextFormatting) {
-                cachedStyle = cachedStyle.applyFormatting((TextFormatting) component);
+                cachedStyle.setColor((TextFormatting) component);
             } else if (component instanceof Block) {
                 current = translate(((Block) component).getTranslationKey());
             } else if (component instanceof Item) {
@@ -67,15 +63,15 @@ public class TextComponentUtil {
                 //If we don't have a component to add, don't
                 continue;
             }
-            if (!cachedStyle.equals(Style.EMPTY)) {
+            if (!cachedStyle.equals(new Style())) {
                 //Apply the style and reset
                 current.setStyle(cachedStyle);
-                cachedStyle = Style.EMPTY;
+                cachedStyle = new Style();
             }
             if (result == null) {
                 result = current;
             } else {
-                result.append(current);
+                result.appendSibling(current);
             }
         }
         //TODO: Make this more like smartTranslate? Including back to back color codes treat the second as name?
@@ -83,7 +79,7 @@ public class TextComponentUtil {
         return result;
     }
 
-    private static IFormattableTextComponent getTranslatedDirection(Direction direction) {
+    private static ITextComponent getTranslatedDirection(Direction direction) {
         switch (direction) {
             case DOWN:
                 return APILang.DOWN.translate();
@@ -119,16 +115,16 @@ public class TextComponentUtil {
             return translate(key);
         }
         List<Object> args = new ArrayList<>();
-        Style cachedStyle = Style.EMPTY;
+        Style cachedStyle = new Style();
         for (Object component : components) {
             if (component == null) {
                 //If the component doesn't exist add it anyways, because we may want to be replacing it
                 // with a literal null in the formatted text
                 args.add(null);
-                cachedStyle = Style.EMPTY;
+                cachedStyle = new Style();
                 continue;
             }
-            IFormattableTextComponent current = null;
+            ITextComponent current = null;
             if (component instanceof IHasTextComponent) {
                 current = getFormattableComponent(((IHasTextComponent) component).getTextComponent());
             } else if (component instanceof IHasTranslationKey) {
@@ -145,7 +141,7 @@ public class TextComponentUtil {
                 current = translate(((Fluid) component).getAttributes().getTranslationKey());
             } else if (component instanceof Direction) {
                 current = getTranslatedDirection((Direction) component);
-            } else if (!cachedStyle.equals(Style.EMPTY)) {
+            } else if (!cachedStyle.equals(new Style())) {
                 //Only bother attempting these checks if we have a cached format, because
                 // otherwise we are just going to want to use the raw text
                 if (component instanceof ITextComponent) {
@@ -167,13 +163,13 @@ public class TextComponentUtil {
             }
             //Formatting
             else if (component instanceof EnumColor) {
-                cachedStyle = cachedStyle.setColor(((EnumColor) component).getColor());
+                cachedStyle = cachedStyle.setColor(((EnumColor) component).textFormatting);
                 continue;
             } else if (component instanceof TextFormatting) {
-                cachedStyle = cachedStyle.applyFormatting((TextFormatting) component);
+                cachedStyle.setColor((TextFormatting) component);
                 continue;
             }
-            if (!cachedStyle.equals(Style.EMPTY)) {
+            if (!cachedStyle.equals(new Style())) {
                 //If we don't have a text component, then we have to just ignore the formatting and
                 // add it directly as an argument. (Note: This should never happen because of the fallback)
                 if (current == null) {
@@ -182,7 +178,7 @@ public class TextComponentUtil {
                     //Otherwise we apply the formatting and then add it
                     args.add(current.setStyle(cachedStyle));
                 }
-                cachedStyle = Style.EMPTY;
+                cachedStyle = new Style();
             } else if (current == null) {
                 //Add raw
                 args.add(component);
@@ -191,7 +187,7 @@ public class TextComponentUtil {
                 args.add(current);
             }
         }
-        if (!cachedStyle.equals(Style.EMPTY)) {
+        if (!cachedStyle.equals(new Style())) {
             //Add trailing formatting as a color name or just directly
             //Note: We know that we have at least one element in the array, so we don't need to safety check here
             Object lastComponent = components[components.length - 1];

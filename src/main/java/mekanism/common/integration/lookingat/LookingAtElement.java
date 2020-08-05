@@ -1,14 +1,15 @@
 package mekanism.common.integration.lookingat;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import com.mojang.blaze3d.systems.RenderSystem;
 import mekanism.client.gui.GuiUtils;
 import mekanism.client.render.MekanismRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.text.ITextComponent;
+
+import javax.annotation.Nullable;
 
 public abstract class LookingAtElement {
 
@@ -20,25 +21,25 @@ public abstract class LookingAtElement {
         this.textColor = textColor;
     }
 
-    public void render(@Nonnull MatrixStack matrix, int x, int y) {
+    public void render(int x, int y) {
         int width = getWidth();
         int height = getHeight();
-        AbstractGui.fill(matrix, x, y, x + width - 1, y + 1, borderColor);
-        AbstractGui.fill(matrix, x, y, x + 1, y + height - 1, borderColor);
-        AbstractGui.fill(matrix, x + width - 1, y, x + width, y + height - 1, borderColor);
-        AbstractGui.fill(matrix, x, y + height - 1, x + width, y + height, borderColor);
+        AbstractGui.fill(x, y, x + width - 1, y + 1, borderColor);
+        AbstractGui.fill(x, y, x + 1, y + height - 1, borderColor);
+        AbstractGui.fill(x + width - 1, y, x + width, y + height - 1, borderColor);
+        AbstractGui.fill(x, y + height - 1, x + width, y + height, borderColor);
         TextureAtlasSprite icon = getIcon();
         if (icon != null) {
             int scale = getScaledLevel(width - 2);
             if (scale > 0) {
                 boolean colored = applyRenderColor();
-                GuiUtils.drawTiledSprite(matrix, x + 1, y + 1, height - 2, scale, height - 2, icon, 16, 16, 0);
+                GuiUtils.drawTiledSprite(x + 1, y + 1, height - 2, scale, height - 2, icon, 16, 16, 0);
                 if (colored) {
                     MekanismRenderer.resetColor();
                 }
             }
         }
-        renderScaledText(Minecraft.getInstance(), matrix, x + 4, y + 3, textColor, getWidth() - 8, getText());
+        renderScaledText(Minecraft.getInstance(), x + 4, y + 3, textColor, getWidth() - 8, getText());
     }
 
     public int getWidth() {
@@ -60,18 +61,18 @@ public abstract class LookingAtElement {
         return false;
     }
 
-    public static void renderScaledText(Minecraft mc, @Nonnull MatrixStack matrix, int x, int y, int color, int maxWidth, ITextComponent component) {
-        int length = mc.fontRenderer.func_238414_a_(component);
+    public static void renderScaledText(Minecraft mc, int x, int y, int color, int maxWidth, ITextComponent component) {
+        int length = mc.fontRenderer.getStringWidth(component.getFormattedText());
         if (length <= maxWidth) {
-            mc.fontRenderer.func_238422_b_(matrix, component, x, y, color);
+            mc.fontRenderer.drawString(component.getFormattedText(), x, y, color);
         } else {
             float scale = (float) maxWidth / length;
             float reverse = 1 / scale;
             float yAdd = 4 - (scale * 8) / 2F;
-            matrix.push();
-            matrix.scale(scale, scale, scale);
-            mc.fontRenderer.func_238422_b_(matrix, component, (int) (x * reverse), (int) ((y * reverse) + yAdd), color);
-            matrix.pop();
+            RenderSystem.pushMatrix();
+            RenderSystem.scalef(scale, scale, scale);
+            mc.fontRenderer.drawString(component.getFormattedText(), (int) (x * reverse), (int) ((y * reverse) + yAdd), color);
+            RenderSystem.popMatrix();
         }
         //Make sure the color does not leak from having drawn the string
         MekanismRenderer.resetColor();

@@ -145,7 +145,7 @@ public abstract class TileEntityStructuralMultiblock extends TileEntityMekanism 
                 if (master != null && !getMultiblockData(s.getManager()).isFormed()) {
                     FormationResult result = s.runUpdate(this);
                     if (!result.isFormed() && result.getResultText() != null) {
-                        player.sendMessage(result.getResultText(), Util.DUMMY_UUID);
+                        player.sendMessage(result.getResultText());
                         return ActionResultType.SUCCESS;
                     }
                 }
@@ -170,8 +170,8 @@ public abstract class TileEntityStructuralMultiblock extends TileEntityMekanism 
     }
 
     @Override
-    public void handleUpdateTag(BlockState state, @Nonnull CompoundNBT tag) {
-        super.handleUpdateTag(state, tag);
+    public void handleUpdateTag(@Nonnull CompoundNBT tag) {
+        super.handleUpdateTag(tag);
         clientActiveMultiblock = tag.contains(NBTConstants.ACTIVE_STATE) ? tag.getString(NBTConstants.ACTIVE_STATE) : null;
     }
 

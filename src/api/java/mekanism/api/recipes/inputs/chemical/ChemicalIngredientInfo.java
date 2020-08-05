@@ -1,6 +1,5 @@
 package mekanism.api.recipes.inputs.chemical;
 
-import javax.annotation.Nonnull;
 import mekanism.api.JsonConstants;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
@@ -16,8 +15,10 @@ import mekanism.api.chemical.pigment.Pigment;
 import mekanism.api.chemical.pigment.PigmentStack;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.Nonnull;
 
 /**
  * Helper class for providing information to the various chemical ingredients
@@ -64,7 +65,7 @@ class ChemicalIngredientInfo<CHEMICAL extends Chemical<CHEMICAL>, STACK extends 
         return stackToStackCreator.createStack(stack, amount);
     }
 
-    public ResourceLocation getTagLocation(ITag<CHEMICAL> tag) {
+    public ResourceLocation getTagLocation(Tag<CHEMICAL> tag) {
         return tags.lookupTag(tag);
     }
 }

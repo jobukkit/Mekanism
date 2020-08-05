@@ -1,26 +1,18 @@
 package mekanism.client.gui.element.button;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.IntConsumer;
-import java.util.function.IntSupplier;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
+
 import mekanism.api.text.EnumColor;
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.slot.GuiSequencedSlotDisplay;
 import mekanism.client.render.MekanismRenderer;
 import mekanism.common.MekanismLang;
-import mekanism.common.content.filter.IFilter;
-import mekanism.common.content.filter.IItemStackFilter;
-import mekanism.common.content.filter.IMaterialFilter;
-import mekanism.common.content.filter.IModIDFilter;
-import mekanism.common.content.filter.ITagFilter;
+import mekanism.common.content.filter.*;
 import mekanism.common.content.transporter.SorterFilter;
 import mekanism.common.lib.HashList;
 import net.minecraft.item.ItemStack;
+
+import java.util.List;
+import java.util.function.*;
 
 public class MovableFilterButton extends FilterButton {
 
@@ -41,9 +33,9 @@ public class MovableFilterButton extends FilterButton {
         super(gui, x, y, width, height, index, filterIndex, filters, onPress);
         int arrowX = this.x + width - 12;
         upButton = new FilterSelectButton(gui, arrowX, this.y + 1, false, () -> upButtonPress.accept(index + filterIndex.getAsInt()),
-              (onHover, matrix, xAxis, yAxis) -> displayTooltip(matrix, MekanismLang.MOVE_UP.translate(), xAxis, yAxis));
+              (onHover, xAxis, yAxis) -> displayTooltip(MekanismLang.MOVE_UP.translate(), xAxis, yAxis));
         downButton = new FilterSelectButton(gui, arrowX, this.y + height - 8, true, () -> downButtonPress.accept(index + filterIndex.getAsInt()),
-              (onHover, matrix, xAxis, yAxis) -> displayTooltip(matrix, MekanismLang.MOVE_DOWN.translate(), xAxis, yAxis));
+              (onHover, xAxis, yAxis) -> displayTooltip(MekanismLang.MOVE_DOWN.translate(), xAxis, yAxis));
         addChild(slotDisplay = new GuiSequencedSlotDisplay(gui, x + 3, y + 3,
               () -> renderStackSupplier.apply(filters.get().getOrNull(filterIndex.getAsInt() + index))));
     }
@@ -60,14 +52,14 @@ public class MovableFilterButton extends FilterButton {
     }
 
     @Override
-    public void renderForeground(MatrixStack matrix, int mouseX, int mouseY) {
+    public void renderForeground( int mouseX, int mouseY) {
         int xAxis = mouseX - guiObj.getLeft(), yAxis = mouseY - guiObj.getTop();
         if (upButton.isMouseOverCheckWindows(mouseX, mouseY)) {
-            upButton.renderToolTip(matrix, xAxis, yAxis);
+            upButton.renderToolTip(xAxis, yAxis);
         } else if (downButton.isMouseOverCheckWindows(mouseX, mouseY)) {
-            downButton.renderToolTip(matrix, xAxis, yAxis);
+            downButton.renderToolTip(xAxis, yAxis);
         } else {
-            super.renderForeground(matrix, mouseX, mouseY);
+            super.renderForeground( mouseX, mouseY);
         }
         IFilter<?> filter = filters.get().getOrNull(filterIndex.getAsInt() + index);
         if (filter != prevFilter) {
@@ -77,17 +69,17 @@ public class MovableFilterButton extends FilterButton {
         int x = this.x - guiObj.getLeft();
         int y = this.y - guiObj.getTop();
         if (filter instanceof IItemStackFilter) {
-            drawTextScaledBound(matrix, MekanismLang.ITEM_FILTER.translate(), x + 22, y + 2, titleTextColor(), 60);
+            drawTextScaledBound(MekanismLang.ITEM_FILTER.translate(), x + 22, y + 2, titleTextColor(), 60);
         } else if (filter instanceof ITagFilter) {
-            drawTextScaledBound(matrix, MekanismLang.TAG_FILTER.translate(), x + 22, y + 2, titleTextColor(), 60);
+            drawTextScaledBound(MekanismLang.TAG_FILTER.translate(), x + 22, y + 2, titleTextColor(), 60);
         } else if (filter instanceof IMaterialFilter) {
-            drawTextScaledBound(matrix, MekanismLang.MATERIAL_FILTER.translate(), x + 22, y + 2, titleTextColor(), 60);
+            drawTextScaledBound(MekanismLang.MATERIAL_FILTER.translate(), x + 22, y + 2, titleTextColor(), 60);
         } else if (filter instanceof IModIDFilter) {
-            drawTextScaledBound(matrix, MekanismLang.MODID_FILTER.translate(), x + 22, y + 2, titleTextColor(), 60);
+            drawTextScaledBound(MekanismLang.MODID_FILTER.translate(), x + 22, y + 2, titleTextColor(), 60);
         }
         if (filter instanceof SorterFilter) {
             SorterFilter<?> sorterFilter = (SorterFilter<?>) filter;
-            drawString(matrix, sorterFilter.color == null ? MekanismLang.NONE.translate() : sorterFilter.color.getColoredName(), x + 22, y + 11, titleTextColor());
+            drawString(sorterFilter.color == null ? MekanismLang.NONE.translate() : sorterFilter.color.getColoredName(), x + 22, y + 11, titleTextColor());
         }
     }
 
@@ -112,14 +104,14 @@ public class MovableFilterButton extends FilterButton {
     }
 
     @Override
-    public void drawBackground(@Nonnull MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
-        super.drawBackground(matrix, mouseX, mouseY, partialTicks);
+    public void drawBackground(int mouseX, int mouseY, float partialTicks) {
+        super.drawBackground(mouseX, mouseY, partialTicks);
         if (visible) {
             //Update visibility state of our buttons
             updateButtonVisibility();
             //Render our sub buttons and our slot
-            upButton.onDrawBackground(matrix, mouseX, mouseY, partialTicks);
-            downButton.onDrawBackground(matrix, mouseX, mouseY, partialTicks);
+            upButton.onDrawBackground(mouseX, mouseY, partialTicks);
+            downButton.onDrawBackground(mouseX, mouseY, partialTicks);
         }
     }
 

@@ -40,6 +40,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
@@ -52,6 +53,7 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceContext.FluidMode;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
@@ -150,10 +152,10 @@ public class ItemBlockFluidTank extends ItemBlockTooltip<BlockFluidTank> impleme
         ItemStack stack = player.getHeldItem(hand);
         if (getBucketMode(stack)) {
             if (SecurityUtils.canAccess(player, stack)) {
-                BlockRayTraceResult result = rayTrace(world, player, !player.isSneaking() ? FluidMode.SOURCE_ONLY : FluidMode.NONE);
+                RayTraceResult result = rayTrace(world, player, !player.isSneaking() ? FluidMode.SOURCE_ONLY : FluidMode.NONE);
                 //It can be null if there is nothing in range
                 if (result.getType() == Type.BLOCK) {
-                    BlockPos pos = result.getPos();
+                    BlockPos pos = ((BlockRayTraceResult)result).getPos();
                     if (!world.isBlockModifiable(player, pos)) {
                         return new ActionResult<>(ActionResultType.FAIL, stack);
                     }
@@ -173,10 +175,10 @@ public class ItemBlockFluidTank extends ItemBlockTooltip<BlockFluidTank> impleme
                         return new ActionResult<>(ActionResultType.FAIL, stack);
                     }
                     if (!player.isSneaking()) {
-                        if (!player.canPlayerEdit(pos, result.getFace(), stack)) {
+                        if (!player.canPlayerEdit(pos, ((BlockRayTraceResult)result).getFace(), stack)) {
                             return new ActionResult<>(ActionResultType.FAIL, stack);
                         }
-                        FluidState fluidState = world.getFluidState(pos);
+                        IFluidState fluidState = world.getFluidState(pos);
                         if (!fluidState.isEmpty() && fluidState.isSource()) {
                             //Just in case someone does weird things and has a fluid state that is empty and a source
                             // only allow collecting from non empty sources
@@ -221,10 +223,10 @@ public class ItemBlockFluidTank extends ItemBlockTooltip<BlockFluidTank> impleme
                         }
                     } else {
                         if (fluidTank.extract(FluidAttributes.BUCKET_VOLUME, Action.SIMULATE, AutomationType.MANUAL).getAmount() < FluidAttributes.BUCKET_VOLUME
-                            || !player.canPlayerEdit(pos.offset(result.getFace()), result.getFace(), stack)) {
+                            || !player.canPlayerEdit(pos.offset(((BlockRayTraceResult)result).getFace()), ((BlockRayTraceResult)result).getFace(), stack)) {
                             return new ActionResult<>(ActionResultType.FAIL, stack);
                         }
-                        if (MekanismUtils.tryPlaceContainedLiquid(player, world, pos, fluidHandlerItem.getFluidInTank(0), result.getFace())) {
+                        if (MekanismUtils.tryPlaceContainedLiquid(player, world, pos, fluidHandlerItem.getFluidInTank(0), ((BlockRayTraceResult)result).getFace())) {
                             if (!player.isCreative()) {
                                 MekanismUtils.logMismatchedStackSize(fluidTank.shrinkStack(FluidAttributes.BUCKET_VOLUME, Action.EXECUTE), FluidAttributes.BUCKET_VOLUME);
                             }
@@ -264,7 +266,7 @@ public class ItemBlockFluidTank extends ItemBlockTooltip<BlockFluidTank> impleme
             setBucketMode(stack, newState);
             if (displayChangeMessage) {
                 player.sendMessage(MekanismLang.LOG_FORMAT.translateColored(EnumColor.DARK_BLUE, MekanismLang.MEKANISM,
-                      MekanismLang.BUCKET_MODE.translateColored(EnumColor.GRAY, OnOff.of(newState, true))), Util.DUMMY_UUID);
+                      MekanismLang.BUCKET_MODE.translateColored(EnumColor.GRAY, OnOff.of(newState, true))));
             }
         }
     }

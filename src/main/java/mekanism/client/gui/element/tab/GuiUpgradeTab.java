@@ -1,7 +1,6 @@
 package mekanism.client.gui.element.tab;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.Nonnull;
+
 import mekanism.client.SpecialColors;
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.GuiInsetElement;
@@ -21,8 +20,8 @@ public class GuiUpgradeTab extends GuiInsetElement<TileEntity> {
     }
 
     @Override
-    public void renderToolTip(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        displayTooltip(matrix, MekanismLang.UPGRADES.translate(), mouseX, mouseY);
+    public void renderToolTip(int mouseX, int mouseY) {
+        displayTooltip(MekanismLang.UPGRADES.translate(), mouseX, mouseY);
     }
 
     @Override

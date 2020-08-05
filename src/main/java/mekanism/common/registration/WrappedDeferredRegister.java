@@ -14,15 +14,15 @@ public class WrappedDeferredRegister<T extends IForgeRegistryEntry<T>> {
     protected final DeferredRegister<T> internal;
 
     protected WrappedDeferredRegister(String modid, IForgeRegistry<T> registry) {
-        internal = DeferredRegister.create(registry, modid);
+        internal = new DeferredRegister<>(registry, modid);
     }
 
     /**
      * @apiNote For use with custom registries
-     */
+
     protected WrappedDeferredRegister(String modid, Class<T> base) {
-        internal = DeferredRegister.create(base, modid);
-    }
+        internal = new DeferredRegister<>(base, modid);
+    }*/
 
     protected <I extends T, W extends WrappedRegistryObject<I>> W register(String name, Supplier<? extends I> sup, Function<RegistryObject<I>, W> objectWrapper) {
         return objectWrapper.apply(internal.register(name, sup));
@@ -32,7 +32,6 @@ public class WrappedDeferredRegister<T extends IForgeRegistryEntry<T>> {
      * Only call this from mekanism and for custom registries
      */
     public void createAndRegister(IEventBus bus, String name) {
-        internal.makeRegistry(name, RegistryBuilder::new);
         register(bus);
     }
 

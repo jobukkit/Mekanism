@@ -1,10 +1,7 @@
 package mekanism.common.network;
 
-import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 import mekanism.api.Range3D;
+import mekanism.api.backport.Vector3d;
 import mekanism.common.Mekanism;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.lib.transmitter.DynamicBufferedNetwork;
@@ -15,12 +12,11 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
@@ -28,6 +24,11 @@ import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
+
+import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public abstract class BasePacketHandler {
 
@@ -127,7 +128,7 @@ public abstract class BasePacketHandler {
      * @param message   - the message to send
      * @param dimension - the dimension to target
      */
-    public <MSG> void sendToDimension(MSG message, RegistryKey<World> dimension) {
+    public <MSG> void sendToDimension(MSG message, DimensionType dimension) {
         getChannel().send(PacketDistributor.DIMENSION.with(() -> dimension), message);
     }
 
@@ -175,7 +176,7 @@ public abstract class BasePacketHandler {
                 //Ignore height for partial Cubic chunks support as range comparision gets used ignoring player height normally anyways
                 int radius = playerList.getViewDistance() * 16;
                 for (ServerPlayerEntity player : playerList.getPlayers()) {
-                    if (range.dimension == player.func_241141_L_()) {
+                    if (range.dimension == player.world.getDimension().getType()) {
                         BlockPos playerPosition = player.getPosition();
                         int playerX = playerPosition.getX();
                         int playerZ = playerPosition.getZ();

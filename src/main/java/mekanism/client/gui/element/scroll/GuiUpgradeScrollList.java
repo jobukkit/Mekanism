@@ -1,8 +1,6 @@
 package mekanism.client.gui.element.scroll;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.Set;
-import javax.annotation.Nullable;
+
 import mekanism.api.Upgrade;
 import mekanism.api.text.TextComponentUtil;
 import mekanism.client.gui.IGuiWrapper;
@@ -13,6 +11,9 @@ import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.MekanismUtils.ResourceType;
 import mekanism.common.util.UpgradeUtils;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.Nullable;
+import java.util.Set;
 
 public class GuiUpgradeScrollList extends GuiScrollList {
 
@@ -62,8 +63,8 @@ public class GuiUpgradeScrollList extends GuiScrollList {
     }
 
     @Override
-    public void renderForeground(MatrixStack matrix, int mouseX, int mouseY) {
-        super.renderForeground(matrix, mouseX, mouseY);
+    public void renderForeground(int mouseX, int mouseY) {
+        super.renderForeground(mouseX, mouseY);
         Upgrade[] upgrades = getCurrentUpgrades().toArray(new Upgrade[0]);
         // first render text
         for (int i = 0; i < getFocusedElements(); i++) {
@@ -74,8 +75,8 @@ public class GuiUpgradeScrollList extends GuiScrollList {
             Upgrade upgrade = upgrades[index];
             int multipliedElement = elementHeight * i;
             //Always render the name and upgrade
-            drawString(matrix, TextComponentUtil.build(upgrade), relativeX + 13, relativeY + 3 + multipliedElement, titleTextColor());
-            renderUpgrade(matrix, upgrade, relativeX + 3, relativeY + 3 + multipliedElement, 0.5F);
+            drawString(TextComponentUtil.build(upgrade), relativeX + 13, relativeY + 3 + multipliedElement, titleTextColor());
+            renderUpgrade(upgrade, relativeX + 3, relativeY + 3 + multipliedElement, 0.5F);
         }
         // next render tooltips
         for (int i = 0; i < getFocusedElements(); i++) {
@@ -86,13 +87,13 @@ public class GuiUpgradeScrollList extends GuiScrollList {
             Upgrade upgrade = upgrades[index];
             int multipliedElement = elementHeight * i;
             if (mouseX >= x + 1 && mouseX < barX - 1 && mouseY >= y + 1 + multipliedElement && mouseY < y + 1 + multipliedElement + elementHeight) {
-                guiObj.displayTooltip(matrix, upgrade.getDescription(), mouseX - guiObj.getLeft(), mouseY - guiObj.getTop(), guiObj.getWidth());
+                guiObj.displayTooltip(upgrade.getDescription(), mouseX - guiObj.getLeft(), mouseY - guiObj.getTop(), guiObj.getWidth());
             }
         }
     }
 
     @Override
-    public void renderElements(MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
+    public void renderElements(int mouseX, int mouseY, float partialTicks) {
         //Draw elements
         if (hasSelection() && component.getUpgrades(getSelection()) == 0) {
             clearSelection();
@@ -113,12 +114,12 @@ public class GuiUpgradeScrollList extends GuiScrollList {
                 j = 0;
             }
             MekanismRenderer.color(upgrade.getColor());
-            blit(matrix, x + 1, shiftedY, 0, elementHeight * j, TEXTURE_WIDTH, elementHeight, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+            blit(x + 1, shiftedY, 0, elementHeight * j, TEXTURE_WIDTH, elementHeight, TEXTURE_WIDTH, TEXTURE_HEIGHT);
             MekanismRenderer.resetColor();
         }
     }
 
-    private void renderUpgrade(MatrixStack matrix, Upgrade type, int x, int y, float size) {
-        guiObj.renderItem(matrix, UpgradeUtils.getStack(type), (int) (x / size), (int) (y / size), size);
+    private void renderUpgrade(Upgrade type, int x, int y, float size) {
+        guiObj.renderItem(UpgradeUtils.getStack(type), (int) (x / size), (int) (y / size), size);
     }
 }

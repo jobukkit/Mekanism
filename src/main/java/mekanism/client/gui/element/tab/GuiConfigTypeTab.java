@@ -1,7 +1,6 @@
 package mekanism.client.gui.element.tab;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.Nonnull;
+
 import mekanism.api.text.TextComponentUtil;
 import mekanism.client.SpecialColors;
 import mekanism.client.gui.IGuiWrapper;
@@ -64,8 +63,8 @@ public class GuiConfigTypeTab extends GuiInsetElement<TileEntity> {
     }
 
     @Override
-    public void renderToolTip(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        displayTooltip(matrix, TextComponentUtil.translate(transmission.getTranslationKey()), mouseX, mouseY);
+    public void renderToolTip(int mouseX, int mouseY) {
+        displayTooltip(TextComponentUtil.translate(transmission.getTranslationKey()), mouseX, mouseY);
     }
 
     @Override

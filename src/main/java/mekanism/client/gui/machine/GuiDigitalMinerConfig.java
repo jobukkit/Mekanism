@@ -1,32 +1,18 @@
 package mekanism.client.gui.machine;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.List;
-import javax.annotation.Nonnull;
+
 import mekanism.client.gui.GuiFilterHolder;
 import mekanism.client.gui.element.button.MekanismImageButton;
 import mekanism.client.gui.element.button.TranslationButton;
-import mekanism.client.gui.element.filter.miner.GuiMinerFilerSelect;
-import mekanism.client.gui.element.filter.miner.GuiMinerItemStackFilter;
-import mekanism.client.gui.element.filter.miner.GuiMinerMaterialFilter;
-import mekanism.client.gui.element.filter.miner.GuiMinerModIDFilter;
-import mekanism.client.gui.element.filter.miner.GuiMinerTagFilter;
+import mekanism.client.gui.element.filter.miner.*;
 import mekanism.client.gui.element.text.GuiTextField;
 import mekanism.client.gui.element.text.InputValidator;
 import mekanism.common.Mekanism;
 import mekanism.common.MekanismLang;
 import mekanism.common.base.TagCache;
 import mekanism.common.config.MekanismConfig;
-import mekanism.common.content.filter.IFilter;
-import mekanism.common.content.filter.IItemStackFilter;
-import mekanism.common.content.filter.IMaterialFilter;
-import mekanism.common.content.filter.IModIDFilter;
-import mekanism.common.content.filter.ITagFilter;
-import mekanism.common.content.miner.MinerFilter;
-import mekanism.common.content.miner.MinerItemStackFilter;
-import mekanism.common.content.miner.MinerMaterialFilter;
-import mekanism.common.content.miner.MinerModIDFilter;
-import mekanism.common.content.miner.MinerTagFilter;
+import mekanism.common.content.filter.*;
+import mekanism.common.content.miner.*;
 import mekanism.common.inventory.container.tile.MekanismTileContainer;
 import mekanism.common.network.PacketGuiButtonPress;
 import mekanism.common.network.PacketGuiButtonPress.ClickedTileButton;
@@ -37,6 +23,8 @@ import mekanism.common.util.text.BooleanStateDisplay.OnOff;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
+
+import java.util.List;
 
 public class GuiDigitalMinerConfig extends GuiFilterHolder<MinerFilter<?>, TileEntityDigitalMiner, MekanismTileContainer<TileEntityDigitalMiner>> {
 
@@ -70,15 +58,15 @@ public class GuiDigitalMinerConfig extends GuiFilterHolder<MinerFilter<?>, TileE
     }
 
     @Override
-    protected void drawForegroundText(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        super.drawForegroundText(matrix, mouseX, mouseY);
-        drawTitleText(matrix, MekanismLang.MINER_CONFIG.translate(), 6);
-        drawTextWithScale(matrix, MekanismLang.FILTERS.translate(), 14, 22, screenTextColor(), 0.8F);
-        drawTextWithScale(matrix, MekanismLang.FILTER_COUNT.translate(getFilters().size()), 14, 31, screenTextColor(), 0.8F);
-        drawTextWithScale(matrix, MekanismLang.MINER_IS_INVERSE.translate(OnOff.of(tile.inverse)), 14, 131, screenTextColor(), 0.8F);
-        drawTextWithScale(matrix, MekanismLang.MINER_RADIUS.translate(tile.getRadius()), 14, 58, screenTextColor(), 0.8F);
-        drawTextWithScale(matrix, MekanismLang.MIN.translate(tile.getMinY()), 14, 83, screenTextColor(), 0.8F);
-        drawTextWithScale(matrix, MekanismLang.MAX.translate(tile.getMaxY()), 14, 108, screenTextColor(), 0.8F);
+    protected void drawForegroundText(int mouseX, int mouseY) {
+        super.drawForegroundText(mouseX, mouseY);
+        drawTitleText(MekanismLang.MINER_CONFIG.translate(), 6);
+        drawTextWithScale(MekanismLang.FILTERS.translate(), 14, 22, screenTextColor(), 0.8F);
+        drawTextWithScale(MekanismLang.FILTER_COUNT.translate(getFilters().size()), 14, 31, screenTextColor(), 0.8F);
+        drawTextWithScale(MekanismLang.MINER_IS_INVERSE.translate(OnOff.of(tile.inverse)), 14, 131, screenTextColor(), 0.8F);
+        drawTextWithScale(MekanismLang.MINER_RADIUS.translate(tile.getRadius()), 14, 58, screenTextColor(), 0.8F);
+        drawTextWithScale(MekanismLang.MIN.translate(tile.getMinY()), 14, 83, screenTextColor(), 0.8F);
+        drawTextWithScale(MekanismLang.MAX.translate(tile.getMaxY()), 14, 108, screenTextColor(), 0.8F);
     }
 
     @Override

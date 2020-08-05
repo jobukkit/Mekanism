@@ -1,19 +1,23 @@
 package mekanism.api.chemical.slurry;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.MekanismAPI;
 import mekanism.api.NBTConstants;
 import mekanism.api.chemical.Chemical;
-import mekanism.api.chemical.ChemicalTags;
 import mekanism.api.chemical.ChemicalUtils;
+import mekanism.api.chemical.infuse.InfuseType;
+import mekanism.api.chemical.infuse.InfuseTypeTags;
 import mekanism.api.providers.ISlurryProvider;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
+import net.minecraftforge.common.util.ReverseTagWrapper;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Set;
 
 /**
  * Represents a slurry chemical subtype
@@ -22,11 +26,13 @@ import net.minecraft.util.Util;
 @MethodsReturnNonnullByDefault
 public class Slurry extends Chemical<Slurry> implements ISlurryProvider {
 
+    private final ReverseTagWrapper<Slurry> reverseTags = new ReverseTagWrapper<>(this, SlurryTags::getGeneration, SlurryTags::getCollection);
+
     @Nullable
-    private final ITag<Item> oreTag;
+    private final Tag<Item> oreTag;
 
     public Slurry(SlurryBuilder builder) {
-        super(builder, ChemicalTags.SLURRY);
+        super(builder);
         this.oreTag = builder.getOreTag();
     }
 
@@ -65,7 +71,17 @@ public class Slurry extends Chemical<Slurry> implements ISlurryProvider {
      * @return The tag for the item the slurry goes with. May be null.
      */
     @Nullable
-    public ITag<Item> getOreTag() {
+    public Tag<Item> getOreTag() {
         return oreTag;
+    }
+
+    @Override
+    public boolean isIn(Tag<Slurry> tag) {
+        return tag.contains(this);
+    }
+
+    @Override
+    public Set<ResourceLocation> getTags() {
+        return reverseTags.getTagNames();
     }
 }

@@ -1,5 +1,6 @@
 package mekanism.tools.common.item;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Collections;
@@ -21,10 +22,10 @@ import net.minecraft.block.CampfireBlock;
 import net.minecraft.block.RotatedPillarBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.AttributeModifier.Operation;
-import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.AxeItem;
@@ -48,15 +49,12 @@ import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.Constants.BlockFlags;
 import net.minecraftforge.common.util.Constants.WorldEvents;
 
-public class ItemMekanismPaxel extends ToolItem implements IHasRepairType, IAttributeRefresher {
+public class ItemMekanismPaxel extends ToolItem implements IHasRepairType{
 
     private static final ToolType PAXEL_TOOL_TYPE = ToolType.get("paxel");
 
     private static Item.Properties getItemProperties(ItemTier material) {
         Item.Properties properties = ItemDeferredRegister.getMekBaseProperties();
-        if (material == ItemTier.NETHERITE) {
-            properties = properties.isBurnable();
-        }
         return addHarvestLevel(properties, material.getHarvestLevel());
     }
 
@@ -71,7 +69,6 @@ public class ItemMekanismPaxel extends ToolItem implements IHasRepairType, IAttr
     private final IntSupplier paxelEnchantability;
     private final IntSupplier paxelMaxDurability;
     private final IntSupplier paxelHarvestLevel;
-    private final AttributeCache attributeCache;
 
     public ItemMekanismPaxel(MaterialCreator material, Item.Properties properties) {
         super(material.getPaxelDamage(), material.getPaxelAtkSpeed(), material, Collections.emptySet(), addHarvestLevel(properties, material.getPaxelHarvestLevel()));
@@ -81,7 +78,6 @@ public class ItemMekanismPaxel extends ToolItem implements IHasRepairType, IAttr
         paxelEnchantability = material::getPaxelEnchantability;
         paxelMaxDurability = material::getPaxelMaxUses;
         paxelHarvestLevel = material::getPaxelHarvestLevel;
-        this.attributeCache = new AttributeCache(this, material.attackDamage, material.paxelDamage, material.paxelAtkSpeed);
     }
 
     public ItemMekanismPaxel(ItemTier material) {
@@ -93,7 +89,6 @@ public class ItemMekanismPaxel extends ToolItem implements IHasRepairType, IAttr
         paxelMaxDurability = material::getMaxUses;
         paxelHarvestLevel = material::getHarvestLevel;
         //Don't add any listeners as all the values are "static"
-        attributeCache = new AttributeCache(this);
     }
 
     @Override
@@ -229,13 +224,13 @@ public class ItemMekanismPaxel extends ToolItem implements IHasRepairType, IAttr
      */
     @Nonnull
     @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(@Nonnull EquipmentSlotType slot, @Nonnull ItemStack stack) {
-        return slot == EquipmentSlotType.MAINHAND ? attributeCache.getAttributes() : ImmutableMultimap.of();
+    public Multimap<String, AttributeModifier> getAttributeModifiers(@Nonnull EquipmentSlotType slot) {
+        Multimap<String, AttributeModifier> attributes = HashMultimap.create();
+        if (slot == EquipmentSlotType.MAINHAND) {
+            attributes.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", getAttackDamage(), Operation.ADDITION));
+            attributes.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", paxelAtkSpeed.getAsFloat(), Operation.ADDITION));
+        }
+        return attributes;
     }
 
-    @Override
-    public void addToBuilder(ImmutableMultimap.Builder<Attribute, AttributeModifier> builder) {
-        builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Tool modifier", getAttackDamage(), Operation.ADDITION));
-        builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Tool modifier", paxelAtkSpeed.getAsFloat(), Operation.ADDITION));
-    }
 }

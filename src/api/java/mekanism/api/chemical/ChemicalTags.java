@@ -1,50 +1,56 @@
 package mekanism.api.chemical;
 
-import java.util.List;
-import java.util.Map.Entry;
+import com.mojang.datafixers.types.Func;
 import mekanism.api.chemical.gas.Gas;
+import mekanism.api.chemical.gas.GasTags;
 import mekanism.api.chemical.infuse.InfuseType;
+import mekanism.api.chemical.infuse.InfuseTypeTags;
 import mekanism.api.chemical.pigment.Pigment;
+import mekanism.api.chemical.pigment.PigmentTags;
 import mekanism.api.chemical.slurry.Slurry;
-import net.minecraft.tags.ITag;
-import net.minecraft.tags.ITag.INamedTag;
+import mekanism.api.chemical.slurry.SlurryTags;
+import net.minecraft.tags.Tag;
 import net.minecraft.tags.TagCollection;
-import net.minecraft.tags.TagRegistry;
 import net.minecraft.util.ResourceLocation;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class ChemicalTags<CHEMICAL extends Chemical<CHEMICAL>> {
 
-    public static final ChemicalTags<Gas> GAS = new ChemicalTags<>();
-    public static final ChemicalTags<InfuseType> INFUSE_TYPE = new ChemicalTags<>();
-    public static final ChemicalTags<Pigment> PIGMENT = new ChemicalTags<>();
-    public static final ChemicalTags<Slurry> SLURRY = new ChemicalTags<>();
+    public static final ChemicalTags<Gas> GAS = new ChemicalTags<>(ChemicalTags::gasTag, GasTags::getCollection);
+    public static final ChemicalTags<InfuseType> INFUSE_TYPE = new ChemicalTags<>(ChemicalTags::infusionTag, InfuseTypeTags::getCollection);
+    public static final ChemicalTags<Pigment> PIGMENT = new ChemicalTags<>(ChemicalTags::pigmentTag, PigmentTags::getCollection);
+    public static final ChemicalTags<Slurry> SLURRY = new ChemicalTags<>(ChemicalTags::slurryTag, SlurryTags::getCollection);
 
-    private final TagRegistry<CHEMICAL> collection = new TagRegistry<>();
+    private Supplier<TagCollection<CHEMICAL>> collection;
 
-    private ChemicalTags() {
-    }
+    private Function<ResourceLocation, Tag<CHEMICAL>> tagger;
 
-    public void setCollection(TagCollection<CHEMICAL> collectionIn) {
-        collection.func_232935_a_(collectionIn);
+    private ChemicalTags(Function<ResourceLocation, Tag<CHEMICAL>> taggerIn, Supplier<TagCollection<CHEMICAL>> collectionIn) {
+        tagger = taggerIn;
+        collection = collectionIn;
     }
 
     public TagCollection<CHEMICAL> getCollection() {
-        return collection.func_232939_b_();
+        return collection.get();
     }
 
-    public ResourceLocation lookupTag(ITag<CHEMICAL> tag) {
+    public ResourceLocation lookupTag(Tag<CHEMICAL> tag) {
         //Manual and slightly modified implementation of TagCollection#func_232975_b_ to have better reverse lookup handling
         TagCollection<CHEMICAL> collection = getCollection();
-        ResourceLocation resourceLocation = collection.func_232973_a_(tag);
-        if (resourceLocation == null) {
-            //If we failed to get the resource location, try manually looking it up by a "matching" entry
-            // as the objects are different and neither Tag nor NamedTag override equals and hashCode
-            List<CHEMICAL> chemicals = tag.getAllElements();
-            for (Entry<ResourceLocation, ITag<CHEMICAL>> entry : collection.getTagMap().entrySet()) {
-                if (chemicals.equals(entry.getValue().getAllElements())) {
-                    resourceLocation = entry.getKey();
-                    break;
-                }
+        ResourceLocation resourceLocation = null;
+        //If we failed to get the resource location, try manually looking it up by a "matching" entry
+        // as the objects are different and neither Tag nor NamedTag override equals and hashCode
+        Collection<CHEMICAL> chemicals = tag.getAllElements();
+        for (Map.Entry<ResourceLocation, Tag<CHEMICAL>> entry : collection.getTagMap().entrySet()) {
+            if (chemicals.equals(entry.getValue().getAllElements())) {
+                resourceLocation = entry.getKey();
+                break;
             }
         }
         if (resourceLocation == null) {
@@ -53,23 +59,23 @@ public class ChemicalTags<CHEMICAL extends Chemical<CHEMICAL>> {
         return resourceLocation;
     }
 
-    public static INamedTag<Gas> gasTag(ResourceLocation resourceLocation) {
-        return chemicalTag(resourceLocation, GAS);
+    public static Tag<Gas> gasTag(ResourceLocation resourceLocation) {
+        return new GasTags.Wrapper(resourceLocation);
     }
 
-    public static INamedTag<InfuseType> infusionTag(ResourceLocation resourceLocation) {
-        return chemicalTag(resourceLocation, INFUSE_TYPE);
+    public static Tag<InfuseType> infusionTag(ResourceLocation resourceLocation) {
+        return new InfuseTypeTags.Wrapper(resourceLocation);
     }
 
-    public static INamedTag<Pigment> pigmentTag(ResourceLocation resourceLocation) {
-        return chemicalTag(resourceLocation, PIGMENT);
+    public static Tag<Pigment> pigmentTag(ResourceLocation resourceLocation) {
+        return new PigmentTags.Wrapper(resourceLocation);
     }
 
-    public static INamedTag<Slurry> slurryTag(ResourceLocation resourceLocation) {
-        return chemicalTag(resourceLocation, SLURRY);
+    public static Tag<Slurry> slurryTag(ResourceLocation resourceLocation) {
+        return new SlurryTags.Wrapper(resourceLocation);
     }
 
-    public static <CHEMICAL extends Chemical<CHEMICAL>> INamedTag<CHEMICAL> chemicalTag(ResourceLocation resourceLocation, ChemicalTags<CHEMICAL> chemicalTags) {
-        return chemicalTags.collection.func_232937_a_(resourceLocation.toString());
+    public static <CHEMICAL extends Chemical<CHEMICAL>> Tag<CHEMICAL> chemicalTag(ResourceLocation resourceLocation, ChemicalTags<CHEMICAL> chemicalTags) {
+        return chemicalTags.tagger.apply(resourceLocation);
     }
 }

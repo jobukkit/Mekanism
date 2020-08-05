@@ -1,8 +1,5 @@
 package mekanism.common.content.gear.mekasuit;
 
-import java.util.List;
-import java.util.Optional;
-import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.gas.IGasHandler;
@@ -33,7 +30,7 @@ import mekanism.common.util.UnitDisplayUtils;
 import mekanism.common.util.UnitDisplayUtils.RadiationUnit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
@@ -42,6 +39,10 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+
+import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.Optional;
 
 public abstract class ModuleMekaSuit extends Module {
 
@@ -55,7 +56,7 @@ public abstract class ModuleMekaSuit extends Module {
             // they get the full strength production
             double maskHeight = player.getPosYEye() - 0.15;
             BlockPos headPos = new BlockPos(player.getPosX(), maskHeight, player.getPosZ());
-            FluidState fluidstate = player.getEntityWorld().getFluidState(headPos);
+            IFluidState fluidstate = player.getEntityWorld().getFluidState(headPos);
             if (fluidstate.isTagged(FluidTags.WATER) && maskHeight <= headPos.getY() + fluidstate.getActualHeight(player.getEntityWorld(), headPos)) {
                 //If the position the bottom of the mask is in is water set the production rate to our max rate
                 productionRate = getMaxRate();
@@ -252,7 +253,7 @@ public abstract class ModuleMekaSuit extends Module {
             super.tickServer(player);
             IEnergyContainer energyContainer = StorageUtils.getEnergyContainer(getContainer(), 0);
             if (energyContainer != null && !energyContainer.getNeeded().isZero() && player.world.isDaytime() &&
-                player.world.canSeeSky(new BlockPos(player.getPositionVec())) && !player.world.isRaining() && player.world.func_230315_m_().hasSkyLight()) {
+                player.world.canSeeSky(new BlockPos(player.getPositionVec())) && !player.world.isRaining() && player.world.getDimension().hasSkyLight()) {
                 FloatingLong rate = MekanismConfig.gear.mekaSuitSolarRechargingRate.get().multiply(getInstalledCount());
                 energyContainer.insert(rate, Action.EXECUTE, AutomationType.MANUAL);
             }

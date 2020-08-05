@@ -15,7 +15,6 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.AttributeModifier.Operation;
-import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.HoeItem;
@@ -28,15 +27,13 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 
-public class ItemMekanismHoe extends HoeItem implements IHasRepairType, IAttributeRefresher {
+public class ItemMekanismHoe extends HoeItem implements IHasRepairType {
 
     private final MaterialCreator material;
-    private final AttributeCache attributeCache;
 
     public ItemMekanismHoe(MaterialCreator material, Item.Properties properties) {
-        super(material, material.getHoeDamage(), material.getHoeAtkSpeed(), properties);
+        super(material, material.getHoeAtkSpeed(), properties);
         this.material = material;
-        this.attributeCache = new AttributeCache(this, material.attackDamage, material.hoeDamage, material.hoeAtkSpeed);
     }
 
     @Override
@@ -63,40 +60,5 @@ public class ItemMekanismHoe extends HoeItem implements IHasRepairType, IAttribu
     @Override
     public boolean isDamageable() {
         return getTier().getMaxUses() > 0;
-    }
-
-    @Override
-    public int getHarvestLevel(@Nonnull ItemStack stack, @Nonnull ToolType tool, @Nullable PlayerEntity player, @Nullable BlockState blockState) {
-        return tool == ToolType.HOE ? getTier().getHarvestLevel() : super.getHarvestLevel(stack, tool, player, blockState);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @implNote Wrap {@link net.minecraft.item.ToolItem#getDestroySpeed(ItemStack, BlockState)} to return our efficiency level
-     */
-    @Override
-    public float getDestroySpeed(@Nonnull ItemStack stack, BlockState state) {
-        if (getToolTypes(stack).stream().anyMatch(state::isToolEffective) || effectiveBlocks.contains(state.getBlock())) {
-            return getTier().getEfficiency();
-        }
-        return 1;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @implNote We bypass calling super to ensure we get added instead of not being able to add the proper values that {@link net.minecraft.item.HoeItem} tries to set
-     */
-    @Nonnull
-    @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(@Nonnull EquipmentSlotType slot, @Nonnull ItemStack stack) {
-        return slot == EquipmentSlotType.MAINHAND ? attributeCache.getAttributes() : ImmutableMultimap.of();
-    }
-
-    @Override
-    public void addToBuilder(ImmutableMultimap.Builder<Attribute, AttributeModifier> builder) {
-        builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", getAttackDamage(), Operation.ADDITION));
-        builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", material.getHoeAtkSpeed(), Operation.ADDITION));
     }
 }

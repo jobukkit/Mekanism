@@ -1,7 +1,6 @@
 package mekanism.client.gui.element.button;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.function.Supplier;
+
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.common.Mekanism;
 import mekanism.common.network.PacketGuiInteract;
@@ -12,6 +11,8 @@ import mekanism.common.util.MekanismUtils.ResourceType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+
+import java.util.function.Supplier;
 
 public class GuiGasMode extends MekanismImageButton {
 
@@ -41,16 +42,16 @@ public class GuiGasMode extends MekanismImageButton {
     }
 
     @Override
-    public void renderForeground(MatrixStack matrix, int mouseX, int mouseY) {
+    public void renderForeground(int mouseX, int mouseY) {
         //Draw the text next to the button
         ITextComponent component = gasModeSupplier.get().getTextComponent();
         int xPos = x - guiObj.getLeft();
         int yPos = y - guiObj.getTop();
         if (left) {
-            drawTextScaledBound(matrix, component, xPos - 3 - (int) (getStringWidth(component) * getNeededScale(component, 66)), yPos + 1, titleTextColor(), 66);
+            drawTextScaledBound(component, xPos - 3 - (int) (getStringWidth(component) * getNeededScale(component, 66)), yPos + 1, titleTextColor(), 66);
         } else {
-            drawTextScaledBound(matrix, component, xPos + width + 5, yPos + 1, titleTextColor(), 66);
+            drawTextScaledBound(component, xPos + width + 5, yPos + 1, titleTextColor(), 66);
         }
-        super.renderForeground(matrix, mouseX, mouseY);
+        super.renderForeground(mouseX, mouseY);
     }
 }

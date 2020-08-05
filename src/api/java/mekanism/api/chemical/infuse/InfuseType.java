@@ -1,24 +1,31 @@
 package mekanism.api.chemical.infuse;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.MekanismAPI;
 import mekanism.api.NBTConstants;
 import mekanism.api.chemical.Chemical;
-import mekanism.api.chemical.ChemicalTags;
 import mekanism.api.chemical.ChemicalUtils;
+import mekanism.api.chemical.gas.Gas;
 import mekanism.api.providers.IInfuseTypeProvider;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
+import net.minecraftforge.common.util.ReverseTagWrapper;
+
+import java.util.Set;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class InfuseType extends Chemical<InfuseType> implements IInfuseTypeProvider {
 
+    private final ReverseTagWrapper<InfuseType> reverseTags = new ReverseTagWrapper<>(this, InfuseTypeTags::getGeneration, InfuseTypeTags::getCollection);
+
     public InfuseType(InfuseTypeBuilder builder) {
-        super(builder, ChemicalTags.INFUSE_TYPE);
+        super(builder);
     }
 
     public static InfuseType readFromNBT(@Nullable CompoundNBT nbtTags) {
@@ -48,5 +55,15 @@ public class InfuseType extends Chemical<InfuseType> implements IInfuseTypeProvi
     @Override
     protected String getDefaultTranslationKey() {
         return Util.makeTranslationKey("infuse_type", getRegistryName());
+    }
+
+    @Override
+    public boolean isIn(@Nonnull Tag<InfuseType> tag) {
+        return tag.contains(this);
+    }
+
+    @Override
+    public Set<ResourceLocation> getTags() {
+        return reverseTags.getTagNames();
     }
 }

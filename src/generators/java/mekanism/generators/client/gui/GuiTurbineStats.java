@@ -1,8 +1,5 @@
 package mekanism.generators.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.Arrays;
-import javax.annotation.Nonnull;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.text.EnumColor;
 import mekanism.client.gui.GuiMekanismTile;
@@ -19,6 +16,8 @@ import mekanism.generators.common.content.turbine.TurbineValidator;
 import mekanism.generators.common.tile.turbine.TileEntityTurbineCasing;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.text.ITextComponent;
+
+import java.util.Arrays;
 
 public class GuiTurbineStats extends GuiMekanismTile<TileEntityTurbineCasing, EmptyTileContainer<TileEntityTurbineCasing>> {
 
@@ -47,33 +46,33 @@ public class GuiTurbineStats extends GuiMekanismTile<TileEntityTurbineCasing, Em
     }
 
     @Override
-    protected void drawForegroundText(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        drawTitleText(matrix, GeneratorsLang.TURBINE_STATS.translate(), 6);
+    protected void drawForegroundText(int mouseX, int mouseY) {
+        drawTitleText(GeneratorsLang.TURBINE_STATS.translate(), 6);
         if (tile.getMultiblock().isFormed()) {
             ITextComponent limiting = GeneratorsLang.IS_LIMITING.translateColored(EnumColor.DARK_RED);
             int lowerVolume = tile.getMultiblock().lowerVolume;
             int clientDispersers = tile.getMultiblock().clientDispersers;
             int vents = tile.getMultiblock().vents;
-            drawString(matrix, GeneratorsLang.TURBINE_TANK_VOLUME.translate(lowerVolume), 8, 26, titleTextColor());
+            drawString(GeneratorsLang.TURBINE_TANK_VOLUME.translate(lowerVolume), 8, 26, titleTextColor());
             boolean dispersersLimiting = lowerVolume * clientDispersers * MekanismGeneratorsConfig.generators.turbineDisperserGasFlow.get()
                                          < vents * MekanismGeneratorsConfig.generators.turbineVentGasFlow.get();
             boolean ventsLimiting = lowerVolume * clientDispersers * MekanismGeneratorsConfig.generators.turbineDisperserGasFlow.get()
                                     > vents * MekanismGeneratorsConfig.generators.turbineVentGasFlow.get();
-            drawString(matrix, GeneratorsLang.TURBINE_STEAM_FLOW.translate(), 8, 40, 0x797979);
-            drawString(matrix, GeneratorsLang.TURBINE_DISPERSERS.translate(clientDispersers, dispersersLimiting ? limiting : ""), 14, 49, titleTextColor());
-            drawString(matrix, GeneratorsLang.TURBINE_VENTS.translate(vents, ventsLimiting ? limiting : ""), 14, 58, titleTextColor());
+            drawString(GeneratorsLang.TURBINE_STEAM_FLOW.translate(), 8, 40, 0x797979);
+            drawString(GeneratorsLang.TURBINE_DISPERSERS.translate(clientDispersers, dispersersLimiting ? limiting : ""), 14, 49, titleTextColor());
+            drawString(GeneratorsLang.TURBINE_VENTS.translate(vents, ventsLimiting ? limiting : ""), 14, 58, titleTextColor());
             int coils = tile.getMultiblock().coils;
             int blades = tile.getMultiblock().blades;
-            drawString(matrix, GeneratorsLang.TURBINE_PRODUCTION.translate(), 8, 72, 0x797979);
-            drawString(matrix, GeneratorsLang.TURBINE_BLADES.translate(blades, coils * 4 > blades ? limiting : ""), 14, 81, titleTextColor());
-            drawString(matrix, GeneratorsLang.TURBINE_COILS.translate(coils, coils * 4 < blades ? limiting : ""), 14, 90, titleTextColor());
+            drawString(GeneratorsLang.TURBINE_PRODUCTION.translate(), 8, 72, 0x797979);
+            drawString(GeneratorsLang.TURBINE_BLADES.translate(blades, coils * 4 > blades ? limiting : ""), 14, 81, titleTextColor());
+            drawString(GeneratorsLang.TURBINE_COILS.translate(coils, coils * 4 < blades ? limiting : ""), 14, 90, titleTextColor());
             FloatingLong energyMultiplier = MekanismConfig.general.maxEnergyPerSteam.get().divide(TurbineValidator.MAX_BLADES)
                   .multiply(Math.min(blades, coils * MekanismGeneratorsConfig.generators.turbineBladesPerCoil.get()));
             double rate = lowerVolume * (clientDispersers * MekanismGeneratorsConfig.generators.turbineDisperserGasFlow.get());
             rate = Math.min(rate, vents * MekanismGeneratorsConfig.generators.turbineVentGasFlow.get());
-            drawString(matrix, GeneratorsLang.TURBINE_MAX_PRODUCTION.translate(EnergyDisplay.of(energyMultiplier.multiply(rate))), 8, 104, titleTextColor());
-            drawString(matrix, GeneratorsLang.TURBINE_MAX_WATER_OUTPUT.translate(tile.getMultiblock().condensers * MekanismGeneratorsConfig.generators.condenserRate.get()), 8, 113, titleTextColor());
+            drawString(GeneratorsLang.TURBINE_MAX_PRODUCTION.translate(EnergyDisplay.of(energyMultiplier.multiply(rate))), 8, 104, titleTextColor());
+            drawString(GeneratorsLang.TURBINE_MAX_WATER_OUTPUT.translate(tile.getMultiblock().condensers * MekanismGeneratorsConfig.generators.condenserRate.get()), 8, 113, titleTextColor());
         }
-        super.drawForegroundText(matrix, mouseX, mouseY);
+        super.drawForegroundText(mouseX, mouseY);
     }
 }

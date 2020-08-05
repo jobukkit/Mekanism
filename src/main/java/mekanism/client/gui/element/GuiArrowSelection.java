@@ -1,17 +1,19 @@
 package mekanism.client.gui.element;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
+
+import com.mojang.blaze3d.systems.RenderSystem;
 import mekanism.client.gui.GuiUtils;
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.render.MekanismRenderer;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.MekanismUtils.ResourceType;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+
+import java.util.function.Supplier;
 
 public class GuiArrowSelection extends GuiTexturedElement {
 
@@ -31,27 +33,27 @@ public class GuiArrowSelection extends GuiTexturedElement {
     }
 
     @Override
-    public void renderToolTip(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
+    public void renderToolTip(int mouseX, int mouseY) {
         ITextComponent component = textComponentSupplier.get();
         if (component != null) {
             int tooltipX = mouseX + 5;
             int tooltipY = mouseY - 5;
-            GuiUtils.renderExtendedTexture(matrix, GuiInnerScreen.SCREEN, 2, 2, tooltipX - 3, tooltipY - 4, getStringWidth(component) + 6, 16);
+            GuiUtils.renderExtendedTexture(GuiInnerScreen.SCREEN, 2, 2, tooltipX - 3, tooltipY - 4, getStringWidth(component) + 6, 16);
             IRenderTypeBuffer.Impl renderType = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
-            matrix.push();
+            RenderSystem.pushMatrix();
             //Make sure the text is above other renders like JEI
-            matrix.translate(0.0D, 0.0D, 300);
-            getFont().func_238416_a_(component, tooltipX, tooltipY, screenTextColor(), false, matrix.getLast().getMatrix(),
+            RenderSystem.translated(0.0D, 0.0D, 300);
+            getFont().renderString(component.getString(), tooltipX, tooltipY, screenTextColor(), false, Matrix4f.makeTranslate(0,0, 0),
                   renderType, false, 0, MekanismRenderer.FULL_LIGHT);
-            matrix.pop();
+            RenderSystem.popMatrix();
             renderType.finish();
         }
     }
 
     @Override
-    public void drawBackground(@Nonnull MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
-        super.drawBackground(matrix, mouseX, mouseY, partialTicks);
+    public void drawBackground(int mouseX, int mouseY, float partialTicks) {
+        super.drawBackground(mouseX, mouseY, partialTicks);
         minecraft.textureManager.bindTexture(getResource());
-        blit(matrix, x, y, 0, 0, width, height, width, height);
+        blit(x, y, 0, 0, width, height, width, height);
     }
 }

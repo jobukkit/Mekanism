@@ -15,8 +15,8 @@ public class DoubleDeferredRegister<PRIMARY extends IForgeRegistryEntry<PRIMARY>
     private final DeferredRegister<SECONDARY> secondaryRegister;
 
     public DoubleDeferredRegister(String modid, IForgeRegistry<PRIMARY> primaryRegistry, IForgeRegistry<SECONDARY> secondaryRegistry) {
-        primaryRegister = DeferredRegister.create(primaryRegistry, modid);
-        secondaryRegister = DeferredRegister.create(secondaryRegistry, modid);
+        primaryRegister = new DeferredRegister<>(primaryRegistry, modid);
+        secondaryRegister = new DeferredRegister<>(secondaryRegistry, modid);
     }
 
     public <P extends PRIMARY, S extends SECONDARY, W extends DoubleWrappedRegistryObject<P, S>> W register(String name, Supplier<? extends P> primarySupplier,

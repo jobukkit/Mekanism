@@ -32,10 +32,6 @@ class SawingRecipeProvider implements ISubRecipeProvider {
               Blocks.OAK_PRESSURE_PLATE, Blocks.OAK_TRAPDOOR, "oak");
         RecipeProviderUtil.addPrecisionSawmillWoodTypeRecipes(consumer, basePath, Blocks.SPRUCE_PLANKS, Items.SPRUCE_BOAT, Items.SPRUCE_DOOR, Blocks.SPRUCE_FENCE_GATE,
               ItemTags.SPRUCE_LOGS, Blocks.SPRUCE_PRESSURE_PLATE, Blocks.SPRUCE_TRAPDOOR, "spruce");
-        RecipeProviderUtil.addPrecisionSawmillWoodTypeRecipes(consumer, basePath, Blocks.CRIMSON_PLANKS, null, Items.CRIMSON_DOOR, Blocks.CRIMSON_FENCE_GATE,
-              ItemTags.field_232913_w_, Blocks.CRIMSON_PRESSURE_PLATE, Blocks.CRIMSON_TRAPDOOR, "crimson");
-        RecipeProviderUtil.addPrecisionSawmillWoodTypeRecipes(consumer, basePath, Blocks.WARPED_PLANKS, null, Items.WARPED_DOOR, Blocks.WARPED_FENCE_GATE,
-              ItemTags.field_232914_x_, Blocks.WARPED_PRESSURE_PLATE, Blocks.WARPED_TRAPDOOR, "warped");
         //Barrel
         SawmillRecipeBuilder.sawing(
               ItemStackIngredient.from(Items.BARREL),

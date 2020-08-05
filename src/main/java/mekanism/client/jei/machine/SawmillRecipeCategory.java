@@ -58,11 +58,11 @@ public class SawmillRecipeCategory extends BaseRecipeCategory<SawmillRecipe> {
     }
 
     @Override
-    public void draw(SawmillRecipe recipe, MatrixStack matrix, double mouseX, double mouseY) {
-        super.draw(recipe, matrix, mouseX, mouseY);
+    public void draw(SawmillRecipe recipe, double mouseX, double mouseY) {
+        super.draw(recipe, mouseX, mouseY);
         double secondaryChance = recipe.getSecondaryChance();
         if (secondaryChance > 0) {
-            getFont().drawString(matrix, Math.round(secondaryChance * 100) + "%", 104, 41, 0x404040);
+            getFont().drawString( Math.round(secondaryChance * 100) + "%", 104, 41, 0x404040);
         }
     }
 }

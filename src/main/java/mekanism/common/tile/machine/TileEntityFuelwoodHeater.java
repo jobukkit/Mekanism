@@ -71,8 +71,8 @@ public class TileEntityFuelwoodHeater extends TileEntityMekanism {
     }
 
     @Override
-    public void read(@Nonnull BlockState state, @Nonnull CompoundNBT nbtTags) {
-        super.read(state, nbtTags);
+    public void read(@Nonnull CompoundNBT nbtTags) {
+        super.read(nbtTags);
         burnTime = nbtTags.getInt(NBTConstants.BURN_TIME);
         maxBurnTime = nbtTags.getInt(NBTConstants.MAX_BURN_TIME);
     }

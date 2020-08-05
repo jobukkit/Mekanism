@@ -1,6 +1,6 @@
 package mekanism.client.gui.element.custom;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.GuiColorPickerSlot;
 import mekanism.client.gui.element.GuiScreenSwitch;
@@ -44,16 +44,16 @@ public class GuiMekaSuitHelmetOptions extends GuiWindow {
     }
 
     @Override
-    public void renderForeground(MatrixStack matrix, int mouseX, int mouseY) {
-        super.renderForeground(matrix, mouseX, mouseY);
+    public void renderForeground(int mouseX, int mouseY) {
+        super.renderForeground(mouseX, mouseY);
 
-        drawCenteredTextScaledBound(matrix, MekanismLang.HELMET_OPTIONS.translate(), 120, 6, titleTextColor());
-        drawTextExact(matrix, MekanismLang.HUD_OVERLAY.translate(), relativeX + 7, relativeY + 20, headingTextColor());
+        drawCenteredTextScaledBound(MekanismLang.HELMET_OPTIONS.translate(), 120, 6, titleTextColor());
+        drawTextExact(MekanismLang.HUD_OVERLAY.translate(), relativeX + 7, relativeY + 20, headingTextColor());
 
-        drawScaledCenteredText(matrix, MekanismLang.DEFAULT.translate(), relativeX + 21, relativeY + 52, subheadingTextColor(), 0.8F);
-        drawScaledCenteredText(matrix, MekanismLang.WARNING.translate(), relativeX + 70, relativeY + 52, subheadingTextColor(), 0.8F);
-        drawScaledCenteredText(matrix, MekanismLang.DANGER.translate(), relativeX + 119, relativeY + 52, subheadingTextColor(), 0.8F);
+        drawScaledCenteredText(MekanismLang.DEFAULT.translate(), relativeX + 21, relativeY + 52, subheadingTextColor(), 0.8F);
+        drawScaledCenteredText(MekanismLang.WARNING.translate(), relativeX + 70, relativeY + 52, subheadingTextColor(), 0.8F);
+        drawScaledCenteredText(MekanismLang.DANGER.translate(), relativeX + 119, relativeY + 52, subheadingTextColor(), 0.8F);
 
-        drawScaledCenteredText(matrix, MekanismLang.OPACITY.translate(), relativeX + 70, relativeY + 75, subheadingTextColor(), 0.8F);
+        drawScaledCenteredText(MekanismLang.OPACITY.translate(), relativeX + 70, relativeY + 75, subheadingTextColor(), 0.8F);
     }
 }

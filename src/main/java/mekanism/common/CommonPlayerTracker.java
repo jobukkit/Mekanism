@@ -37,7 +37,7 @@ public class CommonPlayerTracker {
 
     static {
         TranslationTextComponent hereComponent = MekanismLang.ALPHA_WARNING_HERE.translate();
-        hereComponent.getStyle().setUnderlined(true).setColor(EnumColor.INDIGO.getColor())
+        hereComponent.getStyle().setUnderlined(true).setColor(EnumColor.INDIGO.textFormatting)
               .setClickEvent(new ClickEvent(Action.OPEN_URL, "https://github.com/mekanism/Mekanism#alpha-status"));
         ALPHA_WARNING = MekanismLang.LOG_FORMAT.translateColored(EnumColor.RED, MekanismLang.MEKANISM, EnumColor.GRAY, MekanismLang.ALPHA_WARNING.translate(hereComponent));
     }

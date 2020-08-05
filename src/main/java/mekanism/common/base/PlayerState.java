@@ -4,9 +4,6 @@ import it.unimi.dsi.fastutil.objects.Object2FloatMap;
 import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 import mekanism.api.math.FloatingLong;
 import mekanism.client.sound.PlayerSound.SoundType;
 import mekanism.client.sound.SoundHandler;
@@ -24,9 +21,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IWorld;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 public class PlayerState {
 
@@ -249,7 +250,7 @@ public class PlayerState {
                 ModuleGravitationalModulatingUnit module = Modules.load(player.getItemStackFromSlot(EquipmentSlotType.CHEST), Modules.GRAVITATIONAL_MODULATING_UNIT);
                 player.setSprinting(false);
                 if (boostKey) {
-                    player.moveRelative(module.getBoost(), new Vector3d(0, 0, 1));
+                    player.moveRelative(module.getBoost(), new Vec3d(0, 0, 1));
                 }
                 module.useEnergy(player, boostKey ? usage.multiply(4) : usage);
             }

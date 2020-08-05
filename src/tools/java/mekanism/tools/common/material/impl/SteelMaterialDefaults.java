@@ -127,9 +127,4 @@ public class SteelMaterialDefaults extends BaseMekanismMaterial {
     public Ingredient getCommonRepairMaterial() {
         return Ingredient.fromTag(MekanismTags.Items.INGOTS_STEEL);
     }
-
-    @Override
-    public float getKnockbackResistance() {
-        return 0;
-    }
 }

@@ -1,12 +1,6 @@
 package mekanism.common.base;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 import mekanism.common.block.BlockBounding;
 import mekanism.common.lib.WildcardMatcher;
 import net.minecraft.block.Block;
@@ -14,11 +8,14 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.Tag;
 import net.minecraft.tags.TagCollection;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public final class TagCache {
 
@@ -46,7 +43,7 @@ public final class TagCache {
         List<ResourceLocation> keys = tagCollection.getRegisteredTags().stream().filter(rl -> WildcardMatcher.matches(oreName, rl.toString())).collect(Collectors.toList());
         Set<Item> items = new HashSet<>();
         for (ResourceLocation key : keys) {
-            ITag<Item> itemTag = tagCollection.get(key);
+            Tag<Item> itemTag = tagCollection.get(key);
             if (itemTag != null) {
                 items.addAll(itemTag.getAllElements());
             }
@@ -64,7 +61,7 @@ public final class TagCache {
         List<ResourceLocation> keys = tagCollection.getRegisteredTags().stream().filter(rl -> WildcardMatcher.matches(oreName, rl.toString())).collect(Collectors.toList());
         Set<Block> blocks = new HashSet<>();
         for (ResourceLocation key : keys) {
-            ITag<Block> blockTag = tagCollection.get(key);
+            Tag<Block> blockTag = tagCollection.get(key);
             if (blockTag != null) {
                 blocks.addAll(blockTag.getAllElements());
             }

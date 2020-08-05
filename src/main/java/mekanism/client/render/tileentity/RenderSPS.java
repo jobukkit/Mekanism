@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import javax.annotation.ParametersAreNonnullByDefault;
+
+import com.mojang.blaze3d.systems.RenderSystem;
+import mekanism.api.backport.Vector3d;
 import mekanism.client.render.lib.effect.BillboardingEffectRenderer;
 import mekanism.client.render.lib.effect.BoltRenderer;
 import mekanism.common.base.ProfilerConstants;
@@ -28,7 +31,6 @@ import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
 
 @ParametersAreNonnullByDefault
 public class RenderSPS extends MekanismTileEntityRenderer<TileEntitySPSCasing> {
@@ -85,7 +87,6 @@ public class RenderSPS extends MekanismTileEntityRenderer<TileEntitySPSCasing> {
             } else if (tile.orbitEffects.size() < targetEffectCount && rand.nextDouble() < 0.5) {
                 tile.orbitEffects.add(new SPSOrbitEffect(tile.getMultiblock(), center));
             }
-
             bolts.render(partialTick, matrix, renderer);
 
             if (tile.getMultiblock().lastProcessed > 0) {
