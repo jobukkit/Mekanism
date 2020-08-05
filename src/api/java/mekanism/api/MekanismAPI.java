@@ -9,7 +9,9 @@ import mekanism.api.chemical.pigment.EmptyPigment;
 import mekanism.api.chemical.pigment.Pigment;
 import mekanism.api.chemical.slurry.EmptySlurry;
 import mekanism.api.chemical.slurry.Slurry;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.RegistryBuilder;
 import net.minecraftforge.registries.RegistryManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,10 +30,10 @@ public class MekanismAPI {
 
     public static final Logger logger = LogManager.getLogger(MEKANISM_MODID + "_api");
 
-    private static IForgeRegistry<Gas> GAS_REGISTRY;
-    private static IForgeRegistry<InfuseType> INFUSE_TYPE_REGISTRY;
-    private static IForgeRegistry<Pigment> PIGMENT_REGISTRY;
-    private static IForgeRegistry<Slurry> SLURRY_REGISTRY;
+    private static IForgeRegistry<Gas> GAS_REGISTRY = new RegistryBuilder<Gas>().setName(new ResourceLocation(MEKANISM_MODID, "gas")).setType(Gas.class).create();
+    private static IForgeRegistry<InfuseType> INFUSE_TYPE_REGISTRY = new RegistryBuilder<InfuseType>().setName(new ResourceLocation(MEKANISM_MODID, "infuse_type")).setType(InfuseType.class).create();;
+    private static IForgeRegistry<Pigment> PIGMENT_REGISTRY = new RegistryBuilder<Pigment>().setName(new ResourceLocation(MEKANISM_MODID, "pigment")).setType(Pigment.class).create();
+    private static IForgeRegistry<Slurry> SLURRY_REGISTRY = new RegistryBuilder<Slurry>().setName(new ResourceLocation(MEKANISM_MODID, "slurry")).setType(Slurry.class).create();
 
     //Note: None of the empty variants support registry replacement
     @Nonnull

@@ -11,6 +11,7 @@ import java.util.Locale;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.client.render.FluidRenderMap;
+import mekanism.client.render.MekanismRenderType;
 import mekanism.client.render.MekanismRenderer;
 import mekanism.client.render.MekanismRenderer.FluidType;
 import mekanism.client.render.MekanismRenderer.Model3D;
@@ -22,6 +23,7 @@ import mekanism.common.tile.transmitter.TileEntityMechanicalPipe;
 import mekanism.common.util.EnumUtils;
 import net.minecraft.client.renderer.Atlases;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.util.Direction;
@@ -69,7 +71,7 @@ public class RenderMechanicalPipe extends RenderTransmitterBase<TileEntityMechan
                     if (connectionType == ConnectionType.NORMAL) {
                         MekanismRenderer.renderObject(getModel(side, fluidStack, stage), matrix, buffer, color, glow, overlayLight);
                     } else if (connectionType != ConnectionType.NONE) {
-                        connectionContents.add(side.getString() + connectionType.getString().toUpperCase(Locale.ROOT));
+                        connectionContents.add(side.getName() + connectionType.getName().toUpperCase());
                     }
                     if (model != null) {
                         model.setSideRender(side, connectionType == ConnectionType.NONE);

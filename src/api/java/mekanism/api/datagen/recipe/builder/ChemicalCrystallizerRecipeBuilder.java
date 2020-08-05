@@ -1,9 +1,6 @@
 package mekanism.api.datagen.recipe.builder;
 
 import com.google.gson.JsonObject;
-import java.util.function.Consumer;
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.JsonConstants;
 import mekanism.api.SerializerHelper;
@@ -14,6 +11,10 @@ import mekanism.api.recipes.inputs.chemical.IChemicalStackIngredient;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.Consumer;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -55,7 +56,7 @@ public class ChemicalCrystallizerRecipeBuilder extends MekanismRecipeBuilder<Che
 
         @Override
         public void serialize(@Nonnull JsonObject json) {
-            json.addProperty(JsonConstants.CHEMICAL_TYPE, chemicalType.getString());
+            json.addProperty(JsonConstants.CHEMICAL_TYPE, chemicalType.getName());
             json.add(JsonConstants.INPUT, input.serialize());
             json.add(JsonConstants.OUTPUT, SerializerHelper.serializeItemStack(output));
         }

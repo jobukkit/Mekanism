@@ -1,9 +1,7 @@
 package mekanism.client.gui.element.text;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.function.Consumer;
-import java.util.function.IntSupplier;
-import javax.annotation.Nonnull;
+
+import com.mojang.blaze3d.systems.RenderSystem;
 import mekanism.api.functions.CharPredicate;
 import mekanism.client.SpecialColors;
 import mekanism.client.gui.IGuiWrapper;
@@ -13,8 +11,10 @@ import mekanism.client.gui.element.button.MekanismImageButton;
 import mekanism.client.render.MekanismRenderer;
 import mekanism.common.lib.Color;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.util.text.StringTextComponent;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.function.Consumer;
+import java.util.function.IntSupplier;
 
 /**
  * GuiElement wrapper of TextFieldWidget for more control
@@ -44,7 +44,7 @@ public class GuiTextField extends GuiRelativeElement {
     public GuiTextField(IGuiWrapper gui, int x, int y, int width, int height) {
         super(gui, x, y, width, height);
 
-        textField = new TextFieldWidget(getFont(), this.x, this.y, width, height, StringTextComponent.EMPTY);
+        textField = new TextFieldWidget(getFont(), this.x, this.y, width, height, "");
         textField.setEnableBackgroundDrawing(false);
         textField.setResponder(s -> {
             if (responder != null) {
@@ -178,25 +178,25 @@ public class GuiTextField extends GuiRelativeElement {
     }
 
     @Override
-    public void drawBackground(@Nonnull MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
-        super.drawBackground(matrix, mouseX, mouseY, partialTicks);
-        backgroundType.render(this, matrix);
+    public void drawBackground(int mouseX, int mouseY, float partialTicks) {
+        super.drawBackground(mouseX, mouseY, partialTicks);
+        backgroundType.render(this);
         if (textScale != 1F) {
             // hacky. we should write our own renderer at some point.
             float reverse = (1 / textScale) - 1;
             float yAdd = 4 - (textScale * 8) / 2F;
-            matrix.push();
-            matrix.scale(textScale, textScale, textScale);
-            matrix.translate(textField.x * reverse, (textField.y) * reverse + yAdd * (1 / textScale), 0);
-            textField.render(matrix, mouseX, mouseY, 0);
-            matrix.pop();
+            RenderSystem.pushMatrix();
+            RenderSystem.scaled(textScale, textScale, textScale);
+            RenderSystem.translated(textField.x * reverse, (textField.y) * reverse + yAdd * (1 / textScale), 0);
+            textField.render(mouseX, mouseY, 0);
+            RenderSystem.popMatrix();
         } else {
-            textField.render(matrix, mouseX, mouseY, 0);
+            textField.render(mouseX, mouseY, 0);
         }
         MekanismRenderer.resetColor();
         if (iconType != null) {
             minecraft.textureManager.bindTexture(iconType.getIcon());
-            blit(matrix, x + 2, y + (height / 2) - (int) Math.ceil(iconType.getHeight() / 2F), 0, 0, iconType.getWidth(), iconType.getHeight(), iconType.getWidth(), iconType.getHeight());
+            blit(x + 2, y + (height / 2) - (int) Math.ceil(iconType.getHeight() / 2F), 0, 0, iconType.getWidth(), iconType.getHeight(), iconType.getWidth(), iconType.getHeight());
         }
     }
 

@@ -1,13 +1,6 @@
 package mekanism.client.gui.element.scroll;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
 import mekanism.api.text.EnumColor;
 import mekanism.api.text.TextComponentUtil;
 import mekanism.client.gui.IGuiWrapper;
@@ -22,6 +15,13 @@ import mekanism.common.util.MekanismUtils.ResourceType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class GuiModuleScrollList extends GuiScrollList {
 
@@ -93,8 +93,8 @@ public class GuiModuleScrollList extends GuiScrollList {
     }
 
     @Override
-    public void renderForeground(MatrixStack matrix, int mouseX, int mouseY) {
-        super.renderForeground(matrix, mouseX, mouseY);
+    public void renderForeground(int mouseX, int mouseY) {
+        super.renderForeground(mouseX, mouseY);
         ItemStack stack = itemSupplier.get();
         if (!ItemStack.areItemStacksEqual(currentItem, stack)) {
             updateList(stack, false);
@@ -109,14 +109,14 @@ public class GuiModuleScrollList extends GuiScrollList {
             //Always render the name and module
             Module instance = Modules.load(currentItem, module);
             int color = module.isExclusive() ? (instance.isEnabled() ? 0x635BD4 : 0x2E2A69) : (instance.isEnabled() ? titleTextColor() : 0x5E1D1D);
-            drawScaledTextScaledBound(matrix, TextComponentUtil.build(module), relativeX + 13, relativeY + 3 + multipliedElement, color, 86, 0.7F);
-            renderModule(matrix, module, relativeX + 3, relativeY + 3 + multipliedElement, 0.5F);
+            drawScaledTextScaledBound(TextComponentUtil.build(module), relativeX + 13, relativeY + 3 + multipliedElement, color, 86, 0.7F);
+            renderModule(module, relativeX + 3, relativeY + 3 + multipliedElement, 0.5F);
         }
     }
 
     @Override
-    public void renderToolTip(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        super.renderToolTip(matrix, mouseX, mouseY);
+    public void renderToolTip(int mouseX, int mouseY) {
+        super.renderToolTip(mouseX, mouseY);
         for (int i = 0; i < getFocusedElements(); i++) {
             int index = getCurrentSelection() + i;
             if (index > currentList.size() - 1) {
@@ -127,13 +127,13 @@ public class GuiModuleScrollList extends GuiScrollList {
             int multipliedElement = elementHeight * i;
             if (mouseX >= relativeX + 1 && mouseX < relativeX + barXShift - 1 && mouseY >= relativeY + 1 + multipliedElement && mouseY < relativeY + 1 + multipliedElement + elementHeight) {
                 ITextComponent t = MekanismLang.GENERIC_FRACTION.translateColored(EnumColor.GRAY, instance.getInstalledCount(), module.getMaxStackSize());
-                guiObj.displayTooltip(matrix, MekanismLang.MODULE_INSTALLED.translate(t), mouseX, mouseY, guiObj.getWidth());
+                guiObj.displayTooltip(MekanismLang.MODULE_INSTALLED.translate(t), mouseX, mouseY, guiObj.getWidth());
             }
         }
     }
 
     @Override
-    public void renderElements(MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
+    public void renderElements(int mouseX, int mouseY, float partialTicks) {
         //Draw elements
         minecraft.textureManager.bindTexture(MODULE_SELECTION);
         for (int i = 0; i < getFocusedElements(); i++) {
@@ -149,12 +149,12 @@ public class GuiModuleScrollList extends GuiScrollList {
             } else if (mouseX >= x + 1 && mouseX < barX - 1 && mouseY >= shiftedY && mouseY < shiftedY + elementHeight) {
                 j = 0;
             }
-            blit(matrix, x + 1, shiftedY, 0, elementHeight * j, TEXTURE_WIDTH, elementHeight, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+            blit(x + 1, shiftedY, 0, elementHeight * j, TEXTURE_WIDTH, elementHeight, TEXTURE_WIDTH, TEXTURE_HEIGHT);
             MekanismRenderer.resetColor();
         }
     }
 
-    private void renderModule(MatrixStack matrix, ModuleData<?> type, int x, int y, float size) {
-        guiObj.renderItem(matrix, type.getStack(), (int) (x / size), (int) (y / size), size);
+    private void renderModule(ModuleData<?> type, int x, int y, float size) {
+        guiObj.renderItem(type.getStack(), (int) (x / size), (int) (y / size), size);
     }
 }

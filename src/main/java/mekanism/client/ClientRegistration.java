@@ -139,6 +139,7 @@ import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -458,7 +459,7 @@ public class ClientRegistration {
             //Only allow an exact match, so we don't add to modded entities that only have a modded extended armor layer
             if (layerRenderer.getClass() == BipedArmorLayer.class) {
                 BipedArmorLayer<T, M, A> bipedArmorLayer = (BipedArmorLayer<T, M, A>) layerRenderer;
-                renderer.addLayer(new MekanismArmorLayer<>(renderer, bipedArmorLayer.modelLeggings, bipedArmorLayer.modelArmor));
+                renderer.addLayer(new MekanismArmorLayer<>(renderer, bipedArmorLayer.getModelFromSlot(EquipmentSlotType.LEGS), bipedArmorLayer.getModelFromSlot(EquipmentSlotType.CHEST)));
                 break;
             }
         }

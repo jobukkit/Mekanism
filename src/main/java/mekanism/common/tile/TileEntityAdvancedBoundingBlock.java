@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import mekanism.api.IConfigCardAccess.ISpecialConfigData;
 import mekanism.api.Upgrade;
+import mekanism.api.backport.Vector3i;
 import mekanism.common.Mekanism;
 import mekanism.common.registries.MekanismTileEntityTypes;
 import mekanism.common.tile.component.TileComponentUpgrade;
@@ -91,7 +92,7 @@ public class TileEntityAdvancedBoundingBlock extends TileEntityBoundingBlock imp
         if (inv == null) {
             return super.getCapability(capability, side);
         }
-        return inv.getOffsetCapability(capability, side, pos.subtract(getMainPos()));
+        return inv.getOffsetCapability(capability, side, new Vector3i(pos.subtract(getMainPos())));
     }
 
     @Override

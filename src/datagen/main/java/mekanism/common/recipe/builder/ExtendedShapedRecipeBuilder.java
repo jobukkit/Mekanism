@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
+import mekanism.api.backport.ITag;
 import mekanism.common.DataGenJsonConstants;
 import mekanism.common.recipe.pattern.RecipePattern;
 import net.minecraft.item.Item;
@@ -57,7 +58,7 @@ public class ExtendedShapedRecipeBuilder extends BaseRecipeBuilder<ExtendedShape
     }
 
     public ExtendedShapedRecipeBuilder key(char symbol, ITag<Item> tag) {
-        return key(symbol, Ingredient.fromTag(tag));
+        return key(symbol, Ingredient.fromTag(tag.toTag()));
     }
 
     public ExtendedShapedRecipeBuilder key(char symbol, IItemProvider item) {

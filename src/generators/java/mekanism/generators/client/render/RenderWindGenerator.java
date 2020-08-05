@@ -10,10 +10,10 @@ import mekanism.generators.client.model.ModelWindGenerator;
 import mekanism.generators.common.GeneratorsProfilerConstants;
 import mekanism.generators.common.tile.TileEntityWindGenerator;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.vector.Vector3f;
 
 @ParametersAreNonnullByDefault
 public class RenderWindGenerator extends MekanismTileEntityRenderer<TileEntityWindGenerator> implements IWireFrameRenderer {

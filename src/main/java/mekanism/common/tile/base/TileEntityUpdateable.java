@@ -73,10 +73,10 @@ public abstract class TileEntityUpdateable extends TileEntity implements ITileWr
     }
 
     @Override
-    public void handleUpdateTag(BlockState state, @Nonnull CompoundNBT tag) {
+    public void handleUpdateTag(@Nonnull CompoundNBT tag) {
         //We don't want to do a full read from NBT so simply call the super's read method to let Forge do whatever
         // it wants, but don't treat this as if it was the full saved NBT data as not everything has to be synced to the client
-        super.read(state, tag);
+        super.read(tag);
     }
 
     @Nonnull
@@ -103,7 +103,7 @@ public abstract class TileEntityUpdateable extends TileEntity implements ITileWr
     }
 
     public void handleUpdatePacket(@Nonnull CompoundNBT tag) {
-        handleUpdateTag(getBlockState(), tag);
+        handleUpdateTag(tag);
     }
 
     public void sendUpdatePacket() {

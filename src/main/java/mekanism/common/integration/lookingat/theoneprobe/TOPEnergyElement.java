@@ -1,11 +1,12 @@
 package mekanism.common.integration.lookingat.theoneprobe;
 
 import mcjty.theoneprobe.api.IElement;
+import mcjty.theoneprobe.api.IElementNew;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.integration.lookingat.EnergyElement;
 import net.minecraft.network.PacketBuffer;
 
-public class TOPEnergyElement extends EnergyElement implements IElement {
+public class TOPEnergyElement extends EnergyElement implements IElementNew {
 
     public TOPEnergyElement(FloatingLong energy, FloatingLong maxEnergy) {
         super(energy, maxEnergy);

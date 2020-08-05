@@ -1,11 +1,6 @@
 package mekanism.client.gui.qio;
 
 import com.google.common.collect.Sets;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import javax.annotation.Nonnull;
 import mekanism.api.text.EnumColor;
 import mekanism.client.gui.GuiMekanism;
 import mekanism.client.gui.element.GuiDigitalIconToggle;
@@ -28,6 +23,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IHasContainer;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.text.ITextComponent;
+
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public abstract class GuiQIOItemViewer<CONTAINER extends QIOItemViewerContainer> extends GuiMekanism<CONTAINER> {
 
@@ -88,13 +88,13 @@ public abstract class GuiQIOItemViewer<CONTAINER extends QIOItemViewerContainer>
     }
 
     @Override
-    protected void drawForegroundText(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        drawString(matrix, MekanismLang.INVENTORY.translate(), 8, (getYSize() - 96) + 4, titleTextColor());
-        drawString(matrix, MekanismLang.LIST_SEARCH.translate(), 7, 31, titleTextColor());
+    protected void drawForegroundText(int mouseX, int mouseY) {
+        drawString( MekanismLang.INVENTORY.translate(), 8, (getYSize() - 96) + 4, titleTextColor());
+        drawString( MekanismLang.LIST_SEARCH.translate(), 7, 31, titleTextColor());
         ITextComponent text = MekanismLang.LIST_SORT.translate();
         int width = getStringWidth(text);
-        drawString(matrix, text, xSize - 66 - width, (getYSize() - 96) + 4, titleTextColor());
-        super.drawForegroundText(matrix, mouseX, mouseY);
+        drawString( text, xSize - 66 - width, (getYSize() - 96) + 4, titleTextColor());
+        super.drawForegroundText( mouseX, mouseY);
     }
 
     @Override

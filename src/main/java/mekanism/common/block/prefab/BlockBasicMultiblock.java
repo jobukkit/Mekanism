@@ -16,6 +16,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -26,7 +27,7 @@ import net.minecraft.world.World;
 public class BlockBasicMultiblock<TILE extends TileEntityMekanism> extends BlockTile<TILE, BlockTypeTile<TILE>> {
 
     public BlockBasicMultiblock(BlockTypeTile<TILE> type) {
-        this(type, Block.Properties.create(Material.IRON).hardnessAndResistance(5F, 10F).setRequiresTool());
+        this(type, Block.Properties.create(Material.IRON).hardnessAndResistance(5F, 10F));
     }
 
     public BlockBasicMultiblock(BlockTypeTile<TILE> type, Block.Properties properties) {
@@ -53,7 +54,7 @@ public class BlockBasicMultiblock<TILE extends TileEntityMekanism> extends Block
         }
         if (world.isRemote) {
             ItemStack stack = player.getHeldItem(hand);
-            if (stack.getItem() instanceof BlockItem && new BlockItemUseContext(player, hand, stack, hit).canPlace()) {
+            if (stack.getItem() instanceof BlockItem && new BlockItemUseContext(new ItemUseContext(player, hand, hit)).canPlace()) {
                 if (!tile.hasGui() || !tile.getMultiblock().isFormed()) {
                     //If the block doesn't have a gui (frames of things like the evaporation plant), or the multiblock is not formed then pass
                     return ActionResultType.PASS;

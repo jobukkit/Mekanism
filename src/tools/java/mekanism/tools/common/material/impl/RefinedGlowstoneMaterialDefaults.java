@@ -127,9 +127,4 @@ public class RefinedGlowstoneMaterialDefaults extends BaseMekanismMaterial {
     public Ingredient getCommonRepairMaterial() {
         return Ingredient.fromTag(MekanismTags.Items.INGOTS_REFINED_GLOWSTONE);
     }
-
-    @Override
-    public float getKnockbackResistance() {
-        return 0;
-    }
 }

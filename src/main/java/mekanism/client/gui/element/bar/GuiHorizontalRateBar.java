@@ -1,6 +1,6 @@
 package mekanism.client.gui.element.bar;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.bar.GuiBar.IBarInfoHandler;
 import mekanism.common.util.MekanismUtils;
@@ -18,8 +18,8 @@ public class GuiHorizontalRateBar extends GuiBar<IBarInfoHandler> {
     }
 
     @Override
-    protected void renderBarOverlay(MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
+    protected void renderBarOverlay(int mouseX, int mouseY, float partialTicks) {
         int displayInt = (int) (getHandler().getLevel() * texWidth);
-        blit(matrix, x + 1, y + 1, 0, 0, displayInt, texHeight, texWidth, texHeight);
+        blit(x + 1, y + 1, 0, 0, displayInt, texHeight, texWidth, texHeight);
     }
 }

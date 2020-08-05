@@ -1,9 +1,7 @@
 package mekanism.client.gui.machine;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import java.util.Map;
-import javax.annotation.Nonnull;
 import mekanism.client.gui.GuiConfigurableTile;
 import mekanism.client.gui.element.GuiElementHolder;
 import mekanism.client.gui.element.button.FilterButton;
@@ -23,6 +21,8 @@ import mekanism.common.tile.machine.TileEntityOredictionificator.Oredictionifica
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
+
+import java.util.Map;
 
 public class GuiOredictionificator extends GuiConfigurableTile<TileEntityOredictionificator, MekanismTileContainer<TileEntityOredictionificator>> {
 
@@ -70,9 +70,9 @@ public class GuiOredictionificator extends GuiConfigurableTile<TileEntityOredict
     }
 
     @Override
-    protected void drawForegroundText(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        renderTitleText(matrix);
-        drawString(matrix, MekanismLang.INVENTORY.translate(), 8, (getYSize() - 96) + 2, titleTextColor());
+    protected void drawForegroundText(int mouseX, int mouseY) {
+        renderTitleText();
+        drawString(MekanismLang.INVENTORY.translate(), 8, (getYSize() - 96) + 2, titleTextColor());
         HashList<OredictionificatorFilter> filters = getFilters();
         for (int i = 0; i < FILTER_COUNT; i++) {
             OredictionificatorFilter filter = filters.getOrNull(scrollBar.getCurrentSelection() + i);
@@ -81,12 +81,12 @@ public class GuiOredictionificator extends GuiConfigurableTile<TileEntityOredict
                     updateRenderStacks();
                 }
                 int yStart = i * 22 + 18;
-                renderItem(matrix, renderStacks.get(filter), 13, yStart + 3);
-                drawString(matrix, MekanismLang.FILTER.translate(), 32, yStart + 2, titleTextColor());
-                drawTextScaledBound(matrix, filter.getFilterText(), 32, yStart + 2 + 9, titleTextColor(), 117);
+                renderItem(renderStacks.get(filter), 13, yStart + 3);
+                drawString(MekanismLang.FILTER.translate(), 32, yStart + 2, titleTextColor());
+                drawTextScaledBound(filter.getFilterText(), 32, yStart + 2 + 9, titleTextColor(), 117);
             }
         }
-        super.drawForegroundText(matrix, mouseX, mouseY);
+        super.drawForegroundText(mouseX, mouseY);
     }
 
     @Override

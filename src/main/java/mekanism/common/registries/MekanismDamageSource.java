@@ -1,11 +1,13 @@
 package mekanism.common.registries;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mcp.MethodsReturnNonnullByDefault;
+import mekanism.api.backport.Vector3d;
 import mekanism.api.text.IHasTranslationKey;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.Vec3d;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 //Note: This isn't an actual registry but should make things a bit cleaner
 @MethodsReturnNonnullByDefault
@@ -43,8 +45,8 @@ public class MekanismDamageSource extends DamageSource implements IHasTranslatio
 
     @Nullable
     @Override
-    public Vector3d getDamageLocation() {
-        return damageLocation;
+    public Vec3d getDamageLocation() {
+        return damageLocation.toVec();
     }
 
     @Override

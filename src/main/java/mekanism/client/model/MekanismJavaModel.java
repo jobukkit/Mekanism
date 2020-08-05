@@ -17,7 +17,7 @@ public abstract class MekanismJavaModel extends Model {
     }
 
     protected IVertexBuilder getVertexBuilder(@Nonnull IRenderTypeBuffer renderer, @Nonnull RenderType renderType, boolean hasEffect) {
-        return ItemRenderer.func_239391_c_(renderer, renderType, false, hasEffect);
+        return renderer.getBuffer(renderType);
     }
 
     protected void setRotation(ModelRenderer model, float x, float y, float z) {

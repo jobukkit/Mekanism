@@ -1,15 +1,7 @@
 package mekanism.common.block;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.DataHandlerUtils;
 import mekanism.api.NBTConstants;
-import mekanism.api.chemical.ChemicalTankBuilder;
-import mekanism.api.chemical.gas.IGasTank;
-import mekanism.api.chemical.gas.attribute.GasAttributes;
 import mekanism.common.Mekanism;
 import mekanism.common.block.attribute.Attribute;
 import mekanism.common.block.attribute.AttributeGui;
@@ -20,17 +12,11 @@ import mekanism.common.block.states.BlockStateHelper;
 import mekanism.common.block.states.IStateFluidLoggable;
 import mekanism.common.lib.security.ISecurityItem;
 import mekanism.common.network.PacketSecurityUpdate;
-import mekanism.common.tier.ChemicalTankTier;
-import mekanism.common.tile.TileEntityChemicalTank;
 import mekanism.common.tile.TileEntitySecurityDesk;
 import mekanism.common.tile.base.SubstanceType;
 import mekanism.common.tile.base.TileEntityMekanism;
-import mekanism.common.tile.interfaces.IBoundingBlock;
-import mekanism.common.tile.interfaces.IComparatorSupport;
+import mekanism.common.tile.interfaces.*;
 import mekanism.common.tile.interfaces.IRedstoneControl.RedstoneControl;
-import mekanism.common.tile.interfaces.ISideConfiguration;
-import mekanism.common.tile.interfaces.ISustainedData;
-import mekanism.common.tile.interfaces.ISustainedInventory;
 import mekanism.common.util.EnumUtils;
 import mekanism.common.util.ItemDataUtils;
 import mekanism.common.util.MekanismUtils;
@@ -42,20 +28,11 @@ import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.fluid.IFluidState;
+import net.minecraft.item.*;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
@@ -66,6 +43,10 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.UUID;
 
 /**
  * Special handling for block drops that need TileEntity data
@@ -129,7 +110,7 @@ public abstract class BlockMekanism extends Block {
         return itemStack;
     }
 
-    @Nonnull
+    /*@Nonnull
     @Override
     @Deprecated
     public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull LootContext.Builder builder) {
@@ -177,7 +158,7 @@ public abstract class BlockMekanism extends Block {
             }
         }
         return drops;
-    }
+    }*/
 
     @Override
     public boolean hasTileEntity(BlockState state) {
@@ -207,7 +188,7 @@ public abstract class BlockMekanism extends Block {
     @Nonnull
     @Override
     @Deprecated
-    public FluidState getFluidState(BlockState state) {
+    public IFluidState getFluidState(BlockState state) {
         if (state.getBlock() instanceof IStateFluidLoggable) {
             return ((IStateFluidLoggable) state.getBlock()).getFluid(state);
         }
@@ -382,7 +363,7 @@ public abstract class BlockMekanism extends Block {
 
     protected ActionResultType genericClientActivated(@Nonnull PlayerEntity player, @Nonnull Hand hand, @Nonnull BlockRayTraceResult hit) {
         ItemStack stack = player.getHeldItem(hand);
-        if (stack.getItem() instanceof BlockItem && new BlockItemUseContext(player, hand, stack, hit).canPlace() && !Attribute.has(this, AttributeGui.class)) {
+        if (stack.getItem() instanceof BlockItem && new BlockItemUseContext(new ItemUseContext(player, hand, hit)).canPlace() && !Attribute.has(this, AttributeGui.class)) {
             return ActionResultType.PASS;
         }
         return ActionResultType.SUCCESS;

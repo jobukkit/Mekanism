@@ -19,20 +19,14 @@ import mekanism.common.tile.transmitter.TileEntityTransmitter;
 import mekanism.common.util.EnumUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.IModelTransform;
-import net.minecraft.client.renderer.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.model.*;
 import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
-import net.minecraft.client.renderer.model.ItemOverrideList;
-import net.minecraft.client.renderer.model.ModelBakery;
-import net.minecraft.client.renderer.model.RenderMaterial;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockDisplayReader;
+import net.minecraft.world.ILightReader;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.model.IModelBuilder;
 import net.minecraftforge.client.model.IModelConfiguration;
@@ -48,7 +42,7 @@ public class TransmitterBakedModel implements IBakedModel {
     private final OBJModel glass;
     private final IModelConfiguration owner;
     private final ModelBakery bakery;
-    private final Function<RenderMaterial, TextureAtlasSprite> spriteGetter;
+    private final Function<Material, TextureAtlasSprite> spriteGetter;
     private final IModelTransform modelTransform;
     private final ItemOverrideList overrides;
     private final ResourceLocation modelLocation;
@@ -57,7 +51,7 @@ public class TransmitterBakedModel implements IBakedModel {
     private final Map<QuickHash, List<BakedQuad>> modelCache;
 
     public TransmitterBakedModel(OBJModel internal, @Nullable OBJModel glass, IModelConfiguration owner, ModelBakery bakery,
-          Function<RenderMaterial, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform, ItemOverrideList overrides, ResourceLocation modelLocation) {
+                                 Function<Material, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform, ItemOverrideList overrides, ResourceLocation modelLocation) {
         //4^6 number of states, if we have a glass texture (support coloring), multiply by 2
         this.modelCache = new Object2ObjectOpenHashMap<>(glass == null ? 4_096 : 8_192);
         this.internal = internal;
@@ -93,7 +87,7 @@ public class TransmitterBakedModel implements IBakedModel {
             if (!modelCache.containsKey(hash)) {
                 List<String> visible = new ArrayList<>();
                 for (Direction dir : EnumUtils.DIRECTIONS) {
-                    visible.add(dir.getString() + data.getConnectionType(dir).getString().toUpperCase(Locale.ROOT));
+                    visible.add(dir.getName() + data.getConnectionType(dir).getName().toUpperCase(Locale.ROOT));
                 }
                 List<BakedQuad> result = bake(new TransmitterModelConfiguration(owner, visible, extraData), hasColor).getQuads(state, null, rand, extraData);
                 modelCache.put(hash, result);
@@ -197,7 +191,7 @@ public class TransmitterBakedModel implements IBakedModel {
 
     @Nonnull
     @Override
-    public IModelData getModelData(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
+    public IModelData getModelData(@Nonnull ILightReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
         return bakedVariant.getModelData(world, pos, state, tileData);
     }
 

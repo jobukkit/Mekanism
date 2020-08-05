@@ -1,6 +1,6 @@
 package mekanism.client.gui.element.filter.transporter;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+
 import mekanism.api.text.EnumColor;
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.button.MekanismImageButton;
@@ -47,11 +47,11 @@ public class GuiSorterItemStackFilter extends GuiItemStackFilter<SorterItemStack
         maxField.setInputValidator(InputValidator.DIGIT);
         maxField.setText("" + filter.max);
         addChild(new MekanismImageButton(guiObj, x + 148, y + 57, 11, 14, getButtonLocation("silk_touch"),
-              () -> filter.sizeMode = !filter.sizeMode, (onHover, matrix, xAxis, yAxis) -> {
+              () -> filter.sizeMode = !filter.sizeMode, (onHover, xAxis, yAxis) -> {
             if (tile.singleItem && filter.sizeMode) {
-                displayTooltip(matrix, MekanismLang.SIZE_MODE_CONFLICT.translate(), xAxis, yAxis);
+                displayTooltip(MekanismLang.SIZE_MODE_CONFLICT.translate(), xAxis, yAxis);
             } else {
-                displayTooltip(matrix, MekanismLang.SIZE_MODE.translate(), xAxis, yAxis);
+                displayTooltip(MekanismLang.SIZE_MODE.translate(), xAxis, yAxis);
             }
         }));
         addChild(new MekanismImageButton(guiObj, x + 148, y + 70, 11, 14, getButtonLocation("fuzzy"),
@@ -87,16 +87,16 @@ public class GuiSorterItemStackFilter extends GuiItemStackFilter<SorterItemStack
     }
 
     @Override
-    public void renderForeground(MatrixStack matrix, int mouseX, int mouseY) {
-        super.renderForeground(matrix, mouseX, mouseY);
-        renderSorterForeground(matrix, filter);
-        drawString(matrix, MekanismLang.MIN.translate(""), relativeX + 148, relativeY + 33, titleTextColor());
-        drawString(matrix, MekanismLang.MAX.translate(""), relativeX + 148, relativeY + 45, titleTextColor());
+    public void renderForeground(int mouseX, int mouseY) {
+        super.renderForeground(mouseX, mouseY);
+        renderSorterForeground(filter);
+        drawString(MekanismLang.MIN.translate(""), relativeX + 148, relativeY + 33, titleTextColor());
+        drawString(MekanismLang.MAX.translate(""), relativeX + 148, relativeY + 45, titleTextColor());
         if (tile.singleItem && filter.sizeMode) {
-            drawString(matrix, MekanismLang.ITEM_FILTER_SIZE_MODE.translateColored(EnumColor.RED, OnOff.of(true)), relativeX + 161, relativeY + 59, titleTextColor());
+            drawString(MekanismLang.ITEM_FILTER_SIZE_MODE.translateColored(EnumColor.RED, OnOff.of(true)), relativeX + 161, relativeY + 59, titleTextColor());
         } else {
-            drawString(matrix, OnOff.of(filter.sizeMode).getTextComponent(), relativeX + 161, relativeY + 59, titleTextColor());
+            drawString(OnOff.of(filter.sizeMode).getTextComponent(), relativeX + 161, relativeY + 59, titleTextColor());
         }
-        drawString(matrix, OnOff.of(filter.fuzzyMode).getTextComponent(), relativeX + 161, relativeY + 72, titleTextColor());
+        drawString(OnOff.of(filter.fuzzyMode).getTextComponent(), relativeX + 161, relativeY + 72, titleTextColor());
     }
 }

@@ -1,15 +1,16 @@
 package mekanism.api.recipes.inputs;
 
+import net.minecraft.tags.Tag;
+
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-import net.minecraft.tags.ITag;
 
 /**
  * @apiNote Only use this from within mekanism
  */
 public class TagResolverHelper {
 
-    public static <TYPE> List<TYPE> getRepresentations(ITag<TYPE> tag) {
+    public static <TYPE> Collection<TYPE> getRepresentations(Tag<TYPE> tag) {
         try {
             return tag.getAllElements();
         } catch (IllegalStateException e) {

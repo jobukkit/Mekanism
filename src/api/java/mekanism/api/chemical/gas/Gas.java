@@ -1,17 +1,21 @@
 package mekanism.api.chemical.gas;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.MekanismAPI;
 import mekanism.api.NBTConstants;
 import mekanism.api.chemical.Chemical;
-import mekanism.api.chemical.ChemicalTags;
 import mekanism.api.chemical.ChemicalUtils;
 import mekanism.api.providers.IGasProvider;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
+import net.minecraftforge.common.util.ReverseTagWrapper;
+
+import java.util.Set;
 
 /**
  * Gas - a class used to set specific properties of gases when used or seen in-game.
@@ -23,8 +27,10 @@ import net.minecraft.util.Util;
 public class Gas extends Chemical<Gas> implements IGasProvider {
 
     public Gas(GasBuilder builder) {
-        super(builder, ChemicalTags.GAS);
+        super(builder);
     }
+
+    private final ReverseTagWrapper<Gas> reverseTags = new ReverseTagWrapper<>(this, GasTags::getGeneration, GasTags::getCollection);
 
     /**
      * Returns the Gas stored in the defined tag compound.
@@ -60,5 +66,16 @@ public class Gas extends Chemical<Gas> implements IGasProvider {
     @Override
     protected String getDefaultTranslationKey() {
         return Util.makeTranslationKey("gas", getRegistryName());
+    }
+
+
+    @Override
+    public boolean isIn(@Nonnull Tag<Gas> tag) {
+        return tag.contains(this);
+    }
+
+    @Override
+    public Set<ResourceLocation> getTags() {
+        return reverseTags.getTagNames();
     }
 }

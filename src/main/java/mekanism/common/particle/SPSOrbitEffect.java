@@ -1,5 +1,6 @@
 package mekanism.common.particle;
 
+import mekanism.api.backport.Vector3d;
 import mekanism.common.content.sps.SPSMultiblockData;
 import mekanism.common.lib.Color;
 import mekanism.common.lib.effect.CustomEffect;
@@ -8,7 +9,6 @@ import mekanism.common.lib.math.Quaternion;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.MekanismUtils.ResourceType;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
 
 public class SPSOrbitEffect extends CustomEffect {
 

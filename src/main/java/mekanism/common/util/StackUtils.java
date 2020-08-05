@@ -1,9 +1,5 @@
 package mekanism.common.util;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.inventory.IInventorySlot;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -15,8 +11,13 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.items.ItemHandlerHelper;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class StackUtils {
 
@@ -87,6 +88,6 @@ public final class StackUtils {
     @Nullable
     public static BlockState getStateForPlacement(ItemStack stack, BlockPos pos, PlayerEntity player) {
         return Block.getBlockFromItem(stack.getItem()).getStateForPlacement(new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND,
-              new BlockRayTraceResult(Vector3d.ZERO, Direction.UP, pos, false))));
+              new BlockRayTraceResult(Vec3d.ZERO, Direction.UP, pos, false))));
     }
 }

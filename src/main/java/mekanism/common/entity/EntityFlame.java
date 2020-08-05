@@ -1,8 +1,7 @@
 package mekanism.common.entity;
 
-import java.util.Optional;
-import javax.annotation.Nonnull;
 import mekanism.api.NBTConstants;
+import mekanism.api.backport.Vector3d;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.item.gear.ItemFlamethrower;
 import mekanism.common.item.gear.ItemFlamethrower.FlamethrowerMode;
@@ -10,19 +9,18 @@ import mekanism.common.lib.math.Pos3D;
 import mekanism.common.registries.MekanismEntityTypes;
 import mekanism.common.util.NBTUtils;
 import mekanism.common.util.StackUtils;
-import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.CampfireBlock;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.TNTBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.FlintAndSteelItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipe;
 import net.minecraft.item.crafting.IRecipeType;
@@ -35,25 +33,25 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.EntityPredicates;
 import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.EntityRayTraceResult;
-import net.minecraft.util.math.RayTraceContext;
+import net.minecraft.util.math.*;
 import net.minecraft.util.math.RayTraceContext.BlockMode;
 import net.minecraft.util.math.RayTraceContext.FluidMode;
 import net.minecraft.util.math.RayTraceResult.Type;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.WorldEvents;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.network.NetworkHooks;
 
-public class EntityFlame extends ProjectileEntity implements IEntityAdditionalSpawnData {
+import javax.annotation.Nonnull;
+import java.util.Optional;
+
+public class EntityFlame extends Entity implements IEntityAdditionalSpawnData {
 
     public static final int LIFESPAN = 80;
-    private static final int DAMAGE = 10;
+    public static final int DAMAGE = 10;
 
-    private FlamethrowerMode mode = FlamethrowerMode.COMBAT;
+    public Entity owner = null;
+    public ItemFlamethrower.FlamethrowerMode mode = ItemFlamethrower.FlamethrowerMode.COMBAT;
 
     public EntityFlame(EntityType<EntityFlame> type, World world) {
         super(type, world);
@@ -61,21 +59,31 @@ public class EntityFlame extends ProjectileEntity implements IEntityAdditionalSp
 
     public EntityFlame(PlayerEntity player) {
         this(MekanismEntityTypes.FLAME.getEntityType(), player.world);
-        Pos3D playerPos = new Pos3D(player.getPosX(), player.getPosYEye() - 0.1, player.getPosZ());
+        Pos3D playerPos = new Pos3D(player).translate(0, 1.6, 0);
         Pos3D flameVec = new Pos3D(1, 1, 1);
 
-        Vector3d lookVec = player.getLookVec();
-        flameVec = flameVec.multiply(lookVec).rotateYaw(6);
+        flameVec = flameVec.multiply(new Pos3D(new Vector3d(player.getLookVec()))).rotateYaw(6);
 
         Pos3D mergedVec = playerPos.translate(flameVec);
         setPosition(mergedVec.x, mergedVec.y, mergedVec.z);
-        setShooter(player);
+
+        Pos3D motion = new Pos3D(0.4, 0.4, 0.4).multiply(new Pos3D(new Vector3d(player.getLookVec())));
+
+        setHeading(motion);
+        setMotion(motion.toVec());
+
+        owner = player;
         mode = ((ItemFlamethrower) player.inventory.getCurrentItem().getItem()).getMode(player.inventory.getCurrentItem());
-        func_234612_a_(player, player.rotationPitch, player.rotationYaw, 0, 0.5F, 1);
+    }
+
+    public void setHeading(Pos3D motion) {
+        float d = MathHelper.sqrt((motion.x * motion.x) + (motion.z * motion.z));
+        prevRotationYaw = rotationYaw = (float) Math.toDegrees(Math.atan2(motion.x, motion.z));
+        prevRotationPitch = rotationPitch = (float) Math.toDegrees(Math.atan2(motion.y, d));
     }
 
     @Override
-    public void baseTick() {
+    public void tick() {
         if (!isAlive()) {
             return;
         }
@@ -88,7 +96,7 @@ public class EntityFlame extends ProjectileEntity implements IEntityAdditionalSp
         prevRotationPitch = rotationPitch;
         prevRotationYaw = rotationYaw;
 
-        Vector3d motion = getMotion();
+        Vec3d motion = getMotion();
         setRawPosition(getPosX() + motion.getX(), getPosY() + motion.getY(), getPosZ() + motion.getZ());
 
         setPosition(getPosX(), getPosY(), getPosZ());
@@ -100,73 +108,65 @@ public class EntityFlame extends ProjectileEntity implements IEntityAdditionalSp
     }
 
     private void calculateVector() {
-        Vector3d localVec = new Vector3d(getPosX(), getPosY(), getPosZ());
-        Vector3d motion = getMotion();
-        Vector3d motionVec = new Vector3d(getPosX() + motion.getX() * 2, getPosY() + motion.getY() * 2, getPosZ() + motion.getZ() * 2);
+        Vec3d localVec = new Vec3d(getPosX(), getPosY(), getPosZ());
+        Vec3d motion = getMotion();
+        Vec3d motionVec = new Vec3d(getPosX() + motion.getX() * 2, getPosY() + motion.getY() * 2, getPosZ() + motion.getZ() * 2);
         BlockRayTraceResult blockRayTrace = world.rayTraceBlocks(new RayTraceContext(localVec, motionVec, BlockMode.COLLIDER, FluidMode.ANY, this));
-        localVec = new Vector3d(getPosX(), getPosY(), getPosZ());
-        motionVec = new Vector3d(getPosX() + motion.getX(), getPosY() + motion.getY(), getPosZ() + motion.getZ());
+        localVec = new Vec3d(getPosX(), getPosY(), getPosZ());
+        motionVec = new Vec3d(getPosX() + motion.getX(), getPosY() + motion.getY(), getPosZ() + motion.getZ());
         if (blockRayTrace.getType() != Type.MISS) {
             motionVec = blockRayTrace.getHitVec();
         }
         EntityRayTraceResult entityResult = ProjectileHelper.rayTraceEntities(world, this, localVec, motionVec,
-              getBoundingBox().expand(getMotion()).grow(1.0D, 1.0D, 1.0D), EntityPredicates.NOT_SPECTATING);
-        onImpact(entityResult == null ? blockRayTrace : entityResult);
-    }
-
-    @Override
-    protected void onEntityHit(EntityRayTraceResult entityResult) {
-        Entity entity = entityResult.getEntity();
-        if (entity instanceof PlayerEntity) {
-            PlayerEntity player = (PlayerEntity) entity.getEntity();
-            Entity owner = func_234616_v_();
-            if (player.abilities.disableDamage || owner instanceof PlayerEntity && !((PlayerEntity) owner).canAttackPlayer(player)) {
-                return;
+                getBoundingBox().expand(getMotion()).grow(1.0D, 1.0D, 1.0D), EntityPredicates.NOT_SPECTATING);
+        if (entityResult != null) {
+            Entity entity = entityResult.getEntity();
+            if (entity instanceof PlayerEntity) {
+                PlayerEntity player = (PlayerEntity) entity.getEntity();
+                if (player.abilities.disableDamage || owner instanceof PlayerEntity && !((PlayerEntity) owner).canAttackPlayer(player)) {
+                    return;
+                }
             }
-        }
-        if (!entity.getEntity().isImmuneToFire()) {
-            if (entity.getEntity() instanceof ItemEntity && mode == FlamethrowerMode.HEAT) {
-                if (entity.getEntity().ticksExisted > 100 && !smeltItem((ItemEntity) entity.getEntity())) {
+            if (!entity.getEntity().isImmuneToFire()) {
+                if (entity.getEntity() instanceof ItemEntity && mode == FlamethrowerMode.HEAT) {
+                    if (entity.getEntity().ticksExisted > 100 && !smeltItem((ItemEntity) entity.getEntity())) {
+                        burn(entity.getEntity());
+                    }
+                } else {
                     burn(entity.getEntity());
                 }
-            } else {
-                burn(entity.getEntity());
             }
-        }
-        remove();
-    }
-
-    @Override
-    protected void func_230299_a_(@Nonnull BlockRayTraceResult blockRayTrace) {
-        super.func_230299_a_(blockRayTrace);
-        BlockPos hitPos = blockRayTrace.getPos();
-        Direction hitSide = blockRayTrace.getFace();
-        boolean hitFluid = !world.getFluidState(hitPos).isEmpty();
-        if (!world.isRemote && MekanismConfig.general.aestheticWorldDamage.get() && !hitFluid) {
-            if (mode == FlamethrowerMode.HEAT) {
-                smeltBlock(hitPos);
-            } else if (mode == FlamethrowerMode.INFERNO) {
-                Entity owner = func_234616_v_();
-                PlayerEntity shooter = owner instanceof PlayerEntity ? (PlayerEntity) owner : null;
-                BlockPos sidePos = hitPos.offset(hitSide);
-                BlockState hitState = world.getBlockState(hitPos);
-                if (AbstractFireBlock.canLightBlock(world, sidePos)) {
-                    world.setBlockState(sidePos, AbstractFireBlock.getFireForPlacement(world, sidePos));
-                } else if (CampfireBlock.canBeLit(hitState)) {
-                    world.setBlockState(hitPos, hitState.with(BlockStateProperties.LIT, true));
-                } else if (hitState.isFlammable(world, hitPos, hitSide)) {
-                    hitState.catchFire(world, hitPos, hitSide, shooter);
-                    if (hitState.getBlock() instanceof TNTBlock) {
-                        world.removeBlock(hitPos, false);
+            remove();
+        } else if (blockRayTrace.getType() != Type.MISS) {
+            BlockPos hitPos = blockRayTrace.getPos();
+            Direction hitSide = blockRayTrace.getFace();
+            boolean hitFluid = !world.getFluidState(hitPos).isEmpty();
+            if (!world.isRemote && MekanismConfig.general.aestheticWorldDamage.get() && !hitFluid) {
+                if (mode == FlamethrowerMode.HEAT) {
+                    smeltBlock(hitPos);
+                } else if (mode == FlamethrowerMode.INFERNO) {
+                    BlockState hitState = world.getBlockState(hitPos);
+                    BlockPos sidePos = hitPos.offset(hitSide);
+                    BlockState sideState = world.getBlockState(sidePos);
+                    PlayerEntity shooter = owner instanceof PlayerEntity ? (PlayerEntity) owner : null;
+                    if (FlintAndSteelItem.canSetFire(sideState, world, sidePos)) {
+                        world.setBlockState(sidePos, Blocks.FIRE.getDefaultState());
+                    } else if (FlintAndSteelItem.isUnlitCampfire(hitState)) {
+                        world.setBlockState(hitPos, hitState.with(BlockStateProperties.LIT, true));
+                    } else if (hitState.isFlammable(world, hitPos, hitSide)) {
+                        hitState.catchFire(world, hitPos, hitSide, shooter);
+                        if (hitState.getBlock() instanceof TNTBlock) {
+                            world.removeBlock(hitPos, false);
+                        }
                     }
                 }
             }
+            if (hitFluid) {
+                spawnParticlesAt(getPosition());
+                playSound(SoundEvents.BLOCK_FIRE_EXTINGUISH, 1.0F, 1.0F);
+            }
+            remove();
         }
-        if (hitFluid) {
-            spawnParticlesAt(getPosition());
-            playSound(SoundEvents.BLOCK_FIRE_EXTINGUISH, 1.0F, 1.0F);
-        }
-        remove();
     }
 
     private boolean smeltItem(ItemEntity item) {
@@ -218,13 +218,20 @@ public class EntityFlame extends ProjectileEntity implements IEntityAdditionalSp
 
     private void burn(Entity entity) {
         entity.setFire(20);
-        entity.attackEntityFrom(DamageSource.causeThrownDamage(this, func_234616_v_()), DAMAGE);
+        entity.attackEntityFrom(getFlamethrowerDamage(), DAMAGE);
+    }
+
+    private DamageSource getFlamethrowerDamage() {
+        if (owner == null) {
+            return DamageSource.causeThrownDamage(this, this);
+        }
+        return DamageSource.causeThrownDamage(this, owner);
     }
 
     private void spawnParticlesAt(BlockPos pos) {
         for (int i = 0; i < 10; i++) {
             world.addParticle(ParticleTypes.SMOKE, pos.getX() + (rand.nextFloat() - 0.5), pos.getY() + (rand.nextFloat() - 0.5),
-                  pos.getZ() + (rand.nextFloat() - 0.5), 0, 0, 0);
+                    pos.getZ() + (rand.nextFloat() - 0.5), 0, 0, 0);
         }
     }
 
@@ -233,14 +240,12 @@ public class EntityFlame extends ProjectileEntity implements IEntityAdditionalSp
     }
 
     @Override
-    public void readAdditional(@Nonnull CompoundNBT nbtTags) {
-        super.readAdditional(nbtTags);
+    protected void readAdditional(@Nonnull CompoundNBT nbtTags) {
         NBTUtils.setEnumIfPresent(nbtTags, NBTConstants.MODE, FlamethrowerMode::byIndexStatic, mode -> this.mode = mode);
     }
 
     @Override
-    public void writeAdditional(@Nonnull CompoundNBT nbtTags) {
-        super.writeAdditional(nbtTags);
+    protected void writeAdditional(@Nonnull CompoundNBT nbtTags) {
         nbtTags.putInt(NBTConstants.MODE, mode.ordinal());
     }
 

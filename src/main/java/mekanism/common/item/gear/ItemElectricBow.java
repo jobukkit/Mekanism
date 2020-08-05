@@ -89,8 +89,8 @@ public class ItemElectricBow extends BowItem implements IModeItem, IItemHUDProvi
                 if (!world.isRemote) {
                     ArrowItem arrowitem = (ArrowItem) (ammo.getItem() instanceof ArrowItem ? ammo.getItem() : Items.ARROW);
                     AbstractArrowEntity arrowEntity = arrowitem.createArrow(world, ammo, player);
-                    arrowEntity = customArrow(arrowEntity);
-                    arrowEntity.func_234612_a_(player, player.rotationPitch, player.rotationYaw, 0, 3 * velocity, 1);
+                    arrowEntity = customeArrow(arrowEntity);
+                    arrowEntity.shoot(player, player.rotationPitch, player.rotationYaw, 0, 3 * velocity, 1);
                     if (velocity == 1) {
                         arrowEntity.setIsCritical(true);
                     }
@@ -180,7 +180,7 @@ public class ItemElectricBow extends BowItem implements IModeItem, IItemHUDProvi
             setFireState(stack, newState);
             if (displayChangeMessage) {
                 player.sendMessage(MekanismLang.LOG_FORMAT.translateColored(EnumColor.DARK_BLUE, MekanismLang.MEKANISM,
-                      MekanismLang.FIRE_MODE.translateColored(EnumColor.GRAY, OnOff.of(newState, true))), Util.DUMMY_UUID);
+                      MekanismLang.FIRE_MODE.translateColored(EnumColor.GRAY, OnOff.of(newState, true))));
             }
         }
     }

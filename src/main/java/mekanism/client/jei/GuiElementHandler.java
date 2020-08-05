@@ -17,7 +17,7 @@ import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.util.ResourceLocation;
 
-public class GuiElementHandler<GUI extends GuiMekanism<?>> implements IGuiContainerHandler<GUI> {
+public class GuiElementHandler implements IGuiContainerHandler<GuiMekanism> {
 
     private static void addAreaIfOutside(List<Rectangle2d> areas, int parentX, int parentY, int parentWidth, int parentHeight, Widget element) {
         if (element.visible) {
@@ -43,7 +43,8 @@ public class GuiElementHandler<GUI extends GuiMekanism<?>> implements IGuiContai
     }
 
     @Override
-    public List<Rectangle2d> getGuiExtraAreas(GUI gui) {
+    public List<Rectangle2d> getGuiExtraAreas(GuiMekanism genericGui) {
+        GuiMekanism<?> gui = (GuiMekanism<?>) genericGui;
         int parentX = gui.getLeft();
         int parentY = gui.getTop();
         int parentWidth = gui.getWidth();
@@ -59,7 +60,8 @@ public class GuiElementHandler<GUI extends GuiMekanism<?>> implements IGuiContai
 
     @Nullable
     @Override
-    public Object getIngredientUnderMouse(GUI gui, double mouseX, double mouseY) {
+    public Object getIngredientUnderMouse(GuiMekanism genericGui, double mouseX, double mouseY) {
+        GuiMekanism<?> gui = (GuiMekanism<?>) genericGui;
         GuiWindow guiWindow = gui.getWindowHovering(mouseX, mouseY);
         if (guiWindow == null) {
             //If no window is being hovered, then check the elements in general
@@ -80,7 +82,8 @@ public class GuiElementHandler<GUI extends GuiMekanism<?>> implements IGuiContai
     }
 
     @Override
-    public Collection<IGuiClickableArea> getGuiClickableAreas(GUI gui, double mouseX, double mouseY) {
+    public Collection<IGuiClickableArea> getGuiClickableAreas(GuiMekanism genericGui) {
+        /*GuiMekanism<?> gui = (GuiMekanism<?>) genericGui;
         //Make mouseX and mouseY not be relative
         mouseX += gui.getGuiLeft();
         mouseY += gui.getGuiTop();
@@ -90,7 +93,8 @@ public class GuiElementHandler<GUI extends GuiMekanism<?>> implements IGuiContai
             return getGuiClickableArea(gui.children(), mouseX, mouseY);
         }
         //Otherwise check the elements of the window
-        return getGuiClickableArea(guiWindow.children(), mouseX, mouseY);
+        return getGuiClickableArea(guiWindow.children(), mouseX, mouseY);*/
+        return Collections.emptyList();
     }
 
     private Collection<IGuiClickableArea> getGuiClickableArea(List<? extends IGuiEventListener> children, double mouseX, double mouseY) {

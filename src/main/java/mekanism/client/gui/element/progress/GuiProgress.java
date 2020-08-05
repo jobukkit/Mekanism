@@ -1,12 +1,13 @@
 package mekanism.client.gui.element.progress;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.GuiTexturedElement;
 import mekanism.client.jei.interfaces.IJEIRecipeArea;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class GuiProgress extends GuiTexturedElement implements IJEIRecipeArea<GuiProgress> {
 
@@ -21,18 +22,18 @@ public class GuiProgress extends GuiTexturedElement implements IJEIRecipeArea<Gu
     }
 
     @Override
-    public void drawBackground(@Nonnull MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
-        super.drawBackground(matrix, mouseX, mouseY, partialTicks);
+    public void drawBackground(int mouseX, int mouseY, float partialTicks) {
+        super.drawBackground(mouseX, mouseY, partialTicks);
         if (handler.isActive()) {
             minecraft.textureManager.bindTexture(getResource());
-            blit(matrix, x, y, 0, 0, width, height, type.getTextureWidth(), type.getTextureHeight());
+            blit(x, y, 0, 0, width, height, type.getTextureWidth(), type.getTextureHeight());
             if (type.isVertical()) {
                 int displayInt = (int) (handler.getProgress() * height);
-                blit(matrix, x, y, type.getOverlayX(), type.getOverlayY(), width, displayInt, type.getTextureWidth(), type.getTextureHeight());
+                blit(x, y, type.getOverlayX(), type.getOverlayY(), width, displayInt, type.getTextureWidth(), type.getTextureHeight());
             } else {
                 int innerOffsetX = type == ProgressType.BAR ? 1 : 0;
                 int displayInt = (int) (handler.getProgress() * (width - 2 * innerOffsetX));
-                blit(matrix, x + innerOffsetX, y, type.getOverlayX() + innerOffsetX, type.getOverlayY(), displayInt, height, type.getTextureWidth(), type.getTextureHeight());
+                blit(x + innerOffsetX, y, type.getOverlayX() + innerOffsetX, type.getOverlayY(), displayInt, height, type.getTextureWidth(), type.getTextureHeight());
             }
         }
     }

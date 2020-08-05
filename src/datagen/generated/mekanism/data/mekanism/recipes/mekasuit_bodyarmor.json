@@ -13,7 +13,7 @@
       "tag": "forge:circuits/ultimate"
     },
     "#": {
-      "item": "minecraft:netherite_chestplate"
+      "item": "minecraft:diamond_chestplate"
     },
     "E": {
       "item": "mekanism:basic_induction_cell"

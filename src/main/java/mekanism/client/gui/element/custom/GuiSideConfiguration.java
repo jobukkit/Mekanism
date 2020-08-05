@@ -1,8 +1,6 @@
 package mekanism.client.gui.element.custom;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.ArrayList;
-import java.util.List;
+
 import mekanism.api.RelativeSide;
 import mekanism.api.text.EnumColor;
 import mekanism.client.gui.GuiMekanism;
@@ -25,6 +23,9 @@ import mekanism.common.tile.component.config.ConfigInfo;
 import mekanism.common.tile.component.config.DataType;
 import mekanism.common.tile.interfaces.ISideConfiguration;
 import mekanism.common.util.text.BooleanStateDisplay.OnOff;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GuiSideConfiguration extends GuiWindow {
 
@@ -79,11 +80,11 @@ public class GuiSideConfiguration extends GuiWindow {
     }
 
     private IHoverable getOnHover(RelativeSide side) {
-        return (onHover, matrix, xAxis, yAxis) -> {
+        return (onHover, xAxis, yAxis) -> {
             if (onHover instanceof SideDataButton) {
                 DataType dataType = ((SideDataButton) onHover).getDataType();
                 if (dataType != null) {
-                    displayTooltip(matrix, MekanismLang.GENERIC_WITH_TWO_PARENTHESIS.translateColored(dataType.getColor(), dataType,
+                    displayTooltip(MekanismLang.GENERIC_WITH_TWO_PARENTHESIS.translateColored(dataType.getColor(), dataType,
                           dataType.getColor().getName(), side), xAxis, yAxis);
                 }
             }
@@ -105,15 +106,15 @@ public class GuiSideConfiguration extends GuiWindow {
     }
 
     @Override
-    public void renderForeground(MatrixStack matrix, int mouseX, int mouseY) {
-        super.renderForeground(matrix, mouseX, mouseY);
-        drawTitleText(matrix, MekanismLang.CONFIG_TYPE.translate(currentType), 5);
+    public void renderForeground(int mouseX, int mouseY) {
+        super.renderForeground(mouseX, mouseY);
+        drawTitleText(MekanismLang.CONFIG_TYPE.translate(currentType), 5);
         ConfigInfo config = getTile().getConfig().getConfig(currentType);
         if (config == null || !config.canEject()) {
-            drawString(matrix, MekanismLang.NO_EJECT.translate(), relativeX + 43, relativeY + 27, screenTextColor());
+            drawString(MekanismLang.NO_EJECT.translate(), relativeX + 43, relativeY + 27, screenTextColor());
         } else {
-            drawString(matrix, MekanismLang.EJECT.translate(OnOff.of(config.isEjecting())), relativeX + 43, relativeY + 27, screenTextColor());
+            drawString(MekanismLang.EJECT.translate(OnOff.of(config.isEjecting())), relativeX + 43, relativeY + 27, screenTextColor());
         }
-        drawString(matrix, MekanismLang.SLOTS.translate(), relativeX + 67, relativeY + 96, 0x787878);
+        drawString(MekanismLang.SLOTS.translate(), relativeX + 67, relativeY + 96, 0x787878);
     }
 }

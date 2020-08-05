@@ -1,12 +1,6 @@
 package mekanism.common.tile.component;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Set;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.NBTConstants;
 import mekanism.api.Upgrade;
 import mekanism.common.config.MekanismConfig;
@@ -27,6 +21,13 @@ import net.minecraft.world.server.TicketType;
 import net.minecraftforge.common.util.Constants.NBT;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.Set;
 
 public class TileComponentChunkLoader<T extends TileEntityMekanism & IChunkLoader> implements ITileComponent {
 
@@ -68,7 +69,7 @@ public class TileComponentChunkLoader<T extends TileEntityMekanism & IChunkLoade
     }
 
     private void releaseChunkTickets(@Nonnull World world, @Nullable BlockPos pos) {
-        LOGGER.debug("Attempting to remove chunk tickets. Pos: {} World: {}", pos, world.func_234923_W_().func_240901_a_());
+        LOGGER.debug("Attempting to remove chunk tickets. Pos: {} World: {}", pos, world.getDimension().getType().getRegistryName());
         ServerChunkProvider chunkProvider = (ServerChunkProvider) world.getChunkProvider();
         Iterator<ChunkPos> chunkIt = chunkSet.iterator();
         ChunkManager manager = ChunkManager.getInstance((ServerWorld) world);

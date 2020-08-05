@@ -58,7 +58,7 @@ public class AttributeStateFissionPortMode extends AttributeState {
 
         @Nonnull
         @Override
-        public String getString() {
+        public String getName() {
             return name;
         }
 

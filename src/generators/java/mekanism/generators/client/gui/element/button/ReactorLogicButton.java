@@ -1,10 +1,6 @@
 package mekanism.generators.client.gui.element.button;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.function.Consumer;
-import java.util.function.IntSupplier;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import mekanism.api.text.EnumColor;
 import mekanism.api.text.TextComponentUtil;
 import mekanism.client.gui.IGuiWrapper;
@@ -16,6 +12,11 @@ import mekanism.generators.common.base.IReactorLogic;
 import mekanism.generators.common.base.IReactorLogicMode;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
+
+import javax.annotation.Nonnull;
+import java.util.function.Consumer;
+import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
 public class ReactorLogicButton<TYPE extends Enum<TYPE> & IReactorLogicMode<TYPE>> extends MekanismButton {
 
@@ -29,7 +30,7 @@ public class ReactorLogicButton<TYPE extends Enum<TYPE> & IReactorLogicMode<TYPE
 
     public ReactorLogicButton(IGuiWrapper gui, int x, int y, int index, @Nonnull IReactorLogic<TYPE> tile, IntSupplier indexSupplier,
           Supplier<TYPE[]> listSupplier, Consumer<TYPE> onPress) {
-        super(gui, x, y, 128, 22, StringTextComponent.EMPTY, null, null);
+        super(gui, x, y, 128, 22, new StringTextComponent(""), null, null);
         this.index = index;
         this.indexSupplier = indexSupplier;
         this.modeList = listSupplier;
@@ -46,22 +47,22 @@ public class ReactorLogicButton<TYPE extends Enum<TYPE> & IReactorLogicMode<TYPE
     }
 
     @Override
-    public void renderToolTip(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
+    public void renderToolTip(int mouseX, int mouseY) {
         TYPE mode = getMode();
         if (mode != null) {
-            guiObj.displayTooltip(matrix, mode.getDescription(), mouseX, mouseY);
+            guiObj.displayTooltip(mode.getDescription(), mouseX, mouseY);
         }
     }
 
     @Override
-    public void drawBackground(@Nonnull MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
+    public void drawBackground(int mouseX, int mouseY, float partialTicks) {
         TYPE mode = getMode();
         if (mode == null) {
             return;
         }
         MekanismRenderer.bindTexture(TEXTURE);
         MekanismRenderer.color(mode.getColor());
-        blit(matrix, x, y, 0, mode == tile.getMode() ? 22 : 0, width, height, 128, 44);
+        blit(x, y, 0, mode == tile.getMode() ? 22 : 0, width, height, 128, 44);
         MekanismRenderer.resetColor();
     }
 
@@ -71,13 +72,13 @@ public class ReactorLogicButton<TYPE extends Enum<TYPE> & IReactorLogicMode<TYPE
     }
 
     @Override
-    public void renderForeground(MatrixStack matrix, int mouseX, int mouseY) {
+    public void renderForeground(int mouseX, int mouseY) {
         TYPE mode = getMode();
         if (mode != null) {
             int typeOffset = 22 * index;
-            guiObj.renderItem(matrix, mode.getRenderStack(), 20, 35 + typeOffset);
-            drawString(matrix, TextComponentUtil.build(EnumColor.WHITE, mode), 39, 34 + typeOffset, titleTextColor());
-            super.renderForeground(matrix, mouseX, mouseY);
+            guiObj.renderItem(mode.getRenderStack(), 20, 35 + typeOffset);
+            drawString(TextComponentUtil.build(EnumColor.WHITE, mode), 39, 34 + typeOffset, titleTextColor());
+            super.renderForeground(mouseX, mouseY);
         }
     }
 }

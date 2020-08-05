@@ -1,7 +1,6 @@
 package mekanism.common.content.gear.mekasuit;
 
-import java.util.List;
-import java.util.Objects;
+import mekanism.api.backport.Vector3d;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.text.IHasTextComponent;
 import mekanism.common.Mekanism;
@@ -13,9 +12,12 @@ import mekanism.common.network.PacketLightningRender;
 import mekanism.common.network.PacketLightningRender.LightningPreset;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+
+import java.util.List;
+import java.util.Objects;
 
 public class ModuleMagneticAttractionUnit extends ModuleMekaSuit {
 
@@ -40,12 +42,12 @@ public class ModuleMagneticAttractionUnit extends ModuleMekaSuit {
                 }
                 if (item.getDistance(player) > 0.001) {
                     useEnergy(player, usage);
-                    Vector3d diff = player.getPositionVec().subtract(item.getPositionVec());
-                    Vector3d motionNeeded = new Vector3d(Math.min(diff.x, 1), Math.min(diff.y, 1), Math.min(diff.z, 1));
-                    Vector3d motionDiff = motionNeeded.subtract(player.getMotion());
+                    Vec3d diff = player.getPositionVec().subtract(item.getPositionVec());
+                    Vec3d motionNeeded = new Vec3d(Math.min(diff.x, 1), Math.min(diff.y, 1), Math.min(diff.z, 1));
+                    Vec3d motionDiff = motionNeeded.subtract(player.getMotion());
                     item.setMotion(motionDiff.scale(0.2));
                     Mekanism.packetHandler.sendToAllTrackingAndSelf(new PacketLightningRender(LightningPreset.MAGNETIC_ATTRACTION, Objects.hash(player, item),
-                          player.getPositionVec().add(0, 0.2, 0), item.getPositionVec(), (int) (diff.length() * 4)), player);
+                          new Vector3d(player.getPositionVec().add(0, 0.2, 0)), new Vector3d(item.getPositionVec()), (int) (diff.length() * 4)), player);
                 }
             }
         }

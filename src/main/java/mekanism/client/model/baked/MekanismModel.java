@@ -17,14 +17,7 @@ import java.util.function.Function;
 import javax.annotation.Nonnull;
 import mekanism.client.render.lib.Quad;
 import mekanism.client.render.lib.QuadTransformation;
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.BlockModel;
-import net.minecraft.client.renderer.model.BlockPart;
-import net.minecraft.client.renderer.model.BlockPartFace;
-import net.minecraft.client.renderer.model.IModelTransform;
-import net.minecraft.client.renderer.model.IUnbakedModel;
-import net.minecraft.client.renderer.model.ModelBakery;
-import net.minecraft.client.renderer.model.RenderMaterial;
+import net.minecraft.client.renderer.model.*;
 import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.IResourceManager;
@@ -114,7 +107,7 @@ public class MekanismModel implements IMultipartModelGeometry<MekanismModel> {
         }
 
         @Override
-        public void addQuads(IModelConfiguration owner, IModelBuilder<?> modelBuilder, ModelBakery bakery, Function<RenderMaterial, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform,
+        public void addQuads(IModelConfiguration owner, IModelBuilder<?> modelBuilder, ModelBakery bakery, Function<Material, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform,
               ResourceLocation modelLocation) {
             for (Direction direction : blockPart.mapFaces.keySet()) {
                 BlockPartFace face = blockPart.mapFaces.get(direction);
@@ -132,10 +125,10 @@ public class MekanismModel implements IMultipartModelGeometry<MekanismModel> {
         }
 
         @Override
-        public Collection<RenderMaterial> getTextures(IModelConfiguration owner, Function<ResourceLocation, IUnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors) {
-            Set<RenderMaterial> textures = Sets.newHashSet();
+        public Collection<Material> getTextures(IModelConfiguration owner, Function<ResourceLocation, IUnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors) {
+            Set<Material> textures = Sets.newHashSet();
             for (BlockPartFace face : blockPart.mapFaces.values()) {
-                RenderMaterial texture = owner.resolveTexture(face.texture);
+                Material texture = owner.resolveTexture(face.texture);
                 if (Objects.equals(texture.getTextureLocation(), MissingTextureSprite.getLocation())) {
                     missingTextureErrors.add(Pair.of(face.texture, owner.getModelName()));
                 }

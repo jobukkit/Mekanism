@@ -91,7 +91,7 @@ public abstract class RobitAIBase extends Goal {
     }
 
     private boolean canNavigate(BlockPos pos) {
-        PathNodeType pathnodetype = WalkNodeProcessor.func_237231_a_(this.world, pos.toMutable());
+        PathNodeType pathnodetype = WalkNodeProcessor.func_227480_b_(this.world, pos.getX(), pos.getY(), pos.getZ());
         if (pathnodetype == PathNodeType.WALKABLE) {
             BlockPos blockpos = pos.subtract(theRobit.getPosition());
             return world.hasNoCollisions(theRobit, theRobit.getBoundingBox().offset(blockpos));

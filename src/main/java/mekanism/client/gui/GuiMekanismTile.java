@@ -1,8 +1,6 @@
 package mekanism.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.Set;
-import javax.annotation.Nonnull;
+
 import mekanism.api.inventory.IInventorySlot;
 import mekanism.common.MekanismLang;
 import mekanism.common.inventory.container.slot.InventoryContainerSlot;
@@ -20,6 +18,8 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 
+import java.util.Set;
+
 public abstract class GuiMekanismTile<TILE extends TileEntityMekanism, CONTAINER extends MekanismTileContainer<TILE>> extends GuiMekanism<CONTAINER> {
 
     protected final TILE tile;
@@ -34,8 +34,8 @@ public abstract class GuiMekanismTile<TILE extends TileEntityMekanism, CONTAINER
     }
 
     @Override
-    protected void drawForegroundText(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        super.drawForegroundText(matrix, mouseX, mouseY);
+    protected void drawForegroundText(int mouseX, int mouseY) {
+        super.drawForegroundText(mouseX, mouseY);
         if (tile instanceof ISideConfiguration) {
             ItemStack stack = getMinecraft().player.inventory.getItemStack();
             if (!stack.isEmpty() && stack.getItem() instanceof ItemConfigurator) {
@@ -44,7 +44,7 @@ public abstract class GuiMekanismTile<TILE extends TileEntityMekanism, CONTAINER
                     if (isMouseOverSlot(slot, mouseX, mouseY)) {
                         DataType data = getFromSlot(slot);
                         if (data != null) {
-                            displayTooltip(matrix, MekanismLang.GENERIC_PARENTHESIS.translateColored(data.getColor(), data.getColor().getName()), mouseX - getGuiLeft(), mouseY - getGuiTop());
+                            displayTooltip(MekanismLang.GENERIC_PARENTHESIS.translateColored(data.getColor(), data.getColor().getName()), mouseX - getGuiLeft(), mouseY - getGuiTop());
                         }
                         break;
                     }
@@ -53,12 +53,12 @@ public abstract class GuiMekanismTile<TILE extends TileEntityMekanism, CONTAINER
         }
     }
 
-    public void renderTitleText(MatrixStack matrix, int y) {
-        drawTitleText(matrix, tile.getName(), y);
+    public void renderTitleText(int y) {
+        drawTitleText(tile.getName(), y);
     }
 
-    public void renderTitleText(MatrixStack matrix) {
-        renderTitleText(matrix, 6);
+    public void renderTitleText() {
+        renderTitleText(6);
     }
 
     private DataType getFromSlot(Slot slot) {

@@ -1,8 +1,6 @@
 package mekanism.api.recipes.inputs.chemical;
 
 import com.google.gson.JsonElement;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.providers.IGasProvider;
@@ -10,7 +8,10 @@ import mekanism.api.recipes.inputs.chemical.ChemicalStackIngredient.MultiIngredi
 import mekanism.api.recipes.inputs.chemical.ChemicalStackIngredient.SingleIngredient;
 import mekanism.api.recipes.inputs.chemical.ChemicalStackIngredient.TaggedIngredient;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public interface GasStackIngredient extends IChemicalStackIngredient<Gas, GasStack> {
 
@@ -22,7 +23,7 @@ public interface GasStackIngredient extends IChemicalStackIngredient<Gas, GasSta
         return new Single(gas.getStack(amount));
     }
 
-    static GasStackIngredient from(@Nonnull ITag<Gas> tag, long amount) {
+    static GasStackIngredient from(@Nonnull Tag<Gas> tag, long amount) {
         return new Tagged(tag, amount);
     }
 
@@ -52,7 +53,7 @@ public interface GasStackIngredient extends IChemicalStackIngredient<Gas, GasSta
 
     class Tagged extends TaggedIngredient<Gas, GasStack> implements GasStackIngredient {
 
-        protected Tagged(@Nonnull ITag<Gas> tag, long amount) {
+        protected Tagged(@Nonnull Tag<Gas> tag, long amount) {
             super(tag, amount);
         }
     }

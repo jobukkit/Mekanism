@@ -5,13 +5,12 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 
 /**
  * Coord4D - an integer-based way to keep track of and perform operations on blocks in a Minecraft-based environment. This also takes in account the dimension the
@@ -24,7 +23,7 @@ public class Coord4D {//TODO - V11: Continue working on replacing uses of this w
     private final int x;
     private final int y;
     private final int z;
-    public final RegistryKey<World> dimension;
+    public final DimensionType dimension;
 
     /**
      * Creates a Coord4D from an entity's position, rounded down.
@@ -36,7 +35,7 @@ public class Coord4D {//TODO - V11: Continue working on replacing uses of this w
         this.x = entityPosition.getX();
         this.y = entityPosition.getY();
         this.z = entityPosition.getZ();
-        this.dimension = entity.world.func_234923_W_();
+        this.dimension = entity.world.getDimension().getType();
     }
 
     /**
@@ -47,7 +46,7 @@ public class Coord4D {//TODO - V11: Continue working on replacing uses of this w
      * @param z         - z coordinate
      * @param dimension - dimension ID
      */
-    public Coord4D(double x, double y, double z, RegistryKey<World> dimension) {
+    public Coord4D(double x, double y, double z, DimensionType dimension) {
         this.x = MathHelper.floor(x);
         this.y = MathHelper.floor(y);
         this.z = MathHelper.floor(z);
@@ -55,10 +54,10 @@ public class Coord4D {//TODO - V11: Continue working on replacing uses of this w
     }
 
     public Coord4D(BlockPos pos, World world) {
-        this(pos, world.func_234923_W_());
+        this(pos, world.getDimension().getType());
     }
 
-    public Coord4D(BlockPos pos, RegistryKey<World> dimension) {
+    public Coord4D(BlockPos pos, DimensionType dimension) {
         this(pos.getX(), pos.getY(), pos.getZ(), dimension);
     }
 
@@ -86,7 +85,7 @@ public class Coord4D {//TODO - V11: Continue working on replacing uses of this w
      */
     public static Coord4D read(CompoundNBT tag) {
         return new Coord4D(tag.getInt(NBTConstants.X), tag.getInt(NBTConstants.Y), tag.getInt(NBTConstants.Z),
-              RegistryKey.func_240903_a_(Registry.WORLD_KEY, new ResourceLocation(tag.getString(NBTConstants.DIMENSION))));
+              DimensionType.byName(new ResourceLocation(tag.getString(NBTConstants.DIMENSION))));
     }
 
     /**
@@ -97,7 +96,7 @@ public class Coord4D {//TODO - V11: Continue working on replacing uses of this w
      * @return the Coord4D from the data input
      */
     public static Coord4D read(PacketBuffer dataStream) {
-        return new Coord4D(dataStream.readBlockPos(), RegistryKey.func_240903_a_(Registry.WORLD_KEY, dataStream.readResourceLocation()));
+        return new Coord4D(dataStream.readBlockPos(), DimensionType.byName(dataStream.readResourceLocation()));
     }
 
     /**
@@ -136,7 +135,7 @@ public class Coord4D {//TODO - V11: Continue working on replacing uses of this w
         nbtTags.putInt(NBTConstants.X, x);
         nbtTags.putInt(NBTConstants.Y, y);
         nbtTags.putInt(NBTConstants.Z, z);
-        nbtTags.putString(NBTConstants.DIMENSION, dimension.func_240901_a_().toString());
+        nbtTags.putString(NBTConstants.DIMENSION, dimension.getRegistryName().toString());
         return nbtTags;
     }
 
@@ -148,7 +147,7 @@ public class Coord4D {//TODO - V11: Continue working on replacing uses of this w
     public void write(PacketBuffer dataStream) {
         //Note: We write the position as a block pos over the network so that it can be packed more efficiently
         dataStream.writeBlockPos(getPos());
-        dataStream.writeResourceLocation(dimension.func_240901_a_());
+        dataStream.writeResourceLocation(dimension.getRegistryName());
     }
 
     /**
@@ -206,7 +205,7 @@ public class Coord4D {//TODO - V11: Continue working on replacing uses of this w
 
     @Override
     public String toString() {
-        return "[Coord4D: " + x + ", " + y + ", " + z + ", dim=" + dimension.func_240901_a_() + "]";
+        return "[Coord4D: " + x + ", " + y + ", " + z + ", dim=" + dimension.toString() + "]";
     }
 
     @Override

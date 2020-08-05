@@ -12,6 +12,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.Property;
@@ -80,7 +81,7 @@ public class BlockStateHelper {
             }
         }
         if (block instanceof IStateFluidLoggable) {
-            FluidState fluidState = world.getFluidState(pos);
+            IFluidState fluidState = world.getFluidState(pos);
             state = state.with(FLUID_LOGGED, fluidState.getFluid() == Fluids.WATER);
         }
         return state;

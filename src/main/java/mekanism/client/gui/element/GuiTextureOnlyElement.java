@@ -1,7 +1,6 @@
 package mekanism.client.gui.element;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.Nonnull;
+
 import mekanism.client.gui.IGuiWrapper;
 import net.minecraft.util.ResourceLocation;
 
@@ -22,9 +21,9 @@ public class GuiTextureOnlyElement extends GuiTexturedElement {
     }
 
     @Override
-    public void drawBackground(@Nonnull MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
-        super.drawBackground(matrix, mouseX, mouseY, partialTicks);
+    public void drawBackground(int mouseX, int mouseY, float partialTicks) {
+        super.drawBackground(mouseX, mouseY, partialTicks);
         minecraft.textureManager.bindTexture(getResource());
-        blit(matrix, x, y, 0, 0, width, height, textureWidth, textureHeight);
+        blit(x, y, 0, 0, width, height, textureWidth, textureHeight);
     }
 }

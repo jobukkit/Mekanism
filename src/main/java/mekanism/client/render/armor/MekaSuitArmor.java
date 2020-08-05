@@ -21,6 +21,8 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import mekanism.api.backport.Vector3d;
 import mekanism.client.model.BaseModelCache.ModelData;
 import mekanism.client.model.MekanismModelCache;
 import mekanism.client.render.MekanismRenderType;
@@ -42,17 +44,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.IModelTransform;
-import net.minecraft.client.renderer.model.IUnbakedModel;
-import net.minecraft.client.renderer.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.model.ModelRotation;
-import net.minecraft.client.renderer.model.RenderMaterial;
+import net.minecraft.client.renderer.model.*;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.client.model.IModelConfiguration;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.data.EmptyModelData;
@@ -155,7 +151,7 @@ public class MekaSuitArmor extends CustomArmor {
 
     private void render(IRenderTypeBuffer renderer, MatrixStack matrix, int light, int overlayLight, boolean hasEffect, List<BakedQuad> quads, boolean transparent) {
         RenderType renderType = transparent ? RenderType.getEntityTranslucent(AtlasTexture.LOCATION_BLOCKS_TEXTURE) : MekanismRenderType.getMekaSuit();
-        IVertexBuilder builder = ItemRenderer.func_239391_c_(renderer, renderType, false, hasEffect);
+        IVertexBuilder builder = renderer.getBuffer(renderType);
         MatrixStack.Entry last = matrix.getLast();
         for (BakedQuad quad : quads) {
             builder.addVertexData(last, quad, 1, 1, 1, 1, light, overlayLight);
@@ -453,7 +449,7 @@ public class MekaSuitArmor extends CustomArmor {
 
         @Nonnull
         @Override
-        public RenderMaterial resolveTexture(@Nonnull String name) {
+        public Material resolveTexture(@Nonnull String name) {
             return ModelLoaderRegistry.blockMaterial(name);
         }
 

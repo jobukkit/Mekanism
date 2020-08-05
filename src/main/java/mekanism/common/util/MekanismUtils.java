@@ -1,19 +1,11 @@
 package mekanism.common.util;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.IMekWrench;
 import mekanism.api.NBTConstants;
 import mekanism.api.Upgrade;
+import mekanism.api.backport.Vector3d;
 import mekanism.api.chemical.IChemicalTank;
 import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.fluid.IExtendedFluidTank;
@@ -53,28 +45,12 @@ import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceContext;
+import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 import net.minecraft.util.math.RayTraceContext.BlockMode;
 import net.minecraft.util.math.RayTraceContext.FluidMode;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.IBlockDisplayReader;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
+import net.minecraft.world.*;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraftforge.common.UsernameCache;
@@ -86,6 +62,11 @@ import net.minecraftforge.fml.common.thread.EffectiveSide;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Contract;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.function.Supplier;
+
 /**
  * Utilities used by Mekanism. All miscellaneous methods are located here.
  *
@@ -93,7 +74,7 @@ import org.jetbrains.annotations.Contract;
  */
 public final class MekanismUtils {
 
-    public static final Codec<Direction> DIRECTION_CODEC = IStringSerializable.createEnumCodec(Direction::values, Direction::byName);
+    //public static final Codec<Direction> DIRECTION_CODEC = IStringSerializable.createEnumCodec(Direction::values, Direction::byName);
 
     public static final float ONE_OVER_ROOT_TWO = (float) (1 / Math.sqrt(2));
 
@@ -509,7 +490,7 @@ public final class MekanismUtils {
      * @param world - world the block is in
      * @param pos   - coordinates
      */
-    public static void recheckLighting(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos) {
+    public static void recheckLighting(@Nonnull ILightReader world, @Nonnull BlockPos pos) {
         world.getLightManager().checkBlock(pos);
     }
 
@@ -523,7 +504,7 @@ public final class MekanismUtils {
         boolean isReplaceable = state.isReplaceable(fluid);
         boolean canContainFluid = state.getBlock() instanceof ILiquidContainer && ((ILiquidContainer) state.getBlock()).canContainFluid(world, pos, state, fluid);
         if (world.isAirBlock(pos) || isReplaceable || canContainFluid) {
-            if (world.func_230315_m_().func_236040_e_() && fluid.getAttributes().doesVaporize(world, pos, fluidStack)) {
+            if (world.getDimension().doesWaterVaporize() && fluid.getAttributes().doesVaporize(world, pos, fluidStack)) {
                 fluid.getAttributes().vaporize(player, world, pos, fluidStack);
             } else if (canContainFluid) {
                 if (((ILiquidContainer) state.getBlock()).receiveFluid(world, pos, state, ((FlowingFluid) fluid).getStillFluidState(false))) {
@@ -623,9 +604,9 @@ public final class MekanismUtils {
 
     public static BlockRayTraceResult rayTrace(PlayerEntity player, double reach) {
         Vector3d headVec = getHeadVec(player);
-        Vector3d lookVec = player.getLook(1);
+        Vector3d lookVec = new Vector3d(player.getLook(1));
         Vector3d endVec = headVec.add(lookVec.x * reach, lookVec.y * reach, lookVec.z * reach);
-        return player.getEntityWorld().rayTraceBlocks(new RayTraceContext(headVec, endVec, BlockMode.OUTLINE, FluidMode.NONE, player));
+        return player.getEntityWorld().rayTraceBlocks(new RayTraceContext(headVec.toVec(), endVec.toVec(), BlockMode.OUTLINE, FluidMode.NONE, player));
     }
 
     /**
@@ -774,7 +755,7 @@ public final class MekanismUtils {
      * @return if the chunk is being vibrated
      */
     public static boolean isChunkVibrated(ChunkPos chunk, World world) {
-        return Mekanism.activeVibrators.stream().anyMatch(coord -> coord.dimension == world.func_234923_W_() && coord.getX() >> 4 == chunk.x && coord.getZ() >> 4 == chunk.z);
+        return Mekanism.activeVibrators.stream().anyMatch(coord -> coord.dimension == world.getDimension().getType() && coord.getX() >> 4 == chunk.x && coord.getZ() >> 4 == chunk.z);
     }
 
     /**
@@ -987,8 +968,8 @@ public final class MekanismUtils {
         entity.potionsNeedUpdate = true;
         if (reapply && !entity.world.isRemote) {
             Effect effect = id.getPotion();
-            effect.removeAttributesModifiersFromEntity(entity, entity.getAttributeManager(), id.getAmplifier());
-            effect.applyAttributesModifiersToEntity(entity, entity.getAttributeManager(), id.getAmplifier());
+            effect.removeAttributesModifiersFromEntity(entity, entity.getAttributes(), id.getAmplifier());
+            effect.applyAttributesModifiersToEntity(entity, entity.getAttributes(), id.getAmplifier());
         }
     }
 

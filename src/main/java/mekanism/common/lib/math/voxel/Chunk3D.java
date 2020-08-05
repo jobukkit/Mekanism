@@ -1,18 +1,18 @@
 package mekanism.common.lib.math.voxel;
 
+import mekanism.api.Coord4D;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.dimension.DimensionType;
+
+import javax.annotation.Nonnull;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nonnull;
-import mekanism.api.Coord4D;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
 
 public class Chunk3D extends ChunkPos {
 
-    public final RegistryKey<World> dimension;
+    public final DimensionType dimension;
 
-    public Chunk3D(int x, int z, RegistryKey<World> dimension) {
+    public Chunk3D(int x, int z, DimensionType dimension) {
         super(x, z);
         this.dimension = dimension;
     }
@@ -34,7 +34,7 @@ public class Chunk3D extends ChunkPos {
     @Nonnull
     @Override
     public String toString() {
-        return "[Chunk3D: " + x + ", " + z + ", dim=" + dimension.func_240901_a_() + "]";
+        return "[Chunk3D: " + x + ", " + z + ", dim=" + dimension.toString() + "]";
     }
 
     @Override

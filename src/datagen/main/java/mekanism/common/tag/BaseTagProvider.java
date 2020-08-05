@@ -12,6 +12,8 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.swing.text.html.HTML;
+
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.infuse.InfuseType;
@@ -36,6 +38,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.tags.ITag.INamedTag;
+import net.minecraft.tags.Tag;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -121,93 +124,40 @@ public abstract class BaseTagProvider implements IDataProvider {
         return (TagTypeMap<TYPE>) supportedTagTypes.get(tagType);
     }
 
-    protected <TYPE extends IForgeRegistryEntry<TYPE>> ForgeRegistryTagBuilder<TYPE> getBuilder(TagType<TYPE> tagType, INamedTag<TYPE> tag) {
+    protected <TYPE extends IForgeRegistryEntry<TYPE>> Tag.Builder<TYPE>  getBuilder(TagType<TYPE> tagType, Tag<TYPE> tag) {
         return getTagTypeMap(tagType).getBuilder(tag, modid);
     }
 
-    protected ForgeRegistryTagBuilder<Item> getItemBuilder(INamedTag<Item> tag) {
+    protected Tag.Builder<Item> getItemBuilder(Tag<Item> tag) {
         return getBuilder(TagType.ITEM, tag);
     }
 
-    protected ForgeRegistryTagBuilder<Block> getBlockBuilder(INamedTag<Block> tag) {
+    protected ForgeRegistryTagBuilder<Block> getBlockBuilder(Tag<Block> tag) {
         return getBuilder(TagType.BLOCK, tag);
     }
 
-    protected ForgeRegistryTagBuilder<EntityType<?>> getEntityTypeBuilder(INamedTag<EntityType<?>> tag) {
+    protected ForgeRegistryTagBuilder<EntityType<?>> getEntityTypeBuilder(Tag<EntityType<?>> tag) {
         return getBuilder(TagType.ENTITY_TYPE, tag);
     }
 
-    protected ForgeRegistryTagBuilder<Fluid> getFluidBuilder(INamedTag<Fluid> tag) {
+    protected ForgeRegistryTagBuilder<Fluid> getFluidBuilder(Tag<Fluid> tag) {
         return getBuilder(TagType.FLUID, tag);
     }
 
-    protected ForgeRegistryTagBuilder<Gas> getGasBuilder(INamedTag<Gas> tag) {
+    protected ForgeRegistryTagBuilder<Gas> getGasBuilder(Tag<Gas> tag) {
         return getBuilder(TagType.GAS, tag);
     }
 
-    protected ForgeRegistryTagBuilder<InfuseType> getInfuseTypeBuilder(INamedTag<InfuseType> tag) {
+    protected  Tag.Builder<InfuseType> getInfuseTypeBuilder(Tag<InfuseType> tag) {
         return getBuilder(TagType.INFUSE_TYPE, tag);
     }
 
-    protected ForgeRegistryTagBuilder<Pigment> getPigmentBuilder(INamedTag<Pigment> tag) {
+    protected  Tag.Builder<Slurry> getPigmentBuilder(Tag<Pigment> tag) {
         return getBuilder(TagType.PIGMENT, tag);
     }
 
-    protected ForgeRegistryTagBuilder<Slurry> getSlurryBuilder(INamedTag<Slurry> tag) {
+    protected Tag.Builder<Slurry> getSlurryBuilder(Tag<Slurry> tag) {
         return getBuilder(TagType.SLURRY, tag);
-    }
-
-    protected void addToTag(INamedTag<Item> tag, IItemProvider... itemProviders) {
-        ForgeRegistryTagBuilder<Item> tagBuilder = getItemBuilder(tag);
-        for (IItemProvider itemProvider : itemProviders) {
-            tagBuilder.add(itemProvider.getItem());
-        }
-    }
-
-    protected void addToTag(INamedTag<Block> tag, IBlockProvider... blockProviders) {
-        ForgeRegistryTagBuilder<Block> tagBuilder = getBlockBuilder(tag);
-        for (IBlockProvider blockProvider : blockProviders) {
-            tagBuilder.add(blockProvider.getBlock());
-        }
-    }
-
-    protected void addToTags(INamedTag<Item> itemTag, INamedTag<Block> blockTag, IBlockProvider... blockProviders) {
-        ForgeRegistryTagBuilder<Item> itemTagBuilder = getItemBuilder(itemTag);
-        ForgeRegistryTagBuilder<Block> blockTagBuilder = getBlockBuilder(blockTag);
-        for (IBlockProvider blockProvider : blockProviders) {
-            itemTagBuilder.add(blockProvider.getItem());
-            blockTagBuilder.add(blockProvider.getBlock());
-        }
-    }
-
-    protected void addToTag(INamedTag<EntityType<?>> tag, IEntityTypeProvider... entityTypeProviders) {
-        ForgeRegistryTagBuilder<EntityType<?>> tagBuilder = getEntityTypeBuilder(tag);
-        for (IEntityTypeProvider entityTypeProvider : entityTypeProviders) {
-            tagBuilder.add(entityTypeProvider.getEntityType());
-        }
-    }
-
-    protected void addToTag(INamedTag<Fluid> tag, FluidRegistryObject<?, ?, ?, ?>... fluidRegistryObjects) {
-        ForgeRegistryTagBuilder<Fluid> tagBuilder = getFluidBuilder(tag);
-        for (FluidRegistryObject<?, ?, ?, ?> fluidRO : fluidRegistryObjects) {
-            tagBuilder.add(fluidRO.getStillFluid(), fluidRO.getFlowingFluid());
-        }
-    }
-
-    protected void addToTag(INamedTag<Gas> tag, IGasProvider... gasProviders) {
-        addToTag(getGasBuilder(tag), gasProviders);
-    }
-
-    protected void addToTag(INamedTag<InfuseType> tag, IInfuseTypeProvider... infuseTypeProviders) {
-        addToTag(getInfuseTypeBuilder(tag), infuseTypeProviders);
-    }
-
-    protected void addToTag(INamedTag<Pigment> tag, IPigmentProvider... pigmentProviders) {
-        addToTag(getPigmentBuilder(tag), pigmentProviders);
-    }
-
-    protected void addToTag(INamedTag<Slurry> tag, ISlurryProvider... slurryProviders) {
-        addToTag(getSlurryBuilder(tag), slurryProviders);
     }
 
     @SafeVarargs

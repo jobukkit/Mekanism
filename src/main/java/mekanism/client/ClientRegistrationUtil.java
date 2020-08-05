@@ -33,7 +33,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.item.IItemPropertyGetter;
-import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
@@ -93,7 +92,8 @@ public class ClientRegistrationUtil {
     }
 
     public static void setPropertyOverride(IItemProvider itemProvider, ResourceLocation override, IItemPropertyGetter propertyGetter) {
-        ItemModelsProperties.func_239418_a_(itemProvider.getItem(), override, propertyGetter);
+
+        //ItemModelsProperties.func_239418_a_(itemProvider.getItem(), override, propertyGetter);
     }
 
     public static void registerItemColorHandler(ItemColors colors, IItemColor itemColor, IItemProvider... items) {

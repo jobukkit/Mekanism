@@ -1,6 +1,8 @@
 package mekanism.common.registration.impl;
 
 import java.util.function.Supplier;
+
+import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.infuse.InfuseType;
 import mekanism.api.chemical.infuse.InfuseTypeBuilder;
 import mekanism.common.registration.WrappedDeferredRegister;
@@ -9,7 +11,7 @@ import net.minecraft.util.ResourceLocation;
 public class InfuseTypeDeferredRegister extends WrappedDeferredRegister<InfuseType> {
 
     public InfuseTypeDeferredRegister(String modid) {
-        super(modid, InfuseType.class);
+        super(modid, MekanismAPI.infuseTypeRegistry());
     }
 
     public InfuseTypeRegistryObject<InfuseType> register(String name, int tint) {

@@ -12,7 +12,6 @@ import mekanism.tools.common.registries.ToolsRecipeSerializers;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.SkeletonEntity;
 import net.minecraft.entity.monster.ZombieEntity;
-import net.minecraft.entity.monster.piglin.PiglinEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -96,13 +95,13 @@ public class MekanismTools implements IModule {
 
     private void onLivingSpecialSpawn(LivingSpawnEvent.SpecialSpawn event) {
         LivingEntity entity = event.getEntityLiving();
-        if (entity instanceof ZombieEntity || entity instanceof SkeletonEntity || entity instanceof PiglinEntity) {
+        if (entity instanceof ZombieEntity || entity instanceof SkeletonEntity) {
             //Don't bother calculating random numbers unless the instanceof checks pass
             Random random = event.getWorld().getRandom();
             double chance = random.nextDouble();
             if (chance < MekanismToolsConfig.tools.armorSpawnRate.get()) {
                 //We can only spawn refined glowstone armor on piglins
-                int armorType = entity instanceof PiglinEntity ? 0 : random.nextInt(5);
+                int armorType = random.nextInt(5);
                 if (armorType == 0) {
                     setEntityArmorWithChance(random, entity, ToolsItems.REFINED_GLOWSTONE_SWORD, ToolsItems.REFINED_GLOWSTONE_HELMET, ToolsItems.REFINED_GLOWSTONE_CHESTPLATE,
                           ToolsItems.REFINED_GLOWSTONE_LEGGINGS, ToolsItems.REFINED_GLOWSTONE_BOOTS);

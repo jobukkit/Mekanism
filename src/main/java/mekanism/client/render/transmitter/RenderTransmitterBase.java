@@ -71,7 +71,7 @@ public abstract class RenderTransmitterBase<TRANSMITTER extends TileEntityTransm
           TextureAtlasSprite icon) {
         renderModel(transmitter, matrix, builder, MekanismRenderer.getRed(rgb), MekanismRenderer.getGreen(rgb), MekanismRenderer.getBlue(rgb), alpha, light,
               overlayLight, icon, Arrays.stream(EnumUtils.DIRECTIONS)
-                    .map(side -> side.getString() + transmitter.getTransmitter().getConnectionType(side).getString().toUpperCase(Locale.ROOT))
+                    .map(side -> side.getName() + transmitter.getTransmitter().getConnectionType(side).getName().toUpperCase(Locale.ROOT))
                     .collect(Collectors.toList()));
     }
 

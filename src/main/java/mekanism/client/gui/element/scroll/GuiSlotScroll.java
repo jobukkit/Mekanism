@@ -1,9 +1,7 @@
 package mekanism.client.gui.element.scroll;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.List;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
+
+import com.mojang.blaze3d.systems.RenderSystem;
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.GuiRelativeElement;
 import mekanism.client.gui.element.slot.GuiSlot;
@@ -14,8 +12,12 @@ import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.MekanismUtils.ResourceType;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
+
+import java.util.List;
+import java.util.function.Supplier;
 
 public class GuiSlotScroll extends GuiRelativeElement {
 
@@ -39,10 +41,10 @@ public class GuiSlotScroll extends GuiRelativeElement {
     }
 
     @Override
-    public void drawBackground(@Nonnull MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
-        super.drawBackground(matrix, mouseX, mouseY, partialTicks);
+    public void drawBackground(int mouseX, int mouseY, float partialTicks) {
+        super.drawBackground(mouseX, mouseY, partialTicks);
         minecraft.textureManager.bindTexture(getSlotList() == null ? SLOTS_DARK : SLOTS);
-        blit(matrix, x, y, 0, 0, xSlots * 18, ySlots * 18, 288, 288);
+        blit(x, y, 0, 0, xSlots * 18, ySlots * 18, 288, 288);
 
         List<IScrollableSlot> list = getSlotList();
         if (list != null) {
@@ -54,30 +56,30 @@ public class GuiSlotScroll extends GuiRelativeElement {
                     break;
                 }
                 int slotX = x + (i % xSlots) * 18, slotY = y + (i / xSlots) * 18;
-                renderSlot(matrix, list.get(slot), slotX, slotY);
+                renderSlot( list.get(slot), slotX, slotY);
             }
         }
     }
 
     @Override
-    public void renderForeground(MatrixStack matrix, int mouseX, int mouseY) {
-        super.renderForeground(matrix, mouseX, mouseY);
+    public void renderForeground(int mouseX, int mouseY) {
+        super.renderForeground(mouseX, mouseY);
         int xAxis = mouseX - guiObj.getLeft(), yAxis = mouseY - guiObj.getTop();
         int slotX = (xAxis - relativeX) / 18, slotY = (yAxis - relativeY) / 18;
         if (slotX >= 0 && slotY >= 0 && slotX < xSlots && slotY < ySlots) {
             int slotStartX = relativeX + slotX * 18 + 1, slotStartY = relativeY + slotY * 18 + 1;
             if (xAxis >= slotStartX && xAxis < slotStartX + 16 && yAxis >= slotStartY && yAxis < slotStartY + 16) {
-                fill(matrix, slotStartX, slotStartY, slotStartX + 16, slotStartY + 16, GuiSlot.DEFAULT_HOVER_COLOR);
+                fill(slotStartX, slotStartY, slotStartX + 16, slotStartY + 16, GuiSlot.DEFAULT_HOVER_COLOR);
                 MekanismRenderer.resetColor();
             }
         }
     }
 
     @Override
-    public void renderToolTip(@Nonnull MatrixStack matrix, int xAxis, int yAxis) {
+    public void renderToolTip(int xAxis, int yAxis) {
         IScrollableSlot slot = getSlot(xAxis, yAxis, relativeX, relativeY);
         if (slot != null) {
-            renderSlotTooltip(matrix, slot, xAxis, yAxis);
+            renderSlotTooltip(slot, xAxis, yAxis);
         }
     }
 
@@ -117,37 +119,37 @@ public class GuiSlotScroll extends GuiRelativeElement {
         return list.get(slot);
     }
 
-    private void renderSlot(MatrixStack matrix, IScrollableSlot slot, int slotX, int slotY) {
+    private void renderSlot(IScrollableSlot slot, int slotX, int slotY) {
         // sanity checks
         if (slot.getItem() == null || slot.getItem().getStack() == null || slot.getItem().getStack().isEmpty()) {
             return;
         }
-        guiObj.renderItemWithOverlay(matrix, slot.getItem().getStack(), slotX + 1, slotY + 1, 1.0F, "");
+        guiObj.renderItemWithOverlay(slot.getItem().getStack(), slotX + 1, slotY + 1, 1.0F, "");
         if (slot.getCount() > 1) {
-            renderSlotText(matrix, getCountText(slot.getCount()), slotX + 1, slotY + 1);
+            renderSlotText(getCountText(slot.getCount()), slotX + 1, slotY + 1);
         }
     }
 
-    private void renderSlotTooltip(MatrixStack matrix, IScrollableSlot slot, int slotX, int slotY) {
+    private void renderSlotTooltip( IScrollableSlot slot, int slotX, int slotY) {
         // sanity checks
         if (slot.getItem() == null || slot.getItem().getStack() == null || slot.getItem().getStack().isEmpty()) {
             return;
         }
-        guiObj.renderItemTooltip(matrix, slot.getItem().getStack(), slotX, slotY);
+        guiObj.renderItemTooltip(slot.getItem().getStack(), slotX, slotY);
     }
 
-    private void renderSlotText(MatrixStack matrix, String text, int x, int y) {
-        matrix.push();
+    private void renderSlotText(String text, int x, int y) {
+        RenderSystem.pushMatrix();
         MekanismRenderer.resetColor();
         float scale = 0.6F;
         float yAdd = 4 - (scale * 8) / 2F;
-        matrix.translate(x + 16 - getFont().getStringWidth(text) * scale, y + 9 + yAdd, 200F);
-        matrix.scale(scale, scale, scale);
+        RenderSystem.translated(x + 16 - getFont().getStringWidth(text) * scale, y + 9 + yAdd, 200F);
+        RenderSystem.scaled(scale, scale, scale);
 
         IRenderTypeBuffer.Impl buffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
-        getFont().renderString(text, 0, 0, 0xFFFFFF, true, matrix.getLast().getMatrix(), buffer, false, 0, 15728880);
+        getFont().renderString(text, 0, 0, 0xFFFFFF, true, Matrix4f.makeScale(1, 1, 1), buffer, false, 0, 15728880);
         buffer.finish();
-        matrix.pop();
+        RenderSystem.popMatrix();
     }
 
     private String getCountText(long count) {

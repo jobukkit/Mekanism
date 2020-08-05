@@ -1,16 +1,17 @@
 package mekanism.common.util;
 
-import java.util.Collections;
-import java.util.List;
 import mekanism.common.Mekanism;
 import mekanism.common.registries.MekanismItems;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.LootParameters;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.storage.loot.LootContext;
+import net.minecraft.world.storage.loot.LootParameters;
+
+import java.util.Collections;
+import java.util.List;
 
 public final class MinerUtils {
 

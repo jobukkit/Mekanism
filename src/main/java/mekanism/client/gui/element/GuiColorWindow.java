@@ -1,9 +1,7 @@
 package mekanism.client.gui.element;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+
 import com.mojang.blaze3d.systems.RenderSystem;
-import java.util.function.Consumer;
-import javax.annotation.Nonnull;
 import mekanism.api.text.EnumColor;
 import mekanism.client.gui.GuiUtils;
 import mekanism.client.gui.IGuiWrapper;
@@ -21,9 +19,10 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldVertexBufferUploader;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.text.ITextComponent;
 import org.lwjgl.opengl.GL11;
+
+import java.util.function.Consumer;
 
 public class GuiColorWindow extends GuiWindow {
 
@@ -71,16 +70,16 @@ public class GuiColorWindow extends GuiWindow {
     }
 
     @Override
-    public void renderForeground(MatrixStack matrix, int mouseX, int mouseY) {
-        super.renderForeground(matrix, mouseX, mouseY);
+    public void renderForeground(int mouseX, int mouseY) {
+        super.renderForeground(mouseX, mouseY);
 
-        drawCenteredTextScaledBound(matrix, MekanismLang.COLOR_PICKER.translate(), 120, 6, titleTextColor());
-        drawTextScaledBound(matrix, MekanismLang.RGB.translate(), relativeX + 7, relativeY + getButtonHeight() - 17.5F, titleTextColor(), 20);
+        drawCenteredTextScaledBound(MekanismLang.COLOR_PICKER.translate(), 120, 6, titleTextColor());
+        drawTextScaledBound(MekanismLang.RGB.translate(), relativeX + 7, relativeY + getButtonHeight() - 17.5F, titleTextColor(), 20);
     }
 
     private static final int S_TILES = 10, V_TILES = 10;
 
-    private void drawTiledGradient(MatrixStack matrix, int x, int y, int width, int height) {
+    private void drawTiledGradient(int x, int y, int width, int height) {
         int tileWidth = Math.round((float) width / S_TILES);
         int tileHeight = Math.round((float) height / V_TILES);
         for (int i = 0; i < 10; i++) {
@@ -88,24 +87,23 @@ public class GuiColorWindow extends GuiWindow {
             for (int j = 0; j < 10; j++) {
                 float minS = (float) j / S_TILES, maxS = (float) (j + 1) / S_TILES;
                 Color tl = Color.hsv(hue, minS, maxV), tr = Color.hsv(hue, maxS, maxV), bl = Color.hsv(hue, minS, minV), br = Color.hsv(hue, maxS, minV);
-                drawGradient(matrix, x + j * tileWidth, y + (V_TILES - i - 1) * tileHeight, tileWidth, tileHeight, tl, tr, bl, br);
+                drawGradient(x + j * tileWidth, y + (V_TILES - i - 1) * tileHeight, tileWidth, tileHeight, tl, tr, bl, br);
             }
         }
     }
 
-    private void drawGradient(MatrixStack matrix, int x, int y, int width, int height, Color tl, Color tr, Color bl, Color br) {
+    private void drawGradient(int x, int y, int width, int height, Color tl, Color tr, Color bl, Color br) {
         RenderSystem.disableTexture();
         RenderSystem.enableBlend();
         RenderSystem.disableAlphaTest();
         RenderSystem.defaultBlendFunc();
         RenderSystem.shadeModel(GL11.GL_SMOOTH);
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-        Matrix4f matrix4f = matrix.getLast().getMatrix();
         buffer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        buffer.pos(matrix4f, x, y + height, 0).color(bl.rf(), bl.gf(), bl.bf(), bl.af()).endVertex();
-        buffer.pos(matrix4f, x + width, y + height, 0).color(br.rf(), br.gf(), br.bf(), br.af()).endVertex();
-        buffer.pos(matrix4f, x + width, y, 0).color(tr.rf(), tr.gf(), tr.bf(), tr.af()).endVertex();
-        buffer.pos(matrix4f, x, y, 0).color(tl.rf(), tl.gf(), tl.bf(), tl.af()).endVertex();
+        buffer.pos(x, y + height, 0).color(bl.rf(), bl.gf(), bl.bf(), bl.af()).endVertex();
+        buffer.pos( x + width, y + height, 0).color(br.rf(), br.gf(), br.bf(), br.af()).endVertex();
+        buffer.pos( x + width, y, 0).color(tr.rf(), tr.gf(), tr.bf(), tr.af()).endVertex();
+        buffer.pos( x, y, 0).color(tl.rf(), tl.gf(), tl.bf(), tl.af()).endVertex();
         buffer.finishDrawing();
         WorldVertexBufferUploader.draw(buffer);
         RenderSystem.shadeModel(GL11.GL_FLAT);
@@ -147,9 +145,9 @@ public class GuiColorWindow extends GuiWindow {
         return val >= 0 && val <= 255;
     }
 
-    private void drawColorBar(MatrixStack matrix, int x, int y, int width, int height) {
+    private void drawColorBar(int x, int y, int width, int height) {
         for (int i = 0; i < width; i++) {
-            GuiUtils.fill(matrix, x + i, y, 1, height, Color.hsv(((float) i / width) * 360F, 1, 1).argb());
+            GuiUtils.fill(x + i, y, 1, height, Color.hsv(((float) i / width) * 360F, 1, 1).argb());
         }
     }
 
@@ -174,18 +172,18 @@ public class GuiColorWindow extends GuiWindow {
         }
 
         @Override
-        public void renderToolTip(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-            super.renderToolTip(matrix, mouseX, mouseY);
+        public void renderToolTip(int mouseX, int mouseY) {
+            super.renderToolTip(mouseX, mouseY);
             ITextComponent hex = MekanismLang.GENERIC_HEX.translateColored(EnumColor.GRAY, TextUtils.hex(false, 3, getColor().rgb()));
-            guiObj.displayTooltip(matrix, hex, mouseX, mouseY);
+            guiObj.displayTooltip(hex, mouseX, mouseY);
         }
 
         @Override
-        public void drawBackground(@Nonnull MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
-            super.drawBackground(matrix, mouseX, mouseY, partialTicks);
+        public void drawBackground(int mouseX, int mouseY, float partialTicks) {
+            super.drawBackground(mouseX, mouseY, partialTicks);
 
             Color c = Color.hsv(hue, saturation, value);
-            GuiUtils.fill(matrix, getButtonX(), getButtonY(), getButtonWidth(), getButtonHeight(), c.argb());
+            GuiUtils.fill(getButtonX(), getButtonY(), getButtonWidth(), getButtonHeight(), c.argb());
         }
     }
 
@@ -198,13 +196,13 @@ public class GuiColorWindow extends GuiWindow {
         }
 
         @Override
-        public void renderBackgroundOverlay(MatrixStack matrix, int mouseX, int mouseY) {
-            super.renderBackgroundOverlay(matrix, mouseX, mouseY);
-            drawTiledGradient(matrix, getButtonX(), getButtonY(), getButtonWidth(), getButtonHeight());
+        public void renderBackgroundOverlay(int mouseX, int mouseY) {
+            super.renderBackgroundOverlay(mouseX, mouseY);
+            drawTiledGradient(getButtonX(), getButtonY(), getButtonWidth(), getButtonHeight());
             int posX = getButtonX() + Math.round(saturation * getButtonWidth()) - 2;
             int posY = getButtonY() + Math.round((1 - value) * getButtonHeight()) - 2;
-            GuiUtils.drawOutline(matrix, posX, posY, 5, 5, 0xFFFFFFFF);
-            GuiUtils.fill(matrix, posX + 1, posY + 1, 3, 3, getColor().argb());
+            GuiUtils.drawOutline(posX, posY, 5, 5, 0xFFFFFFFF);
+            GuiUtils.fill(posX + 1, posY + 1, 3, 3, getColor().argb());
         }
 
         @Override
@@ -240,13 +238,13 @@ public class GuiColorWindow extends GuiWindow {
         }
 
         @Override
-        public void renderBackgroundOverlay(MatrixStack matrix, int mouseX, int mouseY) {
-            super.renderBackgroundOverlay(matrix, mouseX, mouseY);
-            drawColorBar(matrix, getButtonX(), getButtonY(), getButtonWidth(), getButtonHeight());
+        public void renderBackgroundOverlay(int mouseX, int mouseY) {
+            super.renderBackgroundOverlay(mouseX, mouseY);
+            drawColorBar(getButtonX(), getButtonY(), getButtonWidth(), getButtonHeight());
             minecraft.textureManager.bindTexture(HUE_PICKER);
             int posX = Math.round((hue / 360F) * (getButtonWidth() - 3));
-            blit(matrix, getButtonX() - 2 + posX, getButtonY() - 2, 0, 0, 7, 12, 12, 12);
-            GuiUtils.fill(matrix, getButtonX() + posX, getButtonY(), 3, 8, Color.hsv(hue, 1, 1).argb());
+            blit(getButtonX() - 2 + posX, getButtonY() - 2, 0, 0, 7, 12, 12, 12);
+            GuiUtils.fill(getButtonX() + posX, getButtonY(), 3, 8, Color.hsv(hue, 1, 1).argb());
         }
 
         @Override

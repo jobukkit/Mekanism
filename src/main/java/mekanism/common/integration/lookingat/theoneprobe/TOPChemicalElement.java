@@ -1,7 +1,9 @@
 package mekanism.common.integration.lookingat.theoneprobe;
 
 import javax.annotation.Nonnull;
-import mcjty.theoneprobe.api.IElement;
+
+import io.netty.buffer.ByteBuf;
+import mcjty.theoneprobe.api.IElementNew;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.ChemicalUtils;
 import mekanism.api.chemical.gas.GasStack;
@@ -11,7 +13,7 @@ import mekanism.api.chemical.slurry.SlurryStack;
 import mekanism.common.integration.lookingat.ChemicalElement;
 import net.minecraft.network.PacketBuffer;
 
-public abstract class TOPChemicalElement extends ChemicalElement implements IElement {
+public abstract class TOPChemicalElement extends ChemicalElement implements IElementNew {
 
     protected TOPChemicalElement(@Nonnull ChemicalStack<?> stored, long capacity) {
         super(stored, capacity);

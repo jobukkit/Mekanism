@@ -1,29 +1,29 @@
 package mekanism.api.chemical;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.chemical.attribute.ChemicalAttribute;
 import mekanism.api.providers.IChemicalProvider;
 import mekanism.api.text.IHasTextComponent;
 import mekanism.api.text.IHasTranslationKey;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.util.ReverseTagWrapper;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class Chemical<CHEMICAL extends Chemical<CHEMICAL>> extends ForgeRegistryEntry<CHEMICAL> implements IChemicalProvider<CHEMICAL>, IHasTextComponent,
       IHasTranslationKey {
 
-    private final ReverseTagWrapper<CHEMICAL> reverseTags;
     private final Map<Class<? extends ChemicalAttribute>, ChemicalAttribute> attributeMap;
 
     private final ResourceLocation iconLocation;
@@ -32,8 +32,7 @@ public abstract class Chemical<CHEMICAL extends Chemical<CHEMICAL>> extends Forg
 
     private String translationKey;
 
-    protected Chemical(ChemicalBuilder<CHEMICAL, ?> builder, ChemicalTags<CHEMICAL> chemicalTags) {
-        reverseTags = new ReverseTagWrapper<>(getChemical(), chemicalTags::getCollection);
+    protected Chemical(ChemicalBuilder<CHEMICAL, ?> builder) {
         this.attributeMap = builder.getAttributeMap();
         this.iconLocation = builder.getTexture();
         this.tint = builder.getColor();
@@ -147,13 +146,9 @@ public abstract class Chemical<CHEMICAL extends Chemical<CHEMICAL>> extends Forg
         return hidden;
     }
 
-    public boolean isIn(ITag<CHEMICAL> tag) {
-        return tag.contains(getChemical());
-    }
+    public abstract boolean isIn(Tag<CHEMICAL> tag);
 
-    public Set<ResourceLocation> getTags() {
-        return reverseTags.getTagNames();
-    }
+    public abstract Set<ResourceLocation> getTags();
 
     public abstract boolean isEmptyType();
 }

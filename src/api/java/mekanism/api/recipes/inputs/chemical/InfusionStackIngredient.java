@@ -1,8 +1,6 @@
 package mekanism.api.recipes.inputs.chemical;
 
 import com.google.gson.JsonElement;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.chemical.infuse.InfuseType;
 import mekanism.api.chemical.infuse.InfusionStack;
 import mekanism.api.providers.IInfuseTypeProvider;
@@ -10,7 +8,10 @@ import mekanism.api.recipes.inputs.chemical.ChemicalStackIngredient.MultiIngredi
 import mekanism.api.recipes.inputs.chemical.ChemicalStackIngredient.SingleIngredient;
 import mekanism.api.recipes.inputs.chemical.ChemicalStackIngredient.TaggedIngredient;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public interface InfusionStackIngredient extends IChemicalStackIngredient<InfuseType, InfusionStack> {
 
@@ -22,7 +23,7 @@ public interface InfusionStackIngredient extends IChemicalStackIngredient<Infuse
         return new Single(infuseType.getStack(amount));
     }
 
-    static InfusionStackIngredient from(@Nonnull ITag<InfuseType> tag, long amount) {
+    static InfusionStackIngredient from(@Nonnull Tag<InfuseType> tag, long amount) {
         return new Tagged(tag, amount);
     }
 
@@ -52,7 +53,7 @@ public interface InfusionStackIngredient extends IChemicalStackIngredient<Infuse
 
     class Tagged extends TaggedIngredient<InfuseType, InfusionStack> implements InfusionStackIngredient {
 
-        protected Tagged(@Nonnull ITag<InfuseType> tag, long amount) {
+        protected Tagged(@Nonnull Tag<InfuseType> tag, long amount) {
             super(tag, amount);
         }
     }

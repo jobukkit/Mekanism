@@ -1,10 +1,6 @@
 package mekanism.client.gui.element.slot;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.function.IntSupplier;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import com.mojang.blaze3d.systems.RenderSystem;
 import mekanism.api.text.EnumColor;
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.GuiTexturedElement;
@@ -13,6 +9,10 @@ import mekanism.client.render.MekanismRenderer;
 import mekanism.common.inventory.container.slot.SlotOverlay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nullable;
+import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
 public class GuiSlot extends GuiTexturedElement implements IJEIGhostTarget {
 
@@ -83,30 +83,30 @@ public class GuiSlot extends GuiTexturedElement implements IJEIGhostTarget {
     }
 
     @Override
-    public void renderButton(@Nonnull MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
+    public void renderButton(int mouseX, int mouseY, float partialTicks) {
         if (!renderAboveSlots) {
-            draw(matrix, mouseX, mouseY);
+            draw(mouseX, mouseY);
         }
     }
 
     @Override
-    public void drawBackground(@Nonnull MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
+    public void drawBackground(int mouseX, int mouseY, float partialTicks) {
         if (renderAboveSlots) {
-            draw(matrix, mouseX, mouseY);
+            draw(mouseX, mouseY);
         }
     }
 
-    private void draw(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
+    private void draw(int mouseX, int mouseY) {
         minecraft.textureManager.bindTexture(getResource());
-        blit(matrix, x, y, 0, 0, width, height, width, height);
+        blit(x, y, 0, 0, width, height, width, height);
         if (hasValidityCheck) {
             ItemStack invalid = validityCheck.get();
             if (!invalid.isEmpty()) {
                 int xPos = x + 1;
                 int yPos = y + 1;
-                fill(matrix, xPos, yPos, xPos + 16, yPos + 16, INVALID_SLOT_COLOR);
+                fill(xPos, yPos, xPos + 16, yPos + 16, INVALID_SLOT_COLOR);
                 MekanismRenderer.resetColor();
-                guiObj.renderItem(matrix, invalid, xPos, yPos);
+                guiObj.renderItem(invalid, xPos, yPos);
             }
         }
         if (overlaySupplier != null) {
@@ -114,38 +114,38 @@ public class GuiSlot extends GuiTexturedElement implements IJEIGhostTarget {
         }
         if (overlay != null) {
             minecraft.textureManager.bindTexture(overlay.getTexture());
-            blit(matrix, x, y, 0, 0, overlay.getWidth(), overlay.getHeight(), overlay.getWidth(), overlay.getHeight());
+            blit(x, y, 0, 0, overlay.getWidth(), overlay.getHeight(), overlay.getWidth(), overlay.getHeight());
         }
     }
 
     @Override
-    public void renderForeground(MatrixStack matrix, int mouseX, int mouseY) {
+    public void renderForeground(int mouseX, int mouseY) {
         if (renderHover && isHovered()) {
             int xPos = relativeX + 1;
             int yPos = relativeY + 1;
-            fill(matrix, xPos, yPos, xPos + 16, yPos + 16, DEFAULT_HOVER_COLOR);
+            fill(xPos, yPos, xPos + 16, yPos + 16, DEFAULT_HOVER_COLOR);
             MekanismRenderer.resetColor();
         }
         if (overlayColorSupplier != null) {
-            matrix.push();
-            matrix.translate(0, 0, 10);
+            RenderSystem.pushMatrix();
+            RenderSystem.translated(0, 0, 10);
             int xPos = relativeX + 1;
             int yPos = relativeY + 1;
-            fill(matrix, xPos, yPos, xPos + 16, yPos + 16, overlayColorSupplier.getAsInt());
-            matrix.translate(0, 0, -10);
-            matrix.pop();
+            fill(xPos, yPos, xPos + 16, yPos + 16, overlayColorSupplier.getAsInt());
+            RenderSystem.translated(0, 0, -10);
+            RenderSystem.popMatrix();
             MekanismRenderer.resetColor();
         }
         if (isHovered()) {
             //TODO: Should it pass it the proper mouseX and mouseY. Probably, though buttons may have to be redone slightly then
-            renderToolTip(matrix, mouseX - guiObj.getLeft(), mouseY - guiObj.getTop());
+            renderToolTip(mouseX - guiObj.getLeft(), mouseY - guiObj.getTop());
         }
     }
 
     @Override
-    public void renderToolTip(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
+    public void renderToolTip(int mouseX, int mouseY) {
         if (onHover != null) {
-            onHover.onHover(this, matrix, mouseX, mouseY);
+            onHover.onHover(this, mouseX, mouseY);
         }
     }
 

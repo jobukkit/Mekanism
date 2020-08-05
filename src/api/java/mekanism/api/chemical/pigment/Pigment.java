@@ -6,12 +6,15 @@ import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.MekanismAPI;
 import mekanism.api.NBTConstants;
 import mekanism.api.chemical.Chemical;
-import mekanism.api.chemical.ChemicalTags;
 import mekanism.api.chemical.ChemicalUtils;
 import mekanism.api.providers.IPigmentProvider;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
+import net.minecraftforge.common.util.ReverseTagWrapper;
+
+import java.util.Set;
 
 /**
  * Represents a pigment chemical subtype
@@ -20,8 +23,10 @@ import net.minecraft.util.Util;
 @MethodsReturnNonnullByDefault
 public class Pigment extends Chemical<Pigment> implements IPigmentProvider {
 
+    private final ReverseTagWrapper<Pigment> reverseTags = new ReverseTagWrapper<>(this, PigmentTags::getGeneration, PigmentTags::getCollection);
+
     public Pigment(PigmentBuilder builder) {
-        super(builder, ChemicalTags.PIGMENT);
+        super(builder);
     }
 
     public static Pigment readFromNBT(@Nullable CompoundNBT nbtTags) {
@@ -51,5 +56,15 @@ public class Pigment extends Chemical<Pigment> implements IPigmentProvider {
     @Override
     protected String getDefaultTranslationKey() {
         return Util.makeTranslationKey("pigment", getRegistryName());
+    }
+
+    @Override
+    public boolean isIn(Tag<Pigment> tag) {
+        return tag.contains(this);
+    }
+
+    @Override
+    public Set<ResourceLocation> getTags() {
+        return reverseTags.getTagNames();
     }
 }

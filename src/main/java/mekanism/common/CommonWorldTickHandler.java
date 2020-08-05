@@ -1,24 +1,24 @@
 package mekanism.common;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Random;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.lib.chunkloading.ChunkManager;
 import mekanism.common.lib.frequency.FrequencyManager;
 import mekanism.common.world.GenHandler;
-import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.TickEvent.WorldTickEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Random;
 
 public class CommonWorldTickHandler {
 
@@ -27,11 +27,11 @@ public class CommonWorldTickHandler {
     private Map<ResourceLocation, Queue<ChunkPos>> chunkRegenMap;
     public static boolean flushTagAndRecipeCaches;
 
-    public void addRegenChunk(RegistryKey<World> dimension, ChunkPos chunkCoord) {
+    public void addRegenChunk(DimensionType dimension, ChunkPos chunkCoord) {
         if (chunkRegenMap == null) {
             chunkRegenMap = new Object2ObjectArrayMap<>();
         }
-        ResourceLocation dimensionName = dimension.func_240901_a_();
+        ResourceLocation dimensionName = dimension.getRegistryName();
         if (!chunkRegenMap.containsKey(dimensionName)) {
             LinkedList<ChunkPos> list = new LinkedList<>();
             list.add(chunkCoord);
@@ -86,7 +86,7 @@ public class CommonWorldTickHandler {
             if (chunkRegenMap == null || !MekanismConfig.world.enableRegeneration.get()) {
                 return;
             }
-            ResourceLocation dimensionName = world.func_234923_W_().func_240901_a_();
+            ResourceLocation dimensionName = world.getDimension().getType().getRegistryName();
             //Credit to E. Beef
             if (chunkRegenMap.containsKey(dimensionName)) {
                 Queue<ChunkPos> chunksToGen = chunkRegenMap.get(dimensionName);

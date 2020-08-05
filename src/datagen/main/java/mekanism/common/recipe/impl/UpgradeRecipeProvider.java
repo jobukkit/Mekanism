@@ -1,6 +1,9 @@
 package mekanism.common.recipe.impl;
 
 import java.util.function.Consumer;
+
+import mekanism.api.backport.ITag;
+import mekanism.api.backport.Tags;
 import mekanism.common.Mekanism;
 import mekanism.common.item.ItemUpgrade;
 import mekanism.common.recipe.ISubRecipeProvider;
@@ -15,8 +18,6 @@ import mekanism.common.resource.ResourceType;
 import mekanism.common.tags.MekanismTags;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.item.Item;
-import net.minecraft.tags.ITag;
-import net.minecraftforge.common.Tags;
 
 class UpgradeRecipeProvider implements ISubRecipeProvider {
 

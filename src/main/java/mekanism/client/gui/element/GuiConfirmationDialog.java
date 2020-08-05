@@ -1,12 +1,13 @@
 package mekanism.client.gui.element;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.function.Supplier;
+
 import mekanism.api.text.EnumColor;
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.button.TranslationButton;
 import mekanism.common.MekanismLang;
 import net.minecraft.util.text.ITextComponent;
+
+import java.util.function.Supplier;
 
 public class GuiConfirmationDialog extends GuiWindow {
 
@@ -29,9 +30,9 @@ public class GuiConfirmationDialog extends GuiWindow {
     }
 
     @Override
-    public void renderForeground(MatrixStack matrix, int mouseX, int mouseY) {
-        super.renderForeground(matrix, mouseX, mouseY);
-        drawWrappedCenteredText(matrix, title, relativeX + (width / 2), relativeY + 10, titleTextColor(), width - 10);
+    public void renderForeground(int mouseX, int mouseY) {
+        super.renderForeground(mouseX, mouseY);
+        drawWrappedCenteredText(title, relativeX + (width / 2), relativeY + 10, titleTextColor(), width - 10);
     }
 
     @Override

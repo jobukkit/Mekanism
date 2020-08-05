@@ -1,19 +1,21 @@
 package mekanism.common.lib.math;
 
-import javax.annotation.Nonnull;
 import mekanism.api.Coord4D;
 import mekanism.api.NBTConstants;
+import mekanism.api.backport.Vector3d;
+import mekanism.api.backport.Vector3i;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
-import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3i;
-import net.minecraft.world.World;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.dimension.DimensionType;
+
+import javax.annotation.Nonnull;
 
 /**
  * Pos3D - a way of performing operations on objects in a three dimensional environment.
@@ -27,6 +29,9 @@ public class Pos3D extends Vector3d {
     }
 
     public Pos3D(Vector3d vec) {
+        super(vec.x, vec.y, vec.z);
+    }
+    public Pos3D(Vec3d vec) {
         super(vec.x, vec.y, vec.z);
     }
 
@@ -48,7 +53,8 @@ public class Pos3D extends Vector3d {
     }
 
     public static Pos3D create(TileEntity tile) {
-        return create(tile.getPos());
+        BlockPos pos = tile.getPos();
+        return create(new Vector3i(pos.getX(), pos.getY(), pos.getZ()));
     }
 
     public static Pos3D create(Vector3i vec) {
@@ -117,7 +123,7 @@ public class Pos3D extends Vector3d {
      *
      * @return Coord4D representing this Pos3D
      */
-    public Coord4D getCoord(RegistryKey<World> dimension) {
+    public Coord4D getCoord(DimensionType dimension) {
         return new Coord4D((int) x, (int) y, (int) z, dimension);
     }
 

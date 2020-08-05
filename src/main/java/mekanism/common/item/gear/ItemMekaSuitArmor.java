@@ -124,18 +124,8 @@ public class ItemMekaSuitArmor extends ArmorItem implements IModuleContainerItem
             if (!gasTankSpecs.isEmpty()) {
                 StorageUtils.addStoredGas(stack, tooltip, true, false);
             }
-            tooltip.add(MekanismLang.HOLD_FOR_MODULES.translateColored(EnumColor.GRAY, EnumColor.INDIGO, MekanismKeyHandler.detailsKey.func_238171_j_()));
+            tooltip.add(MekanismLang.HOLD_FOR_MODULES.translateColored(EnumColor.GRAY, EnumColor.INDIGO, MekanismKeyHandler.detailsKey.getLocalizedName()));
         }
-    }
-
-    @Override
-    public boolean makesPiglinsNeutral(@Nonnull ItemStack stack, @Nonnull LivingEntity wearer) {
-        return true;
-    }
-
-    @Override
-    public boolean isEnderMask(@Nonnull ItemStack stack, @Nonnull PlayerEntity player, @Nonnull EndermanEntity enderman) {
-        return getEquipmentSlot() == EquipmentSlotType.HEAD;
     }
 
     @Override
@@ -293,8 +283,13 @@ public class ItemMekaSuitArmor extends ArmorItem implements IModuleContainerItem
     protected static class MekaSuitMaterial extends BaseSpecialArmorMaterial {
 
         @Override
-        public float getKnockbackResistance() {
-            return 0.1F;
+        public int getDamageReductionAmount(@Nonnull EquipmentSlotType slotType) {
+            return 0;
+        }
+
+        @Override
+        public float getToughness() {
+            return 0;
         }
 
         @Nonnull

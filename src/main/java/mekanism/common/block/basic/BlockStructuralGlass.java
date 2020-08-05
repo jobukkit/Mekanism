@@ -10,6 +10,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -33,7 +34,7 @@ public class BlockStructuralGlass<TILE extends TileEntityStructuralMultiblock> e
         }
         if (world.isRemote) {
             ItemStack stack = player.getHeldItem(hand);
-            if (stack.getItem() instanceof BlockItem && new BlockItemUseContext(player, hand, stack, hit).canPlace()) {
+            if (stack.getItem() instanceof BlockItem && new BlockItemUseContext(new ItemUseContext(player, hand, hit)).canPlace()) {
                 if (!tile.structuralGuiAccessAllowed() || !tile.hasFormedMultiblock()) {
                     //If the block's multiblock doesn't allow gui access via structural multiblocks (for example the evaporation plant),
                     // or if the multiblock is not formed then pass

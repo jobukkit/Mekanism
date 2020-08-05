@@ -1,8 +1,6 @@
 package mekanism.common.block.prefab;
 
-import java.util.Random;
-import java.util.function.Function;
-import javax.annotation.Nonnull;
+import mekanism.api.backport.Vector3d;
 import mekanism.common.block.attribute.Attribute;
 import mekanism.common.block.attribute.AttributeGui;
 import mekanism.common.block.attribute.AttributeParticleFX;
@@ -29,14 +27,17 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
+import java.util.Random;
+import java.util.function.Function;
 
 public class BlockTile<TILE extends TileEntityMekanism, TYPE extends BlockTypeTile<TILE>> extends BlockBase<TYPE> implements IHasTileEntity<TILE> {
 
     public BlockTile(TYPE type) {
-        this(type, Block.Properties.create(Material.IRON).hardnessAndResistance(3.5F, 16F).setRequiresTool());
+        this(type, Block.Properties.create(Material.IRON).hardnessAndResistance(3.5F, 16F));
     }
 
     public BlockTile(TYPE type, Block.Properties properties) {

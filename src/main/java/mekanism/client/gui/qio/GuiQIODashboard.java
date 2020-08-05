@@ -1,7 +1,6 @@
 package mekanism.client.gui.qio;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.Nonnull;
+
 import mekanism.client.gui.element.tab.GuiQIOFrequencyTab;
 import mekanism.common.content.qio.QIOFrequency;
 import mekanism.common.inventory.container.tile.QIODashboardContainer;
@@ -33,9 +32,9 @@ public class GuiQIODashboard extends GuiQIOItemViewer<QIODashboardContainer> {
     }
 
     @Override
-    protected void drawForegroundText(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        drawTitleText(matrix, tile.getName(), 5);
-        super.drawForegroundText(matrix, mouseX, mouseY);
+    protected void drawForegroundText(int mouseX, int mouseY) {
+        drawTitleText( tile.getName(), 5);
+        super.drawForegroundText( mouseX, mouseY);
     }
 
     @Override

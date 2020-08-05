@@ -5,9 +5,6 @@ import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import java.util.Map;
-import java.util.Stack;
-import java.util.UUID;
 import mekanism.api.Coord4D;
 import mekanism.api.MekanismAPI;
 import mekanism.common.Mekanism;
@@ -24,9 +21,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.server.ServerWorld;
+
+import java.util.Map;
+import java.util.Stack;
+import java.util.UUID;
 
 public class CommandMek {
 
@@ -71,7 +72,7 @@ public class CommandMek {
                       rules.get(GameRules.DO_DAYLIGHT_CYCLE).set(false, server);
                       rules.get(GameRules.DO_WEATHER_CYCLE).set(false, server);
                       rules.get(GameRules.MOB_GRIEFING).set(false, server);
-                      ((ServerWorld) source.asPlayer().getEntityWorld()).func_241114_a_(2_000);
+                      ((ServerWorld) source.asPlayer().getEntityWorld()).setDayTime(2_000);
                       source.sendFeedback(MekanismLang.COMMAND_TEST_RULES.translate(), true);
                       return 0;
                   });
@@ -95,7 +96,7 @@ public class CommandMek {
                                 tpStack.put(player, playerLocations);
 
                                 ILocationArgument location = Vec3Argument.getLocation(ctx, "location");
-                                Vector3d position = location.getPosition(source);
+                                Vec3d position = location.getPosition(source);
                                 // Teleport user to new location
                                 teleport(entity, position.getX(), position.getY(), position.getZ());
                                 source.sendFeedback(MekanismLang.COMMAND_TP.translate(position.getX(), position.getY(), position.getZ()), true);
@@ -139,7 +140,7 @@ public class CommandMek {
                         .executes(ctx -> {
                             try {
                                 CommandSource source = ctx.getSource();
-                                Coord4D location = new Coord4D(source.getPos().x, source.getPos().y, source.getPos().z, source.getWorld().func_234923_W_());
+                                Coord4D location = new Coord4D(source.getPos().x, source.getPos().y, source.getPos().z, source.getWorld().getDimension().getType());
                                 double magnitude = DoubleArgumentType.getDouble(ctx, "magnitude");
                                 Mekanism.radiationManager.radiate(location, magnitude);
                                 source.sendFeedback(MekanismLang.COMMAND_RADIATION_ADD.translate(location), true);
@@ -151,7 +152,7 @@ public class CommandMek {
                   .then(Commands.literal("get")
                         .executes(ctx -> {
                             CommandSource source = ctx.getSource();
-                            Coord4D location = new Coord4D(source.getPos().x, source.getPos().y, source.getPos().z, source.getWorld().func_234923_W_());
+                            Coord4D location = new Coord4D(source.getPos().x, source.getPos().y, source.getPos().z, source.getWorld().getDimension().getType());
                             double radiation = Mekanism.radiationManager.getRadiationLevel(location);
                             source.sendFeedback(MekanismLang.COMMAND_RADIATION_GET.translate(radiation), true);
                             return 0;

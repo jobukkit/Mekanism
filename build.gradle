@@ -17,6 +17,7 @@ buildscript {
 plugins {
     id 'org.ajoberstar.grgit' version '4.0.2'
     id "com.matthewprenger.cursegradle" version '1.4.0'
+    id "com.wynprice.cursemaven" version "2.1.4"
     id 'java'
     id 'idea'
     id 'maven'
@@ -279,16 +280,16 @@ repositories {
         url 'http://dvs1.progwml6.com/files/maven'
     }
     maven {
+        name 'curseforge'
+        url 'https://minecraft.curseforge.com/api/maven/'
+    }
+    maven {
         name 'tterrag'
         url 'https://maven.tterrag.com/'
     }
     maven {
-        name 'CurseMaven'
-        url 'https://www.cursemaven.com'
-    }
-    maven {
-        name 'HWYLA'
-        url "https://maven.tehnut.info"
+        name 'BlameJared - Crafttweaker'
+        url 'https://maven.blamejared.com/'
     }
 }
 
@@ -311,19 +312,18 @@ dependencies {
 
     runtimeOnly fg.deobf("team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}")
 
-    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:${top_version}:api")
-    runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:${top_version}")
+    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.15:${top_version}:api")
+    runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.15:${top_version}")
 
-    compileOnly fg.deobf("mcp.mobius.waila:Hwyla:${hwyla_version}:api")
-    runtimeOnly fg.deobf("mcp.mobius.waila:Hwyla:${hwyla_version}")
+    //compileOnly fg.deobf("mcp.mobius.waila:Hwyla:${hwyla_version}:api")
+    //runtimeOnly fg.deobf("mcp.mobius.waila:Hwyla:${hwyla_version}")
 
     //Mods we have dependencies on but don't bother loading into the dev environment
     //compileOnly fg.deobf("curse.maven:projecte:${projecte_api_id}")
     //compileOnly fg.deobf("curse.maven:flux-networks:${flux_networks_id}")
 
     //Dependencies for data generators for mod compat reference
-    datagenmainCompileOnly fg.deobf("curse.maven:biomes-o-plenty-api:${biomesoplenty_api_id}")
-    datagenmainRuntimeOnly fg.deobf("curse.maven:biomes-o-plenty:${biomesoplenty_id}")
+    datagenmainCompile fg.deobf("curse.maven:biomes-o-plenty:${biomesoplenty_id}")
     //datagenmainCompile fg.deobf("curse.maven:i-like-wood:${ilikewood_id}")
 }
 
@@ -736,7 +736,7 @@ if (System.getenv("CURSEFORGE_KEY") != null || project.hasProperty('curseforgeKe
                     optionalDependency "ctm"
                     optionalDependency "biomes-o-plenty"
                     //optionalDependency "flux-networks"
-                    optionalDependency "hwyla"
+                    //optionalDependency "hwyla"
                     //optionalDependency "i-like-wood"
                     //optionalDependency "projecte"
                     optionalDependency "the-one-probe"

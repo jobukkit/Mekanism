@@ -1,12 +1,13 @@
 package mekanism.client.gui.element.filter.miner;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.Nullable;
+
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.filter.GuiMaterialFilter;
 import mekanism.client.jei.interfaces.IJEIGhostTarget.IGhostBlockItemConsumer;
 import mekanism.common.content.miner.MinerMaterialFilter;
 import mekanism.common.tile.machine.TileEntityDigitalMiner;
+
+import javax.annotation.Nullable;
 
 public class GuiMinerMaterialFilter extends GuiMaterialFilter<MinerMaterialFilter, TileEntityDigitalMiner> implements GuiMinerFilterHelper {
 
@@ -34,9 +35,9 @@ public class GuiMinerMaterialFilter extends GuiMaterialFilter<MinerMaterialFilte
     }
 
     @Override
-    public void renderForeground(MatrixStack matrix, int mouseX, int mouseY) {
-        super.renderForeground(matrix, mouseX, mouseY);
-        renderReplaceStack(matrix, guiObj, filter);
+    public void renderForeground( int mouseX, int mouseY) {
+        super.renderForeground(mouseX, mouseY);
+        renderReplaceStack(guiObj, filter);
     }
 
     @Nullable

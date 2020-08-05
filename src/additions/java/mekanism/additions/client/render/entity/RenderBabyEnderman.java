@@ -11,7 +11,7 @@ import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.Vec3d;
 
 /**
  * Copy of vanilla's enderman render, modified to use our own model/layer that is properly scaled, so that the block is held in the correct spot and the head is in the
@@ -38,9 +38,9 @@ public class RenderBabyEnderman extends MobRenderer<EntityBabyEnderman, ModelBab
 
     @Nonnull
     @Override
-    public Vector3d getRenderOffset(EntityBabyEnderman enderman, float partialTicks) {
+    public Vec3d getRenderOffset(EntityBabyEnderman enderman, float partialTicks) {
         if (enderman.isScreaming()) {
-            return new Vector3d(this.rnd.nextGaussian() * 0.02, 0, this.rnd.nextGaussian() * 0.02);
+            return new Vec3d(this.rnd.nextGaussian() * 0.02, 0, this.rnd.nextGaussian() * 0.02);
         }
         return super.getRenderOffset(enderman, partialTicks);
     }

@@ -24,19 +24,13 @@ import mekanism.common.util.EnumUtils;
 import net.minecraft.block.Block;
 import net.minecraft.data.loot.BlockLootTables;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.loot.ConstantRange;
-import net.minecraft.loot.IRandomRange;
-import net.minecraft.loot.ItemLootEntry;
-import net.minecraft.loot.LootPool;
-import net.minecraft.loot.LootTable;
-import net.minecraft.loot.LootTable.Builder;
-import net.minecraft.loot.functions.ApplyBonus;
-import net.minecraft.loot.functions.CopyNbt;
-import net.minecraft.loot.functions.CopyNbt.Source;
-import net.minecraft.loot.functions.SetCount;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IItemProvider;
+import net.minecraft.world.storage.loot.*;
+import net.minecraft.world.storage.loot.functions.ApplyBonus;
+import net.minecraft.world.storage.loot.functions.CopyNbt;
+import net.minecraft.world.storage.loot.functions.SetCount;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.items.IItemHandler;
 
@@ -101,7 +95,7 @@ public abstract class BaseBlockLootTables extends BlockLootTables {
             if (skipBlock(block)) {
                 continue;
             }
-            CopyNbt.Builder nbtBuilder = CopyNbt.builder(Source.BLOCK_ENTITY);
+            CopyNbt.Builder nbtBuilder = CopyNbt.builder(CopyNbt.Source.BLOCK_ENTITY);
             boolean hasData = false;
             @Nullable
             TileEntity tile = null;

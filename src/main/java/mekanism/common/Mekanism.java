@@ -2,10 +2,6 @@ package mekanism.common;
 
 import com.mojang.authlib.GameProfile;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 import mekanism.api.Coord4D;
 import mekanism.api.MekanismAPI;
 import mekanism.api.NBTConstants;
@@ -14,19 +10,11 @@ import mekanism.api.chemical.infuse.InfuseType;
 import mekanism.api.chemical.pigment.Pigment;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.client.render.MekanismRenderer;
-import mekanism.common.base.IModule;
-import mekanism.common.base.KeySync;
-import mekanism.common.base.MekFakePlayer;
-import mekanism.common.base.PlayerState;
-import mekanism.common.base.TagCache;
+import mekanism.common.base.*;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.command.CommandMek;
 import mekanism.common.command.builders.BuildCommand;
-import mekanism.common.command.builders.Builders.BoilerBuilder;
-import mekanism.common.command.builders.Builders.EvaporationBuilder;
-import mekanism.common.command.builders.Builders.MatrixBuilder;
-import mekanism.common.command.builders.Builders.SPSBuilder;
-import mekanism.common.command.builders.Builders.TankBuilder;
+import mekanism.common.command.builders.Builders.*;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.config.MekanismModConfig;
 import mekanism.common.content.boiler.BoilerMultiblockData;
@@ -47,7 +35,6 @@ import mekanism.common.content.tank.TankMultiblockData;
 import mekanism.common.content.tank.TankValidator;
 import mekanism.common.content.transporter.PathfinderCache;
 import mekanism.common.content.transporter.TransporterManager;
-import mekanism.common.entity.EntityRobit;
 import mekanism.common.integration.MekanismHooks;
 import mekanism.common.inventory.container.sync.dynamic.SyncMapper;
 import mekanism.common.lib.Version;
@@ -61,28 +48,13 @@ import mekanism.common.network.PacketHandler;
 import mekanism.common.network.PacketTransmitterUpdate;
 import mekanism.common.recipe.MekanismRecipeType;
 import mekanism.common.recipe.bin.BinInsertRecipe;
-import mekanism.common.registries.MekanismBlocks;
-import mekanism.common.registries.MekanismContainerTypes;
-import mekanism.common.registries.MekanismEntityTypes;
-import mekanism.common.registries.MekanismFeatures;
-import mekanism.common.registries.MekanismFluids;
-import mekanism.common.registries.MekanismGases;
-import mekanism.common.registries.MekanismInfuseTypes;
-import mekanism.common.registries.MekanismItems;
-import mekanism.common.registries.MekanismParticleTypes;
-import mekanism.common.registries.MekanismPigments;
-import mekanism.common.registries.MekanismPlacements;
-import mekanism.common.registries.MekanismRecipeSerializers;
-import mekanism.common.registries.MekanismSlurries;
-import mekanism.common.registries.MekanismSounds;
-import mekanism.common.registries.MekanismTileEntityTypes;
+import mekanism.common.registries.*;
 import mekanism.common.tags.MekanismTagManager;
 import mekanism.common.world.GenHandler;
-import net.minecraft.entity.ai.attributes.GlobalEntityTypeAttributes;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.resources.IFutureReloadListener;
-import net.minecraft.resources.IResourceManager;
+import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.resources.SimpleReloadableResourceManager;
 import net.minecraft.tags.NetworkTagManager;
 import net.minecraft.util.ResourceLocation;
@@ -91,8 +63,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.event.world.ChunkDataEvent;
@@ -106,10 +76,17 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
+import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Mod(Mekanism.MODID)
 public class Mekanism {
@@ -189,10 +166,10 @@ public class Mekanism {
         MinecraftForge.EVENT_BUS.addListener(this::onChunkDataLoad);
         MinecraftForge.EVENT_BUS.addListener(this::onWorldLoad);
         MinecraftForge.EVENT_BUS.addListener(this::onWorldUnload);
-        MinecraftForge.EVENT_BUS.addListener(this::registerCommands);
+        MinecraftForge.EVENT_BUS.addListener(this::serverStarting);
         MinecraftForge.EVENT_BUS.addListener(this::serverStopped);
-        MinecraftForge.EVENT_BUS.addListener(this::addReloadListeners);
-        MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, this::addReloadListenersLowest);
+        MinecraftForge.EVENT_BUS.addListener(this::serverAboutToStart);
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, this::serverAboutToStartLowest);
         MinecraftForge.EVENT_BUS.addListener(BinInsertRecipe::onCrafting);
         MinecraftForge.EVENT_BUS.addListener(this::onTagsReload);
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -281,9 +258,9 @@ public class Mekanism {
         TagCache.resetTagCaches();
     }
 
-    private void addReloadListeners(AddReloadListenerEvent event) {
+    private void serverAboutToStart(FMLServerAboutToStartEvent event) {
+        IReloadableResourceManager resourceManager = event.getServer().getResourceManager();
         boolean added = false;
-        IResourceManager resourceManager = event.getDataPackRegistries().getResourceManager();
         if (resourceManager instanceof SimpleReloadableResourceManager) {
             //Note: We "hack" it so that our tag manager gets registered directly after the normal tag manager
             // to ensure that it is before the recipe manager and that the custom tags can be properly resolved
@@ -293,7 +270,6 @@ public class Mekanism {
                 IFutureReloadListener listener = manager.reloadListeners.get(i);
                 if (listener instanceof NetworkTagManager) {
                     manager.reloadListeners.add(i + 1, getTagManager());
-                    manager.initTaskQueue.add(i + 1, getTagManager());
                     added = true;
                     break;
                 }
@@ -301,22 +277,24 @@ public class Mekanism {
         }
         if (!added) {
             //Fallback to trying to just add it even though this is probably too late to do so properly
-            event.addListener(getTagManager());
+            resourceManager.addReloadListener(getTagManager());
         }
+
+
     }
 
-    private void addReloadListenersLowest(AddReloadListenerEvent event) {
+    private void serverAboutToStartLowest(FMLServerAboutToStartEvent event) {
         //Note: We register reload listeners here which we want to make sure run after CraftTweaker or any other mods that may modify recipes
-        event.addListener(getRecipeCacheManager());
+        event.getServer().getResourceManager().addReloadListener(getRecipeCacheManager());
     }
 
-    private void registerCommands(RegisterCommandsEvent event) {
+    private void serverStarting(FMLServerStartingEvent event) {
         BuildCommand.register("boiler", new BoilerBuilder());
         BuildCommand.register("matrix", new MatrixBuilder());
         BuildCommand.register("tank", new TankBuilder());
         BuildCommand.register("evaporation", new EvaporationBuilder());
         BuildCommand.register("sps", new SPSBuilder());
-        event.getDispatcher().register(CommandMek.register());
+        event.getCommandDispatcher().register(CommandMek.register());
     }
 
     private void serverStopped(FMLServerStoppedEvent event) {
@@ -352,9 +330,7 @@ public class Mekanism {
             //Collect sync mapper scan data
             SyncMapper.collectScanData();
             //Entity attribute assignments
-            GlobalEntityTypeAttributes.put(MekanismEntityTypes.ROBIT.get(), EntityRobit.getDefaultAttributes().create());
         });
-
         //Register player tracker
         MinecraftForge.EVENT_BUS.register(new CommonPlayerTracker());
         MinecraftForge.EVENT_BUS.register(new CommonPlayerTickHandler());
@@ -412,7 +388,7 @@ public class Mekanism {
         if (world instanceof World && !world.isRemote() && MekanismConfig.world.enableRegeneration.get()) {
             CompoundNBT levelTag = event.getData().getCompound(NBTConstants.CHUNK_DATA_LEVEL);
             if (levelTag.getInt(NBTConstants.WORLD_GEN_VERSION) < MekanismConfig.world.userGenVersion.get()) {
-                worldTickHandler.addRegenChunk(((World) world).func_234923_W_(), event.getChunk().getPos());
+                worldTickHandler.addRegenChunk(((World) world).getDimension().getType(), event.getChunk().getPos());
             }
         }
     }

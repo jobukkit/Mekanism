@@ -1,9 +1,10 @@
 package mekanism.api.tier;
 
-import java.util.Locale;
 import mekanism.api.math.MathUtils;
 import mekanism.api.text.EnumColor;
 import net.minecraft.util.IStringSerializable;
+
+import java.util.Locale;
 
 /**
  * The default tiers used in Mekanism.
@@ -46,7 +47,7 @@ public enum BaseTier implements IStringSerializable {
     }
 
     @Override
-    public String getString() {
+    public String getName() {
         return name().toLowerCase(Locale.ROOT);
     }
 

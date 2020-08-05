@@ -1,6 +1,6 @@
 package mekanism.client.gui.element.bar;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.bar.GuiBar.IBarInfoHandler;
@@ -29,18 +29,18 @@ public class GuiDynamicHorizontalRateBar extends GuiBar<IBarInfoHandler> {
     }
 
     @Override
-    protected void renderBarOverlay(MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
+    protected void renderBarOverlay(int mouseX, int mouseY, float partialTicks) {
         int displayInt = (int) (getHandler().getLevel() * (width - 2));
         for (int i = 0; i < displayInt; i++) {
             float level = (float) i / (float) (width - 2);
             Color color = colorFunction.getColor(level);
             RenderSystem.color4f(color.rf(), color.gf(), color.bf(), color.af());
             if (i == 0) {
-                blit(matrix, x + 1, y + 1, 0, 0, 1, texHeight, texWidth, texHeight);
+                blit(x + 1, y + 1, 0, 0, 1, texHeight, texWidth, texHeight);
             } else if (i == displayInt - 1) {
-                blit(matrix, x + 1 + i, y + 1, texWidth - 1, 0, 1, texHeight, texWidth, texHeight);
+                blit(x + 1 + i, y + 1, texWidth - 1, 0, 1, texHeight, texWidth, texHeight);
             } else {
-                blit(matrix, x + 1 + i, y + 1, 1, 0, 1, texHeight, texWidth, texHeight);
+                blit(x + 1 + i, y + 1, 1, 0, 1, texHeight, texWidth, texHeight);
             }
             MekanismRenderer.resetColor();
         }

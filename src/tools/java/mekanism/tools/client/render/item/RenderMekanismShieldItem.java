@@ -12,7 +12,7 @@ import mekanism.tools.common.registries.ToolsItems;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
-import net.minecraft.client.renderer.model.RenderMaterial;
+import net.minecraft.client.renderer.model.Material;
 import net.minecraft.client.renderer.tileentity.BannerTileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.ItemStackTileEntityRenderer;
 import net.minecraft.item.DyeColor;
@@ -25,7 +25,7 @@ import net.minecraft.tileentity.BannerTileEntity;
 public class RenderMekanismShieldItem extends ItemStackTileEntityRenderer {
 
     @Override
-    public void func_239207_a_(@Nonnull ItemStack stack, @Nonnull TransformType transformType, @Nonnull MatrixStack matrix, @Nonnull IRenderTypeBuffer renderer, int light, int overlayLight) {
+    public void render(@Nonnull ItemStack stack, @Nonnull MatrixStack matrix, @Nonnull IRenderTypeBuffer renderer, int light, int overlayLight) {
         Item item = stack.getItem();
         ShieldTextures textures;
         if (item == ToolsItems.BRONZE_SHIELD.getItem()) {
@@ -44,10 +44,11 @@ public class RenderMekanismShieldItem extends ItemStackTileEntityRenderer {
             Mekanism.logger.warn("Unknown item for mekanism shield renderer: {}", item.getRegistryName());
             return;
         }
-        RenderMaterial material = textures.getBase();
+        Material material = textures.getBase();
         matrix.push();
         matrix.scale(1, -1, -1);
-        IVertexBuilder buffer = material.getSprite().wrapBuffer(ItemRenderer.func_239391_c_(renderer, modelShield.getRenderType(material.getAtlasLocation()), false, stack.hasEffect()));
+
+        IVertexBuilder buffer = material.getSprite().wrapBuffer(renderer.getBuffer(modelShield.getRenderType(material.getAtlasLocation())));
         if (stack.getChildTag(NBTConstants.BLOCK_ENTITY_TAG) != null) {
             modelShield.func_228294_b_().render(matrix, buffer, light, overlayLight, 1, 1, 1, 1);
             List<Pair<BannerPattern, DyeColor>> list = BannerTileEntity.func_230138_a_(ShieldItem.getColor(stack), BannerTileEntity.func_230139_a_(stack));

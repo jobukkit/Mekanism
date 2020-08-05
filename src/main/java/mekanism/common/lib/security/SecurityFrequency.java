@@ -1,8 +1,5 @@
 package mekanism.common.lib.security;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import mekanism.api.NBTConstants;
 import mekanism.common.lib.HashList;
 import mekanism.common.lib.frequency.Frequency;
@@ -16,6 +13,10 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.util.Constants.NBT;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class SecurityFrequency extends Frequency {
 
@@ -50,7 +51,7 @@ public class SecurityFrequency extends Frequency {
         if (!trusted.isEmpty()) {
             ListNBT trustedList = new ListNBT();
             for (UUID uuid : trusted) {
-                trustedList.add(NBTUtil.func_240626_a_(uuid));
+                trustedList.add(NBTUtil.writeUniqueId(uuid));
             }
             nbtTags.put(NBTConstants.TRUSTED, trustedList);
         }

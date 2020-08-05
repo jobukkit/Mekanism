@@ -13,6 +13,7 @@ import mekanism.api.annotations.FieldsAreNonnullByDefault;
 import mekanism.api.annotations.NonNull;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.inventory.AutomationType;
+import mekanism.common.Mekanism;
 import mekanism.common.inventory.container.slot.ContainerSlotType;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.item.ItemStack;
@@ -21,6 +22,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import org.apache.logging.log4j.Level;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -123,6 +125,7 @@ public class FluidInventorySlot extends BasicInventorySlot implements IFluidHand
                 IFluidHandlerItem fluidHandlerItem = cap.get();
                 for (int tank = 0; tank < fluidHandlerItem.getTanks(); tank++) {
                     FluidStack fluidInTank = fluidHandlerItem.getFluidInTank(tank);
+                    Mekanism.logger.log(Level.INFO, "Fluid in tank? {}", fluidInTank.isEmpty());
                     if (!fluidInTank.isEmpty() && fluidTank.insert(fluidInTank, Action.SIMULATE, AutomationType.INTERNAL).getAmount() < fluidInTank.getAmount()) {
                         //True if we can fill the tank with any of our contents
                         // Note: We need to recheck the fact the fluid is not empty and that it is valid,

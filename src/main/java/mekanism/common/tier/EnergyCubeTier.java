@@ -36,7 +36,7 @@ public enum EnergyCubeTier implements ITier, IStringSerializable {
     }
 
     @Override
-    public String getString() {
+    public String getName() {
         return name().toLowerCase(Locale.ROOT);
     }
 

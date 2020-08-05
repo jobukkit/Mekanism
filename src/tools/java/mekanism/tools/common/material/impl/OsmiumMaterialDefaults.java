@@ -129,9 +129,4 @@ public class OsmiumMaterialDefaults extends BaseMekanismMaterial {
     public Ingredient getCommonRepairMaterial() {
         return Ingredient.fromTag(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.OSMIUM));
     }
-
-    @Override
-    public float getKnockbackResistance() {
-        return 0;
-    }
 }

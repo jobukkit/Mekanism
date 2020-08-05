@@ -2,16 +2,14 @@ package mekanism.common.particle;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import java.util.Locale;
-import javax.annotation.Nonnull;
 import mekanism.common.registries.MekanismParticleTypes;
-import mekanism.common.util.MekanismUtils;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleType;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nonnull;
+import java.util.Locale;
 
 public class LaserParticleData implements IParticleData {
 
@@ -33,11 +31,6 @@ public class LaserParticleData implements IParticleData {
             return new LaserParticleData(buf.readEnumValue(Direction.class), buf.readDouble(), buf.readFloat());
         }
     };
-    public static final Codec<LaserParticleData> CODEC = RecordCodecBuilder.create(val -> val.group(
-          MekanismUtils.DIRECTION_CODEC.fieldOf("direction").forGetter(data -> data.direction),
-          Codec.DOUBLE.fieldOf("distance").forGetter(data -> data.distance),
-          Codec.FLOAT.fieldOf("energyScale").forGetter(data -> data.energyScale)
-    ).apply(val, LaserParticleData::new));
 
     public final Direction direction;
     public final double distance;

@@ -1,15 +1,7 @@
 package mekanism.common.integration.lookingat.theoneprobe;
 
-import java.util.Optional;
-import java.util.function.Function;
-import mcjty.theoneprobe.api.CompoundText;
-import mcjty.theoneprobe.api.IProbeConfig;
+import mcjty.theoneprobe.api.*;
 import mcjty.theoneprobe.api.IProbeConfig.ConfigMode;
-import mcjty.theoneprobe.api.IProbeHitData;
-import mcjty.theoneprobe.api.IProbeInfo;
-import mcjty.theoneprobe.api.IProbeInfoProvider;
-import mcjty.theoneprobe.api.ITheOneProbe;
-import mcjty.theoneprobe.api.ProbeMode;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.infuse.InfusionStack;
@@ -42,6 +34,9 @@ import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 //Registered via IMC
 @SuppressWarnings("unused")
@@ -135,7 +130,7 @@ public class TOPProvider implements IProbeInfoProvider, Function<ITheOneProbe, V
 
         @Override
         public void addText(ITextComponent text) {
-            info.text(CompoundText.create().name(text).get());
+            info.text(text.getFormattedText());
         }
 
         @Override
