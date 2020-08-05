@@ -1,6 +1,7 @@
 package mekanism.client.lang;
 
 import com.google.common.collect.Table.Cell;
+import java.util.Locale;
 import java.util.Map;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.slurry.Slurry;
@@ -1171,6 +1172,9 @@ public class MekanismLangProvider extends BaseLanguageProvider {
         add(MekanismLang.MODULE_CHARGE_INVENTORY, "Charge Inventory");
         add(MekanismLang.MODULE_SPEED_BOOST, "Speed Boost");
         add(MekanismLang.MODULE_VISION_ENHANCEMENT, "Vision Enhancement");
+        add(MekanismLang.MODULE_PURIFICATION_BENEFICIAL, "Remove Beneficial");
+        add(MekanismLang.MODULE_PURIFICATION_NEUTRAL, "Remove Neutral");
+        add(MekanismLang.MODULE_PURIFICATION_HARMFUL, "Remove Harmful");
 
         add(MekanismLang.MODULE_ENERGY_UNIT, "Energy Unit");
 
@@ -1205,7 +1209,7 @@ public class MekanismLangProvider extends BaseLanguageProvider {
         add(MekanismLang.DESCRIPTION_TELEPORTATION_UNIT, "Provides for quick travel to nearby blocks.");
 
         add(MekanismLang.DESCRIPTION_ELECTROLYTIC_BREATHING_UNIT, "Uses electrolysis to create breathable oxygen from water. Will also fill a jetpack module with hydrogen when necessary.");
-        add(MekanismLang.DESCRIPTION_INHALATION_PURIFICATION_UNIT, "Applies a miniature electromagnetic field around the breathing apparatus, preventing negative potion effects.");
+        add(MekanismLang.DESCRIPTION_INHALATION_PURIFICATION_UNIT, "Applies a miniature electromagnetic field around the breathing apparatus, preventing selected potion effect types.");
         add(MekanismLang.DESCRIPTION_RADIATION_SHIELDING_UNIT, "Provides thick, radiation-proof metal plating to any MekaSuit armor piece.");
         add(MekanismLang.DESCRIPTION_VISION_ENHANCEMENT_UNIT, "Brightens the surrounding environment, allowing the user to see through darkness. Install multiple for more effective night vision.");
         add(MekanismLang.DESCRIPTION_SOLAR_RECHARGING_UNIT, "Harnesses the power of the sun to charge your MekaSuit. Install multiple for faster charging. Requires Mekanism: Generators.");
@@ -1239,6 +1243,6 @@ public class MekanismLangProvider extends BaseLanguageProvider {
     }
 
     private String capitalize(String s) {
-        return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
+        return s.substring(0, 1).toUpperCase(Locale.ROOT) + s.substring(1).toLowerCase(Locale.ROOT);
     }
 }

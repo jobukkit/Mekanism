@@ -5,7 +5,6 @@ import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.RenderState;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.ResourceLocation;
@@ -60,27 +59,6 @@ public class MekanismRenderType extends RenderType {
               .lightmap(LIGHTMAP_DISABLED)//disableLighting
               .build(true);
         return makeType("mek_flame", DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_QUADS, 256, true, false, state);
-    }
-
-    public static RenderType transmitterContents(ResourceLocation resourceLocation) {
-        return makeType("transmitter_contents", DefaultVertexFormats.ENTITY, GL11.GL_QUADS, 256, true, false,
-              preset(resourceLocation).build(true));
-    }
-
-    private static RenderType.State.Builder preset(ResourceLocation resourceLocation) {
-        return RenderType.State.getBuilder()
-              .texture(new RenderState.TextureState(resourceLocation, false, false))//Texture state
-              .cull(CULL_ENABLED)//enableCull
-              .transparency(TRANSLUCENT_TRANSPARENCY)//enableBlend/blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA)
-              .shadeModel(SHADE_ENABLED);//shadeModel(GL11.GL_SMOOTH)
-    }
-
-    public static RenderType resizableCuboid() {
-        RenderType.State.Builder stateBuilder = preset(AtlasTexture.LOCATION_BLOCKS_TEXTURE)
-              .lightmap(LIGHTMAP_ENABLED)
-              .alpha(CUBOID_ALPHA);//enableAlphaTest/alphaFunc(GL11.GL_GREATER, 0.1F)
-        return makeType("resizable_cuboid", DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_QUADS, 256, true, true,
-              stateBuilder.build(true));
     }
 
     public static RenderType getMekaSuit() {

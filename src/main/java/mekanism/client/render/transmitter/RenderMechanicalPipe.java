@@ -7,10 +7,10 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.client.render.FluidRenderMap;
-import mekanism.client.render.MekanismRenderType;
 import mekanism.client.render.MekanismRenderer;
 import mekanism.client.render.MekanismRenderer.FluidType;
 import mekanism.client.render.MekanismRenderer.Model3D;
@@ -20,8 +20,8 @@ import mekanism.common.content.network.transmitter.MechanicalPipe;
 import mekanism.common.lib.transmitter.ConnectionType;
 import mekanism.common.tile.transmitter.TileEntityMechanicalPipe;
 import mekanism.common.util.EnumUtils;
+import net.minecraft.client.renderer.Atlases;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.util.Direction;
@@ -63,25 +63,24 @@ public class RenderMechanicalPipe extends RenderTransmitterBase<TileEntityMechan
                 int color = MekanismRenderer.getColorARGB(fluidStack, fluidScale);
                 List<String> connectionContents = new ArrayList<>();
                 Model3D model = getModel(null, fluidStack, stage);
-                IVertexBuilder buffer = renderer.getBuffer(MekanismRenderType.resizableCuboid());
+                IVertexBuilder buffer = renderer.getBuffer(Atlases.getTranslucentCullBlockType());
                 for (Direction side : EnumUtils.DIRECTIONS) {
                     ConnectionType connectionType = pipe.getConnectionType(side);
                     if (connectionType == ConnectionType.NORMAL) {
-                        MekanismRenderer.renderObject(getModel(side, fluidStack, stage), matrix, buffer, color, glow);
+                        MekanismRenderer.renderObject(getModel(side, fluidStack, stage), matrix, buffer, color, glow, overlayLight);
                     } else if (connectionType != ConnectionType.NONE) {
-                        connectionContents.add(side.getString() + connectionType.getString().toUpperCase());
+                        connectionContents.add(side.getString() + connectionType.getString().toUpperCase(Locale.ROOT));
                     }
                     if (model != null) {
                         model.setSideRender(side, connectionType == ConnectionType.NONE);
                     }
                 }
-                MekanismRenderer.renderObject(model, matrix, buffer, MekanismRenderer.getColorARGB(fluidStack, fluidScale), glow);
+                MekanismRenderer.renderObject(model, matrix, buffer, MekanismRenderer.getColorARGB(fluidStack, fluidScale), glow, overlayLight);
                 if (!connectionContents.isEmpty()) {
                     matrix.push();
                     matrix.translate(0.5, 0.5, 0.5);
-                    renderModel(tile, matrix, renderer.getBuffer(MekanismRenderType.transmitterContents(AtlasTexture.LOCATION_BLOCKS_TEXTURE)),
-                          MekanismRenderer.getRed(color), MekanismRenderer.getGreen(color), MekanismRenderer.getBlue(color), MekanismRenderer.getAlpha(color), glow,
-                          overlayLight, MekanismRenderer.getFluidTexture(fluidStack, FluidType.STILL), connectionContents);
+                    renderModel(tile, matrix, buffer, MekanismRenderer.getRed(color), MekanismRenderer.getGreen(color), MekanismRenderer.getBlue(color),
+                          MekanismRenderer.getAlpha(color), glow, overlayLight, MekanismRenderer.getFluidTexture(fluidStack, FluidType.STILL), connectionContents);
                     matrix.pop();
                 }
             }

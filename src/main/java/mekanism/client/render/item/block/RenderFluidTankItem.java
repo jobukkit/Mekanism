@@ -6,13 +6,13 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import javax.annotation.Nonnull;
 import mekanism.client.model.ModelFluidTank;
 import mekanism.client.render.FluidRenderMap;
-import mekanism.client.render.MekanismRenderType;
 import mekanism.client.render.MekanismRenderer;
 import mekanism.client.render.MekanismRenderer.FluidType;
 import mekanism.client.render.MekanismRenderer.Model3D;
 import mekanism.common.item.block.machine.ItemBlockFluidTank;
 import mekanism.common.tier.FluidTankTier;
 import mekanism.common.util.StorageUtils;
+import net.minecraft.client.renderer.Atlases;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.tileentity.ItemStackTileEntityRenderer;
@@ -30,7 +30,8 @@ public class RenderFluidTankItem extends ItemStackTileEntityRenderer {
     }
 
     @Override
-    public void func_239207_a_(@Nonnull ItemStack stack, @Nonnull TransformType transformType, @Nonnull MatrixStack matrix, @Nonnull IRenderTypeBuffer renderer, int light, int overlayLight) {
+    public void func_239207_a_(@Nonnull ItemStack stack, @Nonnull TransformType transformType, @Nonnull MatrixStack matrix, @Nonnull IRenderTypeBuffer renderer,
+          int light, int overlayLight) {
         FluidTankTier tier = ((ItemBlockFluidTank) stack.getItem()).getTier();
         FluidStack fluid = StorageUtils.getStoredFluidFromNBT(stack);
         if (!fluid.isEmpty()) {
@@ -42,8 +43,8 @@ public class RenderFluidTankItem extends ItemStackTileEntityRenderer {
                 } else {
                     modelNumber = Math.min(stages - 1, (int) (fluidScale * (stages - 1)));
                 }
-                MekanismRenderer.renderObject(getFluidModel(fluid, modelNumber), matrix, renderer.getBuffer(MekanismRenderType.resizableCuboid()),
-                      MekanismRenderer.getColorARGB(fluid, fluidScale), MekanismRenderer.calculateGlowLight(light, fluid));
+                MekanismRenderer.renderObject(getFluidModel(fluid, modelNumber), matrix, renderer.getBuffer(Atlases.getTranslucentCullBlockType()),
+                      MekanismRenderer.getColorARGB(fluid, fluidScale), MekanismRenderer.calculateGlowLight(light, fluid), overlayLight);
             }
         }
         matrix.push();
