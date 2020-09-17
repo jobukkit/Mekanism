@@ -1,9 +1,5 @@
 package mekanism.common.item.block.machine;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.api.DataHandlerUtils;
 import mekanism.api.NBTConstants;
@@ -39,17 +35,13 @@ import net.minecraft.block.IBucketPickupHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.Util;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceContext.FluidMode;
@@ -67,6 +59,11 @@ import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import javax.annotation.Nonnull;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 public class ItemBlockFluidTank extends ItemBlockTooltip<BlockFluidTank> implements IItemSustainedInventory, ISecurityItem, IModeItem {
 
@@ -216,6 +213,12 @@ public class ItemBlockFluidTank extends ItemBlockTooltip<BlockFluidTank> impleme
                                     //Grow the stack
                                     MekanismUtils.logMismatchedStackSize(fluidTank.growStack(fluidStack.getAmount(), Action.EXECUTE), fluidStack.getAmount());
                                 }
+                                //Play the bucket fill sound
+                                SoundEvent soundevent = fluidStack.getFluid().getAttributes().getFillSound(world, pos);
+                                if (soundevent == null) {
+                                    soundevent = fluidStack.getFluid().isIn(FluidTags.LAVA) ? SoundEvents.ITEM_BUCKET_FILL_LAVA : SoundEvents.ITEM_BUCKET_FILL;
+                                }
+                                world.playSound(player, pos, soundevent, SoundCategory.BLOCKS, 1.0F, 1.0F);
                                 return new ActionResult<>(ActionResultType.SUCCESS, stack);
                             } else {
                                 return new ActionResult<>(ActionResultType.FAIL, stack);
