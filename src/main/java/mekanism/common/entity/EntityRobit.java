@@ -44,6 +44,7 @@ import mekanism.common.registries.MekanismDamageSource;
 import mekanism.common.registries.MekanismEntityTypes;
 import mekanism.common.registries.MekanismItems;
 import mekanism.common.tile.TileEntityChargepad;
+import mekanism.common.tile.component.TileComponentChunkLoader;
 import mekanism.common.tile.interfaces.ISustainedInventory;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
@@ -66,10 +67,12 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.server.TicketType;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.common.util.ITeleporter;
@@ -88,6 +91,7 @@ import java.util.function.Predicate;
 public class EntityRobit extends CreatureEntity implements IMekanismInventory, ISustainedInventory, ICachedRecipeHolder<ItemStackToItemStackRecipe>,
       IMekanismStrictEnergyHandler {
 
+    private static final TicketType<Integer> ROBIT_CHUNK_UNLOAD = TicketType.create("robit_chunk_unload", Integer::compareTo, 20);
     private static final DataParameter<String> OWNER_UUID = EntityDataManager.createKey(EntityRobit.class, DataSerializers.STRING);
     private static final DataParameter<String> OWNER_NAME = EntityDataManager.createKey(EntityRobit.class, DataSerializers.STRING);
     private static final DataParameter<Boolean> FOLLOW = EntityDataManager.createKey(EntityRobit.class, DataSerializers.BOOLEAN);
@@ -192,10 +196,24 @@ public class EntityRobit extends CreatureEntity implements IMekanismInventory, I
     }
 
     @Override
+    public void onRemovedFromWorld() {
+        if (world != null && !world.isRemote && getFollowing() && getOwner() != null) {
+            //If this robit is currently following its owner and is being removed from the world (due to chunk unloading)
+            // register a ticket that loads the chunk for a second, so that it has time to have its following check run again
+            // (as it runs every 10 ticks, half a second), and then teleport to the owner.
+            ((ServerWorld) world).getChunkProvider().registerTicket(ROBIT_CHUNK_UNLOAD, new ChunkPos(getPosition()), TileComponentChunkLoader.TICKET_DISTANCE, getEntityId());
+        }
+        super.onRemovedFromWorld();
+    }
+
+    @Override
     public void baseTick() {
         if (!world.isRemote) {
-            if (getFollowing() && getOwner() != null && getDistanceSq(getOwner()) > 4 && !getNavigator().noPath() && !energyContainer.isEmpty()) {
-                energyContainer.extract(getRoundedTravelEnergy(), Action.EXECUTE, AutomationType.INTERNAL);
+            if (getFollowing()) {
+                PlayerEntity owner = getOwner();
+                if (owner != null && getDistanceSq(owner) > 4 && !getNavigator().noPath() && !energyContainer.isEmpty()) {
+                    energyContainer.extract(getRoundedTravelEnergy(), Action.EXECUTE, AutomationType.INTERNAL);
+                }
             }
         }
 
