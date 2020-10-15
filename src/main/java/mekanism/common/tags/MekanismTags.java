@@ -52,7 +52,10 @@ public class MekanismTags {
             }
         }
 
+        public static final Tag<Item> CONFIGURATORS = tag("configurators");
         public static final Tag<Item> WRENCHES = forgeTag("wrenches");
+        public static final Tag<Item> TOOLS = forgeTag("tools");
+        public static final Tag<Item> TOOLS_WRENCHES = forgeTag("tools/wrenches");
 
         public static final Tag<Item> BATTERIES = forgeTag("batteries");
 
