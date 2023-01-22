@@ -4,9 +4,11 @@ import groovy.json.JsonSlurper
 buildscript {
     repositories {
         jcenter()
+        maven { url = 'https://libraries.minecraft.net/' }
+        mavenCentral()
         maven {
             name "forge"
-            url "https://files.minecraftforge.net/maven"
+            url "https://maven.minecraftforge.net/"
         }
     }
     dependencies {
@@ -273,7 +275,7 @@ minecraft {
 repositories {
     maven {
         name 'ForgeFS'
-        url 'https://files.minecraftforge.net/maven'
+        url 'https://maven.minecraftforge.net/'
     }
     maven {
         name 'prog'
@@ -323,7 +325,7 @@ dependencies {
     //compileOnly fg.deobf("curse.maven:flux-networks:${flux_networks_id}")
 
     //Dependencies for data generators for mod compat reference
-    datagenmainCompile fg.deobf("curse.maven:biomes-o-plenty:${biomesoplenty_id}")
+//    datagenmainCompile fg.deobf("curse.maven:biomes-o-plenty:${biomesoplenty_id}")
     //datagenmainCompile fg.deobf("curse.maven:i-like-wood:${ilikewood_id}")
 }
 
@@ -734,7 +736,7 @@ if (System.getenv("CURSEFORGE_KEY") != null || project.hasProperty('curseforgeKe
                 relations {
                     optionalDependency "jei"
                     optionalDependency "ctm"
-                    optionalDependency "biomes-o-plenty"
+//                    optionalDependency "biomes-o-plenty"
                     //optionalDependency "flux-networks"
                     //optionalDependency "hwyla"
                     //optionalDependency "i-like-wood"

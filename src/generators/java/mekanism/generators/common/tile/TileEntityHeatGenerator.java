@@ -29,10 +29,14 @@ import mekanism.common.util.MekanismUtils;
 import mekanism.generators.common.config.MekanismGeneratorsConfig;
 import mekanism.generators.common.registries.GeneratorsBlocks;
 import mekanism.generators.common.slot.FluidFuelInventorySlot;
+import net.minecraft.block.Block;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.Tag;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.fluids.FluidStack;
@@ -43,6 +47,8 @@ public class TileEntityHeatGenerator extends TileEntityGenerator {
     private static final int FLUID_RATE = 10;
     private static final double THERMAL_EFFICIENCY = 0.5;
     private static final FloatingLong MAX_PRODUCTION = FloatingLong.createConst(500);
+
+    public static final Tag<Block> GLASS_GLOWING = new BlockTags.Wrapper(new ResourceLocation("forge", "glass/glowing"));
     /**
      * The FluidTank for this generator.
      */
@@ -115,7 +121,7 @@ public class TileEntityHeatGenerator extends TileEntityGenerator {
         }
         //Lava boost
         FloatingLong boost = MekanismGeneratorsConfig.generators.heatGenerationLava.get().multiply(Arrays.stream(EnumUtils.DIRECTIONS)
-              .filter(side -> world.getFluidState(pos.offset(side)).isTagged(FluidTags.LAVA)).count());
+              .filter(side -> world.getBlockState(pos.offset(side)).isIn(GLASS_GLOWING)).count());
         if (world.getDimension().getType() == DimensionType.THE_NETHER) {
             boost = boost.plusEqual(MekanismGeneratorsConfig.generators.heatGenerationNether.get());
         }
