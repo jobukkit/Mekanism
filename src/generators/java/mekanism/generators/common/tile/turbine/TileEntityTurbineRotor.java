@@ -5,8 +5,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import mekanism.api.NBTConstants;
 import mekanism.common.tile.prefab.TileEntityInternalMultiblock;
-import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
+import mekanism.common.util.WorldUtils;
 import mekanism.generators.common.registries.GeneratorsBlocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -46,7 +46,7 @@ public class TileEntityTurbineRotor extends TileEntityInternalMultiblock {
         // N.B. must be in bottom->top order.
 
         // Find the bottom-most rotor and start scan from there
-        TileEntityTurbineRotor rotor = getRotor(getPos().down());
+        TileEntityTurbineRotor rotor = getRotor(getBlockPos().below());
         if (rotor == null) {
             // This is the bottom-most rotor, so start scan up
             scanRotors(0);
@@ -69,34 +69,44 @@ public class TileEntityTurbineRotor extends TileEntityInternalMultiblock {
         }
 
         // Pass the scan along to next rotor up, along with their new index
-        TileEntityTurbineRotor rotor = getRotor(getPos().up());
+        TileEntityTurbineRotor rotor = getRotor(getBlockPos().above());
         if (rotor != null) {
             rotor.scanRotors(index + 1);
         }
     }
 
-    public boolean addBlade() {
-        // If the the rotor beneath has less than two blades, add to it
-        TileEntityTurbineRotor next = getRotor(getPos().down());
-        if (next != null && next.blades < 2) {
-            return next.addBlade();
-        } else if (blades < 2) {
+    public boolean addBlade(boolean checkBelow) {
+        if (checkBelow) {
+            //If we want to check rotors that are below (aka we aren't being called by them)
+            // and if the rotor beneath has less than two blades, add to it
+            TileEntityTurbineRotor previous = getRotor(getBlockPos().below());
+            if (previous != null && previous.blades < 2) {
+                return previous.addBlade(true);
+            }
+        }
+        if (blades < 2) {
             // Add the blades to this rotor
             blades++;
-            // Update client state
-            sendUpdatePacket();
+            if (position == -1) {
+                //If we haven't gotten a position assigned yet (single rotor height) then rescan it to set things to the correct values
+                // This will also handle sending the update to the client
+                scanRotors(0);
+            } else {
+                // Update client state
+                sendUpdatePacket();
+            }
             return true;
         }
 
         // This rotor and the rotor below are full up; pass the call
         // on up to the next rotor in stack
-        next = getRotor(getPos().up());
-        return next != null && next.addBlade();
+        TileEntityTurbineRotor next = getRotor(getBlockPos().above());
+        return next != null && next.addBlade(false);
     }
 
     public boolean removeBlade() {
-        // If the the rotor above has any blades, remove them first
-        TileEntityTurbineRotor next = getRotor(getPos().up());
+        // If the rotor above has any blades, remove them first
+        TileEntityTurbineRotor next = getRotor(getBlockPos().above());
         if (next != null && next.blades > 0) {
             return next.removeBlade();
         } else if (blades > 0) {
@@ -110,7 +120,7 @@ public class TileEntityTurbineRotor extends TileEntityInternalMultiblock {
 
         // This rotor and the rotor above are empty; pass the call
         // on up to the next rotor in stack
-        next = getRotor(getPos().down());
+        next = getRotor(getBlockPos().below());
         return next != null && next.removeBlade();
     }
 
@@ -129,12 +139,12 @@ public class TileEntityTurbineRotor extends TileEntityInternalMultiblock {
 
     @Nullable
     private TileEntityTurbineRotor getRotor(BlockPos pos) {
-        return MekanismUtils.getTileEntity(TileEntityTurbineRotor.class, getWorld(), pos);
+        return WorldUtils.getTileEntity(TileEntityTurbineRotor.class, getLevel(), pos);
     }
 
     @Override
-    public void read(@Nonnull BlockState state, @Nonnull CompoundNBT nbtTags) {
-        super.read(state, nbtTags);
+    public void load(@Nonnull BlockState state, @Nonnull CompoundNBT nbtTags) {
+        super.load(state, nbtTags);
         blades = nbtTags.getInt(NBTConstants.BLADES);
         position = nbtTags.getInt(NBTConstants.POSITION);
         updateRadius();
@@ -142,8 +152,8 @@ public class TileEntityTurbineRotor extends TileEntityInternalMultiblock {
 
     @Nonnull
     @Override
-    public CompoundNBT write(@Nonnull CompoundNBT nbtTags) {
-        super.write(nbtTags);
+    public CompoundNBT save(@Nonnull CompoundNBT nbtTags) {
+        super.save(nbtTags);
         nbtTags.putInt(NBTConstants.BLADES, getHousedBlades());
         nbtTags.putInt(NBTConstants.POSITION, getPosition());
         return nbtTags;
@@ -156,7 +166,7 @@ public class TileEntityTurbineRotor extends TileEntityInternalMultiblock {
             //If there are no blades default to the collision box of the rotor
             return super.getRenderBoundingBox();
         }
-        return new AxisAlignedBB(pos.add(-radius, 0, -radius), pos.add(1 + radius, 1, 1 + radius));
+        return new AxisAlignedBB(worldPosition.offset(-radius, 0, -radius), worldPosition.offset(1 + radius, 1, 1 + radius));
     }
 
     @Override

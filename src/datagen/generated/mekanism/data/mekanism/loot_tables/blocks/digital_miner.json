@@ -2,6 +2,7 @@
   "type": "minecraft:block",
   "pools": [
     {
+      "name": "main",
       "rolls": 1,
       "entries": [
         {
@@ -24,6 +25,11 @@
                 {
                   "source": "componentUpgrade",
                   "target": "mekData.componentUpgrade",
+                  "op": "replace"
+                },
+                {
+                  "source": "inverseReplace",
+                  "target": "mekData.inverseReplace",
                   "op": "replace"
                 },
                 {
@@ -62,6 +68,11 @@
                   "op": "replace"
                 },
                 {
+                  "source": "replaceStack",
+                  "target": "mekData.replaceStack",
+                  "op": "replace"
+                },
+                {
                   "source": "inverse",
                   "target": "mekData.inverse",
                   "op": "replace"
@@ -85,11 +96,6 @@
             }
           ],
           "name": "mekanism:digital_miner"
-        }
-      ],
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
         }
       ]
     }

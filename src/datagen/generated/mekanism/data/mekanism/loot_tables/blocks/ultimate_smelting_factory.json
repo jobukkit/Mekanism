@@ -2,6 +2,7 @@
   "type": "minecraft:block",
   "pools": [
     {
+      "name": "main",
       "rolls": 1,
       "entries": [
         {
@@ -55,11 +56,6 @@
             }
           ],
           "name": "mekanism:ultimate_smelting_factory"
-        }
-      ],
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
         }
       ]
     }

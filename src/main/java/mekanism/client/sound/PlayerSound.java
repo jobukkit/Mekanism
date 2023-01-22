@@ -4,33 +4,43 @@ import java.lang.ref.WeakReference;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import mekanism.common.config.MekanismConfig;
-import net.minecraft.client.audio.ITickableSound;
-import net.minecraft.client.audio.LocatableSound;
+import mekanism.common.registration.impl.SoundEventRegistryObject;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.ISoundEventListener;
+import net.minecraft.client.audio.SoundEventAccessor;
+import net.minecraft.client.audio.SoundHandler;
+import net.minecraft.client.audio.TickableSound;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 
-public abstract class PlayerSound extends LocatableSound implements ITickableSound {
+public abstract class PlayerSound extends TickableSound {
 
     @Nonnull
-    private WeakReference<PlayerEntity> playerReference;
+    private final WeakReference<PlayerEntity> playerReference;
+    private final int subtitleFrequency;
     private float lastX;
     private float lastY;
     private float lastZ;
 
     private float fadeUpStep = 0.1f;
     private float fadeDownStep = 0.1f;
+    private int consecutiveTicks;
 
-    private boolean donePlaying = false;
+    public PlayerSound(@Nonnull PlayerEntity player, @Nonnull SoundEventRegistryObject<?> sound) {
+        this(player, sound.get(), 60);
+        //Set it to repeat the subtitle every 3 seconds the sound is constantly playing
+    }
 
-    public PlayerSound(@Nonnull PlayerEntity player, @Nonnull SoundEvent sound) {
+    public PlayerSound(@Nonnull PlayerEntity player, @Nonnull SoundEvent sound, int subtitleFrequency) {
         super(sound, SoundCategory.PLAYERS);
         this.playerReference = new WeakReference<>(player);
-        this.lastX = (float) player.getPosX();
-        this.lastY = (float) player.getPosY();
-        this.lastZ = (float) player.getPosZ();
-        this.repeat = true;
-        this.repeatDelay = 0;
+        this.subtitleFrequency = subtitleFrequency;
+        this.lastX = (float) player.getX();
+        this.lastY = (float) player.getY();
+        this.lastZ = (float) player.getZ();
+        this.looping = true;
+        this.delay = 0;
 
         // N.B. the volume must be > 0 on first time it's processed by sound system or else it will not
         // get registered for tick events.
@@ -52,7 +62,7 @@ public abstract class PlayerSound extends LocatableSound implements ITickableSou
         //Gracefully handle the player becoming null if this object is kept around after update marks us as donePlaying
         PlayerEntity player = getPlayer();
         if (player != null) {
-            this.lastX = (float) player.getPosX();
+            this.lastX = (float) player.getX();
         }
         return this.lastX;
     }
@@ -62,7 +72,7 @@ public abstract class PlayerSound extends LocatableSound implements ITickableSou
         //Gracefully handle the player becoming null if this object is kept around after update marks us as donePlaying
         PlayerEntity player = getPlayer();
         if (player != null) {
-            this.lastY = (float) player.getPosY();
+            this.lastY = (float) player.getY();
         }
         return this.lastY;
     }
@@ -72,7 +82,7 @@ public abstract class PlayerSound extends LocatableSound implements ITickableSou
         //Gracefully handle the player becoming null if this object is kept around after update marks us as donePlaying
         PlayerEntity player = getPlayer();
         if (player != null) {
-            this.lastZ = (float) player.getPosZ();
+            this.lastZ = (float) player.getZ();
         }
         return this.lastZ;
     }
@@ -81,8 +91,9 @@ public abstract class PlayerSound extends LocatableSound implements ITickableSou
     public void tick() {
         PlayerEntity player = getPlayer();
         if (player == null || !player.isAlive()) {
-            this.donePlaying = true;
-            this.volume = 0.0F;
+            stop();
+            volume = 0.0F;
+            consecutiveTicks = 0;
             return;
         }
 
@@ -91,15 +102,23 @@ public abstract class PlayerSound extends LocatableSound implements ITickableSou
                 // If we weren't max volume, start fading up
                 volume = Math.min(1.0F, volume + fadeUpStep);
             }
+            if (consecutiveTicks % subtitleFrequency == 0) {
+                SoundHandler soundHandler = Minecraft.getInstance().getSoundManager();
+                for (ISoundEventListener soundEventListener : soundHandler.soundEngine.listeners) {
+                    SoundEventAccessor soundEventAccessor = resolve(soundHandler);
+                    if (soundEventAccessor != null) {
+                        soundEventListener.onPlaySound(this, soundEventAccessor);
+                    }
+                }
+                consecutiveTicks = 1;
+            } else {
+                consecutiveTicks++;
+            }
         } else if (volume > 0.0F) {
+            consecutiveTicks = 0;
             // Not yet fully muted, fade down
             volume = Math.max(0.0F, volume - fadeDownStep);
         }
-    }
-
-    @Override
-    public boolean isDonePlaying() {
-        return donePlaying;
     }
 
     public abstract boolean shouldPlaySound(@Nonnull PlayerEntity player);
@@ -107,6 +126,20 @@ public abstract class PlayerSound extends LocatableSound implements ITickableSou
     @Override
     public float getVolume() {
         return super.getVolume() * MekanismConfig.client.baseSoundVolume.get();
+    }
+
+    @Override
+    public boolean canStartSilent() {
+        return true;
+    }
+
+    @Override
+    public boolean canPlaySound() {
+        PlayerEntity player = getPlayer();
+        if (player == null) {
+            return super.canPlaySound();
+        }
+        return !player.isSilent();
     }
 
     public enum SoundType {

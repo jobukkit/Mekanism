@@ -4,24 +4,24 @@
     "item": "mekanism:module_gravitational_modulating_unit"
   },
   "pattern": [
-    "I#I",
-    "EAE",
-    "PPP"
+    "A#A",
+    "EPE",
+    "HHH"
   ],
   "key": {
-    "I": {
+    "A": {
       "tag": "forge:alloys/ultimate"
     },
-    "A": {
+    "P": {
       "item": "mekanism:module_base"
     },
     "#": {
-      "item": "minecraft:nether_star"
+      "tag": "forge:nether_stars"
     },
     "E": {
       "item": "mekanism:ultimate_induction_provider"
     },
-    "P": {
+    "H": {
       "item": "mekanism:pellet_antimatter"
     }
   }

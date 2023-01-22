@@ -15,6 +15,9 @@ import net.minecraftforge.registries.IRegistryDelegate;
 @MethodsReturnNonnullByDefault
 public class InfusionStack extends ChemicalStack<InfuseType> {
 
+    /**
+     * Empty InfusionStack instance.
+     */
     public static final InfusionStack EMPTY = new InfusionStack(MekanismAPI.EMPTY_INFUSE_TYPE, 0);
 
     /**
@@ -84,16 +87,9 @@ public class InfusionStack extends ChemicalStack<InfuseType> {
      */
     @Override
     public InfusionStack copy() {
+        if (isEmpty()) {
+            return EMPTY;
+        }
         return new InfusionStack(this, getAmount());
-    }
-
-    /**
-     * Default equality comparison for a InfusionStack. Same functionality as isTypeEqual().
-     *
-     * This is included for use in data structures.
-     */
-    @Override
-    public final boolean equals(Object o) {
-        return o instanceof InfusionStack && isTypeEqual((InfusionStack) o);
     }
 }

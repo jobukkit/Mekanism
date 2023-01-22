@@ -12,7 +12,7 @@ MDK.zip
 /.gradle
 *.classpath
 *.project
-/.settings
+.settings
 /eclipse
 *.txt
 *.launch
@@ -21,6 +21,5 @@ MDK.zip
 *.blend2
 /bin
 /logs
-
-# datagen caches
-/src/datagen/generated/**/.cache
+/src/datagen/main/resources
+/annotation-processor/bin

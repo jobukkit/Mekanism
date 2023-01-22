@@ -2,8 +2,9 @@ package mekanism.tools.common;
 
 import mekanism.tools.client.ToolsItemModelProvider;
 import mekanism.tools.client.ToolsLangProvider;
+import mekanism.tools.common.recipe.ToolsRecipeProvider;
 import net.minecraft.data.DataGenerator;
-import net.minecraftforge.client.model.generators.ExistingFileHelper;
+import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
@@ -11,6 +12,9 @@ import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 
 @EventBusSubscriber(modid = MekanismTools.MODID, bus = Bus.MOD)
 public class ToolsDataGenerator {
+
+    private ToolsDataGenerator() {
+    }
 
     @SubscribeEvent
     public static void gatherData(GatherDataEvent event) {
@@ -23,8 +27,8 @@ public class ToolsDataGenerator {
         }
         if (event.includeServer()) {
             //Server side data generators
-            gen.addProvider(new ToolsTagProvider(gen));
-            gen.addProvider(new ToolsRecipeProvider(gen));
+            gen.addProvider(new ToolsTagProvider(gen, existingFileHelper));
+            gen.addProvider(new ToolsRecipeProvider(gen, existingFileHelper));
         }
     }
 }

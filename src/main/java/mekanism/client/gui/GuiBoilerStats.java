@@ -9,11 +9,13 @@ import mekanism.client.gui.element.tab.GuiBoilerTab.BoilerTab;
 import mekanism.client.gui.element.tab.GuiHeatTab;
 import mekanism.common.MekanismLang;
 import mekanism.common.config.MekanismConfig;
+import mekanism.common.content.boiler.BoilerMultiblockData;
 import mekanism.common.inventory.container.tile.EmptyTileContainer;
 import mekanism.common.tile.multiblock.TileEntityBoilerCasing;
 import mekanism.common.util.HeatUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.UnitDisplayUtils.TemperatureUnit;
+import mekanism.common.util.text.TextUtils;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.text.ITextComponent;
 
@@ -27,35 +29,35 @@ public class GuiBoilerStats extends GuiMekanismTile<TileEntityBoilerCasing, Empt
     }
 
     @Override
-    public void init() {
-        super.init();
+    protected void addGuiElements() {
+        super.addGuiElements();
         addButton(new GuiBoilerTab(this, tile, BoilerTab.MAIN));
-        addButton(new GuiHeatTab(() -> {
+        addButton(new GuiHeatTab(this, () -> {
             ITextComponent environment = MekanismUtils.getTemperatureDisplay(tile.getMultiblock().lastEnvironmentLoss, TemperatureUnit.KELVIN, false);
             return Collections.singletonList(MekanismLang.DISSIPATED_RATE.translate(environment));
-        }, this));
-        addButton(boilGraph = new GuiGraph(this, 8, 83, 160, 36, MekanismLang.BOIL_RATE::translate));
-        addButton(maxGraph = new GuiGraph(this, 8, 122, 160, 36, MekanismLang.MAX_BOIL_RATE::translate));
+        }));
+        boilGraph = addButton(new GuiGraph(this, 7, 82, 162, 38, MekanismLang.BOIL_RATE::translate));
+        maxGraph = addButton(new GuiGraph(this, 7, 121, 162, 38, MekanismLang.MAX_BOIL_RATE::translate));
         maxGraph.enableFixedScale((long) ((MekanismConfig.general.superheatingHeatTransfer.get() * tile.getMultiblock().superheatingElements) / HeatUtils.getWaterThermalEnthalpy()));
     }
 
     @Override
     protected void drawForegroundText(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        drawCenteredText(matrix, MekanismLang.BOILER_STATS.translate(), 0, getXSize(), 6, titleTextColor());
-        drawString(matrix, MekanismLang.BOILER_MAX_WATER.translate(formatInt(tile.getMultiblock().waterTank.getCapacity())), 8, 26, titleTextColor());
-        drawString(matrix, MekanismLang.BOILER_MAX_STEAM.translate(formatInt(tile.getMultiblock().steamTank.getCapacity())), 8, 35, titleTextColor());
-        drawString(matrix, MekanismLang.BOILER_HEAT_TRANSFER.translate(), 8, 49, 0x797979);
-        drawString(matrix, MekanismLang.BOILER_HEATERS.translate(tile.getMultiblock().superheatingElements), 14, 58, titleTextColor());
-        double boilCapacity = MekanismConfig.general.superheatingHeatTransfer.get() * tile.getMultiblock().superheatingElements / HeatUtils.getWaterThermalEnthalpy();
-        boilCapacity *= HeatUtils.getSteamEnergyEfficiency();
-        drawString(matrix, MekanismLang.BOILER_CAPACITY.translate(formatInt((long) boilCapacity)), 8, 72, titleTextColor());
+        drawCenteredText(matrix, MekanismLang.BOILER_STATS.translate(), 0, imageWidth, titleLabelY, titleTextColor());
+        BoilerMultiblockData multiblock = tile.getMultiblock();
+        drawString(matrix, MekanismLang.BOILER_MAX_WATER.translate(TextUtils.format(multiblock.waterTank.getCapacity())), 8, 26, titleTextColor());
+        drawString(matrix, MekanismLang.BOILER_MAX_STEAM.translate(TextUtils.format(multiblock.steamTank.getCapacity())), 8, 35, titleTextColor());
+        drawString(matrix, MekanismLang.BOILER_HEAT_TRANSFER.translate(), 8, 49, subheadingTextColor());
+        drawString(matrix, MekanismLang.BOILER_HEATERS.translate(multiblock.superheatingElements), 14, 58, titleTextColor());
+        drawString(matrix, MekanismLang.BOILER_CAPACITY.translate(TextUtils.format(multiblock.getBoilCapacity())), 8, 72, titleTextColor());
         super.drawForegroundText(matrix, mouseX, mouseY);
     }
 
     @Override
     public void tick() {
         super.tick();
-        boilGraph.addData(tile.getMultiblock().lastBoilRate);
-        maxGraph.addData(tile.getMultiblock().lastMaxBoil);
+        BoilerMultiblockData multiblock = tile.getMultiblock();
+        boilGraph.addData(multiblock.lastBoilRate);
+        maxGraph.addData(multiblock.lastMaxBoil);
     }
 }

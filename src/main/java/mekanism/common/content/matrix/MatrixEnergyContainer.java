@@ -62,7 +62,7 @@ public class MatrixEnergyContainer implements IEnergyContainer {
     // We need to validate that does properly happen even if the cell is floating in the middle and not touching any walls
     // We may also want to make cells and providers extend TileEntityInternalMultiblock
     public void removeInternal(BlockPos pos) {
-        if (!invalidPositions.contains(pos)) {
+        if (invalidPositions.add(pos)) {
             if (providers.containsKey(pos)) {
                 //It is a provider
                 transferCap = transferCap.minusEqual(providers.get(pos).getOutput());
@@ -74,7 +74,6 @@ public class MatrixEnergyContainer implements IEnergyContainer {
                 storageCap = storageCap.plusEqual(cellContainer.getMaxEnergy());
                 cachedTotal = cachedTotal.minusEqual(cellContainer.getEnergy());
             }
-            invalidPositions.add(pos);
         }
     }
 
@@ -173,7 +172,7 @@ public class MatrixEnergyContainer implements IEnergyContainer {
         FloatingLong toAdd = amount.min(getRemainingInput()).min(getNeeded());
         if (toAdd.isZero()) {
             //Exit if we don't actually have anything to add, either due to how much we need
-            // or due to the our remaining rate limit
+            // or due to the remaining rate limit
             return amount;
         }
         if (action.execute()) {

@@ -2,6 +2,7 @@
   "type": "minecraft:block",
   "pools": [
     {
+      "name": "main",
       "rolls": 1,
       "entries": [
         {
@@ -20,11 +21,6 @@
             }
           ],
           "name": "mekanism:creative_bin"
-        }
-      ],
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
         }
       ]
     }

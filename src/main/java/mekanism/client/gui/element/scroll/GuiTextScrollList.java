@@ -4,9 +4,10 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
+import mekanism.api.text.TextComponentUtil;
 import mekanism.client.gui.IGuiWrapper;
+import mekanism.client.gui.element.GuiElement;
 import mekanism.client.gui.element.GuiInnerScreen;
-import net.minecraft.util.text.StringTextComponent;
 
 public class GuiTextScrollList extends GuiScrollList {
 
@@ -14,7 +15,7 @@ public class GuiTextScrollList extends GuiScrollList {
     private int selected = -1;
 
     public GuiTextScrollList(IGuiWrapper gui, int x, int y, int width, int height) {
-        super(gui, x, y, width, height, 10, new GuiInnerScreen(gui, x, y, width, height));
+        super(gui, x, y, width, height, 10, GuiInnerScreen.SCREEN, GuiInnerScreen.SCREEN_SIZE);
     }
 
     @Override
@@ -66,7 +67,7 @@ public class GuiTextScrollList extends GuiScrollList {
             for (int i = 0; i < focusedElements; i++) {
                 int index = scrollIndex + i;
                 if (index < maxElements) {
-                    drawScaledTextScaledBound(matrix, new StringTextComponent(textEntries.get(index)), relativeX + 2, relativeY + 2 + elementHeight * i,
+                    drawScaledTextScaledBound(matrix, TextComponentUtil.getString(textEntries.get(index)), relativeX + 2, relativeY + 2 + elementHeight * i,
                           screenTextColor(), barX - x - 2, 0.8F);
                 }
             }
@@ -81,5 +82,13 @@ public class GuiTextScrollList extends GuiScrollList {
             blit(matrix, x + 1, y + 1 + (selected - scrollIndex) * elementHeight, barX - x - 2, elementHeight,
                   4, 2, 2, 2, TEXTURE_WIDTH, TEXTURE_HEIGHT);
         }
+    }
+
+    @Override
+    public void syncFrom(GuiElement element) {
+        super.syncFrom(element);
+        GuiTextScrollList old = (GuiTextScrollList) element;
+        setText(old.textEntries);
+        setSelected(old.getSelection());
     }
 }

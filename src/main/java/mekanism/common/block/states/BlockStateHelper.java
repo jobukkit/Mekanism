@@ -2,22 +2,23 @@ package mekanism.common.block.states;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.ToIntFunction;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import mekanism.api.providers.IBlockProvider;
 import mekanism.common.block.attribute.Attribute;
 import mekanism.common.block.attribute.AttributeState;
-import mekanism.common.tile.TileEntityCardboardBox;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.BooleanProperty;
+import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.Property;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
@@ -25,14 +26,19 @@ import org.jetbrains.annotations.Contract;
 
 public class BlockStateHelper {
 
+    private BlockStateHelper() {
+    }
+
     //Cardboard Box storage
     public static final BooleanProperty storageProperty = BooleanProperty.create("storage");
-    //Fluid logged. TODO: We may eventually want to make this not be using the same exact property as WATERLOGGED but name it differently
-    public static final BooleanProperty FLUID_LOGGED = BlockStateProperties.WATERLOGGED;
+    //Fluid logged.
+    //TODO - 1.18: Remove CorrectingIntegerProperty and rename the property from waterlogged to fluid_logged
+    // We are keeping it as "waterlogged" so that we can properly read old values using the CorrectingIntegerProperty
+    public static final IntegerProperty FLUID_LOGGED = CorrectingIntegerProperty.create(BlockStateProperties.WATERLOGGED.getName(), 0, IStateFluidLoggable.VANILLA_FLUIDS.length);
+    //public static final IntegerProperty FLUID_LOGGED = IntegerProperty.create("fluid_logged", 0, IStateFluidLoggable.VANILLA_FLUIDS.length);
 
     public static BlockState getDefaultState(@Nonnull BlockState state) {
         Block block = state.getBlock();
-
         for (Attribute attr : Attribute.getAll(block)) {
             if (attr instanceof AttributeState) {
                 state = ((AttributeState) attr).getDefaultState(state);
@@ -40,14 +46,13 @@ public class BlockStateHelper {
         }
         if (block instanceof IStateFluidLoggable) {
             //Default the blocks to not being waterlogged, they have code to force waterlogging to true if being placed in water
-            state = state.with(FLUID_LOGGED, false);
+            state = state.setValue(((IStateFluidLoggable) block).getFluidLoggedProperty(), 0);
         }
         return state;
     }
 
     public static void fillBlockStateContainer(Block block, StateContainer.Builder<Block, BlockState> builder) {
         List<Property<?>> properties = new ArrayList<>();
-
         for (Attribute attr : Attribute.getAll(block)) {
             if (attr instanceof AttributeState) {
                 ((AttributeState) attr).fillBlockStateContainer(block, properties);
@@ -57,16 +62,41 @@ public class BlockStateHelper {
             properties.add(storageProperty);
         }
         if (block instanceof IStateFluidLoggable) {
-            properties.add(FLUID_LOGGED);
+            properties.add(((IStateFluidLoggable) block).getFluidLoggedProperty());
         }
         if (!properties.isEmpty()) {
             builder.add(properties.toArray(new Property[0]));
         }
     }
 
+    /**
+     * Helper to "hack" in and modify the light value precalculator for states to be able to use as a base level the value already set, but also modify it based on which
+     * fluid a block may be fluid logged with and then use that light level instead if it is higher.
+     */
+    public static AbstractBlock.Properties applyLightLevelAdjustments(AbstractBlock.Properties properties) {
+        return applyLightLevelAdjustments(properties, state -> {
+            Block block = state.getBlock();
+            if (block instanceof IStateFluidLoggable) {
+                return ((IStateFluidLoggable) block).getFluid(state).getType().getAttributes().getLuminosity();
+            }
+            return 0;
+        });
+    }
+
+    /**
+     * Helper to "hack" in and modify the light value precalculator for states to be able to use as a base level the value already set, but also modify it based on
+     * another function to allow for compounding the light values and then using that light level instead if it is higher.
+     */
+    public static AbstractBlock.Properties applyLightLevelAdjustments(AbstractBlock.Properties properties, ToIntFunction<BlockState> toApply) {
+        //Cache what the current light level function is
+        ToIntFunction<BlockState> existingLightLevelFunction = properties.lightEmission;
+        //And override the one in the properties in a way that we can modify if we have state information that should adjust it
+        return properties.lightLevel(state -> Math.max(existingLightLevelFunction.applyAsInt(state), toApply.applyAsInt(state)));
+    }
+
     @Contract("_, null, _ -> null")
     public static BlockState getStateForPlacement(Block block, @Nullable BlockState state, BlockItemUseContext context) {
-        return getStateForPlacement(block, state, context.getWorld(), context.getPos(), context.getPlayer(), context.getFace());
+        return getStateForPlacement(block, state, context.getLevel(), context.getClickedPos(), context.getPlayer(), context.getClickedFace());
     }
 
     @Contract("_, null, _, _, _, _ -> null")
@@ -80,33 +110,36 @@ public class BlockStateHelper {
             }
         }
         if (block instanceof IStateFluidLoggable) {
+            IStateFluidLoggable fluidLoggable = (IStateFluidLoggable) block;
             FluidState fluidState = world.getFluidState(pos);
-            state = state.with(FLUID_LOGGED, fluidState.getFluid() == Fluids.WATER);
+            state = state.setValue(fluidLoggable.getFluidLoggedProperty(), fluidLoggable.getSupportedFluidPropertyIndex(fluidState.getType()));
         }
         return state;
     }
 
-    private static boolean isStoring(@Nonnull TileEntity tile) {
-        if (tile instanceof TileEntityCardboardBox) {
-            return ((TileEntityCardboardBox) tile).storedData != null;
-        }
-        return false;
+    public static BlockState copyStateData(BlockState oldState, IBlockProvider newBlockProvider) {
+        return copyStateData(oldState, newBlockProvider.getBlock().defaultBlockState());
     }
 
     public static BlockState copyStateData(BlockState oldState, BlockState newState) {
         Block oldBlock = oldState.getBlock();
         Block newBlock = newState.getBlock();
-
         for (Attribute attr : Attribute.getAll(oldBlock)) {
             if (attr instanceof AttributeState) {
                 newState = ((AttributeState) attr).copyStateData(oldState, newState);
             }
         }
         if (oldBlock instanceof IStateStorage && newBlock instanceof IStateStorage) {
-            newState = newState.with(storageProperty, oldState.get(storageProperty));
+            newState = newState.setValue(storageProperty, oldState.getValue(storageProperty));
         }
         if (oldBlock instanceof IStateFluidLoggable && newBlock instanceof IStateFluidLoggable) {
-            newState = newState.with(FLUID_LOGGED, oldState.get(FLUID_LOGGED));
+            IStateFluidLoggable oldFluidLoggable = (IStateFluidLoggable) oldBlock;
+            IStateFluidLoggable newFluidLoggable = (IStateFluidLoggable) newBlock;
+            if (oldFluidLoggable.getSupportedFluids().length == newFluidLoggable.getSupportedFluids().length) {
+                //Basic check if the number of supported fluids is the same copy it over
+                //TODO: Eventually maybe we want a better check? In theory they should always match but just in case
+                newState = newState.setValue(newFluidLoggable.getFluidLoggedProperty(), oldState.getValue(oldFluidLoggable.getFluidLoggedProperty()));
+            }
         }
         return newState;
     }

@@ -2,20 +2,25 @@ package mekanism.common;
 
 import com.mojang.authlib.GameProfile;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import mekanism.api.Coord4D;
 import mekanism.api.MekanismAPI;
+import mekanism.api.MekanismIMC;
 import mekanism.api.NBTConstants;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.infuse.InfuseType;
 import mekanism.api.chemical.pigment.Pigment;
 import mekanism.api.chemical.slurry.Slurry;
-import mekanism.client.render.MekanismRenderer;
-import mekanism.common.base.IModule;
+import mekanism.api.providers.IItemProvider;
+import mekanism.api.robit.RobitSkin;
+import mekanism.common.base.IModModule;
 import mekanism.common.base.KeySync;
+import mekanism.common.base.LootTableModifierReloadListener;
 import mekanism.common.base.MekFakePlayer;
 import mekanism.common.base.PlayerState;
 import mekanism.common.base.TagCache;
@@ -33,7 +38,9 @@ import mekanism.common.content.boiler.BoilerMultiblockData;
 import mekanism.common.content.boiler.BoilerValidator;
 import mekanism.common.content.evaporation.EvaporationMultiblockData;
 import mekanism.common.content.evaporation.EvaporationValidator;
-import mekanism.common.content.gear.Modules;
+import mekanism.common.content.gear.MekaSuitDispenseBehavior;
+import mekanism.common.content.gear.ModuleDispenseBehavior;
+import mekanism.common.content.gear.ModuleHelper;
 import mekanism.common.content.matrix.MatrixMultiblockData;
 import mekanism.common.content.matrix.MatrixValidator;
 import mekanism.common.content.network.BoxedChemicalNetwork.ChemicalTransferEvent;
@@ -47,9 +54,10 @@ import mekanism.common.content.tank.TankMultiblockData;
 import mekanism.common.content.tank.TankValidator;
 import mekanism.common.content.transporter.PathfinderCache;
 import mekanism.common.content.transporter.TransporterManager;
-import mekanism.common.entity.EntityRobit;
 import mekanism.common.integration.MekanismHooks;
-import mekanism.common.inventory.container.sync.dynamic.SyncMapper;
+import mekanism.common.integration.crafttweaker.content.CrTContentUtils;
+import mekanism.common.item.block.machine.ItemBlockFluidTank.FluidTankItemDispenseBehavior;
+import mekanism.common.lib.MekAnnotationScanner;
 import mekanism.common.lib.Version;
 import mekanism.common.lib.frequency.FrequencyManager;
 import mekanism.common.lib.frequency.FrequencyType;
@@ -58,39 +66,45 @@ import mekanism.common.lib.multiblock.MultiblockManager;
 import mekanism.common.lib.radiation.RadiationManager;
 import mekanism.common.lib.transmitter.TransmitterNetworkRegistry;
 import mekanism.common.network.PacketHandler;
-import mekanism.common.network.PacketTransmitterUpdate;
+import mekanism.common.network.to_client.PacketTransmitterUpdate;
 import mekanism.common.recipe.MekanismRecipeType;
 import mekanism.common.recipe.bin.BinInsertRecipe;
+import mekanism.common.recipe.condition.ModVersionLoadedCondition;
+import mekanism.common.recipe.ingredient.IngredientWithout;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.registries.MekanismContainerTypes;
+import mekanism.common.registries.MekanismDataSerializers;
 import mekanism.common.registries.MekanismEntityTypes;
 import mekanism.common.registries.MekanismFeatures;
 import mekanism.common.registries.MekanismFluids;
 import mekanism.common.registries.MekanismGases;
 import mekanism.common.registries.MekanismInfuseTypes;
 import mekanism.common.registries.MekanismItems;
+import mekanism.common.registries.MekanismModules;
 import mekanism.common.registries.MekanismParticleTypes;
 import mekanism.common.registries.MekanismPigments;
 import mekanism.common.registries.MekanismPlacements;
 import mekanism.common.registries.MekanismRecipeSerializers;
+import mekanism.common.registries.MekanismRobitSkins;
 import mekanism.common.registries.MekanismSlurries;
 import mekanism.common.registries.MekanismSounds;
 import mekanism.common.registries.MekanismTileEntityTypes;
-import mekanism.common.tags.MekanismTagManager;
+import mekanism.common.tags.MekanismTags;
+import mekanism.common.tile.component.TileComponentChunkLoader.ChunkValidationCallback;
+import mekanism.common.tile.machine.TileEntityOredictionificator;
 import mekanism.common.world.GenHandler;
-import net.minecraft.entity.ai.attributes.GlobalEntityTypeAttributes;
+import net.minecraft.block.DispenserBlock;
+import net.minecraft.dispenser.IDispenseItemBehavior;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.resources.IFutureReloadListener;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.resources.SimpleReloadableResourceManager;
-import net.minecraft.tags.NetworkTagManager;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.common.world.ForgeChunkManager;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
@@ -99,15 +113,18 @@ import net.minecraftforge.event.world.ChunkDataEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DeferredWorkQueue;
-import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.DatagenModLoader;
+import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.javafmlmod.FMLModContainer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -126,11 +143,6 @@ public class Mekanism {
      * Mekanism logger instance
      */
     public static final Logger logger = LogManager.getLogger(MOD_NAME);
-    /**
-     * Mekanism proxy instance
-     */
-    //TODO: Remove need for having a proxy as it is the legacy way of doing things
-    public static CommonProxy proxy = DistExecutor.safeRunForDist(() -> CommonProxy::createClientProxy, () -> CommonProxy::new);
 
     /**
      * Mekanism mod instance
@@ -153,17 +165,13 @@ public class Mekanism {
     public static final MultiblockManager<EvaporationMultiblockData> evaporationManager = new MultiblockManager<>("evaporation", MultiblockCache::new, EvaporationValidator::new);
     public static final MultiblockManager<SPSMultiblockData> spsManager = new MultiblockManager<>("sps", SPSCache::new, SPSValidator::new);
     /**
-     * RadiationManager for handling radiation across all dimensions
-     */
-    public static final RadiationManager radiationManager = new RadiationManager();
-    /**
      * Mekanism creative tab
      */
     public static final CreativeTabMekanism tabMekanism = new CreativeTabMekanism();
     /**
      * List of Mekanism modules loaded
      */
-    public static final List<IModule> modulesLoaded = new ArrayList<>();
+    public static final List<IModModule> modulesLoaded = new ArrayList<>();
     /**
      * The server's world tick handler.
      */
@@ -171,11 +179,10 @@ public class Mekanism {
     /**
      * The GameProfile used by the dummy Mekanism player
      */
-    public static final GameProfile gameProfile = new GameProfile(UUID.nameUUIDFromBytes("mekanism.common".getBytes()), Mekanism.LOG_TAG);
+    public static final GameProfile gameProfile = new GameProfile(UUID.nameUUIDFromBytes("mekanism.common".getBytes(StandardCharsets.UTF_8)), Mekanism.LOG_TAG);
     public static final KeySync keyMap = new KeySync();
     public static final Set<Coord4D> activeVibrators = new ObjectOpenHashSet<>();
 
-    private MekanismTagManager mekanismTagManager;
     private ReloadListener recipeCacheManager;
 
     public Mekanism() {
@@ -191,14 +198,16 @@ public class Mekanism {
         MinecraftForge.EVENT_BUS.addListener(this::onWorldUnload);
         MinecraftForge.EVENT_BUS.addListener(this::registerCommands);
         MinecraftForge.EVENT_BUS.addListener(this::serverStopped);
-        MinecraftForge.EVENT_BUS.addListener(this::addReloadListeners);
         MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, this::addReloadListenersLowest);
         MinecraftForge.EVENT_BUS.addListener(BinInsertRecipe::onCrafting);
-        MinecraftForge.EVENT_BUS.addListener(this::onTagsReload);
+        MinecraftForge.EVENT_BUS.addListener(this::onVanillaTagsReload);
+        MinecraftForge.EVENT_BUS.addListener(this::onCustomTagsReload);
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, GenHandler::onBiomeLoad);
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::onConfigLoad);
         modEventBus.addListener(this::imcQueue);
+        modEventBus.addListener(this::imcHandle);
         MekanismItems.ITEMS.register(modEventBus);
         MekanismBlocks.BLOCKS.register(modEventBus);
         MekanismFluids.FLUIDS.register(modEventBus);
@@ -210,59 +219,73 @@ public class Mekanism {
         MekanismPlacements.PLACEMENTS.register(modEventBus);
         MekanismFeatures.FEATURES.register(modEventBus);
         MekanismRecipeSerializers.RECIPE_SERIALIZERS.register(modEventBus);
-        MekanismGases.GASES.createAndRegister(modEventBus, "gas");
-        MekanismInfuseTypes.INFUSE_TYPES.createAndRegister(modEventBus, "infuse_type");
-        MekanismPigments.PIGMENTS.createAndRegister(modEventBus, "pigment");
-        MekanismSlurries.SLURRIES.createAndRegister(modEventBus, "slurry");
+        MekanismDataSerializers.DATA_SERIALIZERS.register(modEventBus);
+        MekanismGases.GASES.createAndRegister(modEventBus, "gas", builder -> builder.tagFolder("gases").setDefaultKey(rl("empty_gas")));
+        MekanismInfuseTypes.INFUSE_TYPES.createAndRegister(modEventBus, "infuse_type", builder -> builder.tagFolder("infuse_types").setDefaultKey(rl("empty_infuse_type")));
+        MekanismPigments.PIGMENTS.createAndRegister(modEventBus, "pigment", builder -> builder.tagFolder("pigments").setDefaultKey(rl("empty_pigment")));
+        MekanismSlurries.SLURRIES.createAndRegister(modEventBus, "slurry", builder -> builder.tagFolder("slurries").setDefaultKey(rl("empty_slurry")));
+        MekanismRobitSkins.ROBIT_SKINS.createAndRegister(modEventBus, "robit_skin", builder -> builder.setDefaultKey(rl("robit")));
+        MekanismModules.MODULES.createAndRegister(modEventBus, "module");
         modEventBus.addGenericListener(Gas.class, this::registerGases);
         modEventBus.addGenericListener(InfuseType.class, this::registerInfuseTypes);
         modEventBus.addGenericListener(Pigment.class, this::registerPigments);
         modEventBus.addGenericListener(Slurry.class, this::registerSlurries);
         modEventBus.addGenericListener(IRecipeSerializer.class, this::registerRecipeSerializers);
         //Set our version number to match the mods.toml file, which matches the one in our build.gradle
-        versionNumber = new Version(ModLoadingContext.get().getActiveContainer().getModInfo().getVersion());
-
-        //Register our model loader as soon as we can to avoid it not existing when models are loaded
-        // as there seems to be some odd race condition which allows for the model loader to sometimes not be loaded
-        // when the client starts loading models. Even if we register our loader as early as ClientSetupEvent
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> MekanismRenderer::registerModelLoader);
+        versionNumber = new Version(ModLoadingContext.get().getActiveContainer());
+        //Super early hooks, only reliable thing is for checking dependencies that we declare we are after
+        hooks.hookConstructor();
+        if (hooks.CraftTweakerLoaded && !DatagenModLoader.isRunningDataGen()) {
+            //Attempt to grab the mod event bus for CraftTweaker so that we can register our custom content in their namespace
+            // to make it clearer which chemicals were added by CraftTweaker, and which are added by actual mods.
+            // Gracefully fallback to our event bus if something goes wrong with getting CrT's and just then have the log have
+            // warnings about us registering things in their namespace.
+            IEventBus crtModEventBus = modEventBus;
+            Optional<? extends ModContainer> crtModContainer = ModList.get().getModContainerById(MekanismHooks.CRAFTTWEAKER_MOD_ID);
+            if (crtModContainer.isPresent()) {
+                ModContainer container = crtModContainer.get();
+                if (container instanceof FMLModContainer) {
+                    crtModEventBus = ((FMLModContainer) container).getEventBus();
+                }
+            }
+            //Register these at lowest priority to try and ensure they get later ids in the chemical registries
+            crtModEventBus.addGenericListener(Gas.class, EventPriority.LOWEST, CrTContentUtils::registerCrTGases);
+            crtModEventBus.addGenericListener(InfuseType.class, EventPriority.LOWEST, CrTContentUtils::registerCrTInfuseTypes);
+            crtModEventBus.addGenericListener(Pigment.class, EventPriority.LOWEST, CrTContentUtils::registerCrTPigments);
+            crtModEventBus.addGenericListener(Slurry.class, EventPriority.LOWEST, CrTContentUtils::registerCrTSlurries);
+            crtModEventBus.addGenericListener(RobitSkin.class, EventPriority.LOWEST, CrTContentUtils::registerCrTRobitSkins);
+        }
     }
 
     //Register the empty chemicals
     private void registerGases(RegistryEvent.Register<Gas> event) {
+        MekanismAPI.EMPTY_GAS.setRegistryName(rl("empty_gas"));
         event.getRegistry().register(MekanismAPI.EMPTY_GAS);
     }
 
     private void registerInfuseTypes(RegistryEvent.Register<InfuseType> event) {
+        MekanismAPI.EMPTY_INFUSE_TYPE.setRegistryName(rl("empty_infuse_type"));
         event.getRegistry().register(MekanismAPI.EMPTY_INFUSE_TYPE);
     }
 
     private void registerPigments(RegistryEvent.Register<Pigment> event) {
+        MekanismAPI.EMPTY_PIGMENT.setRegistryName(rl("empty_pigment"));
         event.getRegistry().register(MekanismAPI.EMPTY_PIGMENT);
     }
 
     private void registerSlurries(RegistryEvent.Register<Slurry> event) {
+        MekanismAPI.EMPTY_SLURRY.setRegistryName(rl("empty_slurry"));
         event.getRegistry().register(MekanismAPI.EMPTY_SLURRY);
     }
 
     private void registerRecipeSerializers(RegistryEvent.Register<IRecipeSerializer<?>> event) {
         MekanismRecipeType.registerRecipeTypes(event.getRegistry());
+        CraftingHelper.register(ModVersionLoadedCondition.Serializer.INSTANCE);
+        CraftingHelper.register(IngredientWithout.ID, IngredientWithout.Serializer.INSTANCE);
     }
 
     public static ResourceLocation rl(String path) {
         return new ResourceLocation(Mekanism.MODID, path);
-    }
-
-    private void setTagManager(MekanismTagManager manager) {
-        if (mekanismTagManager == null) {
-            mekanismTagManager = manager;
-        } else {
-            logger.warn("Mekanism Tag Manager has already been set.");
-        }
-    }
-
-    public MekanismTagManager getTagManager() {
-        return mekanismTagManager;
     }
 
     private void setRecipeCacheManager(ReloadListener manager) {
@@ -277,58 +300,39 @@ public class Mekanism {
         return recipeCacheManager;
     }
 
-    private void onTagsReload(TagsUpdatedEvent event) {
-        TagCache.resetTagCaches();
+    private void onVanillaTagsReload(TagsUpdatedEvent.VanillaTagTypes event) {
+        TagCache.resetVanillaTagCaches();
     }
 
-    private void addReloadListeners(AddReloadListenerEvent event) {
-        boolean added = false;
-        IResourceManager resourceManager = event.getDataPackRegistries().getResourceManager();
-        if (resourceManager instanceof SimpleReloadableResourceManager) {
-            //Note: We "hack" it so that our tag manager gets registered directly after the normal tag manager
-            // to ensure that it is before the recipe manager and that the custom tags can be properly resolved
-            //TODO: It would make sense to eventually make a PR to forge to make custom tags easier to do
-            SimpleReloadableResourceManager manager = (SimpleReloadableResourceManager) resourceManager;
-            for (int i = 0; i < manager.reloadListeners.size(); i++) {
-                IFutureReloadListener listener = manager.reloadListeners.get(i);
-                if (listener instanceof NetworkTagManager) {
-                    manager.reloadListeners.add(i + 1, getTagManager());
-                    manager.initTaskQueue.add(i + 1, getTagManager());
-                    added = true;
-                    break;
-                }
-            }
-        }
-        if (!added) {
-            //Fallback to trying to just add it even though this is probably too late to do so properly
-            event.addListener(getTagManager());
-        }
+    private void onCustomTagsReload(TagsUpdatedEvent.CustomTagTypes event) {
+        TagCache.resetCustomTagCaches();
     }
 
     private void addReloadListenersLowest(AddReloadListenerEvent event) {
-        //Note: We register reload listeners here which we want to make sure run after CraftTweaker or any other mods that may modify recipes
+        //Note: We register reload listeners here which we want to make sure run after CraftTweaker or any other mods that may modify recipes or loot tables
+        event.addListener(new LootTableModifierReloadListener(event.getDataPackRegistries()));
         event.addListener(getRecipeCacheManager());
     }
 
     private void registerCommands(RegisterCommandsEvent event) {
-        BuildCommand.register("boiler", new BoilerBuilder());
-        BuildCommand.register("matrix", new MatrixBuilder());
-        BuildCommand.register("tank", new TankBuilder());
-        BuildCommand.register("evaporation", new EvaporationBuilder());
-        BuildCommand.register("sps", new SPSBuilder());
+        BuildCommand.register("boiler", MekanismLang.BOILER, new BoilerBuilder());
+        BuildCommand.register("matrix", MekanismLang.MATRIX, new MatrixBuilder());
+        BuildCommand.register("tank", MekanismLang.DYNAMIC_TANK, new TankBuilder());
+        BuildCommand.register("evaporation", MekanismLang.EVAPORATION_PLANT, new EvaporationBuilder());
+        BuildCommand.register("sps", MekanismLang.SPS, new SPSBuilder());
         event.getDispatcher().register(CommandMek.register());
     }
 
     private void serverStopped(FMLServerStoppedEvent event) {
         //Clear all cache data, wait until server stopper though so that we make sure saving can use any data it needs
-        playerState.clear();
+        playerState.clear(false);
         activeVibrators.clear();
         worldTickHandler.resetRegenChunks();
         FrequencyType.clear();
         BoilerMultiblockData.hotMap.clear();
 
         //Reset consistent managers
-        radiationManager.reset();
+        RadiationManager.INSTANCE.reset();
         MultiblockManager.reset();
         FrequencyManager.reset();
         TransporterManager.reset();
@@ -337,32 +341,59 @@ public class Mekanism {
     }
 
     private void imcQueue(InterModEnqueueEvent event) {
+        //IMC messages we send to other mods
         hooks.sendIMCMessages(event);
+        //IMC messages that we are sending to ourselves
+        MekanismIMC.addModulesToAll(MekanismModules.ENERGY_UNIT);
+        MekanismIMC.addMekaSuitModules(MekanismModules.LASER_DISSIPATION_UNIT, MekanismModules.RADIATION_SHIELDING_UNIT);
+        MekanismIMC.addMekaToolModules(MekanismModules.ATTACK_AMPLIFICATION_UNIT, MekanismModules.SILK_TOUCH_UNIT, MekanismModules.VEIN_MINING_UNIT,
+              MekanismModules.FARMING_UNIT, MekanismModules.SHEARING_UNIT, MekanismModules.TELEPORTATION_UNIT, MekanismModules.EXCAVATION_ESCALATION_UNIT);
+        MekanismIMC.addMekaSuitHelmetModules(MekanismModules.ELECTROLYTIC_BREATHING_UNIT, MekanismModules.INHALATION_PURIFICATION_UNIT,
+              MekanismModules.VISION_ENHANCEMENT_UNIT, MekanismModules.SOLAR_RECHARGING_UNIT, MekanismModules.NUTRITIONAL_INJECTION_UNIT);
+        MekanismIMC.addMekaSuitBodyarmorModules(MekanismModules.JETPACK_UNIT, MekanismModules.GRAVITATIONAL_MODULATING_UNIT, MekanismModules.CHARGE_DISTRIBUTION_UNIT,
+              MekanismModules.DOSIMETER_UNIT, MekanismModules.GEIGER_UNIT, MekanismModules.ELYTRA_UNIT);
+        MekanismIMC.addMekaSuitPantsModules(MekanismModules.LOCOMOTIVE_BOOSTING_UNIT);
+        MekanismIMC.addMekaSuitBootsModules(MekanismModules.HYDRAULIC_PROPULSION_UNIT, MekanismModules.MAGNETIC_ATTRACTION_UNIT, MekanismModules.FROST_WALKER_UNIT);
+    }
+
+    private void imcHandle(InterModProcessEvent event) {
+        ModuleHelper.INSTANCE.processIMC();
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
         hooks.hookCommonSetup();
         Capabilities.registerCapabilities();
-        setTagManager(new MekanismTagManager());
         setRecipeCacheManager(new ReloadListener());
 
-        DeferredWorkQueue.runLater(() -> {
+        event.enqueueWork(() -> {
+            //Ensure our tags are all initialized
+            MekanismTags.init();
             //Register the mod's world generators
-            GenHandler.setupWorldGeneration();
-            //Collect sync mapper scan data
-            SyncMapper.collectScanData();
-            //Entity attribute assignments
-            GlobalEntityTypeAttributes.put(MekanismEntityTypes.ROBIT.get(), EntityRobit.getDefaultAttributes().create());
+            GenHandler.setupWorldGenFeatures();
+            //Collect annotation scan data
+            MekAnnotationScanner.collectScanData();
+            //Add chunk loading callbacks
+            ForgeChunkManager.setForcedChunkLoadingCallback(Mekanism.MODID, ChunkValidationCallback.INSTANCE);
+            //Add our custom item predicate serializer even though I don't think we actually need it as json anywhere
+            LootTableModifierReloadListener.registerCustomPredicate();
+            //Register dispenser behaviors
+            MekanismFluids.FLUIDS.registerBucketDispenserBehavior();
+            registerDispenseBehavior(FluidTankItemDispenseBehavior.INSTANCE, MekanismBlocks.BASIC_FLUID_TANK, MekanismBlocks.ADVANCED_FLUID_TANK,
+                  MekanismBlocks.ELITE_FLUID_TANK, MekanismBlocks.ULTIMATE_FLUID_TANK, MekanismBlocks.CREATIVE_FLUID_TANK);
+            registerDispenseBehavior(new ModuleDispenseBehavior(), MekanismItems.MEKA_TOOL);
+            registerDispenseBehavior(new MekaSuitDispenseBehavior(), MekanismItems.MEKASUIT_HELMET, MekanismItems.MEKASUIT_BODYARMOR, MekanismItems.MEKASUIT_PANTS,
+                  MekanismItems.MEKASUIT_BOOTS);
         });
 
         //Register player tracker
         MinecraftForge.EVENT_BUS.register(new CommonPlayerTracker());
         MinecraftForge.EVENT_BUS.register(new CommonPlayerTickHandler());
+        MinecraftForge.EVENT_BUS.register(Mekanism.worldTickHandler);
 
-        MinecraftForge.EVENT_BUS.register(radiationManager);
+        MinecraftForge.EVENT_BUS.register(RadiationManager.INSTANCE);
 
-        //Set up module container tooltips
-        Modules.processSupportedContainers();
+        //Check which modules are legacy
+        ModuleHelper.INSTANCE.gatherLegacyModules();
 
         //Initialization notification
         logger.info("Version {} initializing...", versionNumber);
@@ -373,9 +404,6 @@ public class Mekanism {
         //Packet registrations
         packetHandler.initialize();
 
-        //Load proxy
-        proxy.init();
-
         //Fake player info
         logger.info("Fake player readout: UUID = {}, name = {}", gameProfile.getId(), gameProfile.getName());
 
@@ -384,6 +412,12 @@ public class Mekanism {
 
         //Success message
         logger.info("Mod loaded.");
+    }
+
+    private static void registerDispenseBehavior(IDispenseItemBehavior behavior, IItemProvider... itemProviders) {
+        for (IItemProvider itemProvider : itemProviders) {
+            DispenserBlock.registerBehavior(itemProvider.getItem(), behavior);
+        }
     }
 
     private void onEnergyTransferred(EnergyTransferEvent event) {
@@ -399,8 +433,8 @@ public class Mekanism {
     }
 
     private void chunkSave(ChunkDataEvent.Save event) {
-        if (event.getWorld() != null && !event.getWorld().isRemote()) {
-            //TODO - 1.17: Make both this and load write to the main tag instead of the level sub tag. For now we are using the level tag
+        if (event.getWorld() != null && !event.getWorld().isClientSide()) {
+            //TODO - 1.18: Make both this and load write to the main tag instead of the level sub tag. For now we are using the level tag
             // in both spots to have proper backwards compatibility with earlier mek release versions from 1.16
             CompoundNBT levelTag = event.getData().getCompound(NBTConstants.CHUNK_DATA_LEVEL);
             levelTag.putInt(NBTConstants.WORLD_GEN_VERSION, MekanismConfig.world.userGenVersion.get());
@@ -409,16 +443,16 @@ public class Mekanism {
 
     private synchronized void onChunkDataLoad(ChunkDataEvent.Load event) {
         IWorld world = event.getWorld();
-        if (world instanceof World && !world.isRemote() && MekanismConfig.world.enableRegeneration.get()) {
+        if (world instanceof World && !world.isClientSide() && MekanismConfig.world.enableRegeneration.get()) {
             CompoundNBT levelTag = event.getData().getCompound(NBTConstants.CHUNK_DATA_LEVEL);
             if (levelTag.getInt(NBTConstants.WORLD_GEN_VERSION) < MekanismConfig.world.userGenVersion.get()) {
-                worldTickHandler.addRegenChunk(((World) world).func_234923_W_(), event.getChunk().getPos());
+                worldTickHandler.addRegenChunk(((World) world).dimension(), event.getChunk().getPos());
             }
         }
     }
 
     private void onConfigLoad(ModConfig.ModConfigEvent configEvent) {
-        //Note: We listen to both the initial load and the reload, so as to make sure that we fix any accidentally
+        //Note: We listen to both the initial load and the reload, to make sure that we fix any accidentally
         // cached values from calls before the initial loading
         ModConfig config = configEvent.getConfig();
         //Make sure it is for the same modid as us
@@ -436,6 +470,15 @@ public class Mekanism {
         // when the server shuts down
         if (event.getWorld() instanceof ServerWorld) {
             MekFakePlayer.releaseInstance(event.getWorld());
+        }
+        if (event.getWorld() instanceof World && MekanismConfig.general.validOredictionificatorFilters.hasInvalidationListeners()) {
+            //If there are any invalidation listeners for the oredictionificator as there was a loaded oredictionificator
+            // then go through the entities and remove the corresponding invalidation listeners from them
+            for (TileEntity tile : ((World) event.getWorld()).blockEntityList) {
+                if (tile instanceof TileEntityOredictionificator) {
+                    ((TileEntityOredictionificator) tile).removeInvalidationListener();
+                }
+            }
         }
     }
 }

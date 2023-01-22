@@ -3,12 +3,12 @@ package mekanism.common.block.basic;
 import javax.annotation.Nonnull;
 import mekanism.common.block.BlockMekanism;
 import mekanism.common.resource.BlockResourceInfo;
-import net.minecraft.block.Block;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.PushReaction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorldReader;
+import net.minecraft.world.IBlockReader;
 import net.minecraftforge.common.ToolType;
 
 public class BlockResource extends BlockMekanism {
@@ -18,8 +18,8 @@ public class BlockResource extends BlockMekanism {
 
     //TODO: Isn't as "generic"? So make it be from one BlockType thing?
     public BlockResource(@Nonnull BlockResourceInfo resource) {
-        super(Block.Properties.create(Material.IRON).hardnessAndResistance(resource.getHardness(), resource.getResistance()).setLightLevel(state -> resource.getLightValue())
-              .setRequiresTool().harvestTool(ToolType.PICKAXE).harvestLevel(resource.getHarvestLevel()));
+        super(AbstractBlock.Properties.of(Material.METAL).strength(resource.getHardness(), resource.getResistance())
+              .lightLevel(state -> resource.getLightValue()).requiresCorrectToolForDrops().harvestTool(ToolType.PICKAXE).harvestLevel(resource.getHarvestLevel()));
         this.resource = resource;
     }
 
@@ -31,12 +31,12 @@ public class BlockResource extends BlockMekanism {
     @Nonnull
     @Override
     @Deprecated
-    public PushReaction getPushReaction(@Nonnull BlockState state) {
+    public PushReaction getPistonPushReaction(@Nonnull BlockState state) {
         return resource.getPushReaction();
     }
 
     @Override
-    public boolean isPortalFrame(BlockState state, IWorldReader world, BlockPos pos) {
+    public boolean isPortalFrame(BlockState state, IBlockReader world, BlockPos pos) {
         return resource.isPortalFrame();
     }
 }

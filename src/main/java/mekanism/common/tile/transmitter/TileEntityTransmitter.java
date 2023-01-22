@@ -18,17 +18,21 @@ import mekanism.common.block.states.TransmitterType.Size;
 import mekanism.common.block.transmitter.BlockLargeTransmitter;
 import mekanism.common.block.transmitter.BlockSmallTransmitter;
 import mekanism.common.capabilities.Capabilities;
-import mekanism.common.capabilities.resolver.basic.BasicCapabilityResolver;
+import mekanism.common.capabilities.DynamicHandler.InteractPredicate;
+import mekanism.common.capabilities.resolver.BasicCapabilityResolver;
+import mekanism.common.content.network.transmitter.BufferedTransmitter;
+import mekanism.common.content.network.transmitter.IUpgradeableTransmitter;
 import mekanism.common.content.network.transmitter.Transmitter;
 import mekanism.common.lib.transmitter.ConnectionType;
+import mekanism.common.lib.transmitter.DynamicBufferedNetwork;
 import mekanism.common.lib.transmitter.DynamicNetwork;
 import mekanism.common.lib.transmitter.TransmitterNetworkRegistry;
 import mekanism.common.tile.base.CapabilityTileEntity;
 import mekanism.common.upgrade.transmitter.TransmitterUpgradeData;
 import mekanism.common.util.EnumUtils;
-import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.MultipartUtils;
 import mekanism.common.util.MultipartUtils.AdvancedRayTraceResult;
+import mekanism.common.util.WorldUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -39,12 +43,12 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.World;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelDataMap;
 import net.minecraftforge.client.model.data.ModelProperty;
-import org.apache.commons.lang3.tuple.Pair;
 
 public abstract class TileEntityTransmitter extends CapabilityTileEntity implements IConfigurable, ITickableTileEntity, IAlloyInteraction {
 
@@ -57,6 +61,7 @@ public abstract class TileEntityTransmitter extends CapabilityTileEntity impleme
     public TileEntityTransmitter(IBlockProvider blockProvider) {
         super(((IHasTileEntity<? extends TileEntityTransmitter>) blockProvider.getBlock()).getTileType());
         this.transmitter = createTransmitter(blockProvider);
+        cacheCoord();
         addCapabilityResolver(BasicCapabilityResolver.constant(Capabilities.ALLOY_INTERACTION_CAPABILITY, this));
         addCapabilityResolver(BasicCapabilityResolver.constant(Capabilities.CONFIGURABLE_CAPABILITY, this));
     }
@@ -98,19 +103,19 @@ public abstract class TileEntityTransmitter extends CapabilityTileEntity impleme
         super.handleUpdatePacket(tag);
         //Delay requesting the model data update and actually updating the packet until we have finished parsing the update tag
         requestModelDataUpdate();
-        MekanismUtils.updateBlock(getWorld(), getPos());
+        WorldUtils.updateBlock(getLevel(), getBlockPos(), getBlockState());
     }
 
     @Override
-    public void read(@Nonnull BlockState state, @Nonnull CompoundNBT nbtTags) {
-        super.read(state, nbtTags);
+    public void load(@Nonnull BlockState state, @Nonnull CompoundNBT nbtTags) {
+        super.load(state, nbtTags);
         getTransmitter().read(nbtTags);
     }
 
     @Nonnull
     @Override
-    public CompoundNBT write(@Nonnull CompoundNBT nbtTags) {
-        return getTransmitter().write(super.write(nbtTags));
+    public CompoundNBT save(@Nonnull CompoundNBT nbtTags) {
+        return getTransmitter().write(super.save(nbtTags));
     }
 
     public void onNeighborTileChange(Direction side) {
@@ -122,8 +127,8 @@ public abstract class TileEntityTransmitter extends CapabilityTileEntity impleme
     }
 
     @Override
-    public void validate() {
-        super.validate();
+    public void clearRemoved() {
+        super.clearRemoved();
         onWorldJoin();
     }
 
@@ -133,12 +138,13 @@ public abstract class TileEntityTransmitter extends CapabilityTileEntity impleme
             getTransmitter().takeShare();
         }
         onWorldSeparate();
+        getTransmitter().onChunkUnload();
         super.onChunkUnloaded();
     }
 
     @Override
-    public void remove() {
-        super.remove();
+    public void setRemoved() {
+        super.setRemoved();
         onWorldSeparate();
         getTransmitter().remove();
     }
@@ -168,27 +174,36 @@ public abstract class TileEntityTransmitter extends CapabilityTileEntity impleme
         return loaded;
     }
 
-    @Override
-    public ActionResultType onSneakRightClick(PlayerEntity player, Direction side) {
-        if (!isRemote()) {
-            Pair<Vector3d, Vector3d> vecs = MultipartUtils.getRayTraceVectors(player);
-            AdvancedRayTraceResult result = MultipartUtils.collisionRayTrace(getPos(), vecs.getLeft(), vecs.getRight(), getCollisionBoxes());
-            if (result == null) {
-                return ActionResultType.PASS;
-            }
-            List<Direction> list = new ArrayList<>();
+    public Direction getSideLookingAt(PlayerEntity player, Direction fallback) {
+        Direction side = getSideLookingAt(player);
+        return side == null ? fallback : side;
+    }
+
+    @Nullable
+    public Direction getSideLookingAt(PlayerEntity player) {
+        AdvancedRayTraceResult result = MultipartUtils.collisionRayTrace(player, getBlockPos(), getCollisionBoxes());
+        if (result != null && result.valid()) {
+            List<Direction> list = new ArrayList<>(EnumUtils.DIRECTIONS.length);
             byte connections = getTransmitter().getAllCurrentConnections();
             for (Direction dir : EnumUtils.DIRECTIONS) {
                 if (Transmitter.connectionMapContainsSide(connections, dir)) {
                     list.add(dir);
                 }
             }
-            Direction hitSide;
             int boxIndex = result.hit.subHit + 1;
             if (boxIndex < list.size()) {
-                hitSide = list.get(boxIndex);
-            } else {
-                if (transmitter.connectionTypes[side.ordinal()] != ConnectionType.NONE && onConfigure(player, side) == ActionResultType.SUCCESS) {
+                return list.get(boxIndex);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public ActionResultType onSneakRightClick(PlayerEntity player, Direction side) {
+        if (!isRemote()) {
+            Direction hitSide = getSideLookingAt(player);
+            if (hitSide == null) {
+                if (transmitter.getConnectionTypeRaw(side) != ConnectionType.NONE && onConfigure(player, side) == ActionResultType.SUCCESS) {
                     //Refresh/notify so that we actually update the block and how it can connect given color or things might have changed
                     getTransmitter().refreshConnections();
                     getTransmitter().notifyTileChange();
@@ -196,11 +211,13 @@ public abstract class TileEntityTransmitter extends CapabilityTileEntity impleme
                 }
                 hitSide = side;
             }
-            transmitter.connectionTypes[hitSide.ordinal()] = transmitter.connectionTypes[hitSide.ordinal()].getNext();
-            getTransmitter().onModeChange(Direction.byIndex(hitSide.ordinal()));
+            transmitter.setConnectionTypeRaw(hitSide, transmitter.getConnectionTypeRaw(hitSide).getNext());
+            //Note: This stuff happens here and not in sideChanged because we don't want it to happen on load
+            // or things which also would cause sideChanged to be called
+            getTransmitter().onModeChange(Direction.from3DDataValue(hitSide.ordinal()));
             getTransmitter().refreshConnections();
             getTransmitter().notifyTileChange();
-            player.sendMessage(MekanismLang.CONNECTION_TYPE.translate(transmitter.connectionTypes[hitSide.ordinal()]), Util.DUMMY_UUID);
+            player.sendMessage(MekanismLang.CONNECTION_TYPE.translate(transmitter.getConnectionTypeRaw(hitSide)), Util.NIL_UUID);
             sendUpdatePacket();
         }
         return ActionResultType.SUCCESS;
@@ -218,10 +235,9 @@ public abstract class TileEntityTransmitter extends CapabilityTileEntity impleme
 
     public List<VoxelShape> getCollisionBoxes() {
         List<VoxelShape> list = new ArrayList<>();
-        byte connections = getTransmitter().getAllCurrentConnections();
         boolean isSmall = getTransmitterType().getSize() == Size.SMALL;
         for (Direction side : EnumUtils.DIRECTIONS) {
-            ConnectionType connectionType = Transmitter.getConnectionType(side, connections, transmitter.currentTransmitterConnections, transmitter.connectionTypes);
+            ConnectionType connectionType = getTransmitter().getConnectionType(side);
             if (connectionType != ConnectionType.NONE) {
                 if (isSmall) {
                     list.add(BlockSmallTransmitter.getSideForType(connectionType, side));
@@ -239,7 +255,7 @@ public abstract class TileEntityTransmitter extends CapabilityTileEntity impleme
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
         //If any of the block is in view, then allow rendering the contents
-        return new AxisAlignedBB(pos, pos.add(1, 1, 1));
+        return new AxisAlignedBB(worldPosition, worldPosition.offset(1, 1, 1));
     }
 
     @Nonnull
@@ -262,48 +278,60 @@ public abstract class TileEntityTransmitter extends CapabilityTileEntity impleme
         return new TransmitterModelData();
     }
 
-    protected boolean canUpgrade(AlloyTier tier) {
-        return false;
-    }
-
     @Override
     public void onAlloyInteraction(PlayerEntity player, Hand hand, ItemStack stack, @Nonnull AlloyTier tier) {
-        if (getWorld() != null && getTransmitter().hasTransmitterNetwork()) {
+        if (getLevel() != null && getTransmitter().hasTransmitterNetwork()) {
             DynamicNetwork<?, ?, ?> transmitterNetwork = getTransmitter().getTransmitterNetwork();
             List<Transmitter<?, ?, ?>> list = new ArrayList<>(transmitterNetwork.getTransmitters());
             list.sort((o1, o2) -> {
                 if (o1 != null && o2 != null) {
-                    return Double.compare(o1.getTilePos().distanceSq(pos), o2.getTilePos().distanceSq(pos));
+                    return Double.compare(o1.getTilePos().distSqr(worldPosition), o2.getTilePos().distSqr(worldPosition));
                 }
                 return 0;
             });
+            boolean sharesSet = false;
             int upgraded = 0;
             for (Transmitter<?, ?, ?> transmitter : list) {
-                //TODO: Re-evaluate
-                TileEntityTransmitter transmitterTile = transmitter.getTransmitterTile();
-                if (transmitterTile.canUpgrade(tier)) {
-                    BlockState state = transmitterTile.getBlockState();
-                    BlockState upgradeState = transmitterTile.upgradeResult(state, tier.getBaseTier());
-                    if (state == upgradeState) {
-                        //Skip if it would not actually upgrade anything
-                        continue;
-                    }
-                    transmitter.takeShare();
-                    transmitter.setTransmitterNetwork(null);
-                    TransmitterUpgradeData upgradeData = transmitterTile.getUpgradeData();
-                    if (upgradeData == null) {
-                        Mekanism.logger.warn("Got no upgrade data for transmitter at position: {} in {} but it said it would be able to provide some.",
-                              transmitter.getTilePos(), transmitter.getTileWorld());
-                    } else {
-                        transmitter.getTileWorld().setBlockState(transmitter.getTilePos(), upgradeState);
-                        TileEntityTransmitter upgradedTile = MekanismUtils.getTileEntity(TileEntityTransmitter.class, transmitter.getTileWorld(), transmitter.getTilePos());
-                        if (upgradedTile == null) {
-                            Mekanism.logger.warn("Error upgrading transmitter at position: {} in {}.", transmitter.getTilePos(), transmitter.getTileWorld());
+                if (transmitter instanceof IUpgradeableTransmitter) {
+                    IUpgradeableTransmitter<?> upgradeableTransmitter = (IUpgradeableTransmitter<?>) transmitter;
+                    if (upgradeableTransmitter.canUpgrade(tier)) {
+                        TileEntityTransmitter transmitterTile = transmitter.getTransmitterTile();
+                        BlockState state = transmitterTile.getBlockState();
+                        BlockState upgradeState = transmitterTile.upgradeResult(state, tier.getBaseTier());
+                        if (state == upgradeState) {
+                            //Skip if it would not actually upgrade anything
+                            continue;
+                        }
+                        if (!sharesSet) {
+                            if (transmitterNetwork instanceof DynamicBufferedNetwork) {
+                                //Ensure we save the shares to the tiles so that they can properly take them, and they don't get voided
+                                ((DynamicBufferedNetwork) transmitterNetwork).validateSaveShares((BufferedTransmitter<?, ?, ?, ?>) transmitter);
+                            }
+                            sharesSet = true;
+                        }
+                        transmitter.startUpgrading();
+                        TransmitterUpgradeData upgradeData = upgradeableTransmitter.getUpgradeData();
+                        BlockPos transmitterPos = transmitter.getTilePos();
+                        World transmitterWorld = transmitter.getTileWorld();
+                        if (upgradeData == null) {
+                            Mekanism.logger.warn("Got no upgrade data for transmitter at position: {} in {} but it said it would be able to provide some.",
+                                  transmitterPos, transmitterWorld);
                         } else {
-                            upgradedTile.parseUpgradeData(upgradeData);
-                            upgraded++;
-                            if (upgraded == 8) {
-                                break;
+                            transmitterWorld.setBlockAndUpdate(transmitterPos, upgradeState);
+                            TileEntityTransmitter upgradedTile = WorldUtils.getTileEntity(TileEntityTransmitter.class, transmitterWorld, transmitterPos);
+                            if (upgradedTile == null) {
+                                Mekanism.logger.warn("Error upgrading transmitter at position: {} in {}.", transmitterPos, transmitterWorld);
+                            } else {
+                                Transmitter<?, ?, ?> upgradedTransmitter = upgradedTile.getTransmitter();
+                                if (upgradedTransmitter instanceof IUpgradeableTransmitter) {
+                                    transferUpgradeData((IUpgradeableTransmitter<?>) upgradedTransmitter, upgradeData);
+                                } else {
+                                    Mekanism.logger.warn("Unhandled upgrade data.", new IllegalStateException());
+                                }
+                                upgraded++;
+                                if (upgraded == 8) {
+                                    break;
+                                }
                             }
                         }
                     }
@@ -314,11 +342,16 @@ public abstract class TileEntityTransmitter extends CapabilityTileEntity impleme
                 transmitterNetwork.invalidate(null);
                 if (!player.isCreative()) {
                     stack.shrink(1);
-                    if (stack.getCount() == 0) {
-                        player.setHeldItem(hand, ItemStack.EMPTY);
-                    }
                 }
             }
+        }
+    }
+
+    private <DATA extends TransmitterUpgradeData> void transferUpgradeData(IUpgradeableTransmitter<DATA> upgradeableTransmitter, TransmitterUpgradeData data) {
+        if (upgradeableTransmitter.dataTypeMatches(data)) {
+            upgradeableTransmitter.parseUpgradeData((DATA) data);
+        } else {
+            Mekanism.logger.warn("Unhandled upgrade data.", new IllegalStateException());
         }
     }
 
@@ -327,12 +360,30 @@ public abstract class TileEntityTransmitter extends CapabilityTileEntity impleme
         return current;
     }
 
-    @Nullable
-    protected TransmitterUpgradeData getUpgradeData() {
-        return null;
+    public void sideChanged(@Nonnull Direction side, @Nonnull ConnectionType old, @Nonnull ConnectionType type) {
     }
 
-    protected void parseUpgradeData(@Nonnull TransmitterUpgradeData upgradeData) {
-        Mekanism.logger.warn("Unhandled upgrade data.", new IllegalStateException());
+    protected InteractPredicate getExtractPredicate() {
+        return (tank, side) -> {
+            if (side == null) {
+                //Note: We return true here, but extraction isn't actually allowed and gets blocked by the read only handler
+                return true;
+            }
+            //If we have a side only allow extracting if our connection allows it
+            ConnectionType connectionType = getTransmitter().getConnectionType(side);
+            return connectionType == ConnectionType.NORMAL || connectionType == ConnectionType.PUSH;
+        };
+    }
+
+    protected InteractPredicate getInsertPredicate() {
+        return (tank, side) -> {
+            if (side == null) {
+                //Note: We return true here, but insertion isn't actually allowed and gets blocked by the read only handler
+                return true;
+            }
+            //If we have a side only allow inserting if our connection allows it
+            ConnectionType connectionType = getTransmitter().getConnectionType(side);
+            return connectionType == ConnectionType.NORMAL || connectionType == ConnectionType.PULL;
+        };
     }
 }

@@ -3,6 +3,7 @@ package mekanism.generators.common.tile.fusion;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.integration.energy.EnergyCompatUtils;
 import mekanism.common.tile.base.SubstanceType;
+import mekanism.generators.common.content.fusion.FusionReactorMultiblockData;
 import mekanism.generators.common.registries.GeneratorsBlocks;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -19,14 +20,16 @@ public class TileEntityFusionReactorController extends TileEntityFusionReactorBl
     }
 
     @Override
-    public void onUpdateServer() {
-        super.onUpdateServer();
-        setActive(getMultiblock().isFormed());
+    protected boolean onUpdateServer(FusionReactorMultiblockData multiblock) {
+        boolean needsPacket = super.onUpdateServer(multiblock);
+        setActive(multiblock.isFormed());
+        return needsPacket;
     }
 
     @Override
     protected boolean canPlaySound() {
-        return getMultiblock().isFormed() && getMultiblock().isBurning();
+        FusionReactorMultiblockData multiblock = getMultiblock();
+        return multiblock.isFormed() && multiblock.isBurning();
     }
 
     @Override
@@ -40,10 +43,5 @@ public class TileEntityFusionReactorController extends TileEntityFusionReactorBl
             return false;
         }
         return super.handles(type);
-    }
-
-    @Override
-    public boolean renderUpdate() {
-        return true;
     }
 }

@@ -3,10 +3,10 @@ package mekanism.generators.common;
 import java.util.function.Consumer;
 import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.api.chemical.gas.Gas;
-import mekanism.api.datagen.recipe.builder.ChemicalInfuserRecipeBuilder;
+import mekanism.api.datagen.recipe.builder.ChemicalChemicalToChemicalRecipeBuilder;
 import mekanism.api.datagen.recipe.builder.ElectrolysisRecipeBuilder;
 import mekanism.api.datagen.recipe.builder.GasToGasRecipeBuilder;
-import mekanism.api.datagen.recipe.builder.MetallurgicInfuserRecipeBuilder;
+import mekanism.api.datagen.recipe.builder.ItemStackChemicalToItemStackRecipeBuilder;
 import mekanism.api.datagen.recipe.builder.RotaryRecipeBuilder;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.providers.IFluidProvider;
@@ -15,10 +15,10 @@ import mekanism.api.recipes.inputs.FluidStackIngredient;
 import mekanism.api.recipes.inputs.ItemStackIngredient;
 import mekanism.api.recipes.inputs.chemical.GasStackIngredient;
 import mekanism.api.recipes.inputs.chemical.InfusionStackIngredient;
-import mekanism.common.content.gear.Modules;
 import mekanism.common.recipe.BaseRecipeProvider;
 import mekanism.common.recipe.builder.ExtendedShapedRecipeBuilder;
 import mekanism.common.recipe.builder.MekDataShapedRecipeBuilder;
+import mekanism.common.recipe.impl.MekanismRecipeProvider;
 import mekanism.common.recipe.pattern.Pattern;
 import mekanism.common.recipe.pattern.RecipePattern;
 import mekanism.common.recipe.pattern.RecipePattern.TripleLine;
@@ -32,6 +32,7 @@ import mekanism.generators.common.registries.GeneratorsBlocks;
 import mekanism.generators.common.registries.GeneratorsFluids;
 import mekanism.generators.common.registries.GeneratorsGases;
 import mekanism.generators.common.registries.GeneratorsItems;
+import net.minecraft.block.Blocks;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.fluid.Fluid;
@@ -39,6 +40,7 @@ import net.minecraft.item.Items;
 import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
 import net.minecraftforge.common.Tags;
+import net.minecraftforge.common.data.ExistingFileHelper;
 
 @ParametersAreNonnullByDefault
 public class GeneratorsRecipeProvider extends BaseRecipeProvider {
@@ -51,13 +53,12 @@ public class GeneratorsRecipeProvider extends BaseRecipeProvider {
     private static final char COPPER_CHAR = 'C';
     private static final char FURNACE_CHAR = 'F';
 
-    public GeneratorsRecipeProvider(DataGenerator gen) {
-        super(gen, MekanismGenerators.MODID);
+    public GeneratorsRecipeProvider(DataGenerator gen, ExistingFileHelper existingFileHelper) {
+        super(gen, existingFileHelper, MekanismGenerators.MODID);
     }
 
     @Override
-    protected void registerRecipes(Consumer<IFinishedRecipe> consumer) {
-        super.registerRecipes(consumer);
+    protected void addRecipes(Consumer<IFinishedRecipe> consumer) {
         addGeneratorRecipes(consumer);
         addFissionReactorRecipes(consumer);
         addFusionReactorRecipes(consumer);
@@ -73,10 +74,10 @@ public class GeneratorsRecipeProvider extends BaseRecipeProvider {
         String basePath = "separator/";
         //Heavy water
         ElectrolysisRecipeBuilder.separating(
-              FluidStackIngredient.from(MekanismTags.Fluids.HEAVY_WATER, 2),
-              GeneratorsGases.DEUTERIUM.getStack(2),
-              MekanismGases.OXYGEN.getStack(1)
-        ).energyMultiplier(FloatingLong.createConst(2))
+                    FluidStackIngredient.from(MekanismTags.Fluids.HEAVY_WATER, 2),
+                    GeneratorsGases.DEUTERIUM.getStack(2),
+                    MekanismGases.OXYGEN.getStack(1)
+              ).energyMultiplier(FloatingLong.createConst(2))
               .build(consumer, MekanismGenerators.rl(basePath + "heavy_water"));
     }
 
@@ -100,10 +101,10 @@ public class GeneratorsRecipeProvider extends BaseRecipeProvider {
     private void addChemicalInfuserRecipes(Consumer<IFinishedRecipe> consumer) {
         String basePath = "chemical_infusing/";
         //DT Fuel
-        ChemicalInfuserRecipeBuilder.chemicalInfusing(
+        ChemicalChemicalToChemicalRecipeBuilder.chemicalInfusing(
               GasStackIngredient.from(GeneratorsGases.DEUTERIUM, 1),
               GasStackIngredient.from(GeneratorsGases.TRITIUM, 1),
-              GeneratorsGases.FUSION_FUEL.getStack(1)
+              GeneratorsGases.FUSION_FUEL.getStack(2)
         ).build(consumer, MekanismGenerators.rl(basePath + "fusion_fuel"));
     }
 
@@ -182,7 +183,7 @@ public class GeneratorsRecipeProvider extends BaseRecipeProvider {
               .key(Pattern.INGOT, Tags.Items.INGOTS_IRON)
               .key(Pattern.OSMIUM, MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.OSMIUM))
               .key(COPPER_CHAR, MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.COPPER))
-              .key(FURNACE_CHAR, Items.FURNACE)
+              .key(FURNACE_CHAR, Blocks.FURNACE)
               .build(consumer, MekanismGenerators.rl("generator/heat"));
         //Wind
         MekDataShapedRecipeBuilder.shapedRecipe(GeneratorsBlocks.WIND_GENERATOR)
@@ -248,22 +249,27 @@ public class GeneratorsRecipeProvider extends BaseRecipeProvider {
     }
 
     private void addGearModuleRecipes(Consumer<IFinishedRecipe> consumer) {
+        //Geothermal Generator Unit
+        ExtendedShapedRecipeBuilder.shapedRecipe(GeneratorsItems.MODULE_GEOTHERMAL_GENERATOR)
+              .pattern(MekanismRecipeProvider.BASIC_MODULE)
+              .key(Pattern.ALLOY, MekanismTags.Items.ALLOYS_ELITE)
+              .key(Pattern.PREVIOUS, MekanismItems.MODULE_BASE)
+              .key(Pattern.CONSTANT, GeneratorsBlocks.HEAT_GENERATOR)
+              .key(Pattern.HDPE_CHAR, MekanismItems.POLONIUM_PELLET)
+              .build(consumer);
         //Solar Recharging Unit
-        ExtendedShapedRecipeBuilder.shapedRecipe(MekanismItems.MODULES.get(Modules.SOLAR_RECHARGING_UNIT))
-              .pattern(RecipePattern.createPattern(
-                    TripleLine.of(Pattern.INGOT, Pattern.CONSTANT, Pattern.INGOT),
-                    TripleLine.of(Pattern.INGOT, Pattern.ALLOY, Pattern.INGOT),
-                    TripleLine.of(Pattern.PREVIOUS, Pattern.PREVIOUS, Pattern.PREVIOUS))
-              ).key(Pattern.INGOT, MekanismTags.Items.ALLOYS_ELITE)
-              .key(Pattern.ALLOY, MekanismItems.MODULE_BASE)
+        ExtendedShapedRecipeBuilder.shapedRecipe(MekanismItems.MODULE_SOLAR_RECHARGING)
+              .pattern(MekanismRecipeProvider.BASIC_MODULE)
+              .key(Pattern.ALLOY, MekanismTags.Items.ALLOYS_ELITE)
+              .key(Pattern.PREVIOUS, MekanismItems.MODULE_BASE)
               .key(Pattern.CONSTANT, GeneratorsBlocks.ADVANCED_SOLAR_GENERATOR)
-              .key(Pattern.PREVIOUS, MekanismItems.POLONIUM_PELLET)
+              .key(Pattern.HDPE_CHAR, MekanismItems.POLONIUM_PELLET)
               .build(consumer);
     }
 
     private void addFusionReactorRecipes(Consumer<IFinishedRecipe> consumer) {
         //Hohlraum
-        MetallurgicInfuserRecipeBuilder.metallurgicInfusing(
+        ItemStackChemicalToItemStackRecipeBuilder.metallurgicInfusing(
               ItemStackIngredient.from(MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.GOLD), 4),
               InfusionStackIngredient.from(MekanismTags.InfuseTypes.CARBON, 10),
               GeneratorsItems.HOHLRAUM.getItemStack()
@@ -402,7 +408,7 @@ public class GeneratorsRecipeProvider extends BaseRecipeProvider {
                     TripleLine.of(Pattern.CONSTANT, IRON_BARS_CHAR, Pattern.CONSTANT),
                     TripleLine.of(Pattern.EMPTY, Pattern.CONSTANT, Pattern.EMPTY))
               ).key(Pattern.CONSTANT, GeneratorsBlocks.TURBINE_CASING)
-              .key(IRON_BARS_CHAR, Items.IRON_BARS)
+              .key(IRON_BARS_CHAR, Blocks.IRON_BARS)
               .build(consumer, MekanismGenerators.rl("turbine/vent"));
     }
 }

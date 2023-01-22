@@ -6,6 +6,7 @@ import mekanism.api.math.MathUtils;
 import mekanism.api.text.EnumColor;
 import mekanism.api.text.IHasTranslationKey;
 import mekanism.api.text.ILangEntry;
+import mekanism.common.integration.computer.annotation.ComputerMethod;
 import mekanism.common.inventory.container.MekanismContainer;
 import mekanism.common.inventory.container.sync.SyncableBoolean;
 import mekanism.common.inventory.container.sync.SyncableEnum;
@@ -14,6 +15,7 @@ import mekanism.common.util.NBTUtils;
 import mekanism.generators.common.GeneratorsLang;
 import mekanism.generators.common.base.IReactorLogic;
 import mekanism.generators.common.base.IReactorLogicMode;
+import mekanism.generators.common.content.fusion.FusionReactorMultiblockData;
 import mekanism.generators.common.registries.GeneratorsBlocks;
 import mekanism.generators.common.tile.fusion.TileEntityFusionReactorLogicAdapter.FusionReactorLogic;
 import net.minecraft.block.BlockState;
@@ -26,7 +28,7 @@ import net.minecraft.world.World;
 public class TileEntityFusionReactorLogicAdapter extends TileEntityFusionReactorBlock implements IReactorLogic<FusionReactorLogic>, IHasMode {
 
     public FusionReactorLogic logicType = FusionReactorLogic.DISABLED;
-    public boolean activeCooled;
+    private boolean activeCooled;
     private boolean prevOutputting;
 
     public TileEntityFusionReactorLogicAdapter() {
@@ -34,50 +36,52 @@ public class TileEntityFusionReactorLogicAdapter extends TileEntityFusionReactor
     }
 
     @Override
-    protected void onUpdateServer() {
-        super.onUpdateServer();
+    protected boolean onUpdateServer(FusionReactorMultiblockData multiblock) {
+        boolean needsPacket = super.onUpdateServer(multiblock);
         boolean outputting = checkMode();
         if (outputting != prevOutputting) {
-            World world = getWorld();
+            World world = getLevel();
             if (world != null) {
-                world.notifyNeighborsOfStateChange(getPos(), getBlockType());
+                world.updateNeighborsAt(getBlockPos(), getBlockType());
             }
+            prevOutputting = outputting;
         }
-        prevOutputting = outputting;
+        return needsPacket;
     }
 
     public boolean checkMode() {
         if (isRemote()) {
             return prevOutputting;
         }
-        if (!getMultiblock().isFormed()) {
-            return false;
+        FusionReactorMultiblockData multiblock = getMultiblock();
+        if (multiblock.isFormed()) {
+            switch (logicType) {
+                case READY:
+                    return multiblock.getLastPlasmaTemp() >= multiblock.getIgnitionTemperature(activeCooled);
+                case CAPACITY:
+                    return multiblock.getLastPlasmaTemp() >= multiblock.getMaxPlasmaTemperature(activeCooled);
+                case DEPLETED:
+                    return (multiblock.deuteriumTank.getStored() < multiblock.getInjectionRate() / 2) ||
+                           (multiblock.tritiumTank.getStored() < multiblock.getInjectionRate() / 2);
+                case DISABLED:
+                default:
+                    return false;
+            }
         }
-        switch (logicType) {
-            case READY:
-                return getMultiblock().getLastPlasmaTemp() >= getMultiblock().getIgnitionTemperature(activeCooled);
-            case CAPACITY:
-                return getMultiblock().getLastPlasmaTemp() >= getMultiblock().getMaxPlasmaTemperature(activeCooled);
-            case DEPLETED:
-                return (getMultiblock().deuteriumTank.getStored() < getMultiblock().getInjectionRate() / 2) ||
-                       (getMultiblock().tritiumTank.getStored() < getMultiblock().getInjectionRate() / 2);
-            case DISABLED:
-            default:
-                return false;
-        }
+        return false;
     }
 
     @Override
-    public void read(@Nonnull BlockState state, @Nonnull CompoundNBT nbtTags) {
-        super.read(state, nbtTags);
+    public void load(@Nonnull BlockState state, @Nonnull CompoundNBT nbtTags) {
+        super.load(state, nbtTags);
         NBTUtils.setEnumIfPresent(nbtTags, NBTConstants.LOGIC_TYPE, FusionReactorLogic::byIndexStatic, logicType -> this.logicType = logicType);
         activeCooled = nbtTags.getBoolean(NBTConstants.ACTIVE_COOLED);
     }
 
     @Nonnull
     @Override
-    public CompoundNBT write(@Nonnull CompoundNBT nbtTags) {
-        super.write(nbtTags);
+    public CompoundNBT save(@Nonnull CompoundNBT nbtTags) {
+        super.save(nbtTags);
         nbtTags.putInt(NBTConstants.LOGIC_TYPE, logicType.ordinal());
         nbtTags.putBoolean(NBTConstants.ACTIVE_COOLED, activeCooled);
         return nbtTags;
@@ -94,7 +98,13 @@ public class TileEntityFusionReactorLogicAdapter extends TileEntityFusionReactor
         markDirty(false);
     }
 
+    @ComputerMethod(nameOverride = "isActiveCooledLogic")
+    public boolean isActiveCooled() {
+        return activeCooled;
+    }
+
     @Override
+    @ComputerMethod(nameOverride = "getLogicMode")
     public FusionReactorLogic getMode() {
         return logicType;
     }
@@ -104,18 +114,30 @@ public class TileEntityFusionReactorLogicAdapter extends TileEntityFusionReactor
         return FusionReactorLogic.values();
     }
 
+    @ComputerMethod(nameOverride = "setLogicMode")
     public void setLogicTypeFromPacket(FusionReactorLogic logicType) {
-        this.logicType = logicType;
-        markDirty(false);
+        if (this.logicType != logicType) {
+            this.logicType = logicType;
+            markDirty(false);
+        }
     }
 
     @Override
     public void addContainerTrackers(MekanismContainer container) {
         super.addContainerTrackers(container);
-        container.track(SyncableEnum.create(FusionReactorLogic::byIndexStatic, FusionReactorLogic.DISABLED, () -> logicType, value -> logicType = value));
-        container.track(SyncableBoolean.create(() -> activeCooled, value -> activeCooled = value));
+        container.track(SyncableEnum.create(FusionReactorLogic::byIndexStatic, FusionReactorLogic.DISABLED, this::getMode, value -> logicType = value));
+        container.track(SyncableBoolean.create(this::isActiveCooled, value -> activeCooled = value));
         container.track(SyncableBoolean.create(() -> prevOutputting, value -> prevOutputting = value));
     }
+
+    //Methods relating to IComputerTile
+    @ComputerMethod
+    private void setActiveCooledLogic(boolean active) {
+        if (activeCooled != active) {
+            nextMode();
+        }
+    }
+    //End methods IComputerTile
 
     public enum FusionReactorLogic implements IReactorLogicMode<FusionReactorLogic>, IHasTranslationKey {
         DISABLED(GeneratorsLang.REACTOR_LOGIC_DISABLED, GeneratorsLang.DESCRIPTION_REACTOR_DISABLED, new ItemStack(Items.GUNPOWDER)),

@@ -29,6 +29,7 @@ import mekanism.common.util.ItemDataUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.StorageUtils;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
@@ -47,19 +48,19 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 public class ItemFlamethrower extends Item implements IItemHUDProvider, IModeItem, IGasItem {
 
     public ItemFlamethrower(Properties properties) {
-        super(properties.maxStackSize(1).rarity(Rarity.RARE).setNoRepair().setISTER(ISTERProvider::flamethrower));
+        super(properties.stacksTo(1).rarity(Rarity.RARE).setNoRepair().setISTER(ISTERProvider::flamethrower));
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void addInformation(@Nonnull ItemStack stack, @Nullable World world, @Nonnull List<ITextComponent> tooltip, @Nonnull ITooltipFlag flag) {
+    public void appendHoverText(@Nonnull ItemStack stack, @Nullable World world, @Nonnull List<ITextComponent> tooltip, @Nonnull ITooltipFlag flag) {
         StorageUtils.addStoredGas(stack, tooltip, true, false);
         tooltip.add(MekanismLang.MODE.translateColored(EnumColor.GRAY, getMode(stack)));
     }
 
     @Override
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
-        return slotChanged || !ItemStack.areItemsEqual(oldStack, newStack);
+        return slotChanged || !ItemStack.isSame(oldStack, newStack);
     }
 
     @Override
@@ -78,9 +79,9 @@ public class ItemFlamethrower extends Item implements IItemHUDProvider, IModeIte
     }
 
     @Override
-    public void fillItemGroup(@Nonnull ItemGroup group, @Nonnull NonNullList<ItemStack> items) {
-        super.fillItemGroup(group, items);
-        if (isInGroup(group)) {
+    public void fillItemCategory(@Nonnull ItemGroup group, @Nonnull NonNullList<ItemStack> items) {
+        super.fillItemCategory(group, items);
+        if (allowdedIn(group)) {
             items.add(ChemicalUtil.getFilledVariant(new ItemStack(this), MekanismConfig.gear.flamethrowerMaxGas.get(), MekanismGases.HYDROGEN));
         }
     }
@@ -101,13 +102,13 @@ public class ItemFlamethrower extends Item implements IItemHUDProvider, IModeIte
     }
 
     @Override
-    public void addHUDStrings(List<ITextComponent> list, ItemStack stack, EquipmentSlotType slotType) {
+    public void addHUDStrings(List<ITextComponent> list, PlayerEntity player, ItemStack stack, EquipmentSlotType slotType) {
         boolean hasGas = false;
-        Optional<IGasHandler> capability = MekanismUtils.toOptional(stack.getCapability(Capabilities.GAS_HANDLER_CAPABILITY));
+        Optional<IGasHandler> capability = stack.getCapability(Capabilities.GAS_HANDLER_CAPABILITY).resolve();
         if (capability.isPresent()) {
             IGasHandler gasHandlerItem = capability.get();
             if (gasHandlerItem.getTanks() > 0) {
-                //Validate something didn't go terribly wrong and we actually do have the tank we expect to have
+                //Validate something didn't go terribly wrong, and we actually do have the tank we expect to have
                 GasStack storedGas = gasHandlerItem.getChemicalInTank(0);
                 if (!storedGas.isEmpty()) {
                     list.add(MekanismLang.FLAMETHROWER_STORED.translateColored(EnumColor.GRAY, EnumColor.ORANGE, storedGas.getAmount()));
@@ -116,7 +117,7 @@ public class ItemFlamethrower extends Item implements IItemHUDProvider, IModeIte
             }
         }
         if (!hasGas) {
-            list.add(MekanismLang.FLAMETHROWER_STORED.translateColored(EnumColor.GRAY, EnumColor.ORANGE, MekanismLang.NO_GAS.translate()));
+            list.add(MekanismLang.FLAMETHROWER_STORED.translateColored(EnumColor.GRAY, EnumColor.ORANGE, MekanismLang.NO_GAS));
         }
         list.add(MekanismLang.MODE.translate(getMode(stack)));
     }
@@ -128,8 +129,7 @@ public class ItemFlamethrower extends Item implements IItemHUDProvider, IModeIte
         if (mode != newMode) {
             setMode(stack, newMode);
             if (displayChangeMessage) {
-                player.sendMessage(MekanismLang.LOG_FORMAT.translateColored(EnumColor.DARK_BLUE, MekanismLang.MEKANISM,
-                      MekanismLang.FLAMETHROWER_MODE_CHANGE.translateColored(EnumColor.GRAY, newMode)), Util.DUMMY_UUID);
+                player.sendMessage(MekanismUtils.logFormat(MekanismLang.FLAMETHROWER_MODE_CHANGE.translate(newMode)), Util.NIL_UUID);
             }
         }
     }
@@ -138,6 +138,21 @@ public class ItemFlamethrower extends Item implements IItemHUDProvider, IModeIte
     @Override
     public ITextComponent getScrollTextComponent(@Nonnull ItemStack stack) {
         return getMode(stack).getTextComponent();
+    }
+
+    @Override
+    public boolean isEnchantable(@Nonnull ItemStack stack) {
+        return false;
+    }
+
+    @Override
+    public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
+        return false;
+    }
+
+    @Override
+    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
+        return false;
     }
 
     public enum FlamethrowerMode implements IIncrementalEnum<FlamethrowerMode>, IHasTextComponent {

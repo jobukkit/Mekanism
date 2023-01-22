@@ -1,8 +1,8 @@
 package mekanism.common.content.qio;
 
 import com.google.common.collect.Sets;
+import it.unimi.dsi.fastutil.chars.Char2ObjectArrayMap;
 import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
-import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.chars.CharSet;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import mekanism.common.base.TagCache;
+import mekanism.common.util.MekanismUtils;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import org.apache.commons.lang3.tuple.Pair;
@@ -24,7 +25,7 @@ import org.apache.commons.lang3.tuple.Pair;
  */
 public class SearchQueryParser {
 
-    private static final ISearchQuery INVALID = (stack) -> false;
+    private static final ISearchQuery INVALID = stack -> false;
     private static final Set<Character> TERMINATORS = Sets.newHashSet('|', '(', '\"', '\'');
 
     public static ISearchQuery parse(String query) {
@@ -163,16 +164,18 @@ public class SearchQueryParser {
 
     public enum QueryType {
         // ~ is a dummy char, not actually used by parser
-        NAME('~', (key, stack) -> stack.getDisplayName().getString().toLowerCase(Locale.ROOT).contains(key.toLowerCase(Locale.ROOT))),
-        MOD_ID('@', (key, stack) -> stack.getItem().getRegistryName().getNamespace().toLowerCase(Locale.ROOT).contains(key.toLowerCase(Locale.ROOT))),
-        TOOLTIP('$', (key, stack) -> stack.getTooltip(null, ITooltipFlag.TooltipFlags.NORMAL).stream().map(t -> t.getString().toLowerCase(Locale.ROOT))
+        NAME('~', (key, stack) -> stack.getHoverName().getString().toLowerCase(Locale.ROOT).contains(key.toLowerCase(Locale.ROOT))),
+        MOD_ID('@', (key, stack) -> MekanismUtils.getModId(stack).toLowerCase(Locale.ROOT).contains(key.toLowerCase(Locale.ROOT))),
+        TOOLTIP('$', (key, stack) -> stack.getTooltipLines(null, ITooltipFlag.TooltipFlags.NORMAL).stream().map(t -> t.getString().toLowerCase(Locale.ROOT))
               .anyMatch(tooltip -> tooltip.contains(key.toLowerCase(Locale.ROOT)))),
         TAG('#', (key, stack) -> TagCache.getItemTags(stack).stream().anyMatch(itemTag -> itemTag.toLowerCase(Locale.ROOT).contains(key.toLowerCase(Locale.ROOT))));
 
-        private static final Char2ObjectMap<QueryType> charLookupMap = new Char2ObjectOpenHashMap<>();
+        private static final Char2ObjectMap<QueryType> charLookupMap;
 
         static {
-            for (QueryType type : QueryType.values()) {
+            QueryType[] values = values();
+            charLookupMap = new Char2ObjectArrayMap<>(values.length);
+            for (QueryType type : values) {
                 charLookupMap.put(type.prefix, type);
             }
         }

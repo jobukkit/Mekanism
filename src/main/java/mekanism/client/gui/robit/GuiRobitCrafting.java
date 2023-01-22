@@ -12,19 +12,20 @@ public class GuiRobitCrafting extends GuiRobit<CraftingRobitContainer> {
 
     public GuiRobitCrafting(CraftingRobitContainer container, PlayerInventory inv, ITextComponent title) {
         super(container, inv, title);
+        inventoryLabelY += 1;
         dynamicSlots = true;
     }
 
     @Override
-    public void init() {
-        super.init();
+    protected void addGuiElements() {
+        super.addGuiElements();
         addButton(new GuiRightArrow(this, 90, 35).jeiCrafting());
     }
 
     @Override
     protected void drawForegroundText(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        drawString(matrix, MekanismLang.ROBIT_CRAFTING.translate(), 8, 6, titleTextColor());
-        drawString(matrix, MekanismLang.INVENTORY.translate(), 8, getYSize() - 93, titleTextColor());
+        drawString(matrix, MekanismLang.ROBIT_CRAFTING.translate(), titleLabelX, titleLabelY, titleTextColor());
+        drawString(matrix, inventory.getDisplayName(), inventoryLabelX, inventoryLabelY, titleTextColor());
         super.drawForegroundText(matrix, mouseX, mouseY);
     }
 

@@ -26,10 +26,12 @@ public class GuiResizeControls extends GuiSideHolder {
     private static final ResourceLocation PLUS = MekanismUtils.getResource(ResourceType.GUI_BUTTON, "plus.png");
 
     public GuiResizeControls(IGuiWrapper gui, int y, Consumer<ResizeType> resizeHandler) {
-        super(gui, -26, y, 39, true);
+        super(gui, -26, y, 39, true, false);
         this.resizeHandler = resizeHandler;
-        addChild(expandButton = new MekanismImageButton(gui, this.x + 4, this.y + 5, 19, 9, 19, 9, PLUS, () -> handleResize(ResizeType.EXPAND_Y)));
-        addChild(shrinkButton = new MekanismImageButton(gui, this.x + 4, this.y + 25, 19, 9, 19, 9, MINUS, () -> handleResize(ResizeType.SHRINK_Y)));
+        expandButton = addChild(new MekanismImageButton(gui, relativeX + 4, relativeY + 5, 19, 9, 19, 9, PLUS,
+              () -> handleResize(ResizeType.EXPAND_Y)));
+        shrinkButton = addChild(new MekanismImageButton(gui, relativeX + 4, relativeY + 25, 19, 9, 19, 9, MINUS,
+              () -> handleResize(ResizeType.SHRINK_Y)));
         updateButtonState();
         active = true;
     }
@@ -51,7 +53,7 @@ public class GuiResizeControls extends GuiSideHolder {
     @Override
     public void renderForeground(MatrixStack matrix, int mouseX, int mouseY) {
         super.renderForeground(matrix, mouseX, mouseY);
-        drawScaledCenteredText(matrix, MekanismLang.HEIGHT.translate(), relativeX + 13.5F, relativeY + 15.5F, titleTextColor(), 0.7F);
+        drawScaledCenteredTextScaledBound(matrix, MekanismLang.HEIGHT.translate(), relativeX + 13.5F, relativeY + 15.5F, titleTextColor(), width - 4, 0.7F);
     }
 
     @Override
@@ -65,7 +67,7 @@ public class GuiResizeControls extends GuiSideHolder {
 
     @Override
     protected void colorTab() {
-        MekanismRenderer.color(SpecialColors.TAB_RESIZE_CONTROLS.get());
+        MekanismRenderer.color(SpecialColors.TAB_RESIZE_CONTROLS);
     }
 
     private void handleResize(ResizeType type) {

@@ -2,7 +2,7 @@ package mekanism.common.item.block;
 
 import javax.annotation.Nonnull;
 import mekanism.common.registration.impl.ItemDeferredRegister;
-import mekanism.common.util.MekanismUtils;
+import mekanism.common.util.WorldUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
@@ -30,23 +30,23 @@ public abstract class ItemBlockMultipartAble<BLOCK extends Block> extends ItemBl
      */
     @Nonnull
     @Override
-    public ActionResultType onItemUse(ItemUseContext context) {
+    public ActionResultType useOn(ItemUseContext context) {
         PlayerEntity player = context.getPlayer();
         if (player == null) {
             return ActionResultType.PASS;
         }
-        ItemStack stack = player.getHeldItem(context.getHand());
+        ItemStack stack = context.getItemInHand();
         if (stack.isEmpty()) {
             return ActionResultType.FAIL;//WTF
         }
-        World world = context.getWorld();
-        BlockPos pos = context.getPos();
-        if (!MekanismUtils.isValidReplaceableBlock(world, pos)) {
-            pos = pos.offset(context.getFace());
+        World world = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        if (!WorldUtils.isValidReplaceableBlock(world, pos)) {
+            pos = pos.relative(context.getClickedFace());
         }
-        if (player.canPlayerEdit(pos, context.getFace(), stack)) {
+        if (player.mayUseItemAt(pos, context.getClickedFace(), stack)) {
             BlockItemUseContext blockItemUseContext = new BlockItemUseContext(context);
-            BlockState state = getStateForPlacement(blockItemUseContext);
+            BlockState state = getPlacementState(blockItemUseContext);
             if (state == null) {
                 return ActionResultType.FAIL;
             }
@@ -63,7 +63,7 @@ public abstract class ItemBlockMultipartAble<BLOCK extends Block> extends ItemBl
 
     @Override
     public boolean placeBlock(@Nonnull BlockItemUseContext context, @Nonnull BlockState state) {
-        if (MekanismUtils.isValidReplaceableBlock(context.getWorld(), context.getPos())) {
+        if (WorldUtils.isValidReplaceableBlock(context.getLevel(), context.getClickedPos())) {
             return super.placeBlock(context, state);
         }
         return false;

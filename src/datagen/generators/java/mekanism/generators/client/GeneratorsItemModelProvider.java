@@ -5,7 +5,7 @@ import mekanism.generators.common.MekanismGenerators;
 import mekanism.generators.common.registries.GeneratorsFluids;
 import mekanism.generators.common.registries.GeneratorsItems;
 import net.minecraft.data.DataGenerator;
-import net.minecraftforge.client.model.generators.ExistingFileHelper;
+import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class GeneratorsItemModelProvider extends BaseItemModelProvider {
 
@@ -15,8 +15,8 @@ public class GeneratorsItemModelProvider extends BaseItemModelProvider {
 
     @Override
     protected void registerModels() {
+        registerBuckets(GeneratorsFluids.FLUIDS);
+        registerModules(GeneratorsItems.ITEMS);
         registerGenerated(GeneratorsItems.HOHLRAUM, GeneratorsItems.SOLAR_PANEL, GeneratorsItems.TURBINE_BLADE);
-        //Buckets
-        GeneratorsFluids.FLUIDS.getAllFluids().forEach(this::registerBucket);
     }
 }

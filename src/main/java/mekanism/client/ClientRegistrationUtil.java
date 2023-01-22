@@ -1,5 +1,6 @@
 package mekanism.client;
 
+import java.util.Collection;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import javax.annotation.Nonnull;
@@ -7,6 +8,8 @@ import mekanism.api.providers.IBlockProvider;
 import mekanism.api.providers.IItemProvider;
 import mekanism.client.gui.machine.GuiAdvancedElectricMachine;
 import mekanism.client.gui.machine.GuiElectricMachine;
+import mekanism.client.render.MekanismRenderer;
+import mekanism.common.block.interfaces.IColoredBlock;
 import mekanism.common.inventory.container.tile.MekanismTileContainer;
 import mekanism.common.registration.impl.ContainerTypeRegistryObject;
 import mekanism.common.registration.impl.EntityTypeRegistryObject;
@@ -15,6 +18,7 @@ import mekanism.common.registration.impl.ParticleTypeRegistryObject;
 import mekanism.common.registration.impl.TileEntityTypeRegistryObject;
 import mekanism.common.tile.prefab.TileEntityAdvancedElectricMachine;
 import mekanism.common.tile.prefab.TileEntityElectricMachine;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IHasContainer;
 import net.minecraft.client.gui.ScreenManager;
@@ -29,10 +33,13 @@ import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.color.ItemColors;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.IItemPropertyGetter;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.tileentity.TileEntity;
@@ -43,6 +50,27 @@ import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 
 public class ClientRegistrationUtil {
+
+    private static final IBlockColor COLORED_BLOCK_COLOR = (state, world, pos, tintIndex) -> {
+        Block block = state.getBlock();
+        if (block instanceof IColoredBlock) {
+            return MekanismRenderer.getColorARGB(((IColoredBlock) block).getColor(), 1);
+        }
+        return -1;
+    };
+    private static final IItemColor COLORED_BLOCK_ITEM_COLOR = (stack, tintIndex) -> {
+        Item item = stack.getItem();
+        if (item instanceof BlockItem) {
+            Block block = ((BlockItem) item).getBlock();
+            if (block instanceof IColoredBlock) {
+                return MekanismRenderer.getColorARGB(((IColoredBlock) block).getColor(), 1);
+            }
+        }
+        return -1;
+    };
+
+    private ClientRegistrationUtil() {
+    }
 
     public static <T extends Entity> void registerEntityRenderingHandler(EntityTypeRegistryObject<T> entityTypeRO, IRenderFactory<? super T> renderFactory) {
         RenderingRegistry.registerEntityRenderingHandler(entityTypeRO.getEntityType(), renderFactory);
@@ -62,12 +90,12 @@ public class ClientRegistrationUtil {
         }
     }
 
-    public static <T extends IParticleData> void registerParticleFactory(ParticleTypeRegistryObject<T> particleTypeRO, ParticleManager.IParticleMetaFactory<T> factory) {
-        Minecraft.getInstance().particles.registerFactory(particleTypeRO.getParticleType(), factory);
+    public static <T extends IParticleData> void registerParticleFactory(ParticleTypeRegistryObject<T, ?> particleTypeRO, ParticleManager.IParticleMetaFactory<T> factory) {
+        Minecraft.getInstance().particleEngine.register(particleTypeRO.getParticleType(), factory);
     }
 
     public static <C extends Container, U extends Screen & IHasContainer<C>> void registerScreen(ContainerTypeRegistryObject<C> type, IScreenFactory<C, U> factory) {
-        ScreenManager.registerFactory(type.getContainerType(), factory);
+        ScreenManager.register(type.getContainerType(), factory);
     }
 
     //Helper method to register GuiElectricMachine due to generics not being able to be resolved through registerScreen
@@ -92,8 +120,14 @@ public class ClientRegistrationUtil {
         });
     }
 
+    public static synchronized void registerKeyBindings(KeyBinding... keys) {
+        for (KeyBinding key : keys) {
+            ClientRegistry.registerKeyBinding(key);
+        }
+    }
+
     public static void setPropertyOverride(IItemProvider itemProvider, ResourceLocation override, IItemPropertyGetter propertyGetter) {
-        ItemModelsProperties.func_239418_a_(itemProvider.getItem(), override, propertyGetter);
+        ItemModelsProperties.register(itemProvider.getItem(), override, propertyGetter);
     }
 
     public static void registerItemColorHandler(ItemColors colors, IItemColor itemColor, IItemProvider... items) {
@@ -112,6 +146,16 @@ public class ClientRegistrationUtil {
         for (IBlockProvider blockProvider : blocks) {
             blockColors.register(blockColor, blockProvider.getBlock());
             itemColors.register(itemColor, blockProvider.getItem());
+        }
+    }
+
+    public static void registerIColoredBlockHandler(BlockColors blockColors, ItemColors itemColors, IBlockProvider... blocks) {
+        ClientRegistrationUtil.registerBlockColorHandler(blockColors, itemColors, COLORED_BLOCK_COLOR, COLORED_BLOCK_ITEM_COLOR, blocks);
+    }
+
+    public static void setRenderLayer(RenderType type, Collection<? extends IBlockProvider> blockProviders) {
+        for (IBlockProvider blockProvider : blockProviders) {
+            RenderTypeLookup.setRenderLayer(blockProvider.getBlock(), type);
         }
     }
 

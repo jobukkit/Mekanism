@@ -6,13 +6,12 @@ import mekanism.api.tier.AlloyTier;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.util.CapabilityUtils;
-import mekanism.common.util.MekanismUtils;
+import mekanism.common.util.WorldUtils;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.LazyOptional;
@@ -28,17 +27,16 @@ public class ItemAlloy extends Item {
 
     @Nonnull
     @Override
-    public ActionResultType onItemUse(ItemUseContext context) {
+    public ActionResultType useOn(ItemUseContext context) {
         PlayerEntity player = context.getPlayer();
         if (player != null && MekanismConfig.general.transmitterAlloyUpgrade.get()) {
-            World world = context.getWorld();
-            BlockPos pos = context.getPos();
-            TileEntity tile = MekanismUtils.getTileEntity(world, pos);
-            LazyOptional<IAlloyInteraction> capability = CapabilityUtils.getCapability(tile, Capabilities.ALLOY_INTERACTION_CAPABILITY, context.getFace());
+            World world = context.getLevel();
+            BlockPos pos = context.getClickedPos();
+            TileEntity tile = WorldUtils.getTileEntity(world, pos);
+            LazyOptional<IAlloyInteraction> capability = CapabilityUtils.getCapability(tile, Capabilities.ALLOY_INTERACTION_CAPABILITY, context.getClickedFace());
             if (capability.isPresent()) {
-                if (!world.isRemote) {
-                    Hand hand = context.getHand();
-                    MekanismUtils.toOptional(capability).get().onAlloyInteraction(player, hand, player.getHeldItem(hand), tier);
+                if (!world.isClientSide) {
+                    capability.resolve().get().onAlloyInteraction(player, context.getHand(), context.getItemInHand(), tier);
                 }
                 return ActionResultType.SUCCESS;
             }

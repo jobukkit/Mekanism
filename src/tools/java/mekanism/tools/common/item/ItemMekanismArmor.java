@@ -7,13 +7,13 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import mekanism.common.config.value.CachedIntValue;
-import mekanism.tools.client.render.GlowArmor;
-import mekanism.tools.common.IHasRepairType;
-import mekanism.tools.common.ToolsLang;
 import mekanism.common.lib.attribute.AttributeCache;
 import mekanism.common.lib.attribute.IAttributeRefresher;
+import mekanism.tools.client.render.GlowArmor;
+import mekanism.tools.common.IHasRepairType;
 import mekanism.tools.common.material.MaterialCreator;
 import mekanism.tools.common.registries.ToolsItems;
+import mekanism.tools.common.util.ToolsUtils;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
@@ -58,18 +58,19 @@ public class ItemMekanismArmor extends ArmorItem implements IHasRepairType, IAtt
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void addInformation(@Nonnull ItemStack stack, @Nullable World world, @Nonnull List<ITextComponent> tooltip, @Nonnull ITooltipFlag flag) {
-        tooltip.add(ToolsLang.HP.translate(stack.getMaxDamage() - stack.getDamage()));
+    public void appendHoverText(@Nonnull ItemStack stack, @Nullable World world, @Nonnull List<ITextComponent> tooltip, @Nonnull ITooltipFlag flag) {
+        super.appendHoverText(stack, world, tooltip, flag);
+        ToolsUtils.addDurability(tooltip, stack);
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public BipedModel getArmorModel(LivingEntity entityLiving, ItemStack itemStack, EquipmentSlotType armorSlot, BipedModel _default) {
+    public BipedModel getArmorModel(LivingEntity entityLiving, ItemStack itemStack, EquipmentSlotType armorSlot, BipedModel defaultModel) {
         if (itemStack.getItem() == ToolsItems.REFINED_GLOWSTONE_HELMET.getItem() || itemStack.getItem() == ToolsItems.REFINED_GLOWSTONE_CHESTPLATE.getItem()
             || itemStack.getItem() == ToolsItems.REFINED_GLOWSTONE_LEGGINGS.getItem() || itemStack.getItem() == ToolsItems.REFINED_GLOWSTONE_BOOTS.getItem()) {
             return GlowArmor.getGlow(armorSlot);
         }
-        return super.getArmorModel(entityLiving, itemStack, armorSlot, _default);
+        return super.getArmorModel(entityLiving, itemStack, armorSlot, defaultModel);
     }
 
     @Override
@@ -80,44 +81,44 @@ public class ItemMekanismArmor extends ArmorItem implements IHasRepairType, IAtt
     @Nonnull
     @Override
     public Ingredient getRepairMaterial() {
-        return getArmorMaterial().getRepairMaterial();
+        return getMaterial().getRepairIngredient();
     }
 
     @Override
-    public int getDamageReduceAmount() {
-        return getArmorMaterial().getDamageReductionAmount(getEquipmentSlot());
+    public int getDefense() {
+        return getMaterial().getDefenseForSlot(getSlot());
     }
 
     @Override
-    public float func_234657_f_() {
-        return getArmorMaterial().getToughness();
+    public float getToughness() {
+        return getMaterial().getToughness();
     }
 
     public float getKnockbackResistance() {
-        return getArmorMaterial().getKnockbackResistance();
+        return getMaterial().getKnockbackResistance();
     }
 
     @Override
     public int getMaxDamage(ItemStack stack) {
-        return material.getDurability(getEquipmentSlot());
+        return material.getDurabilityForSlot(getSlot());
     }
 
     @Override
-    public boolean isDamageable() {
-        return material.getDurability(getEquipmentSlot()) > 0;
+    public boolean canBeDepleted() {
+        return material.getDurabilityForSlot(getSlot()) > 0;
     }
 
     @Nonnull
     @Override
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(@Nonnull EquipmentSlotType slot, @Nonnull ItemStack stack) {
-        return slot == getEquipmentSlot() ? attributeCache.getAttributes() : ImmutableMultimap.of();
+        return slot == getSlot() ? attributeCache.getAttributes() : ImmutableMultimap.of();
     }
 
     @Override
     public void addToBuilder(ImmutableMultimap.Builder<Attribute, AttributeModifier> builder) {
-        UUID modifier = ARMOR_MODIFIERS[getEquipmentSlot().getIndex()];
-        builder.put(Attributes.ARMOR, new AttributeModifier(modifier, "Armor modifier", getDamageReduceAmount(), Operation.ADDITION));
-        builder.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(modifier, "Armor toughness", func_234657_f_(), Operation.ADDITION));
+        UUID modifier = ARMOR_MODIFIER_UUID_PER_SLOT[getSlot().getIndex()];
+        builder.put(Attributes.ARMOR, new AttributeModifier(modifier, "Armor modifier", getDefense(), Operation.ADDITION));
+        builder.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(modifier, "Armor toughness", getToughness(), Operation.ADDITION));
         builder.put(Attributes.KNOCKBACK_RESISTANCE, new AttributeModifier(modifier, "Armor knockback resistance", getKnockbackResistance(), Operation.ADDITION));
     }
 }

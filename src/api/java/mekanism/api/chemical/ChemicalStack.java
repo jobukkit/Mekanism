@@ -15,6 +15,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.registries.IRegistryDelegate;
 
+//TODO - 1.18: Make the subclasses of this final
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class ChemicalStack<CHEMICAL extends Chemical<CHEMICAL>> implements IHasTextComponent, IHasTranslationKey {
@@ -35,16 +36,27 @@ public abstract class ChemicalStack<CHEMICAL extends Chemical<CHEMICAL>> impleme
      */
     protected abstract IRegistryDelegate<CHEMICAL> getDelegate(CHEMICAL chemical);
 
+    /**
+     * Helper ot get the empty version of this chemical.
+     */
     protected abstract CHEMICAL getEmptyChemical();
 
+    /**
+     * Copies this chemical stack into a new chemical stack.
+     */
     public abstract ChemicalStack<CHEMICAL> copy();
 
+    /**
+     * Gets the chemical represented by this stack.
+     *
+     * @return Backing chemical.
+     */
     public final CHEMICAL getType() {
         return isEmpty ? getEmptyChemical() : getRaw();
     }
 
     /**
-     * Whether or not this ChemicalStack's chemical type is equal to the other defined ChemicalStack.
+     * Whether this ChemicalStack's chemical type is equal to the other defined ChemicalStack.
      *
      * @param stack - ChemicalStack to check
      *
@@ -54,6 +66,13 @@ public abstract class ChemicalStack<CHEMICAL extends Chemical<CHEMICAL>> impleme
         return isTypeEqual(stack.getType());
     }
 
+    /**
+     * Whether this ChemicalStack's chemical type is equal to the other defined Chemical.
+     *
+     * @param chemical - Chemical to check
+     *
+     * @return if the ChemicalStack's type is the same as the given chemical
+     */
     public boolean isTypeEqual(CHEMICAL chemical) {
         return getType() == chemical;
     }
@@ -78,10 +97,27 @@ public abstract class ChemicalStack<CHEMICAL extends Chemical<CHEMICAL>> impleme
         return getType().getTint();
     }
 
+    /**
+     * Helper to get the color representation of the stored chemical. This is equivalent to calling {@code getType().getColorRepresentation()} and is used for things like
+     * durability bars of chemical tanks.
+     *
+     * @return The color representation of the stored chemical.
+     *
+     * @apiNote Does not have any special handling for when the stack is empty.
+     */
+    public int getChemicalColorRepresentation() {
+        return getType().getColorRepresentation();
+    }
+
     public final CHEMICAL getRaw() {
         return chemicalDelegate.get();
     }
 
+    /**
+     * Gets whether this chemical stack is empty.
+     *
+     * @return {@code true} if this stack is empty, {@code false} otherwise.
+     */
     public boolean isEmpty() {
         return isEmpty;
     }
@@ -90,10 +126,20 @@ public abstract class ChemicalStack<CHEMICAL extends Chemical<CHEMICAL>> impleme
         isEmpty = getRaw().isEmptyType() || amount <= 0;
     }
 
+    /**
+     * Gets the size of this chemical stack.
+     *
+     * @return The size of this chemical stack or zero if it is empty
+     */
     public long getAmount() {
         return isEmpty ? 0 : amount;
     }
 
+    /**
+     * Sets this stack's amount to the given amount.
+     *
+     * @param amount The amount to set this stack's amount to.
+     */
     public void setAmount(long amount) {
         if (getRaw().isEmptyType()) {
             throw new IllegalStateException("Can't modify the empty stack.");
@@ -176,7 +222,15 @@ public abstract class ChemicalStack<CHEMICAL extends Chemical<CHEMICAL>> impleme
     }
 
     @Override
-    public abstract boolean equals(Object o);
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        } else if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChemicalStack<?> other = (ChemicalStack<?>) o;
+        return getType() == other.getType() && getAmount() == other.getAmount();
+    }
 
     @Override
     public String toString() {
@@ -220,7 +274,7 @@ public abstract class ChemicalStack<CHEMICAL extends Chemical<CHEMICAL>> impleme
      *
      * @param nbtTags - tag compound to write to
      *
-     * @return tag compound with this GasStack's data
+     * @return tag compound with this ChemicalStack's data
      */
     public CompoundNBT write(CompoundNBT nbtTags) {
         getType().write(nbtTags);
@@ -228,8 +282,13 @@ public abstract class ChemicalStack<CHEMICAL extends Chemical<CHEMICAL>> impleme
         return nbtTags;
     }
 
-    public void writeToPacket(PacketBuffer buf) {
-        buf.writeRegistryId(getType());
-        buf.writeVarLong(getAmount());
+    /**
+     * Writes this ChemicalStack to a Packet Buffer.
+     *
+     * @param buffer - Buffer to write to.
+     */
+    public void writeToPacket(PacketBuffer buffer) {
+        buffer.writeRegistryId(getType());
+        buffer.writeVarLong(getAmount());
     }
 }

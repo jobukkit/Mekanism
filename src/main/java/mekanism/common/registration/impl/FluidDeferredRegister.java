@@ -3,16 +3,25 @@ package mekanism.common.registration.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
+import javax.annotation.Nonnull;
 import mekanism.common.Mekanism;
 import mekanism.common.base.IChemicalConstant;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.block.material.Material;
+import net.minecraft.dispenser.DefaultDispenseItemBehavior;
+import net.minecraft.dispenser.IBlockSource;
+import net.minecraft.dispenser.IDispenseItemBehavior;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.FluidAttributes.Builder;
@@ -25,6 +34,21 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class FluidDeferredRegister {
 
     private static final ResourceLocation OVERLAY = new ResourceLocation("minecraft", "block/water_overlay");
+    //Copy of/based off of vanilla's lava/water bucket dispense behavior
+    private static final IDispenseItemBehavior BUCKET_DISPENSE_BEHAVIOR = new DefaultDispenseItemBehavior() {
+        @Nonnull
+        @Override
+        public ItemStack execute(@Nonnull IBlockSource source, @Nonnull ItemStack stack) {
+            World world = source.getLevel();
+            BucketItem bucket = (BucketItem) stack.getItem();
+            BlockPos pos = source.getPos().relative(source.getBlockState().getValue(DispenserBlock.FACING));
+            if (bucket.emptyBucket(null, world, pos, null)) {
+                bucket.checkExtraContent(world, stack, pos);
+                return new ItemStack(Items.BUCKET);
+            }
+            return super.execute(source, stack);
+        }
+    };
 
     private final List<FluidRegistryObject<?, ?, ?, ?>> allFluids = new ArrayList<>();
 
@@ -48,8 +72,7 @@ public class FluidDeferredRegister {
               .temperature(Math.round(constants.getTemperature()))
               .density(density)
               .viscosity(density)
-              .luminosity(constants.getLuminosity())
-              .gaseous());
+              .luminosity(constants.getLuminosity()));
     }
 
     public FluidRegistryObject<Source, Flowing, FlowingFluidBlock, BucketItem> register(String name, UnaryOperator<Builder> fluidAttributes) {
@@ -71,10 +94,10 @@ public class FluidDeferredRegister {
         fluidRegistryObject.updateStill(fluidRegister.register(name, () -> new Source(properties)));
         fluidRegistryObject.updateFlowing(fluidRegister.register(flowingName, () -> new Flowing(properties)));
         fluidRegistryObject.updateBucket(itemRegister.register(bucketName, () -> new BucketItem(fluidRegistryObject::getStillFluid,
-              ItemDeferredRegister.getMekBaseProperties().maxStackSize(1).containerItem(Items.BUCKET))));
+              ItemDeferredRegister.getMekBaseProperties().stacksTo(1).craftRemainder(Items.BUCKET))));
         //Note: The block properties used here is a copy of the ones for water
         fluidRegistryObject.updateBlock(blockRegister.register(name, () -> new FlowingFluidBlock(fluidRegistryObject::getStillFluid,
-              Block.Properties.create(Material.WATER).doesNotBlockMovement().hardnessAndResistance(100.0F).noDrops())));
+              AbstractBlock.Properties.of(Material.WATER).noCollission().strength(100.0F).noDrops())));
         allFluids.add(fluidRegistryObject);
         return fluidRegistryObject;
     }
@@ -87,5 +110,11 @@ public class FluidDeferredRegister {
 
     public List<FluidRegistryObject<?, ?, ?, ?>> getAllFluids() {
         return allFluids;
+    }
+
+    public void registerBucketDispenserBehavior() {
+        for (FluidRegistryObject<?, ?, ?, ?> fluidRO : getAllFluids()) {
+            DispenserBlock.registerBehavior(fluidRO.getBucket(), BUCKET_DISPENSE_BEHAVIOR);
+        }
     }
 }

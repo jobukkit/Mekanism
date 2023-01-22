@@ -158,19 +158,13 @@ public class Quad {
                 case COLOR:
                     vertex.color(Color.rgbad(f0, f1, f2, f3));
                     break;
-                case UV: {
-                    switch (element.getIndex()) {
-                        case 0:
-                            vertex.texRaw(f0, f1);
-                            break;
-                        case 2:
-                            vertex.lightRaw(f0, f1);
-                            break;
-                        default:
-                            break;
+                case UV:
+                    if (element.getIndex() == 0) {
+                        vertex.texRaw(f0, f1);
+                    } else if (element.getIndex() == 2) {
+                        vertex.lightRaw(f0, f1);
                     }
                     break;
-                }
                 default:
                     break;
             }
@@ -254,7 +248,7 @@ public class Quad {
 
         public Quad build() {
             Vertex[] vertices = new Vertex[4];
-            Vector3d normal = vec3.subtract(vec2).crossProduct(vec1.subtract(vec2)).normalize();
+            Vector3d normal = vec3.subtract(vec2).cross(vec1.subtract(vec2)).normalize();
             vertices[0] = Vertex.create(vec1, normal, texture, minU, minV).light(lightU, lightV);
             vertices[1] = Vertex.create(vec2, normal, texture, minU, maxV).light(lightU, lightV);
             vertices[2] = Vertex.create(vec3, normal, texture, maxU, maxV).light(lightU, lightV);

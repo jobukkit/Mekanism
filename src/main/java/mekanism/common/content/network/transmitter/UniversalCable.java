@@ -23,13 +23,16 @@ import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.lib.transmitter.acceptor.EnergyAcceptorCache;
 import mekanism.common.tier.CableTier;
 import mekanism.common.tile.transmitter.TileEntityTransmitter;
+import mekanism.common.upgrade.transmitter.TransmitterUpgradeData;
+import mekanism.common.upgrade.transmitter.UniversalCableUpgradeData;
 import mekanism.common.util.NBTUtils;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class UniversalCable extends BufferedTransmitter<IStrictEnergyHandler, EnergyNetwork, FloatingLong, UniversalCable> implements IMekanismStrictEnergyHandler {
+public class UniversalCable extends BufferedTransmitter<IStrictEnergyHandler, EnergyNetwork, FloatingLong, UniversalCable> implements IMekanismStrictEnergyHandler,
+      IUpgradeableTransmitter<UniversalCableUpgradeData> {
 
     public final CableTier tier;
 
@@ -39,7 +42,7 @@ public class UniversalCable extends BufferedTransmitter<IStrictEnergyHandler, En
 
     public UniversalCable(IBlockProvider blockProvider, TileEntityTransmitter tile) {
         super(tile, TransmissionType.ENERGY);
-        this.tier = Attribute.getTier(blockProvider.getBlock(), CableTier.class);
+        this.tier = Attribute.getTier(blockProvider, CableTier.class);
         buffer = BasicEnergyContainer.create(getCapacityAsFloatingLong(), BasicEnergyContainer.alwaysFalse, BasicEnergyContainer.alwaysTrue, this);
         energyContainers = Collections.singletonList(buffer);
     }
@@ -54,6 +57,7 @@ public class UniversalCable extends BufferedTransmitter<IStrictEnergyHandler, En
         return (EnergyAcceptorCache) super.getAcceptorCache();
     }
 
+    @Override
     public CableTier getTier() {
         return tier;
     }
@@ -94,21 +98,22 @@ public class UniversalCable extends BufferedTransmitter<IStrictEnergyHandler, En
         getTransmitterTile().markDirty(false);
     }
 
-    @Nonnull
+    @Nullable
     @Override
-    public FloatingLong insertEnergy(int container, @Nonnull FloatingLong amount, @Nullable Direction side, @Nonnull Action action) {
-        IEnergyContainer energyContainer = getEnergyContainer(container, side);
-        if (energyContainer == null) {
-            return amount;
-        } else if (side == null) {
-            return energyContainer.insert(amount, action, AutomationType.INTERNAL);
-        }
-        //If we have a side only allow inserting if our connection allows it
-        ConnectionType connectionType = getConnectionType(side);
-        if (connectionType == ConnectionType.NORMAL || connectionType == ConnectionType.PULL) {
-            return energyContainer.insert(amount, action, AutomationType.EXTERNAL);
-        }
-        return amount;
+    public UniversalCableUpgradeData getUpgradeData() {
+        return new UniversalCableUpgradeData(redstoneReactive, getConnectionTypesRaw(), buffer);
+    }
+
+    @Override
+    public boolean dataTypeMatches(@Nonnull TransmitterUpgradeData data) {
+        return data instanceof UniversalCableUpgradeData;
+    }
+
+    @Override
+    public void parseUpgradeData(@Nonnull UniversalCableUpgradeData data) {
+        redstoneReactive = data.redstoneReactive;
+        setConnectionTypesRaw(data.connectionTypes);
+        buffer.setEnergy(data.buffer.getEnergy());
     }
 
     @Override
@@ -149,11 +154,6 @@ public class UniversalCable extends BufferedTransmitter<IStrictEnergyHandler, En
     @Override
     public boolean isValidAcceptor(TileEntity tile, Direction side) {
         return super.isValidAcceptor(tile, side) && getAcceptorCache().hasStrictEnergyHandlerAndListen(tile, side);
-    }
-
-    @Override
-    public EnergyNetwork createEmptyNetwork() {
-        return new EnergyNetwork();
     }
 
     @Override

@@ -6,9 +6,13 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 import mekanism.common.config.MekanismConfig;
+import mekanism.common.content.qio.IQIOCraftingWindowHolder;
+import mekanism.common.inventory.container.item.PortableQIODashboardContainer;
 import mekanism.common.lib.chunkloading.ChunkManager;
 import mekanism.common.lib.frequency.FrequencyManager;
+import mekanism.common.lib.radiation.RadiationManager;
 import mekanism.common.world.GenHandler;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.ChunkPos;
@@ -31,13 +35,16 @@ public class CommonWorldTickHandler {
         if (chunkRegenMap == null) {
             chunkRegenMap = new Object2ObjectArrayMap<>();
         }
-        ResourceLocation dimensionName = dimension.func_240901_a_();
+        ResourceLocation dimensionName = dimension.location();
         if (!chunkRegenMap.containsKey(dimensionName)) {
             LinkedList<ChunkPos> list = new LinkedList<>();
             list.add(chunkCoord);
             chunkRegenMap.put(dimensionName, list);
-        } else if (!chunkRegenMap.get(dimensionName).contains(chunkCoord)) {
-            chunkRegenMap.get(dimensionName).add(chunkCoord);
+        } else {
+            Queue<ChunkPos> regenPositions = chunkRegenMap.get(dimensionName);
+            if (!regenPositions.contains(chunkCoord)) {
+                regenPositions.add(chunkCoord);
+            }
         }
     }
 
@@ -49,9 +56,9 @@ public class CommonWorldTickHandler {
 
     @SubscribeEvent
     public void worldLoadEvent(WorldEvent.Load event) {
-        if (!event.getWorld().isRemote()) {
+        if (!event.getWorld().isClientSide()) {
             FrequencyManager.load();
-            Mekanism.radiationManager.createOrLoad();
+            RadiationManager.INSTANCE.createOrLoad();
             if (event.getWorld() instanceof ServerWorld) {
                 ChunkManager.worldLoad((ServerWorld) event.getWorld());
             }
@@ -74,19 +81,29 @@ public class CommonWorldTickHandler {
 
     private void serverTick() {
         FrequencyManager.tick();
-        Mekanism.radiationManager.tickServer();
+        RadiationManager.INSTANCE.tickServer();
     }
 
     private void tickEnd(ServerWorld world) {
-        if (!world.isRemote) {
-            Mekanism.radiationManager.tickServerWorld(world);
-            ChunkManager.tick(world);
-            flushTagAndRecipeCaches = false;
+        if (!world.isClientSide) {
+            RadiationManager.INSTANCE.tickServerWorld(world);
+            if (flushTagAndRecipeCaches) {
+                //Loop all open containers and if it is a portable qio dashboard force refresh the window's recipes
+                for (ServerPlayerEntity player : world.players()) {
+                    if (player.containerMenu instanceof PortableQIODashboardContainer) {
+                        PortableQIODashboardContainer qioDashboard = (PortableQIODashboardContainer) player.containerMenu;
+                        for (byte index = 0; index < IQIOCraftingWindowHolder.MAX_CRAFTING_WINDOWS; index++) {
+                            qioDashboard.getCraftingWindow(index).invalidateRecipe();
+                        }
+                    }
+                }
+                flushTagAndRecipeCaches = false;
+            }
 
             if (chunkRegenMap == null || !MekanismConfig.world.enableRegeneration.get()) {
                 return;
             }
-            ResourceLocation dimensionName = world.func_234923_W_().func_240901_a_();
+            ResourceLocation dimensionName = world.dimension().location();
             //Credit to E. Beef
             if (chunkRegenMap.containsKey(dimensionName)) {
                 Queue<ChunkPos> chunksToGen = chunkRegenMap.get(dimensionName);

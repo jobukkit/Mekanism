@@ -10,15 +10,13 @@ import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalTank;
 import mekanism.api.math.MathUtils;
 import mekanism.api.text.TextComponentUtil;
-import mekanism.client.gui.GuiMekanismTile;
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.render.MekanismRenderer;
 import mekanism.common.MekanismLang;
-import mekanism.common.network.PacketDropperUse.TankType;
-import mekanism.common.tile.base.TileEntityMekanism;
-import mekanism.common.tile.component.config.DataType;
-import mekanism.common.tile.interfaces.ISideConfiguration;
+import mekanism.common.network.to_server.PacketDropperUse.TankType;
 import mekanism.common.util.ChemicalUtil;
+import mekanism.common.util.text.TextUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.text.ITextComponent;
 
@@ -50,23 +48,6 @@ public abstract class GuiChemicalGauge<CHEMICAL extends Chemical<CHEMICAL>, STAC
                 return tank == null ? -1 : tanksSupplier.get().indexOf(tank);
             }
         }, type, gui, x, y, sizeX, sizeY, tankType);
-    }
-
-    @Override
-    protected GaugeInfo getGaugeColor() {
-        if (guiObj instanceof GuiMekanismTile) {
-            TANK tank = getTank();
-            if (tank != null) {
-                TileEntityMekanism tile = ((GuiMekanismTile<?, ?>) guiObj).getContainer().getTileEntity();
-                if (tile instanceof ISideConfiguration) {
-                    DataType dataType = ((ISideConfiguration) tile).getActiveDataType(tank);
-                    if (dataType != null) {
-                        return GaugeInfo.get(dataType);
-                    }
-                }
-            }
-        }
-        return GaugeInfo.STANDARD;
     }
 
     public GuiChemicalGauge<CHEMICAL, STACK, TANK> setLabel(ITextComponent label) {
@@ -114,14 +95,10 @@ public abstract class GuiChemicalGauge<CHEMICAL extends Chemical<CHEMICAL>, STAC
         if (amount == Long.MAX_VALUE) {
             list.add(MekanismLang.GENERIC_STORED.translate(tank.getType(), MekanismLang.INFINITE));
         } else {
-            list.add(MekanismLang.GENERIC_STORED_MB.translate(tank.getType(), formatInt(amount)));
+            list.add(MekanismLang.GENERIC_STORED_MB.translate(tank.getType(), TextUtils.format(amount)));
         }
-        addAttributeTooltips(list, tank.getType());
+        ChemicalUtil.addChemicalDataToTooltip(list, tank.getType(), Minecraft.getInstance().options.advancedItemTooltips);
         return list;
-    }
-
-    protected void addAttributeTooltips(List<ITextComponent> tooltips, CHEMICAL chemical) {
-        tooltips.addAll(ChemicalUtil.getAttributeTooltips(chemical));
     }
 
     @Override
@@ -135,7 +112,7 @@ public abstract class GuiChemicalGauge<CHEMICAL extends Chemical<CHEMICAL>, STAC
 
     @Nullable
     @Override
-    public Object getIngredient() {
+    public Object getIngredient(double mouseX, double mouseY) {
         return getTank().isEmpty() ? null : getTank().getStack();
     }
 }

@@ -10,10 +10,14 @@ import net.minecraft.state.properties.BlockStateProperties;
 
 public class AdditionsBlockTypes {
 
+    private AdditionsBlockTypes() {
+    }
+
     // Glow Panel
     public static final BlockType GLOW_PANEL = BlockTypeBuilder
           .createBlock(AdditionsLang.DESCRIPTION_GLOW_PANEL)
           .withCustomShape(BlockShapes.GLOW_PANEL)
           .with(new AttributeStateFacing(BlockStateProperties.FACING, FacePlacementType.SELECTED_FACE))
+          .withLight(15)
           .build();
 }

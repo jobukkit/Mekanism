@@ -1,5 +1,6 @@
 package mekanism.common.inventory.container.slot;
 
+import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import mekanism.api.Action;
@@ -16,16 +17,19 @@ import net.minecraft.item.ItemStack;
 public class InventoryContainerSlot extends Slot implements IInsertableSlot {
 
     private static final IInventory emptyInventory = new Inventory(0);
+    private final Consumer<ItemStack> uncheckedSetter;
     private final ContainerSlotType slotType;
     private final BasicInventorySlot slot;
     @Nullable
     private final SlotOverlay slotOverlay;
 
-    public InventoryContainerSlot(BasicInventorySlot slot, int x, int y, ContainerSlotType slotType, @Nullable SlotOverlay slotOverlay) {
+    public InventoryContainerSlot(BasicInventorySlot slot, int x, int y, ContainerSlotType slotType, @Nullable SlotOverlay slotOverlay,
+          Consumer<ItemStack> uncheckedSetter) {
         super(emptyInventory, 0, x, y);
         this.slot = slot;
         this.slotType = slotType;
         this.slotOverlay = slotOverlay;
+        this.uncheckedSetter = uncheckedSetter;
     }
 
     public IInventorySlot getInventorySlot() {
@@ -37,13 +41,13 @@ public class InventoryContainerSlot extends Slot implements IInsertableSlot {
     public ItemStack insertItem(@Nonnull ItemStack stack, Action action) {
         ItemStack remainder = slot.insertItem(stack, action, AutomationType.MANUAL);
         if (action.execute() && stack.getCount() != remainder.getCount()) {
-            onSlotChanged();
+            setChanged();
         }
         return remainder;
     }
 
     @Override
-    public boolean isItemValid(@Nonnull ItemStack stack) {
+    public boolean mayPlace(@Nonnull ItemStack stack) {
         if (stack.isEmpty()) {
             return false;
         }
@@ -51,7 +55,7 @@ public class InventoryContainerSlot extends Slot implements IInsertableSlot {
             //If the slot is currently empty, just try simulating the insertion
             return insertItem(stack, Action.SIMULATE).getCount() < stack.getCount();
         }
-        //Otherwise we need to check if we can extract the current item
+        //Otherwise, we need to check if we can extract the current item
         if (slot.extractItem(1, Action.SIMULATE, AutomationType.MANUAL).isEmpty()) {
             //If we can't, fail
             return false;
@@ -62,45 +66,60 @@ public class InventoryContainerSlot extends Slot implements IInsertableSlot {
 
     @Nonnull
     @Override
-    public ItemStack getStack() {
+    public ItemStack getItem() {
         return slot.getStack();
     }
 
     @Override
-    public void putStack(@Nonnull ItemStack stack) {
-        slot.setStack(stack);
-        onSlotChanged();
+    public boolean hasItem() {
+        return !slot.isEmpty();
     }
 
     @Override
-    public void onSlotChanged() {
-        super.onSlotChanged();
+    public void set(@Nonnull ItemStack stack) {
+        //Note: We have to set the stack in an unchecked manner here, so that if we sync a stack from the server to the client that
+        // the client does not think is valid for the stack, it doesn't cause major issues. Additionally, we do this directly in
+        // our putStack method rather than having a separate unchecked method, as if some modder is modifying inventories directly
+        // for some reason, and the machine has invalid items in it, it could cause various issues/crashes which are not entirely
+        // worth dealing with, as it is relatively reasonable to assume if an item is stored in a slot, more items of that type
+        // are valid in the same slot without having to check isItemValid.
+        uncheckedSetter.accept(stack);
+        setChanged();
+    }
+
+    @Override
+    public void setChanged() {
+        super.setChanged();
         slot.onContentsChanged();
     }
 
     @Override
-    public void onSlotChange(@Nonnull ItemStack current, @Nonnull ItemStack newStack) {
-        slot.onContentsChanged();
+    public void onQuickCraft(@Nonnull ItemStack current, @Nonnull ItemStack newStack) {
+        int change = newStack.getCount() - current.getCount();
+        if (change > 0) {
+            slot.onContentsChanged();
+            onQuickCraft(newStack, change);
+        }
     }
 
     @Override
-    public int getSlotStackLimit() {
+    public int getMaxStackSize() {
         return slot.getLimit(ItemStack.EMPTY);
     }
 
     @Override
-    public int getItemStackLimit(@Nonnull ItemStack stack) {
+    public int getMaxStackSize(@Nonnull ItemStack stack) {
         return slot.getLimit(stack);
     }
 
     @Override
-    public boolean canTakeStack(@Nonnull PlayerEntity player) {
+    public boolean mayPickup(@Nonnull PlayerEntity player) {
         return !slot.extractItem(1, Action.SIMULATE, AutomationType.MANUAL).isEmpty();
     }
 
     @Nonnull
     @Override
-    public ItemStack decrStackSize(int amount) {
+    public ItemStack remove(int amount) {
         return slot.extractItem(amount, Action.EXECUTE, AutomationType.MANUAL);
     }
 

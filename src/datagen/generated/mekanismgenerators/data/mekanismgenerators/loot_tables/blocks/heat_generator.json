@@ -2,6 +2,7 @@
   "type": "minecraft:block",
   "pools": [
     {
+      "name": "main",
       "rolls": 1,
       "entries": [
         {
@@ -19,6 +20,11 @@
                 {
                   "source": "componentSecurity.securityMode",
                   "target": "mekData.securityMode",
+                  "op": "replace"
+                },
+                {
+                  "source": "componentUpgrade",
+                  "target": "mekData.componentUpgrade",
                   "op": "replace"
                 },
                 {
@@ -50,11 +56,6 @@
             }
           ],
           "name": "mekanismgenerators:heat_generator"
-        }
-      ],
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
         }
       ]
     }

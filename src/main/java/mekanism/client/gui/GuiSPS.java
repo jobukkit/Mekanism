@@ -10,6 +10,7 @@ import mekanism.client.gui.element.bar.GuiDynamicHorizontalRateBar;
 import mekanism.client.gui.element.gauge.GaugeType;
 import mekanism.client.gui.element.gauge.GuiGasGauge;
 import mekanism.common.MekanismLang;
+import mekanism.common.content.sps.SPSMultiblockData;
 import mekanism.common.inventory.container.tile.MekanismTileContainer;
 import mekanism.common.lib.Color;
 import mekanism.common.lib.Color.ColorFunction;
@@ -25,21 +26,23 @@ public class GuiSPS extends GuiMekanismTile<TileEntitySPSCasing, MekanismTileCon
     public GuiSPS(MekanismTileContainer<TileEntitySPSCasing> container, PlayerInventory inv, ITextComponent title) {
         super(container, inv, title);
         dynamicSlots = true;
-        ySize += 16;
+        imageHeight += 16;
+        inventoryLabelY = imageHeight - 92;
     }
 
     @Override
-    public void init() {
-        super.init();
+    protected void addGuiElements() {
+        super.addGuiElements();
         addButton(new GuiGasGauge(() -> tile.getMultiblock().inputTank, () -> tile.getMultiblock().getGasTanks(null), GaugeType.STANDARD, this, 7, 17));
         addButton(new GuiGasGauge(() -> tile.getMultiblock().outputTank, () -> tile.getMultiblock().getGasTanks(null), GaugeType.STANDARD, this, 151, 17));
         addButton(new GuiInnerScreen(this, 27, 17, 122, 60, () -> {
             List<ITextComponent> list = new ArrayList<>();
-            boolean active = tile.getMultiblock().lastProcessed > 0;
-            list.add(MekanismLang.STATUS.translate(active ? MekanismLang.ACTIVE.translate() : MekanismLang.IDLE.translate()));
+            SPSMultiblockData multiblock = tile.getMultiblock();
+            boolean active = multiblock.lastProcessed > 0;
+            list.add(MekanismLang.STATUS.translate(active ? MekanismLang.ACTIVE : MekanismLang.IDLE));
             if (active) {
-                list.add(MekanismLang.SPS_ENERGY_INPUT.translate(EnergyDisplay.of(tile.getMultiblock().lastReceivedEnergy)));
-                list.add(MekanismLang.PROCESS_RATE_MB.translate(tile.getMultiblock().getProcessRate()));
+                list.add(MekanismLang.SPS_ENERGY_INPUT.translate(EnergyDisplay.of(multiblock.lastReceivedEnergy)));
+                list.add(MekanismLang.PROCESS_RATE_MB.translate(multiblock.getProcessRate()));
             }
             return list;
         }).jeiCategories(MekanismBlocks.SPS_CASING.getRegistryName()));
@@ -51,15 +54,15 @@ public class GuiSPS extends GuiMekanismTile<TileEntitySPSCasing, MekanismTileCon
 
             @Override
             public double getLevel() {
-                return tile.getMultiblock().getScaledProgress();
+                return Math.min(1, tile.getMultiblock().getScaledProgress());
             }
-        }, 7, 79, xSize - 16, ColorFunction.scale(Color.rgbi(60, 45, 74), Color.rgbi(100, 30, 170))));
+        }, 7, 79, 160, ColorFunction.scale(Color.rgbi(60, 45, 74), Color.rgbi(100, 30, 170))));
     }
 
     @Override
     protected void drawForegroundText(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        drawTitleText(matrix, MekanismLang.SPS.translate(), 6);
-        drawString(matrix, MekanismLang.INVENTORY.translate(), 8, (getYSize() - 96) + 4, titleTextColor());
+        drawTitleText(matrix, MekanismLang.SPS.translate(), titleLabelY);
+        drawString(matrix, inventory.getDisplayName(), inventoryLabelX, inventoryLabelY, titleTextColor());
         super.drawForegroundText(matrix, mouseX, mouseY);
     }
 }

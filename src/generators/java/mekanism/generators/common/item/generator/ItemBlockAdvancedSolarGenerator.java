@@ -3,7 +3,7 @@ package mekanism.generators.common.item.generator;
 import javax.annotation.Nonnull;
 import mekanism.common.block.prefab.BlockTile;
 import mekanism.common.item.block.machine.ItemBlockMachine;
-import mekanism.common.util.MekanismUtils;
+import mekanism.common.util.WorldUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.util.math.BlockPos;
@@ -17,15 +17,15 @@ public class ItemBlockAdvancedSolarGenerator extends ItemBlockMachine {
 
     @Override
     public boolean placeBlock(@Nonnull BlockItemUseContext context, @Nonnull BlockState state) {
-        World world = context.getWorld();
-        BlockPos pos = context.getPos();
-        if (!MekanismUtils.isValidReplaceableBlock(world, pos.up())) {
+        World world = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        if (!WorldUtils.isValidReplaceableBlock(world, pos.above())) {
             return false;
         }
         for (int xPos = -1; xPos <= 1; xPos++) {
             for (int zPos = -1; zPos <= 1; zPos++) {
-                BlockPos toCheck = pos.add(xPos, 2, zPos);
-                if (!MekanismUtils.isValidReplaceableBlock(world, toCheck)) {
+                BlockPos toCheck = pos.offset(xPos, 2, zPos);
+                if (!WorldUtils.isValidReplaceableBlock(world, toCheck)) {
                     //If there is not enough room, fail
                     return false;
                 }

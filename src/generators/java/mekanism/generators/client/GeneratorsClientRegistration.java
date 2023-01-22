@@ -35,6 +35,7 @@ import mekanism.generators.common.registries.GeneratorsTileEntityTypes;
 import mekanism.generators.common.tile.TileEntityAdvancedSolarGenerator;
 import mekanism.generators.common.tile.TileEntitySolarGenerator;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.util.math.vector.Vector3d;
@@ -49,6 +50,9 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 @Mod.EventBusSubscriber(modid = MekanismGenerators.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class GeneratorsClientRegistration {
 
+    private GeneratorsClientRegistration() {
+    }
+
     @SubscribeEvent
     public static void init(FMLClientSetupEvent event) {
         ClientRegistrationUtil.bindTileEntityRenderer(GeneratorsTileEntityTypes.BIO_GENERATOR, RenderBioGenerator::new);
@@ -61,13 +65,14 @@ public class GeneratorsClientRegistration {
         ClientRegistrationUtil.bindTileEntityRenderer(GeneratorsTileEntityTypes.TURBINE_VALVE, RenderIndustrialTurbine::new);
         ClientRegistrationUtil.bindTileEntityRenderer(GeneratorsTileEntityTypes.TURBINE_VENT, RenderIndustrialTurbine::new);
         ClientRegistrationUtil.bindTileEntityRenderer(GeneratorsTileEntityTypes.WIND_GENERATOR, RenderWindGenerator::new);
+
         //Block render layers
-        ClientRegistrationUtil.setRenderLayer(RenderType.getTranslucent(), GeneratorsBlocks.LASER_FOCUS_MATRIX, GeneratorsBlocks.REACTOR_GLASS);
-        ClientRegistrationUtil.setRenderLayer(renderType -> renderType == RenderType.getSolid() || renderType == RenderType.getTranslucent(),
+        ClientRegistrationUtil.setRenderLayer(RenderType.translucent(), GeneratorsBlocks.LASER_FOCUS_MATRIX, GeneratorsBlocks.REACTOR_GLASS);
+        ClientRegistrationUtil.setRenderLayer(renderType -> renderType == RenderType.solid() || renderType == RenderType.translucent(),
               GeneratorsBlocks.BIO_GENERATOR, GeneratorsBlocks.HEAT_GENERATOR);
         //Fluids (translucent)
         for (FluidRegistryObject<?, ?, ?, ?> fluidRO : GeneratorsFluids.FLUIDS.getAllFluids()) {
-            ClientRegistrationUtil.setRenderLayer(RenderType.getTranslucent(), fluidRO);
+            ClientRegistrationUtil.setRenderLayer(RenderType.translucent(), fluidRO);
         }
 
         // adv solar gen requires to be translated up 1 block, so handle the model separately
@@ -99,6 +104,11 @@ public class GeneratorsClientRegistration {
 
     @SubscribeEvent
     public static void onStitch(TextureStitchEvent.Pre event) {
+        if (!event.getMap().location().equals(AtlasTexture.LOCATION_BLOCKS)) {
+            return;
+        }
         RenderBioGenerator.resetCachedModels();
+        RenderFissionReactor.resetCachedModels();
+        GeneratorsSpecialColors.GUI_OBJECTS.parse(MekanismGenerators.rl("textures/colormap/gui_objects.png"));
     }
 }

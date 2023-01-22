@@ -34,26 +34,26 @@ public class ItemArmoredJetpack extends ItemJetpack implements IAttributeRefresh
     }
 
     @Override
-    public int getDamageReduceAmount() {
-        return getArmorMaterial().getDamageReductionAmount(getEquipmentSlot());
+    public int getDefense() {
+        return getMaterial().getDefenseForSlot(getSlot());
     }
 
     @Override
-    public float func_234657_f_() {
-        return getArmorMaterial().getToughness();
+    public float getToughness() {
+        return getMaterial().getToughness();
     }
 
     @Nonnull
     @Override
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(@Nonnull EquipmentSlotType slot, @Nonnull ItemStack stack) {
-        return slot == getEquipmentSlot() ? attributeCache.getAttributes() : ImmutableMultimap.of();
+        return slot == getSlot() ? attributeCache.getAttributes() : ImmutableMultimap.of();
     }
 
     @Override
     public void addToBuilder(ImmutableMultimap.Builder<Attribute, AttributeModifier> builder) {
-        UUID modifier = ARMOR_MODIFIERS[getEquipmentSlot().getIndex()];
-        builder.put(Attributes.ARMOR, new AttributeModifier(modifier, "Armor modifier", getDamageReduceAmount(), Operation.ADDITION));
-        builder.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(modifier, "Armor toughness", func_234657_f_(), Operation.ADDITION));
+        UUID modifier = ARMOR_MODIFIER_UUID_PER_SLOT[getSlot().getIndex()];
+        builder.put(Attributes.ARMOR, new AttributeModifier(modifier, "Armor modifier", getDefense(), Operation.ADDITION));
+        builder.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(modifier, "Armor toughness", getToughness(), Operation.ADDITION));
     }
 
     @Nonnull
@@ -68,7 +68,7 @@ public class ItemArmoredJetpack extends ItemJetpack implements IAttributeRefresh
     private static class ArmoredJetpackMaterial extends JetpackMaterial {
 
         @Override
-        public int getDamageReductionAmount(EquipmentSlotType slotType) {
+        public int getDefenseForSlot(EquipmentSlotType slotType) {
             return slotType == EquipmentSlotType.CHEST ? MekanismConfig.gear.armoredJetpackArmor.get() : 0;
         }
 

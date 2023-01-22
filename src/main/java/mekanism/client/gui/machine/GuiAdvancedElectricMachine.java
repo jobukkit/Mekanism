@@ -8,10 +8,6 @@ import mekanism.client.gui.element.bar.GuiVerticalPowerBar;
 import mekanism.client.gui.element.progress.GuiProgress;
 import mekanism.client.gui.element.progress.ProgressType;
 import mekanism.client.gui.element.tab.GuiEnergyTab;
-import mekanism.client.gui.element.tab.GuiRedstoneControlTab;
-import mekanism.client.gui.element.tab.GuiSecurityTab;
-import mekanism.client.gui.element.tab.GuiUpgradeTab;
-import mekanism.common.MekanismLang;
 import mekanism.common.inventory.container.tile.MekanismTileContainer;
 import mekanism.common.tile.prefab.TileEntityAdvancedElectricMachine;
 import net.minecraft.entity.player.PlayerInventory;
@@ -26,13 +22,10 @@ public class GuiAdvancedElectricMachine<TILE extends TileEntityAdvancedElectricM
     }
 
     @Override
-    public void init() {
-        super.init();
-        addButton(new GuiRedstoneControlTab(this, tile));
-        addButton(new GuiUpgradeTab(this, tile));
-        addButton(new GuiSecurityTab<>(this, tile));
+    protected void addGuiElements() {
+        super.addGuiElements();
         addButton(new GuiVerticalPowerBar(this, tile.getEnergyContainer(), 164, 15));
-        addButton(new GuiEnergyTab(tile.getEnergyContainer(), this));
+        addButton(new GuiEnergyTab(this, tile.getEnergyContainer(), tile::getActive));
         addButton(new GuiProgress(tile::getScaledProgress, ProgressType.BAR, this, 86, 38).jeiCategory(tile));
         addButton(new GuiChemicalBar<>(this, GuiChemicalBar.getProvider(tile.gasTank, tile.getGasTanks(null)), 68, 36, 6, 12, false));
     }
@@ -40,7 +33,7 @@ public class GuiAdvancedElectricMachine<TILE extends TileEntityAdvancedElectricM
     @Override
     protected void drawForegroundText(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
         renderTitleText(matrix);
-        drawString(matrix, MekanismLang.INVENTORY.translate(), 8, (getYSize() - 96) + 2, titleTextColor());
+        drawString(matrix, inventory.getDisplayName(), inventoryLabelX, inventoryLabelY, titleTextColor());
         super.drawForegroundText(matrix, mouseX, mouseY);
     }
 }

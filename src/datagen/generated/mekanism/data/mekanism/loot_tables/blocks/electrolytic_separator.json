@@ -2,6 +2,7 @@
   "type": "minecraft:block",
   "pools": [
     {
+      "name": "main",
       "rolls": 1,
       "entries": [
         {
@@ -37,6 +38,16 @@
                   "op": "replace"
                 },
                 {
+                  "source": "dumpLeft",
+                  "target": "mekData.dumpLeft",
+                  "op": "replace"
+                },
+                {
+                  "source": "dumpRight",
+                  "target": "mekData.dumpRight",
+                  "op": "replace"
+                },
+                {
                   "source": "controlType",
                   "target": "mekData.controlType",
                   "op": "replace"
@@ -65,11 +76,6 @@
             }
           ],
           "name": "mekanism:electrolytic_separator"
-        }
-      ],
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
         }
       ]
     }

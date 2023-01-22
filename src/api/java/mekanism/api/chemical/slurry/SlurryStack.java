@@ -15,6 +15,9 @@ import net.minecraftforge.registries.IRegistryDelegate;
 @MethodsReturnNonnullByDefault
 public class SlurryStack extends ChemicalStack<Slurry> {
 
+    /**
+     * Empty SlurryStack instance.
+     */
     public static final SlurryStack EMPTY = new SlurryStack(MekanismAPI.EMPTY_SLURRY, 0);
 
     /**
@@ -84,16 +87,9 @@ public class SlurryStack extends ChemicalStack<Slurry> {
      */
     @Override
     public SlurryStack copy() {
+        if (isEmpty()) {
+            return EMPTY;
+        }
         return new SlurryStack(this, getAmount());
-    }
-
-    /**
-     * Default equality comparison for a SlurryStack. Same functionality as isTypeEqual().
-     *
-     * This is included for use in data structures.
-     */
-    @Override
-    public final boolean equals(Object o) {
-        return o instanceof SlurryStack && isTypeEqual((SlurryStack) o);
     }
 }

@@ -9,7 +9,7 @@ import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.gas.IGasHandler;
 import mekanism.api.chemical.gas.IGasHandler.IMekanismGasHandler;
 import mekanism.api.chemical.gas.IGasTank;
-import mekanism.api.inventory.AutomationType;
+import mekanism.common.MekanismLang;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.ItemCapabilityWrapper;
 import mekanism.common.capabilities.chemical.item.RateLimitGasHandler;
@@ -17,7 +17,6 @@ import mekanism.common.config.MekanismConfig;
 import mekanism.common.item.interfaces.IGasItem;
 import mekanism.common.registries.MekanismGases;
 import mekanism.common.util.ChemicalUtil;
-import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.StorageUtils;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
@@ -39,16 +38,14 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 public class ItemCanteen extends Item implements IGasItem {
 
-    private static final long TRANSFER_RATE = 128;
-
     public ItemCanteen(Properties properties) {
-        super(properties.rarity(Rarity.UNCOMMON).maxStackSize(1).setNoRepair());
+        super(properties.rarity(Rarity.UNCOMMON).stacksTo(1).setNoRepair());
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void addInformation(@Nonnull ItemStack stack, @Nullable World world, @Nonnull List<ITextComponent> tooltip, @Nonnull ITooltipFlag flag) {
-        StorageUtils.addStoredGas(stack, tooltip, true, false);
+    public void appendHoverText(@Nonnull ItemStack stack, @Nullable World world, @Nonnull List<ITextComponent> tooltip, @Nonnull ITooltipFlag flag) {
+        StorageUtils.addStoredGas(stack, tooltip, true, false, MekanismLang.EMPTY);
     }
 
     @Override
@@ -67,21 +64,21 @@ public class ItemCanteen extends Item implements IGasItem {
     }
 
     @Override
-    public void fillItemGroup(@Nonnull ItemGroup group, @Nonnull NonNullList<ItemStack> items) {
-        super.fillItemGroup(group, items);
-        if (isInGroup(group)) {
+    public void fillItemCategory(@Nonnull ItemGroup group, @Nonnull NonNullList<ItemStack> items) {
+        super.fillItemCategory(group, items);
+        if (allowdedIn(group)) {
             items.add(ChemicalUtil.getFilledVariant(new ItemStack(this), MekanismConfig.gear.canteenMaxStorage.get(), MekanismGases.NUTRITIONAL_PASTE));
         }
     }
 
     @Nonnull
     @Override
-    public ItemStack onItemUseFinish(@Nonnull ItemStack stack, @Nonnull World world, @Nonnull LivingEntity entityLiving) {
-        if (!world.isRemote && entityLiving instanceof PlayerEntity) {
+    public ItemStack finishUsingItem(@Nonnull ItemStack stack, @Nonnull World world, @Nonnull LivingEntity entityLiving) {
+        if (!world.isClientSide && entityLiving instanceof PlayerEntity) {
             PlayerEntity player = (PlayerEntity) entityLiving;
-            long needed = Math.min(20 - player.getFoodStats().getFoodLevel(), getGas(stack).getAmount() / MekanismConfig.general.nutritionalPasteMBPerFood.get());
+            long needed = Math.min(20 - player.getFoodData().getFoodLevel(), getGas(stack).getAmount() / MekanismConfig.general.nutritionalPasteMBPerFood.get());
             if (needed > 0) {
-                player.getFoodStats().addStats((int) needed, MekanismConfig.general.nutritionalPasteSaturation.get());
+                player.getFoodData().eat((int) needed, MekanismConfig.general.nutritionalPasteSaturation.get());
                 useGas(stack, needed * MekanismConfig.general.nutritionalPasteMBPerFood.get());
             }
         }
@@ -95,19 +92,18 @@ public class ItemCanteen extends Item implements IGasItem {
 
     @Nonnull
     @Override
-    public UseAction getUseAction(@Nonnull ItemStack stack) {
+    public UseAction getUseAnimation(@Nonnull ItemStack stack) {
         return UseAction.DRINK;
     }
 
     @Override
     public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT nbt) {
-        return new ItemCapabilityWrapper(stack, RateLimitGasHandler.create(() -> TRANSFER_RATE, MekanismConfig.gear.canteenMaxStorage,
-              (item, automationType) -> automationType != AutomationType.EXTERNAL, ChemicalTankBuilder.GAS.alwaysTrueBi,
-              gas -> gas == MekanismGases.NUTRITIONAL_PASTE.getChemical()));
+        return new ItemCapabilityWrapper(stack, RateLimitGasHandler.create(MekanismConfig.gear.canteenTransferRate, MekanismConfig.gear.canteenMaxStorage,
+              ChemicalTankBuilder.GAS.alwaysTrueBi, ChemicalTankBuilder.GAS.alwaysTrueBi, gas -> gas == MekanismGases.NUTRITIONAL_PASTE.getChemical()));
     }
 
     private GasStack getGas(ItemStack stack) {
-        Optional<IGasHandler> capability = MekanismUtils.toOptional(stack.getCapability(Capabilities.GAS_HANDLER_CAPABILITY));
+        Optional<IGasHandler> capability = stack.getCapability(Capabilities.GAS_HANDLER_CAPABILITY).resolve();
         if (capability.isPresent()) {
             IGasHandler gasHandlerItem = capability.get();
             if (gasHandlerItem instanceof IMekanismGasHandler) {
@@ -123,10 +119,10 @@ public class ItemCanteen extends Item implements IGasItem {
 
     @Nonnull
     @Override
-    public ActionResult<ItemStack> onItemRightClick(@Nonnull World worldIn, PlayerEntity playerIn, @Nonnull Hand handIn) {
-        if (!playerIn.isCreative() && playerIn.canEat(false) && getGas(playerIn.getHeldItem(handIn)).getAmount() >= 50) {
-            playerIn.setActiveHand(handIn);
+    public ActionResult<ItemStack> use(@Nonnull World worldIn, PlayerEntity playerIn, @Nonnull Hand handIn) {
+        if (!playerIn.isCreative() && playerIn.canEat(false) && getGas(playerIn.getItemInHand(handIn)).getAmount() >= 50) {
+            playerIn.startUsingItem(handIn);
         }
-        return ActionResult.resultSuccess(playerIn.getHeldItem(handIn));
+        return ActionResult.success(playerIn.getItemInHand(handIn));
     }
 }

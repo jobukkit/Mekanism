@@ -2,6 +2,7 @@
   "type": "minecraft:block",
   "pools": [
     {
+      "name": "main",
       "rolls": 1,
       "entries": [
         {
@@ -11,6 +12,11 @@
               "function": "minecraft:copy_nbt",
               "source": "block_entity",
               "ops": [
+                {
+                  "source": "componentFrequency",
+                  "target": "mekData.componentFrequency",
+                  "op": "replace"
+                },
                 {
                   "source": "componentSecurity.owner",
                   "target": "mekData.owner",
@@ -34,16 +40,6 @@
                 {
                   "source": "componentEjector",
                   "target": "mekData.componentEjector",
-                  "op": "replace"
-                },
-                {
-                  "source": "frequency.name",
-                  "target": "mekData.frequency.name",
-                  "op": "replace"
-                },
-                {
-                  "source": "frequency.publicFreq",
-                  "target": "mekData.frequency.publicFreq",
                   "op": "replace"
                 }
               ]

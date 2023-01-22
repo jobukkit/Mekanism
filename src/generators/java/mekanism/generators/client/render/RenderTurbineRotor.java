@@ -4,11 +4,11 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.client.render.tileentity.MekanismTileEntityRenderer;
-import mekanism.common.Mekanism;
 import mekanism.generators.client.model.ModelTurbine;
 import mekanism.generators.common.GeneratorsProfilerConstants;
 import mekanism.generators.common.content.turbine.TurbineMultiblockData;
 import mekanism.generators.common.tile.turbine.TileEntityTurbineRotor;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.profiler.IProfiler;
@@ -39,7 +39,7 @@ public class RenderTurbineRotor extends MekanismTileEntityRenderer<TileEntityTur
             return;
         }
         int baseIndex = tile.getPosition() * 2;
-        if (!Mekanism.proxy.isPaused()) {
+        if (!Minecraft.getInstance().isPaused()) {
             if (tile.getMultiblock() != null && TurbineMultiblockData.clientRotationMap.containsKey(tile.getMultiblock())) {
                 float rotateSpeed = TurbineMultiblockData.clientRotationMap.getFloat(tile.getMultiblock()) * BASE_SPEED;
                 tile.rotationLower = (tile.rotationLower + rotateSpeed * (1F / (baseIndex + 1))) % 360;
@@ -50,18 +50,18 @@ public class RenderTurbineRotor extends MekanismTileEntityRenderer<TileEntityTur
             }
         }
         //Bottom blade
-        matrix.push();
+        matrix.pushPose();
         matrix.translate(0.5, -1, 0.5);
-        matrix.rotate(Vector3f.YP.rotationDegrees(tile.rotationLower));
+        matrix.mulPose(Vector3f.YP.rotationDegrees(tile.rotationLower));
         model.render(matrix, buffer, light, overlayLight, baseIndex);
-        matrix.pop();
+        matrix.popPose();
         //Top blade
         if (housedBlades == 2) {
-            matrix.push();
+            matrix.pushPose();
             matrix.translate(0.5, -0.5, 0.5);
-            matrix.rotate(Vector3f.YP.rotationDegrees(tile.rotationUpper));
+            matrix.mulPose(Vector3f.YP.rotationDegrees(tile.rotationUpper));
             model.render(matrix, buffer, light, overlayLight, baseIndex + 1);
-            matrix.pop();
+            matrix.popPose();
         }
     }
 
@@ -71,7 +71,7 @@ public class RenderTurbineRotor extends MekanismTileEntityRenderer<TileEntityTur
     }
 
     @Override
-    public boolean isGlobalRenderer(TileEntityTurbineRotor tile) {
+    public boolean shouldRenderOffScreen(TileEntityTurbineRotor tile) {
         return tile.getMultiblock() == null && tile.getHousedBlades() > 0;
     }
 }

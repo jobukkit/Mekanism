@@ -15,21 +15,21 @@ import net.minecraft.state.Property;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.text.ITextComponent;
 
-public class AttributeStateBoilerValveMode extends AttributeState {
+public class AttributeStateBoilerValveMode implements AttributeState {
 
     public static final EnumProperty<BoilerValveMode> modeProperty = EnumProperty.create("mode", BoilerValveMode.class);
 
     @Override
     public BlockState copyStateData(BlockState oldState, BlockState newState) {
-        if (Attribute.has(newState.getBlock(), AttributeStateBoilerValveMode.class)) {
-            newState = newState.with(modeProperty, oldState.get(modeProperty));
+        if (Attribute.has(newState, AttributeStateBoilerValveMode.class)) {
+            newState = newState.setValue(modeProperty, oldState.getValue(modeProperty));
         }
         return newState;
     }
 
     @Override
     public BlockState getDefaultState(@Nonnull BlockState state) {
-        return state.with(modeProperty, BoilerValveMode.INPUT);
+        return state.setValue(modeProperty, BoilerValveMode.INPUT);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class AttributeStateBoilerValveMode extends AttributeState {
 
         @Nonnull
         @Override
-        public String getString() {
+        public String getSerializedName() {
             return name;
         }
 

@@ -4,6 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import mekanism.client.gui.GuiUtils;
+import mekanism.client.gui.GuiUtils.TilingDirection;
 import mekanism.client.render.MekanismRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
@@ -32,7 +33,8 @@ public abstract class LookingAtElement {
             int scale = getScaledLevel(width - 2);
             if (scale > 0) {
                 boolean colored = applyRenderColor();
-                GuiUtils.drawTiledSprite(matrix, x + 1, y + 1, height - 2, scale, height - 2, icon, 16, 16, 0);
+                GuiUtils.drawTiledSprite(matrix, x + 1, y + 1, height - 2, scale, height - 2, icon,
+                      16, 16, 0, TilingDirection.DOWN_RIGHT);
                 if (colored) {
                     MekanismRenderer.resetColor();
                 }
@@ -61,17 +63,17 @@ public abstract class LookingAtElement {
     }
 
     public static void renderScaledText(Minecraft mc, @Nonnull MatrixStack matrix, int x, int y, int color, int maxWidth, ITextComponent component) {
-        int length = mc.fontRenderer.func_238414_a_(component);
+        int length = mc.font.width(component);
         if (length <= maxWidth) {
-            mc.fontRenderer.func_238422_b_(matrix, component, x, y, color);
+            mc.font.draw(matrix, component, x, y, color);
         } else {
             float scale = (float) maxWidth / length;
             float reverse = 1 / scale;
             float yAdd = 4 - (scale * 8) / 2F;
-            matrix.push();
+            matrix.pushPose();
             matrix.scale(scale, scale, scale);
-            mc.fontRenderer.func_238422_b_(matrix, component, (int) (x * reverse), (int) ((y * reverse) + yAdd), color);
-            matrix.pop();
+            mc.font.draw(matrix, component, (int) (x * reverse), (int) ((y * reverse) + yAdd), color);
+            matrix.popPose();
         }
         //Make sure the color does not leak from having drawn the string
         MekanismRenderer.resetColor();

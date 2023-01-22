@@ -7,6 +7,9 @@ import net.minecraft.util.SoundEvent;
 
 public final class MekanismSounds {
 
+    private MekanismSounds() {
+    }
+
     public static final SoundEventDeferredRegister SOUND_EVENTS = new SoundEventDeferredRegister(Mekanism.MODID);
 
     public static final SoundEventRegistryObject<SoundEvent> CHARGEPAD = SOUND_EVENTS.register("tile.machine.chargepad");
@@ -34,6 +37,9 @@ public final class MekanismSounds {
     public static final SoundEventRegistryObject<SoundEvent> NUTRITIONAL_LIQUIFIER = SOUND_EVENTS.register("tile.machine.nutritional_liquifier");
     public static final SoundEventRegistryObject<SoundEvent> INDUSTRIAL_ALARM = SOUND_EVENTS.register("tile.machine.industrial_alarm");
     public static final SoundEventRegistryObject<SoundEvent> ANTIPROTONIC_NUCLEOSYNTHESIZER = SOUND_EVENTS.register("tile.machine.antiprotonic_nucleosynthesizer");
+    public static final SoundEventRegistryObject<SoundEvent> PIGMENT_EXTRACTOR = SOUND_EVENTS.register("tile.machine.pigment_extractor");
+    public static final SoundEventRegistryObject<SoundEvent> PIGMENT_MIXER = SOUND_EVENTS.register("tile.machine.pigment_mixer");
+    public static final SoundEventRegistryObject<SoundEvent> PAINTING_MACHINE = SOUND_EVENTS.register("tile.machine.painting_machine");
     public static final SoundEventRegistryObject<SoundEvent> SPS = SOUND_EVENTS.register("tile.machine.sps");
 
     public static final SoundEventRegistryObject<SoundEvent> FLAMETHROWER_IDLE = SOUND_EVENTS.register("item.flamethrower.idle");

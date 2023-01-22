@@ -7,10 +7,11 @@ import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.GuiInsetElement;
 import mekanism.client.render.MekanismRenderer;
 import mekanism.common.Mekanism;
-import mekanism.common.network.PacketGuiInteract;
-import mekanism.common.network.PacketGuiInteract.GuiInteraction;
+import mekanism.common.network.to_server.PacketGuiInteract;
+import mekanism.common.network.to_server.PacketGuiInteract.GuiInteraction;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.tile.interfaces.IFluidContainerManager;
+import mekanism.common.tile.interfaces.IFluidContainerManager.ContainerEditMode;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.MekanismUtils.ResourceType;
 import net.minecraft.util.ResourceLocation;
@@ -27,27 +28,28 @@ public class GuiContainerEditModeTab<TILE extends TileEntityMekanism & IFluidCon
 
     @Override
     protected ResourceLocation getOverlay() {
-        switch (tile.getContainerEditMode()) {
-            case FILL:
-                return FILL;
-            case EMPTY:
-                return EMPTY;
+        ContainerEditMode containerEditMode = dataSource.getContainerEditMode();
+        if (containerEditMode == ContainerEditMode.FILL) {
+            return FILL;
+        } else if (containerEditMode == ContainerEditMode.EMPTY) {
+            return EMPTY;
         }
         return super.getOverlay();
     }
 
     @Override
     public void renderToolTip(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        displayTooltip(matrix, tile.getContainerEditMode().getTextComponent(), mouseX, mouseY);
+        super.renderToolTip(matrix, mouseX, mouseY);
+        displayTooltip(matrix, dataSource.getContainerEditMode().getTextComponent(), mouseX, mouseY);
     }
 
     @Override
     public void onClick(double mouseX, double mouseY) {
-        Mekanism.packetHandler.sendToServer(new PacketGuiInteract(GuiInteraction.NEXT_MODE, tile));
+        Mekanism.packetHandler.sendToServer(new PacketGuiInteract(GuiInteraction.NEXT_MODE, dataSource));
     }
 
     @Override
     protected void colorTab() {
-        MekanismRenderer.color(SpecialColors.TAB_CONTAINER_EDIT_MODE.get());
+        MekanismRenderer.color(SpecialColors.TAB_CONTAINER_EDIT_MODE);
     }
 }

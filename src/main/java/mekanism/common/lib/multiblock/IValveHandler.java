@@ -32,8 +32,8 @@ public interface IValveHandler {
             for (int i = 0; i < valves.size(); i++) {
                 CompoundNBT valveNBT = valves.getCompound(i);
                 ValveData data = new ValveData();
-                NBTUtils.setBlockPosIfPresent(valveNBT, NBTConstants.POSITION, (pos) -> data.location = pos);
-                data.side = Direction.byIndex(valveNBT.getInt(NBTConstants.SIDE));
+                NBTUtils.setBlockPosIfPresent(valveNBT, NBTConstants.POSITION, pos -> data.location = pos);
+                data.side = Direction.from3DDataValue(valveNBT.getInt(NBTConstants.SIDE));
                 getValveData().add(data);
             }
         }

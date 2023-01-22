@@ -1,11 +1,11 @@
 package mekanism.common.content.sps;
 
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.EnumSet;
 import java.util.Set;
 import mekanism.common.MekanismLang;
 import mekanism.common.content.blocktype.BlockType;
-import mekanism.common.content.blocktype.BlockTypeTile;
 import mekanism.common.lib.math.voxel.VoxelCuboid;
 import mekanism.common.lib.math.voxel.VoxelCuboid.CuboidSide;
 import mekanism.common.lib.math.voxel.VoxelCuboid.WallRelative;
@@ -20,6 +20,7 @@ import mekanism.common.registries.MekanismBlockTypes;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.chunk.IChunk;
 
 public class SPSValidator extends CuboidStructureValidator<SPSMultiblockData> {
 
@@ -40,6 +41,7 @@ public class SPSValidator extends CuboidStructureValidator<SPSMultiblockData> {
         if (relative.isWall()) {
             Axis axis = Axis.get(cuboid.getSide(pos));
             Axis h = axis.horizontal(), v = axis.vertical();
+            //Note: This ends up becoming immutable by doing this but that is fine and doesn't really matter
             pos = pos.subtract(cuboid.getMinPos());
             return StructureRequirement.REQUIREMENTS[ALLOWED_GRID[h.getCoord(pos)][v.getCoord(pos)]];
         }
@@ -47,22 +49,22 @@ public class SPSValidator extends CuboidStructureValidator<SPSMultiblockData> {
     }
 
     @Override
-    protected CasingType getCasingType(BlockPos pos, BlockState state) {
+    protected CasingType getCasingType(BlockState state) {
         Block block = state.getBlock();
-        if (BlockTypeTile.is(block, MekanismBlockTypes.SPS_CASING)) {
+        if (BlockType.is(block, MekanismBlockTypes.SPS_CASING)) {
             return CasingType.FRAME;
-        } else if (BlockTypeTile.is(block, MekanismBlockTypes.SPS_PORT)) {
+        } else if (BlockType.is(block, MekanismBlockTypes.SPS_PORT)) {
             return CasingType.VALVE;
         }
         return CasingType.INVALID;
     }
 
     @Override
-    protected boolean validateInner(BlockPos pos) {
-        if (super.validateInner(pos)) {
+    protected boolean validateInner(BlockState state, Long2ObjectMap<IChunk> chunkMap, BlockPos pos) {
+        if (super.validateInner(state, chunkMap, pos)) {
             return true;
         }
-        return BlockType.is(world.getBlockState(pos).getBlock(), MekanismBlockTypes.SUPERCHARGED_COIL);
+        return BlockType.is(state.getBlock(), MekanismBlockTypes.SUPERCHARGED_COIL);
     }
 
     @Override
@@ -73,10 +75,10 @@ public class SPSValidator extends CuboidStructureValidator<SPSMultiblockData> {
     }
 
     @Override
-    public FormationResult postcheck(SPSMultiblockData structure, Set<BlockPos> innerNodes) {
+    public FormationResult postcheck(SPSMultiblockData structure, Set<BlockPos> innerNodes, Long2ObjectMap<IChunk> chunkMap) {
         Set<BlockPos> validCoils = new ObjectOpenHashSet<>();
         for (ValveData valve : structure.valves) {
-            BlockPos pos = valve.location.offset(valve.side.getOpposite());
+            BlockPos pos = valve.location.relative(valve.side.getOpposite());
             if (innerNodes.contains(pos)) {
                 structure.addCoil(valve.location, valve.side.getOpposite());
                 validCoils.add(pos);

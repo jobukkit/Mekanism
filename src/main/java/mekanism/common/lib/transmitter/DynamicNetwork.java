@@ -1,7 +1,9 @@
 package mekanism.common.lib.transmitter;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nonnull;
@@ -24,10 +26,8 @@ public abstract class DynamicNetwork<ACCEPTOR, NETWORK extends DynamicNetwork<AC
     @Nullable
     protected World world;
     private final UUID uuid;
-
-    protected DynamicNetwork() {
-        this(UUID.randomUUID());
-    }
+    @Nullable
+    private CompatibleTransmitterValidator<ACCEPTOR, NETWORK, TRANSMITTER> transmitterValidator;
 
     protected DynamicNetwork(UUID networkID) {
         this.uuid = networkID;
@@ -41,13 +41,10 @@ public abstract class DynamicNetwork<ACCEPTOR, NETWORK extends DynamicNetwork<AC
         return (NETWORK) this;
     }
 
-    public void addNewTransmitters(Collection<TRANSMITTER> newTransmitters) {
-        transmittersToAdd.addAll(newTransmitters);
-    }
-
     public void commit() {
         if (!transmittersToAdd.isEmpty()) {
             boolean addedValidTransmitters = false;
+            List<TRANSMITTER> transmittersToUpdate = new ArrayList<>();
             for (TRANSMITTER transmitter : transmittersToAdd) {
                 //Note: Transmitter should not be able to be null here, but I ran into a null pointer
                 // pointing to it being null that I could not reproduce, so just added this as a safety check
@@ -59,16 +56,34 @@ public abstract class DynamicNetwork<ACCEPTOR, NETWORK extends DynamicNetwork<AC
                     for (Direction side : EnumUtils.DIRECTIONS) {
                         acceptorCache.updateTransmitterOnSide(transmitter, side);
                     }
-                    transmitter.setTransmitterNetwork(getNetwork());
+                    if (transmitter.setTransmitterNetwork(getNetwork(), false)) {
+                        transmittersToUpdate.add(transmitter);
+                    }
                     addTransmitterFromCommit(transmitter);
                 }
             }
             transmittersToAdd.clear();
             if (addedValidTransmitters) {
                 validTransmittersAdded();
+                transmittersToUpdate.forEach(Transmitter::requestsUpdate);
             }
         }
         acceptorCache.commit();
+        transmitterValidator = null;
+    }
+
+    @Nullable
+    public CompatibleTransmitterValidator<ACCEPTOR, NETWORK, TRANSMITTER> getTransmitterValidator() {
+        return transmitterValidator;
+    }
+
+    public void addNewTransmitters(Collection<TRANSMITTER> newTransmitters, CompatibleTransmitterValidator<ACCEPTOR, NETWORK, TRANSMITTER> transmitterValidator) {
+        transmittersToAdd.addAll(newTransmitters);
+        //Cache the transmitter validator in the network, so that if we have a case of orphans being on either side of
+        // an existing network, and the orphans are what have contents stored, that then we don't try merging them all
+        // together when they may not actually be able to have both sets of orphans connect. After the network is
+        // updated (committed), this cached validator will be unset
+        this.transmitterValidator = transmitterValidator;
     }
 
     protected void addTransmitterFromCommit(TRANSMITTER transmitter) {
@@ -79,7 +94,7 @@ public abstract class DynamicNetwork<ACCEPTOR, NETWORK extends DynamicNetwork<AC
     }
 
     public boolean isRemote() {
-        return world == null ? EffectiveSide.get().isClient() : world.isRemote;
+        return world == null ? EffectiveSide.get().isClient() : world.isClientSide;
     }
 
     public void invalidate(@Nullable TRANSMITTER triggerTransmitter) {
@@ -98,7 +113,6 @@ public abstract class DynamicNetwork<ACCEPTOR, NETWORK extends DynamicNetwork<AC
                 }
             }
         }
-        transmitters.clear();
         deregister();
     }
 
@@ -114,13 +128,29 @@ public abstract class DynamicNetwork<ACCEPTOR, NETWORK extends DynamicNetwork<AC
         acceptorCache.acceptorChanged(transmitter, side);
     }
 
-    public void adoptTransmittersAndAcceptorsFrom(NETWORK net) {
+    public List<TRANSMITTER> adoptTransmittersAndAcceptorsFrom(NETWORK net) {
+        List<TRANSMITTER> transmittersToUpdate = new ArrayList<>();
         for (TRANSMITTER transmitter : net.transmitters) {
-            transmitter.setTransmitterNetwork(getNetwork());
             transmitters.add(transmitter);
+            if (transmitter.setTransmitterNetwork(getNetwork(), false)) {
+                transmittersToUpdate.add(transmitter);
+            }
         }
         transmittersToAdd.addAll(net.transmittersToAdd);
         acceptorCache.adoptAcceptors(net.acceptorCache);
+        return transmittersToUpdate;
+    }
+
+    protected void adoptAllAndRegister(Collection<NETWORK> networks) {
+        List<TRANSMITTER> transmittersToUpdate = new ArrayList<>();
+        for (NETWORK net : networks) {
+            if (net != null) {
+                transmittersToUpdate.addAll(adoptTransmittersAndAcceptorsFrom(net));
+                net.deregister();
+            }
+        }
+        register();
+        transmittersToUpdate.forEach(Transmitter::requestsUpdate);
     }
 
     public void register() {
@@ -134,6 +164,8 @@ public abstract class DynamicNetwork<ACCEPTOR, NETWORK extends DynamicNetwork<AC
     public void deregister() {
         transmitters.clear();
         transmittersToAdd.clear();
+        acceptorCache.deregister();
+        transmitterValidator = null;
         if (isRemote()) {
             TransmitterNetworkRegistry.getInstance().removeClientNetwork(this);
         } else {
@@ -191,8 +223,7 @@ public abstract class DynamicNetwork<ACCEPTOR, NETWORK extends DynamicNetwork<AC
     public boolean equals(Object o) {
         if (o == this) {
             return true;
-        }
-        if (o instanceof DynamicNetwork) {
+        } else if (o instanceof DynamicNetwork) {
             return uuid.equals(((DynamicNetwork<?, ?, ?>) o).uuid);
         }
         return false;

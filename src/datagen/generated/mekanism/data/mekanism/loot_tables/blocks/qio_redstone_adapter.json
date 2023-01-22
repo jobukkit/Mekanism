@@ -2,6 +2,7 @@
   "type": "minecraft:block",
   "pools": [
     {
+      "name": "main",
       "rolls": 1,
       "entries": [
         {
@@ -12,6 +13,11 @@
               "source": "block_entity",
               "ops": [
                 {
+                  "source": "componentFrequency",
+                  "target": "mekData.componentFrequency",
+                  "op": "replace"
+                },
+                {
                   "source": "componentSecurity.owner",
                   "target": "mekData.owner",
                   "op": "replace"
@@ -19,6 +25,16 @@
                 {
                   "source": "componentSecurity.securityMode",
                   "target": "mekData.securityMode",
+                  "op": "replace"
+                },
+                {
+                  "source": "amount",
+                  "target": "mekData.amount",
+                  "op": "replace"
+                },
+                {
+                  "source": "singleItem",
+                  "target": "mekData.singleItem",
                   "op": "replace"
                 }
               ]

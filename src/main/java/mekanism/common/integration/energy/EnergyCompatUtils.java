@@ -11,8 +11,8 @@ import mekanism.api.math.FloatingLong;
 import mekanism.api.math.FloatingLongSupplier;
 import mekanism.common.Mekanism;
 import mekanism.common.config.MekanismConfig;
+import mekanism.common.integration.energy.fluxnetworks.FNEnergyCompat;
 import mekanism.common.integration.energy.forgeenergy.ForgeEnergyCompat;
-import mekanism.common.util.MekanismUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -22,11 +22,14 @@ import net.minecraftforge.common.util.LazyOptional;
 
 public class EnergyCompatUtils {
 
+    private EnergyCompatUtils() {
+    }
+
     private static final List<IEnergyCompat> energyCompats = Collections.unmodifiableList(Arrays.asList(
           //We always have our own energy capability as the first one we check
           new StrictEnergyCompat(),
           //Note: We check the Flux Networks capability above Forge's so that we allow it to use the higher throughput amount supported by Flux Networks
-          //new FNEnergyCompat(),//TODO - FluxNetworks
+          new FNEnergyCompat(),
           new ForgeEnergyCompat()
     ));
 
@@ -58,7 +61,7 @@ public class EnergyCompatUtils {
     }
 
     private static boolean isTileValid(@Nullable TileEntity tile) {
-        return tile != null && !tile.isRemoved() && tile.hasWorld();
+        return tile != null && !tile.isRemoved() && tile.hasLevel();
     }
 
     public static boolean hasStrictEnergyHandler(@Nonnull ItemStack stack) {
@@ -81,7 +84,7 @@ public class EnergyCompatUtils {
 
     @Nullable//TODO: Transition usages of this to getLazyStrictEnergyHandler?
     public static IStrictEnergyHandler getStrictEnergyHandler(@Nonnull ItemStack stack) {
-        return MekanismUtils.toOptional(getLazyStrictEnergyHandler(stack)).orElse(null);
+        return getLazyStrictEnergyHandler(stack).resolve().orElse(null);
     }
 
     @Nonnull
@@ -129,11 +132,11 @@ public class EnergyCompatUtils {
     }
 
     /**
-     * Whether or not IC2 power should be used, taking into account whether or not it is installed or another mod is providing its API.
+     * Whether IC2 power should be used, taking into account whether it is installed or another mod is providing its API.
      *
      * @return if IC2 power should be used
      */
-    private static boolean useIC2() {
+    public static boolean useIC2() {
         //TODO: IC2
         return Mekanism.hooks.IC2Loaded/* && EnergyNet.instance != null*/ && !MekanismConfig.general.blacklistIC2.get();
     }

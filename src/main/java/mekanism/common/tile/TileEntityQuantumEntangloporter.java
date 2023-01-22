@@ -1,14 +1,12 @@
 package mekanism.common.tile;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import mekanism.api.NBTConstants;
 import mekanism.api.RelativeSide;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
@@ -22,10 +20,12 @@ import mekanism.api.chemical.pigment.PigmentStack;
 import mekanism.api.chemical.slurry.ISlurryTank;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
+import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.heat.HeatAPI.HeatTransfer;
 import mekanism.api.heat.IHeatCapacitor;
 import mekanism.api.heat.IHeatHandler;
 import mekanism.common.capabilities.Capabilities;
+import mekanism.common.capabilities.heat.CachedAmbientTemperature;
 import mekanism.common.capabilities.holder.chemical.IChemicalTankHolder;
 import mekanism.common.capabilities.holder.chemical.QuantumEntangloporterChemicalTankHolder;
 import mekanism.common.capabilities.holder.energy.IEnergyContainerHolder;
@@ -37,17 +37,20 @@ import mekanism.common.capabilities.holder.heat.QuantumEntangloporterHeatCapacit
 import mekanism.common.capabilities.holder.slot.IInventorySlotHolder;
 import mekanism.common.capabilities.holder.slot.QuantumEntangloporterInventorySlotHolder;
 import mekanism.common.content.entangloporter.InventoryFrequency;
+import mekanism.common.integration.computer.ComputerException;
+import mekanism.common.integration.computer.SpecialComputerMethodWrapper.ComputerChemicalTankWrapper;
+import mekanism.common.integration.computer.SpecialComputerMethodWrapper.ComputerFluidTankWrapper;
+import mekanism.common.integration.computer.annotation.ComputerMethod;
+import mekanism.common.integration.computer.annotation.WrappingComputerMethod;
 import mekanism.common.inventory.container.MekanismContainer;
 import mekanism.common.inventory.container.sync.SyncableDouble;
 import mekanism.common.lib.chunkloading.IChunkLoader;
 import mekanism.common.lib.frequency.Frequency;
 import mekanism.common.lib.frequency.Frequency.FrequencyIdentity;
 import mekanism.common.lib.frequency.FrequencyType;
-import mekanism.common.lib.frequency.IFrequencyHandler;
 import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tile.base.SubstanceType;
-import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.tile.component.TileComponentChunkLoader;
 import mekanism.common.tile.component.TileComponentConfig;
 import mekanism.common.tile.component.TileComponentEjector;
@@ -63,22 +66,17 @@ import mekanism.common.tile.component.config.slot.IProxiedSlotInfo.PigmentProxy;
 import mekanism.common.tile.component.config.slot.IProxiedSlotInfo.ProxySlotInfoCreator;
 import mekanism.common.tile.component.config.slot.IProxiedSlotInfo.SlurryProxy;
 import mekanism.common.tile.component.config.slot.ISlotInfo;
-import mekanism.common.tile.interfaces.ISideConfiguration;
-import mekanism.common.tile.interfaces.ISustainedData;
-import mekanism.common.util.CableUtils;
+import mekanism.common.tile.prefab.TileEntityConfigurableMachine;
 import mekanism.common.util.CapabilityUtils;
-import mekanism.common.util.ItemDataUtils;
-import mekanism.common.util.MekanismUtils;
+import mekanism.common.util.WorldUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.ChunkPos;
 
-public class TileEntityQuantumEntangloporter extends TileEntityMekanism implements ISideConfiguration, IFrequencyHandler, ISustainedData, IChunkLoader {
+public class TileEntityQuantumEntangloporter extends TileEntityConfigurableMachine implements IChunkLoader {
 
-    public final TileComponentEjector ejectorComponent;
-    public final TileComponentConfig configComponent;
-    public final TileComponentChunkLoader<TileEntityQuantumEntangloporter> chunkLoaderComponent;
+    private final TileComponentChunkLoader<TileEntityQuantumEntangloporter> chunkLoaderComponent;
 
     private double lastTransferLoss;
     private double lastEnvironmentLoss;
@@ -86,7 +84,7 @@ public class TileEntityQuantumEntangloporter extends TileEntityMekanism implemen
     public TileEntityQuantumEntangloporter() {
         super(MekanismBlocks.QUANTUM_ENTANGLOPORTER);
         configComponent = new TileComponentConfig(this, TransmissionType.ITEM, TransmissionType.FLUID, TransmissionType.GAS, TransmissionType.INFUSION,
-              /*TransmissionType.PIGMENT, TODO v11 */ TransmissionType.SLURRY, TransmissionType.ENERGY, TransmissionType.HEAT);
+              TransmissionType.PIGMENT, TransmissionType.SLURRY, TransmissionType.ENERGY, TransmissionType.HEAT);
 
         setupConfig(TransmissionType.ITEM, InventoryProxy::new, () -> hasFrequency() ? getFreq().getInventorySlots(null) : Collections.emptyList());
         setupConfig(TransmissionType.FLUID, FluidProxy::new, () -> hasFrequency() ? getFreq().getFluidTanks(null) : Collections.emptyList());
@@ -106,8 +104,9 @@ public class TileEntityQuantumEntangloporter extends TileEntityMekanism implemen
         }
 
         ejectorComponent = new TileComponentEjector(this);
-        ejectorComponent.setOutputData(configComponent, TransmissionType.ITEM, TransmissionType.FLUID, TransmissionType.GAS, TransmissionType.INFUSION,
-              /*TransmissionType.PIGMENT, TODO v11 */ TransmissionType.SLURRY);
+        //Note: All eject types except for items is handled by the frequency
+        //Only allow trying to eject if we have a frequency, because otherwise all our containers and sides will just be empty anyway
+        ejectorComponent.setOutputData(configComponent, TransmissionType.ITEM).setCanEject(type -> hasFrequency());
 
         chunkLoaderComponent = new TileComponentChunkLoader<>(this);
         frequencyComponent.track(FrequencyType.INVENTORY, true, true, true);
@@ -163,7 +162,7 @@ public class TileEntityQuantumEntangloporter extends TileEntityMekanism implemen
 
     @Nonnull
     @Override
-    protected IHeatCapacitorHolder getInitialHeatCapacitors() {
+    protected IHeatCapacitorHolder getInitialHeatCapacitors(CachedAmbientTemperature ambientTemperature) {
         return new QuantumEntangloporterHeatCapacitorHolder(this);
     }
 
@@ -177,17 +176,18 @@ public class TileEntityQuantumEntangloporter extends TileEntityMekanism implemen
     protected void onUpdateServer() {
         super.onUpdateServer();
         if (hasFrequency()) {
-            ConfigInfo info = configComponent.getConfig(TransmissionType.ENERGY);
-            if (info != null && info.isEjecting()) {
-                CableUtils.emit(info.getAllOutputtingSides(), getFreq().storedEnergy, this);
-            }
+            getFreq().handleEject(level.getGameTime());
+            updateHeatCapacitors(null); // manually trigger heat capacitor update
+            HeatTransfer loss = simulate();
+            lastTransferLoss = loss.getAdjacentTransfer();
+            lastEnvironmentLoss = loss.getEnvironmentTransfer();
+        } else {
+            lastTransferLoss = 0;
+            lastEnvironmentLoss = 0;
         }
-        updateHeatCapacitors(null); // manually trigger heat capacitor update
-        HeatTransfer loss = simulate();
-        lastTransferLoss = loss.getAdjacentTransfer();
-        lastEnvironmentLoss = loss.getEnvironmentTransfer();
     }
 
+    @ComputerMethod
     public boolean hasFrequency() {
         Frequency freq = getFreq();
         return freq != null && freq.isValid();
@@ -204,32 +204,23 @@ public class TileEntityQuantumEntangloporter extends TileEntityMekanism implemen
         return false;
     }
 
+    @Override
+    protected boolean shouldDumpRadiation() {
+        //Note: The QE doesn't support radioactive substances but override this method anyway
+        return false;
+    }
+
     @Nullable
     @Override
-    public IHeatHandler getAdjacent(Direction side) {
+    public IHeatHandler getAdjacent(@Nonnull Direction side) {
         if (hasFrequency()) {
             ISlotInfo slotInfo = configComponent.getSlotInfo(TransmissionType.HEAT, side);
             if (slotInfo != null && slotInfo.canInput()) {
-                TileEntity adj = MekanismUtils.getTileEntity(getWorld(), getPos().offset(side));
-                return MekanismUtils.toOptional(CapabilityUtils.getCapability(adj, Capabilities.HEAT_HANDLER_CAPABILITY, side.getOpposite())).orElse(null);
+                TileEntity adj = WorldUtils.getTileEntity(getLevel(), getBlockPos().relative(side));
+                return CapabilityUtils.getCapability(adj, Capabilities.HEAT_HANDLER_CAPABILITY, side.getOpposite()).resolve().orElse(null);
             }
         }
         return null;
-    }
-
-    @Override
-    public TileComponentConfig getConfig() {
-        return configComponent;
-    }
-
-    @Override
-    public Direction getOrientation() {
-        return getDirection();
-    }
-
-    @Override
-    public TileComponentEjector getEjector() {
-        return ejectorComponent;
     }
 
     @Override
@@ -239,41 +230,19 @@ public class TileEntityQuantumEntangloporter extends TileEntityMekanism implemen
 
     @Override
     public Set<ChunkPos> getChunkSet() {
-        return Collections.singleton(new ChunkPos(getPos()));
-    }
-
-    @Override
-    public void writeSustainedData(ItemStack itemStack) {
-        InventoryFrequency freq = frequencyComponent.getFrequency(FrequencyType.INVENTORY);
-        if (freq != null) {
-            ItemDataUtils.setCompound(itemStack, NBTConstants.FREQUENCY, freq.serializeIdentity());
-        }
-    }
-
-    @Override
-    public void readSustainedData(ItemStack itemStack) {
-        FrequencyIdentity freq = FrequencyIdentity.load(FrequencyType.INVENTORY, ItemDataUtils.getCompound(itemStack, NBTConstants.FREQUENCY));
-        if (freq != null) {
-            setFrequency(FrequencyType.INVENTORY, freq);
-        }
-    }
-
-    @Override
-    public Map<String, String> getTileDataRemap() {
-        Map<String, String> remap = new Object2ObjectOpenHashMap<>();
-        remap.put(NBTConstants.FREQUENCY + "." + NBTConstants.NAME, NBTConstants.FREQUENCY + "." + NBTConstants.NAME);
-        remap.put(NBTConstants.FREQUENCY + "." + NBTConstants.PUBLIC_FREQUENCY, NBTConstants.FREQUENCY + "." + NBTConstants.PUBLIC_FREQUENCY);
-        return remap;
+        return Collections.singleton(new ChunkPos(getBlockPos()));
     }
 
     public InventoryFrequency getFreq() {
         return getFrequency(FrequencyType.INVENTORY);
     }
 
+    @ComputerMethod(nameOverride = "getTransferLoss")
     public double getLastTransferLoss() {
         return lastTransferLoss;
     }
 
+    @ComputerMethod(nameOverride = "getEnvironmentalLoss")
     public double getLastEnvironmentLoss() {
         return lastEnvironmentLoss;
     }
@@ -284,4 +253,82 @@ public class TileEntityQuantumEntangloporter extends TileEntityMekanism implemen
         container.track(SyncableDouble.create(this::getLastTransferLoss, value -> lastTransferLoss = value));
         container.track(SyncableDouble.create(this::getLastEnvironmentLoss, value -> lastEnvironmentLoss = value));
     }
+
+    //Methods relating to IComputerTile
+    @ComputerMethod
+    private Collection<InventoryFrequency> getFrequencies() {
+        return FrequencyType.INVENTORY.getManagerWrapper().getPublicManager().getFrequencies();
+    }
+
+    @ComputerMethod
+    private InventoryFrequency getFrequency() throws ComputerException {
+        InventoryFrequency frequency = getFreq();
+        if (frequency == null || !frequency.isValid()) {
+            throw new ComputerException("No frequency is currently selected.");
+        }
+        return frequency;
+    }
+
+    @ComputerMethod
+    private void setFrequency(String name) throws ComputerException {
+        validateSecurityIsPublic();
+        InventoryFrequency frequency = FrequencyType.INVENTORY.getManagerWrapper().getPublicManager().getFrequency(name);
+        if (frequency == null) {
+            throw new ComputerException("No public inventory frequency with name '%s' found.", name);
+        }
+        setFrequency(FrequencyType.INVENTORY, frequency.getIdentity(), getOwnerUUID());
+    }
+
+    @ComputerMethod
+    private void createFrequency(String name) throws ComputerException {
+        validateSecurityIsPublic();
+        InventoryFrequency frequency = FrequencyType.INVENTORY.getManagerWrapper().getPublicManager().getFrequency(name);
+        if (frequency != null) {
+            throw new ComputerException("Unable to create public inventory frequency with name '%s' as one already exists.", name);
+        }
+        setFrequency(FrequencyType.INVENTORY, new FrequencyIdentity(name, true), getOwnerUUID());
+    }
+
+    //Note: A bunch of the below buffer getters are rather "hardcoded", but they should be fine unless we decide to add support for more buffers at some point
+    // in which case we can just add some overloads while we deprecate these
+    @ComputerMethod
+    private ItemStack getBufferItem() throws ComputerException {
+        return getFrequency().getInventorySlots(null).get(0).getStack();
+    }
+
+    @WrappingComputerMethod(wrapper = ComputerFluidTankWrapper.class, methodNames = {"getBufferFluid", "getBufferFluidCapacity", "getBufferFluidNeeded",
+                                                                                     "getBufferFluidFilledPercentage"})
+    private IExtendedFluidTank getBufferFluidTank() throws ComputerException {
+        return getFrequency().getFluidTanks(null).get(0);
+    }
+
+    @WrappingComputerMethod(wrapper = ComputerChemicalTankWrapper.class, methodNames = {"getBufferGas", "getBufferGasCapacity", "getBufferGasNeeded",
+                                                                                        "getBufferGasFilledPercentage"})
+    private IGasTank getBufferGasTank() throws ComputerException {
+        return getFrequency().getGasTanks(null).get(0);
+    }
+
+    @WrappingComputerMethod(wrapper = ComputerChemicalTankWrapper.class, methodNames = {"getBufferInfuseType", "getBufferInfuseTypeCapacity", "getBufferInfuseTypeNeeded",
+                                                                                        "getBufferInfuseTypeFilledPercentage"})
+    private IInfusionTank getBufferInfuseTypeTank() throws ComputerException {
+        return getFrequency().getInfusionTanks(null).get(0);
+    }
+
+    @WrappingComputerMethod(wrapper = ComputerChemicalTankWrapper.class, methodNames = {"getBufferPigment", "getBufferPigmentCapacity", "getBufferPigmentNeeded",
+                                                                                        "getBufferPigmentFilledPercentage"})
+    private IPigmentTank getBufferPigmentTank() throws ComputerException {
+        return getFrequency().getPigmentTanks(null).get(0);
+    }
+
+    @WrappingComputerMethod(wrapper = ComputerChemicalTankWrapper.class, methodNames = {"getBufferSlurry", "getBufferSlurryCapacity", "getBufferSlurryNeeded",
+                                                                                        "getBufferSlurryFilledPercentage"})
+    private ISlurryTank getBufferSlurryTank() throws ComputerException {
+        return getFrequency().getSlurryTanks(null).get(0);
+    }
+
+    @ComputerMethod
+    private double getTemperature() throws ComputerException {
+        return getFrequency().getTotalTemperature();
+    }
+    //End methods IComputerTile
 }

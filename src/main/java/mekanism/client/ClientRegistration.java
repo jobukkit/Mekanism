@@ -1,10 +1,12 @@
 package mekanism.client;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Table.Cell;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import mekanism.api.providers.IItemProvider;
 import mekanism.api.text.EnumColor;
 import mekanism.client.gui.GuiBoilerStats;
@@ -26,7 +28,6 @@ import mekanism.client.gui.GuiSecurityDesk;
 import mekanism.client.gui.GuiTeleporter;
 import mekanism.client.gui.GuiThermalEvaporationController;
 import mekanism.client.gui.GuiThermoelectricBoiler;
-import mekanism.client.gui.GuiUpgradeManagement;
 import mekanism.client.gui.item.GuiDictionary;
 import mekanism.client.gui.item.GuiPersonalChestItem;
 import mekanism.client.gui.item.GuiPortableTeleporter;
@@ -51,6 +52,9 @@ import mekanism.client.gui.machine.GuiMetallurgicInfuser;
 import mekanism.client.gui.machine.GuiNutritionalLiquifier;
 import mekanism.client.gui.machine.GuiOredictionificator;
 import mekanism.client.gui.machine.GuiPRC;
+import mekanism.client.gui.machine.GuiPaintingMachine;
+import mekanism.client.gui.machine.GuiPigmentExtractor;
+import mekanism.client.gui.machine.GuiPigmentMixer;
 import mekanism.client.gui.machine.GuiPrecisionSawmill;
 import mekanism.client.gui.machine.GuiResistiveHeater;
 import mekanism.client.gui.machine.GuiRotaryCondensentrator;
@@ -69,20 +73,26 @@ import mekanism.client.gui.robit.GuiRobitInventory;
 import mekanism.client.gui.robit.GuiRobitMain;
 import mekanism.client.gui.robit.GuiRobitRepair;
 import mekanism.client.gui.robit.GuiRobitSmelting;
+import mekanism.client.key.MekanismKeyHandler;
 import mekanism.client.model.MekanismModelCache;
 import mekanism.client.model.baked.DigitalMinerBakedModel;
 import mekanism.client.model.baked.DriveArrayBakedModel;
 import mekanism.client.model.baked.ExtensionBakedModel.LightedBakedModel;
+import mekanism.client.model.baked.MekanismModel;
 import mekanism.client.model.baked.QIORedstoneAdapterBakedModel;
+import mekanism.client.model.robit.RobitModel;
 import mekanism.client.particle.JetpackFlameParticle;
 import mekanism.client.particle.JetpackSmokeParticle;
 import mekanism.client.particle.LaserParticle;
 import mekanism.client.particle.RadiationParticle;
 import mekanism.client.particle.ScubaBubbleParticle;
 import mekanism.client.render.MekanismRenderer;
+import mekanism.client.render.RenderTickHandler;
 import mekanism.client.render.entity.RenderFlame;
 import mekanism.client.render.entity.RenderRobit;
 import mekanism.client.render.layer.MekanismArmorLayer;
+import mekanism.client.render.layer.MekanismElytraLayer;
+import mekanism.client.render.obj.TransmitterLoader;
 import mekanism.client.render.tileentity.RenderBin;
 import mekanism.client.render.tileentity.RenderChemicalDissolutionChamber;
 import mekanism.client.render.tileentity.RenderDigitalMiner;
@@ -90,7 +100,9 @@ import mekanism.client.render.tileentity.RenderDynamicTank;
 import mekanism.client.render.tileentity.RenderEnergyCube;
 import mekanism.client.render.tileentity.RenderFluidTank;
 import mekanism.client.render.tileentity.RenderIndustrialAlarm;
+import mekanism.client.render.tileentity.RenderNutritionalLiquifier;
 import mekanism.client.render.tileentity.RenderPersonalChest;
+import mekanism.client.render.tileentity.RenderPigmentMixer;
 import mekanism.client.render.tileentity.RenderQuantumEntangloporter;
 import mekanism.client.render.tileentity.RenderSPS;
 import mekanism.client.render.tileentity.RenderSeismicVibrator;
@@ -103,11 +115,16 @@ import mekanism.client.render.transmitter.RenderMechanicalPipe;
 import mekanism.client.render.transmitter.RenderPressurizedTube;
 import mekanism.client.render.transmitter.RenderThermodynamicConductor;
 import mekanism.client.render.transmitter.RenderUniversalCable;
+import mekanism.client.sound.SoundHandler;
 import mekanism.common.Mekanism;
-import mekanism.common.block.interfaces.IColoredBlock;
+import mekanism.common.base.HolidayManager;
+import mekanism.common.integration.MekanismHooks;
+import mekanism.common.item.ItemConfigurationCard;
 import mekanism.common.item.ItemCraftingFormula;
 import mekanism.common.item.ItemPortableQIODashboard;
 import mekanism.common.item.block.ItemBlockCardboardBox;
+import mekanism.common.lib.FieldReflectionHelper;
+import mekanism.common.lib.radiation.RadiationManager;
 import mekanism.common.registration.impl.BlockRegistryObject;
 import mekanism.common.registration.impl.FluidRegistryObject;
 import mekanism.common.registration.impl.ItemRegistryObject;
@@ -122,8 +139,7 @@ import mekanism.common.resource.PrimaryResource;
 import mekanism.common.resource.ResourceType;
 import mekanism.common.tile.qio.TileEntityQIOComponent;
 import mekanism.common.tile.transmitter.TileEntityLogisticalTransporter;
-import mekanism.common.util.MekanismUtils;
-import net.minecraft.block.Block;
+import mekanism.common.util.WorldUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.color.BlockColors;
@@ -133,23 +149,32 @@ import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.layers.BipedArmorLayer;
+import net.minecraft.client.renderer.entity.layers.ElytraLayer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.minecraft.resources.IReloadableResourceManager;
+import net.minecraft.resources.IResourceManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.client.model.SeparatePerspectiveModel;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
@@ -157,10 +182,27 @@ import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 @Mod.EventBusSubscriber(modid = Mekanism.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ClientRegistration {
 
-    private static final Map<ResourceLocation, CustomModelRegistryObject> customModels = new Object2ObjectOpenHashMap<>();
+    private static final FieldReflectionHelper<SeparatePerspectiveModel.BakedModel, IBakedModel> SEPARATE_PERSPECTIVE_BASE_MODEL =
+          new FieldReflectionHelper<>(SeparatePerspectiveModel.BakedModel.class, "baseModel", () -> null);
+    private static final FieldReflectionHelper<SeparatePerspectiveModel.BakedModel, ImmutableMap<TransformType, IBakedModel>> SEPARATE_PERSPECTIVE_PERSPECTIVES =
+          new FieldReflectionHelper<>(SeparatePerspectiveModel.BakedModel.class, "perspectives", ImmutableMap::of);
+    private static final Map<ResourceLocation, CustomModelRegistryObject> customModels = new ConcurrentHashMap<>();
 
     @SubscribeEvent
     public static void init(FMLClientSetupEvent event) {
+        MinecraftForge.EVENT_BUS.register(new ClientTickHandler());
+        MinecraftForge.EVENT_BUS.register(new RenderTickHandler());
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, SoundHandler::onTilePlaySound);
+        if (ModList.get().isLoaded(MekanismHooks.JEI_MOD_ID)) {
+            //Note: We check this directly instead of using our value stored in Mekanism hooks
+            // as that is initialized in CommonSetup and I believe that may be fired in parallel
+            // to ClientSetup, in which case there would be a chance this gets ran before it is
+            // properly initialized and will have the wrong value
+            MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, RenderTickHandler::guiOpening);
+        }
+        MekanismKeyHandler.registerKeybindings();
+        HolidayManager.init();
+
         //Register entity rendering handlers
         ClientRegistrationUtil.registerEntityRenderingHandler(MekanismEntityTypes.ROBIT, RenderRobit::new);
         ClientRegistrationUtil.registerEntityRenderingHandler(MekanismEntityTypes.FLAME, RenderFlame::new);
@@ -171,12 +213,13 @@ public class ClientRegistration {
         ClientRegistrationUtil.bindTileEntityRenderer(RenderDynamicTank::new, MekanismTileEntityTypes.DYNAMIC_TANK, MekanismTileEntityTypes.DYNAMIC_VALVE);
         ClientRegistrationUtil.bindTileEntityRenderer(MekanismTileEntityTypes.DIGITAL_MINER, RenderDigitalMiner::new);
         ClientRegistrationUtil.bindTileEntityRenderer(MekanismTileEntityTypes.PERSONAL_CHEST, RenderPersonalChest::new);
+        ClientRegistrationUtil.bindTileEntityRenderer(MekanismTileEntityTypes.NUTRITIONAL_LIQUIFIER, RenderNutritionalLiquifier::new);
+        ClientRegistrationUtil.bindTileEntityRenderer(MekanismTileEntityTypes.PIGMENT_MIXER, RenderPigmentMixer::new);
         ClientRegistrationUtil.bindTileEntityRenderer(MekanismTileEntityTypes.QUANTUM_ENTANGLOPORTER, RenderQuantumEntangloporter::new);
         ClientRegistrationUtil.bindTileEntityRenderer(MekanismTileEntityTypes.SEISMIC_VIBRATOR, RenderSeismicVibrator::new);
         ClientRegistrationUtil.bindTileEntityRenderer(MekanismTileEntityTypes.SOLAR_NEUTRON_ACTIVATOR, RenderSolarNeutronActivator::new);
         ClientRegistrationUtil.bindTileEntityRenderer(MekanismTileEntityTypes.TELEPORTER, RenderTeleporter::new);
-        ClientRegistrationUtil.bindTileEntityRenderer(RenderThermalEvaporationPlant::new, MekanismTileEntityTypes.THERMAL_EVAPORATION_CONTROLLER,
-              MekanismTileEntityTypes.THERMAL_EVAPORATION_BLOCK, MekanismTileEntityTypes.THERMAL_EVAPORATION_VALVE);
+        ClientRegistrationUtil.bindTileEntityRenderer(MekanismTileEntityTypes.THERMAL_EVAPORATION_CONTROLLER, RenderThermalEvaporationPlant::new);
         ClientRegistrationUtil.bindTileEntityRenderer(MekanismTileEntityTypes.INDUSTRIAL_ALARM, RenderIndustrialAlarm::new);
         ClientRegistrationUtil.bindTileEntityRenderer(RenderSPS::new, MekanismTileEntityTypes.SPS_CASING, MekanismTileEntityTypes.SPS_PORT);
         ClientRegistrationUtil.bindTileEntityRenderer(RenderBin::new, MekanismTileEntityTypes.BASIC_BIN, MekanismTileEntityTypes.ADVANCED_BIN, MekanismTileEntityTypes.ELITE_BIN,
@@ -200,7 +243,7 @@ public class ClientRegistration {
 
         //Block render layers
         //Cutout
-        ClientRegistrationUtil.setRenderLayer(RenderType.getCutout(), MekanismBlocks.STRUCTURAL_GLASS, MekanismBlocks.LASER_AMPLIFIER, MekanismBlocks.LASER_TRACTOR_BEAM,
+        ClientRegistrationUtil.setRenderLayer(RenderType.cutout(), MekanismBlocks.STRUCTURAL_GLASS, MekanismBlocks.LASER_AMPLIFIER, MekanismBlocks.LASER_TRACTOR_BEAM,
               MekanismBlocks.CHARGEPAD, MekanismBlocks.ELECTROLYTIC_SEPARATOR,
               //Fluid Tanks
               MekanismBlocks.BASIC_FLUID_TANK, MekanismBlocks.ADVANCED_FLUID_TANK, MekanismBlocks.ELITE_FLUID_TANK, MekanismBlocks.ULTIMATE_FLUID_TANK,
@@ -220,42 +263,48 @@ public class ClientRegistration {
         //TODO: Does the diversion transporter actually need to be in multiple render types
         // Also can we move the overlay from the TER to being part of the baked model
         //Logistical Transporter
-        ClientRegistrationUtil.setRenderLayer(renderType -> renderType == RenderType.getCutout() || renderType == RenderType.getTranslucent(),
+        ClientRegistrationUtil.setRenderLayer(renderType -> renderType == RenderType.cutout() || renderType == RenderType.translucent(),
               MekanismBlocks.DIVERSION_TRANSPORTER, MekanismBlocks.BASIC_LOGISTICAL_TRANSPORTER, MekanismBlocks.ADVANCED_LOGISTICAL_TRANSPORTER,
               MekanismBlocks.ELITE_LOGISTICAL_TRANSPORTER, MekanismBlocks.ULTIMATE_LOGISTICAL_TRANSPORTER);
         //Fluids (translucent)
         for (FluidRegistryObject<?, ?, ?, ?> fluidRO : MekanismFluids.FLUIDS.getAllFluids()) {
-            ClientRegistrationUtil.setRenderLayer(RenderType.getTranslucent(), fluidRO);
+            ClientRegistrationUtil.setRenderLayer(RenderType.translucent(), fluidRO);
         }
         // Multi-Layer blocks (requiring both sold & translucent render layers)
-        ClientRegistrationUtil.setRenderLayer(renderType -> renderType == RenderType.getSolid() || renderType == RenderType.getTranslucent(),
-              MekanismBlocks.ISOTOPIC_CENTRIFUGE, MekanismBlocks.ANTIPROTONIC_NUCLEOSYNTHESIZER, MekanismBlocks.CHEMICAL_CRYSTALLIZER);
+        ClientRegistrationUtil.setRenderLayer(renderType -> renderType == RenderType.solid() || renderType == RenderType.translucent(),
+              MekanismBlocks.ISOTOPIC_CENTRIFUGE, MekanismBlocks.ANTIPROTONIC_NUCLEOSYNTHESIZER, MekanismBlocks.CHEMICAL_CRYSTALLIZER,
+              MekanismBlocks.NUTRITIONAL_LIQUIFIER);
 
-        ClientRegistrationUtil.setPropertyOverride(MekanismBlocks.CARDBOARD_BOX, Mekanism.rl("storage"),
-              (stack, world, entity) -> ((ItemBlockCardboardBox) stack.getItem()).getBlockData(stack) == null ? 0 : 1);
+        event.enqueueWork(() -> {
+            ClientRegistrationUtil.setPropertyOverride(MekanismBlocks.CARDBOARD_BOX, Mekanism.rl("storage"),
+                  (stack, world, entity) -> ((ItemBlockCardboardBox) stack.getItem()).getBlockData(stack) == null ? 0 : 1);
 
-        ClientRegistrationUtil.setPropertyOverride(MekanismItems.CRAFTING_FORMULA, Mekanism.rl("invalid"), (stack, world, entity) -> {
-            ItemCraftingFormula formula = (ItemCraftingFormula) stack.getItem();
-            return formula.getInventory(stack) != null && formula.isInvalid(stack) ? 1 : 0;
+            ClientRegistrationUtil.setPropertyOverride(MekanismItems.CRAFTING_FORMULA, Mekanism.rl("invalid"), (stack, world, entity) -> {
+                ItemCraftingFormula formula = (ItemCraftingFormula) stack.getItem();
+                return formula.getInventory(stack) != null && formula.isInvalid(stack) ? 1 : 0;
+            });
+            ClientRegistrationUtil.setPropertyOverride(MekanismItems.CRAFTING_FORMULA, Mekanism.rl("encoded"), (stack, world, entity) -> {
+                ItemCraftingFormula formula = (ItemCraftingFormula) stack.getItem();
+                return formula.getInventory(stack) != null && !formula.isInvalid(stack) ? 1 : 0;
+            });
+            ClientRegistrationUtil.setPropertyOverride(MekanismItems.CONFIGURATION_CARD, Mekanism.rl("encoded"),
+                  (stack, world, entity) -> ((ItemConfigurationCard) stack.getItem()).hasData(stack) ? 1 : 0);
+
+            ClientRegistrationUtil.setPropertyOverride(MekanismItems.ELECTRIC_BOW, Mekanism.rl("pull"),
+                  (stack, world, entity) -> entity != null && entity.getUseItem() == stack ? (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / 20.0F : 0);
+            ClientRegistrationUtil.setPropertyOverride(MekanismItems.ELECTRIC_BOW, Mekanism.rl("pulling"),
+                  (stack, world, entity) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
+
+            ClientRegistrationUtil.setPropertyOverride(MekanismItems.GEIGER_COUNTER, Mekanism.rl("radiation"), (stack, world, entity) -> {
+                if (entity instanceof PlayerEntity) {
+                    return RadiationManager.INSTANCE.getClientScale().ordinal();
+                }
+                return 0;
+            });
+            //Note: Our implementation allows for a null entity so don't worry about it and pass it
+            ClientRegistrationUtil.setPropertyOverride(MekanismItems.HDPE_REINFORCED_ELYTRA, Mekanism.rl("broken"),
+                  (stack, world, entity) -> MekanismItems.HDPE_REINFORCED_ELYTRA.get().canElytraFly(stack, entity) ? 0.0F : 1.0F);
         });
-        ClientRegistrationUtil.setPropertyOverride(MekanismItems.CRAFTING_FORMULA, Mekanism.rl("encoded"), (stack, world, entity) -> {
-            ItemCraftingFormula formula = (ItemCraftingFormula) stack.getItem();
-            return formula.getInventory(stack) != null && !formula.isInvalid(stack) ? 1 : 0;
-        });
-
-        ClientRegistrationUtil.setPropertyOverride(MekanismItems.ELECTRIC_BOW, Mekanism.rl("pull"),
-              (stack, world, entity) -> entity != null && entity.getActiveItemStack() == stack ? (stack.getUseDuration() - entity.getItemInUseCount()) / 20.0F : 0);
-        ClientRegistrationUtil.setPropertyOverride(MekanismItems.ELECTRIC_BOW, Mekanism.rl("pulling"),
-              (stack, world, entity) -> entity != null && entity.isHandActive() && entity.getActiveItemStack() == stack ? 1.0F : 0.0F);
-
-        ClientRegistrationUtil.setPropertyOverride(MekanismItems.GEIGER_COUNTER, Mekanism.rl("radiation"), (stack, world, entity) -> {
-            if (entity instanceof PlayerEntity) {
-                return Mekanism.radiationManager.getClientScale().ordinal();
-            }
-            return 0;
-        });
-
-        MekanismModelCache.INSTANCE.setup();
 
         addCustomModel(MekanismBlocks.QIO_DRIVE_ARRAY, (orig, evt) -> new DriveArrayBakedModel(orig));
         addCustomModel(MekanismBlocks.QIO_REDSTONE_ADAPTER, (orig, evt) -> new QIORedstoneAdapterBakedModel(orig));
@@ -313,6 +362,9 @@ public class ClientRegistration {
         ClientRegistrationUtil.registerScreen(MekanismContainerTypes.ISOTOPIC_CENTRIFUGE, GuiIsotopicCentrifuge::new);
         ClientRegistrationUtil.registerScreen(MekanismContainerTypes.NUTRITIONAL_LIQUIFIER, GuiNutritionalLiquifier::new);
         ClientRegistrationUtil.registerScreen(MekanismContainerTypes.ANTIPROTONIC_NUCLEOSYNTHESIZER, GuiAntiprotonicNucleosynthesizer::new);
+        ClientRegistrationUtil.registerScreen(MekanismContainerTypes.PIGMENT_EXTRACTOR, GuiPigmentExtractor::new);
+        ClientRegistrationUtil.registerScreen(MekanismContainerTypes.PIGMENT_MIXER, GuiPigmentMixer::new);
+        ClientRegistrationUtil.registerScreen(MekanismContainerTypes.PAINTING_MACHINE, GuiPaintingMachine::new);
         ClientRegistrationUtil.registerScreen(MekanismContainerTypes.SEISMIC_VIBRATOR, GuiSeismicVibrator::new);
         ClientRegistrationUtil.registerScreen(MekanismContainerTypes.SOLAR_NEUTRON_ACTIVATOR, GuiSolarNeutronActivator::new);
         ClientRegistrationUtil.registerScreen(MekanismContainerTypes.TELEPORTER, GuiTeleporter::new);
@@ -336,11 +388,18 @@ public class ClientRegistration {
         ClientRegistrationUtil.registerScreen(MekanismContainerTypes.DIGITAL_MINER_CONFIG, GuiDigitalMinerConfig::new);
         ClientRegistrationUtil.registerScreen(MekanismContainerTypes.LOGISTICAL_SORTER, GuiLogisticalSorter::new);
 
-        ClientRegistrationUtil.registerScreen(MekanismContainerTypes.UPGRADE_MANAGEMENT, GuiUpgradeManagement::new);
         ClientRegistrationUtil.registerScreen(MekanismContainerTypes.QIO_FREQUENCY_SELECT_TILE, GuiQIOTileFrequencySelect::new);
 
         ClientRegistrationUtil.registerScreen(MekanismContainerTypes.BOILER_STATS, GuiBoilerStats::new);
         ClientRegistrationUtil.registerScreen(MekanismContainerTypes.MATRIX_STATS, GuiMatrixStats::new);
+    }
+
+    @SubscribeEvent
+    public static void registerModelLoaders(ModelRegistryEvent event) {
+        ModelLoaderRegistry.registerLoader(Mekanism.rl("mekanism"), MekanismModel.Loader.INSTANCE);
+        ModelLoaderRegistry.registerLoader(Mekanism.rl("robit"), RobitModel.Loader.INSTANCE);
+        ModelLoaderRegistry.registerLoader(Mekanism.rl("transmitter"), TransmitterLoader.INSTANCE);
+        MekanismModelCache.INSTANCE.setup();
     }
 
     @SubscribeEvent
@@ -354,10 +413,6 @@ public class ClientRegistration {
 
     @SubscribeEvent
     public static void registerParticleFactories(ParticleFactoryRegisterEvent event) {
-        if (MekanismUtils.isGameStateInvalid()) {
-            //Exit early to avoid getting blamed for crashes due to https://github.com/MinecraftForge/MinecraftForge/issues/6374
-            return;
-        }
         ClientRegistrationUtil.registerParticleFactory(MekanismParticleTypes.LASER, LaserParticle.Factory::new);
         ClientRegistrationUtil.registerParticleFactory(MekanismParticleTypes.JETPACK_FLAME, JetpackFlameParticle.Factory::new);
         ClientRegistrationUtil.registerParticleFactory(MekanismParticleTypes.JETPACK_SMOKE, JetpackSmokeParticle.Factory::new);
@@ -365,17 +420,26 @@ public class ClientRegistration {
         ClientRegistrationUtil.registerParticleFactory(MekanismParticleTypes.RADIATION, RadiationParticle.Factory::new);
     }
 
+    private static void createRobitTextureAtlas() {
+        //TODO - 1.18: Move registering the sprite uploader to RegisterClientReloadListenersEvent
+        Minecraft minecraft = Minecraft.getInstance();
+        RobitSpriteUploader spriteUploader = new RobitSpriteUploader(minecraft.getTextureManager());
+        IResourceManager resourceManager = minecraft.getResourceManager();
+        if (resourceManager instanceof IReloadableResourceManager) {
+            IReloadableResourceManager reloadableResourceManager = (IReloadableResourceManager) resourceManager;
+            reloadableResourceManager.registerReloadListener(spriteUploader);
+        }
+    }
+
     @SubscribeEvent
     public static void registerItemColorHandlers(ColorHandlerEvent.Item event) {
-        if (MekanismUtils.isGameStateInvalid()) {
-            //Exit early to avoid getting blamed for crashes due to https://github.com/MinecraftForge/MinecraftForge/issues/6374
-            return;
-        }
+        //Create the texture atlas for the robit's textures here as there isn't a great spot to do it until 1.17
+        createRobitTextureAtlas();
         BlockColors blockColors = event.getBlockColors();
         ItemColors itemColors = event.getItemColors();
         ClientRegistrationUtil.registerBlockColorHandler(blockColors, (state, world, pos, tintIndex) -> {
                   if (pos != null) {
-                      TileEntity tile = MekanismUtils.getTileEntity(world, pos);
+                      TileEntity tile = WorldUtils.getTileEntity(world, pos);
                       if (tile instanceof TileEntityQIOComponent) {
                           EnumColor color = ((TileEntityQIOComponent) tile).getColor();
                           return color != null ? MekanismRenderer.getColorARGB(color, 1) : -1;
@@ -384,28 +448,13 @@ public class ClientRegistration {
                   return -1;
               }, MekanismBlocks.QIO_DRIVE_ARRAY, MekanismBlocks.QIO_DASHBOARD, MekanismBlocks.QIO_IMPORTER, MekanismBlocks.QIO_EXPORTER,
               MekanismBlocks.QIO_REDSTONE_ADAPTER);
-        ClientRegistrationUtil.registerBlockColorHandler(blockColors, itemColors, (state, world, pos, tintIndex) -> {
-                  Block block = state.getBlock();
-                  if (block instanceof IColoredBlock) {
-                      return MekanismRenderer.getColorARGB(((IColoredBlock) block).getColor(), 1);
-                  }
-                  return -1;
-              }, (stack, tintIndex) -> {
-                  Item item = stack.getItem();
-                  if (item instanceof BlockItem) {
-                      Block block = ((BlockItem) item).getBlock();
-                      if (block instanceof IColoredBlock) {
-                          return MekanismRenderer.getColorARGB(((IColoredBlock) block).getColor(), 1);
-                      }
-                  }
-                  return -1;
-              },
+        ClientRegistrationUtil.registerIColoredBlockHandler(blockColors, itemColors,
               //Fluid Tank
               MekanismBlocks.BASIC_FLUID_TANK, MekanismBlocks.ADVANCED_FLUID_TANK, MekanismBlocks.ELITE_FLUID_TANK, MekanismBlocks.ULTIMATE_FLUID_TANK,
               MekanismBlocks.CREATIVE_FLUID_TANK);
         ClientRegistrationUtil.registerBlockColorHandler(blockColors, (state, world, pos, tintIndex) -> {
                   if (tintIndex == 1 && pos != null) {
-                      TileEntityLogisticalTransporter transporter = MekanismUtils.getTileEntity(TileEntityLogisticalTransporter.class, world, pos);
+                      TileEntityLogisticalTransporter transporter = WorldUtils.getTileEntity(TileEntityLogisticalTransporter.class, world, pos);
                       if (transporter != null) {
                           EnumColor renderColor = transporter.getTransmitter().getColor();
                           if (renderColor != null) {
@@ -438,29 +487,52 @@ public class ClientRegistration {
 
     @SubscribeEvent
     public static void loadComplete(FMLLoadCompleteEvent evt) {
-        EntityRendererManager entityRenderManager = Minecraft.getInstance().getRenderManager();
-        //Add our own custom armor layer to the various player renderers
-        for (Entry<String, PlayerRenderer> entry : entityRenderManager.getSkinMap().entrySet()) {
-            addCustomArmorLayer(entry.getValue());
-        }
-        //Add our own custom armor layer to everything that has an armor layer
-        //Note: This includes any modded mobs that have vanilla's BipedArmorLayer added to them
-        for (Entry<EntityType<?>, EntityRenderer<?>> entry : entityRenderManager.renderers.entrySet()) {
-            EntityRenderer<?> renderer = entry.getValue();
-            if (renderer instanceof LivingRenderer) {
-                addCustomArmorLayer((LivingRenderer) renderer);
+        evt.enqueueWork(() -> {
+            //Enqueue our layer render injection code as it acts on non thread safe collections
+            EntityRendererManager entityRenderManager = Minecraft.getInstance().getEntityRenderDispatcher();
+            //Add our own custom armor layer to the various player renderers
+            for (Entry<String, PlayerRenderer> entry : entityRenderManager.getSkinMap().entrySet()) {
+                addCustomLayers(EntityType.PLAYER, entry.getValue());
             }
-        }
+            //Add our own custom armor layer to everything that has an armor layer
+            //Note: This includes any modded mobs that have vanilla's BipedArmorLayer added to them
+            for (Entry<EntityType<?>, EntityRenderer<?>> entry : entityRenderManager.renderers.entrySet()) {
+                EntityRenderer<?> renderer = entry.getValue();
+                if (renderer instanceof LivingRenderer) {
+                    addCustomLayers(entry.getKey(), (LivingRenderer) renderer);
+                }
+            }
+        });
     }
 
-    private static <T extends LivingEntity, M extends BipedModel<T>, A extends BipedModel<T>> void addCustomArmorLayer(LivingRenderer<T, M> renderer) {
-        for (LayerRenderer<T, M> layerRenderer : new ArrayList<>(renderer.layerRenderers)) {
-            //Only allow an exact match, so we don't add to modded entities that only have a modded extended armor layer
-            if (layerRenderer.getClass() == BipedArmorLayer.class) {
-                BipedArmorLayer<T, M, A> bipedArmorLayer = (BipedArmorLayer<T, M, A>) layerRenderer;
-                renderer.addLayer(new MekanismArmorLayer<>(renderer, bipedArmorLayer.modelLeggings, bipedArmorLayer.modelArmor));
-                break;
+    private static <T extends LivingEntity, M extends BipedModel<T>> void addCustomLayers(EntityType<?> type, LivingRenderer<T, M> renderer) {
+        BipedArmorLayer<T, M, ?> bipedArmorLayer = null;
+        boolean hasElytra = false;
+        for (LayerRenderer<T, M> layerRenderer : renderer.layers) {
+            //Validate against the layer render being null, as it seems like some mods do stupid things and add in null layers
+            if (layerRenderer != null) {
+                //Only allow an exact class match, so we don't add to modded entities that only have a modded extended armor or elytra layer
+                Class<?> layerClass = layerRenderer.getClass();
+                if (layerClass == BipedArmorLayer.class) {
+                    bipedArmorLayer = (BipedArmorLayer<T, M, ?>) layerRenderer;
+                    if (hasElytra) {
+                        break;
+                    }
+                } else if (layerClass == ElytraLayer.class) {
+                    hasElytra = true;
+                    if (bipedArmorLayer != null) {
+                        break;
+                    }
+                }
             }
+        }
+        if (bipedArmorLayer != null) {
+            renderer.addLayer(new MekanismArmorLayer<>(renderer, bipedArmorLayer.innerModel, bipedArmorLayer.outerModel));
+            Mekanism.logger.debug("Added Mekanism Armor Layer to entity of type: {}", type.getRegistryName());
+        }
+        if (hasElytra) {
+            renderer.addLayer(new MekanismElytraLayer<>(renderer));
+            Mekanism.logger.debug("Added Mekanism Elytra Layer to entity of type: {}", type.getRegistryName());
         }
     }
 
@@ -470,8 +542,20 @@ public class ClientRegistration {
 
     public static void addLitModel(IItemProvider... providers) {
         for (IItemProvider provider : providers) {
-            addCustomModel(provider, (orig, evt) -> new LightedBakedModel(orig));
+            addCustomModel(provider, (orig, evt) -> lightBakedModel(orig));
         }
+    }
+
+    private static IBakedModel lightBakedModel(IBakedModel orig) {
+        if (orig instanceof SeparatePerspectiveModel.BakedModel) {
+            SeparatePerspectiveModel.BakedModel separatePerspectiveModel = (SeparatePerspectiveModel.BakedModel) orig;
+            //Transform inner components of the separate perspective model and then return the original model
+            SEPARATE_PERSPECTIVE_BASE_MODEL.transformValue(separatePerspectiveModel, Objects::nonNull, ClientRegistration::lightBakedModel);
+            SEPARATE_PERSPECTIVE_PERSPECTIVES.transformValue(separatePerspectiveModel, v -> !v.isEmpty(), org -> ImmutableMap.copyOf(Maps.transformValues(org,
+                  ClientRegistration::lightBakedModel)));
+            return orig;
+        }
+        return new LightedBakedModel(orig);
     }
 
     @FunctionalInterface

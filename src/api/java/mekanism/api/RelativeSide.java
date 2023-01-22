@@ -15,8 +15,13 @@ public enum RelativeSide implements IHasTranslationKey {
     TOP(APILang.TOP),
     BOTTOM(APILang.BOTTOM);
 
-    private final static RelativeSide[] SIDES = values();
+    private static final RelativeSide[] SIDES = values();
 
+    /**
+     * Gets a side by index.
+     *
+     * @param index Index of the side.
+     */
     public static RelativeSide byIndex(int index) {
         return MathUtils.getByIndexMod(SIDES, index);
     }
@@ -48,12 +53,12 @@ public enum RelativeSide implements IHasTranslationKey {
             if (facing == Direction.DOWN || facing == Direction.UP) {
                 return Direction.EAST;
             }
-            return facing.rotateY();
+            return facing.getClockWise();
         } else if (this == RIGHT) {
             if (facing == Direction.DOWN || facing == Direction.UP) {
                 return Direction.WEST;
             }
-            return facing.rotateYCCW();
+            return facing.getCounterClockWise();
         } else if (this == TOP) {
             if (facing == Direction.DOWN) {
                 return Direction.NORTH;
@@ -88,21 +93,11 @@ public enum RelativeSide implements IHasTranslationKey {
             return FRONT;
         } else if (side == facing.getOpposite()) {
             return BACK;
-        } else if (facing == Direction.DOWN) {
+        } else if (facing == Direction.DOWN || facing == Direction.UP) {
             if (side == Direction.NORTH) {
-                return TOP;
+                return facing == Direction.DOWN ? TOP : BOTTOM;
             } else if (side == Direction.SOUTH) {
-                return BOTTOM;
-            } else if (side == Direction.WEST) {
-                return RIGHT;
-            } else if (side == Direction.EAST) {
-                return LEFT;
-            }
-        } else if (facing == Direction.UP) {
-            if (side == Direction.NORTH) {
-                return BOTTOM;
-            } else if (side == Direction.SOUTH) {
-                return TOP;
+                return facing == Direction.DOWN ? BOTTOM : TOP;
             } else if (side == Direction.WEST) {
                 return RIGHT;
             } else if (side == Direction.EAST) {
@@ -112,9 +107,9 @@ public enum RelativeSide implements IHasTranslationKey {
             return BOTTOM;
         } else if (side == Direction.UP) {
             return TOP;
-        } else if (side == facing.rotateYCCW()) {
+        } else if (side == facing.getCounterClockWise()) {
             return RIGHT;
-        } else if (side == facing.rotateY()) {
+        } else if (side == facing.getClockWise()) {
             return LEFT;
         }
         //Fall back to front, should never get here

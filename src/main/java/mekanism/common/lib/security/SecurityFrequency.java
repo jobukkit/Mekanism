@@ -3,15 +3,16 @@ package mekanism.common.lib.security;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import mekanism.api.NBTConstants;
-import mekanism.common.lib.HashList;
+import mekanism.common.lib.collection.HashList;
 import mekanism.common.lib.frequency.Frequency;
 import mekanism.common.lib.frequency.FrequencyType;
-import mekanism.common.lib.security.ISecurityTile.SecurityMode;
 import mekanism.common.network.BasePacketHandler;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.PacketBuffer;
@@ -29,12 +30,15 @@ public class SecurityFrequency extends Frequency {
 
     private SecurityMode securityMode = SecurityMode.PUBLIC;
 
-    public SecurityFrequency(UUID uuid) {
+    /**
+     * @param uuid Should only be null if we have incomplete data that we are loading
+     */
+    public SecurityFrequency(@Nullable UUID uuid) {
         super(FrequencyType.SECURITY, SECURITY, uuid);
     }
 
     public SecurityFrequency() {
-        super(FrequencyType.SECURITY);
+        super(FrequencyType.SECURITY, SECURITY, null);
     }
 
     @Override
@@ -50,7 +54,7 @@ public class SecurityFrequency extends Frequency {
         if (!trusted.isEmpty()) {
             ListNBT trustedList = new ListNBT();
             for (UUID uuid : trusted) {
-                trustedList.add(NBTUtil.func_240626_a_(uuid));
+                trustedList.add(NBTUtil.createUUID(uuid));
             }
             nbtTags.put(NBTConstants.TRUSTED, trustedList);
         }
@@ -62,9 +66,9 @@ public class SecurityFrequency extends Frequency {
         override = nbtTags.getBoolean(NBTConstants.OVERRIDE);
         NBTUtils.setEnumIfPresent(nbtTags, NBTConstants.SECURITY_MODE, SecurityMode::byIndexStatic, mode -> securityMode = mode);
         if (nbtTags.contains(NBTConstants.TRUSTED, NBT.TAG_LIST)) {
-            ListNBT trustedList = nbtTags.getList(NBTConstants.TRUSTED, NBT.TAG_COMPOUND);
-            for (int i = 0; i < trustedList.size(); i++) {
-                UUID uuid = NBTUtil.readUniqueId(trustedList.getCompound(i));
+            ListNBT trustedList = nbtTags.getList(NBTConstants.TRUSTED, NBT.TAG_INT_ARRAY);
+            for (INBT trusted : trustedList) {
+                UUID uuid = NBTUtil.loadUUID(trusted);
                 addTrusted(uuid, MekanismUtils.getLastKnownUsername(uuid));
             }
         }
@@ -74,18 +78,18 @@ public class SecurityFrequency extends Frequency {
     public void write(PacketBuffer buffer) {
         super.write(buffer);
         buffer.writeBoolean(override);
-        buffer.writeEnumValue(securityMode);
-        buffer.writeInt(trustedCache.size());
-        trustedCache.forEach(buffer::writeString);
+        buffer.writeEnum(securityMode);
+        buffer.writeVarInt(trustedCache.size());
+        trustedCache.forEach(buffer::writeUtf);
     }
 
     @Override
     protected void read(PacketBuffer dataStream) {
         super.read(dataStream);
         override = dataStream.readBoolean();
-        securityMode = dataStream.readEnumValue(SecurityMode.class);
+        securityMode = dataStream.readEnum(SecurityMode.class);
         trustedCache = new ArrayList<>();
-        int count = dataStream.readInt();
+        int count = dataStream.readVarInt();
         for (int i = 0; i < count; i++) {
             trustedCache.add(BasePacketHandler.readString(dataStream));
         }

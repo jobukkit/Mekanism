@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 import mekanism.common.block.prefab.BlockTile.BlockTileModel;
 import mekanism.common.content.blocktype.BlockTypeTile;
 import mekanism.common.tile.base.WrenchResult;
-import mekanism.common.util.MekanismUtils;
+import mekanism.common.util.WorldUtils;
 import mekanism.generators.common.item.ItemTurbineBlade;
 import mekanism.generators.common.registries.GeneratorsBlockTypes;
 import mekanism.generators.common.registries.GeneratorsItems;
@@ -23,7 +23,7 @@ import net.minecraft.world.World;
 
 public class BlockTurbineRotor extends BlockTileModel<TileEntityTurbineRotor, BlockTypeTile<TileEntityTurbineRotor>> {
 
-    private static final VoxelShape bounds = makeCuboidShape(6, 0, 6, 10, 16, 10);
+    private static final VoxelShape bounds = box(6, 0, 6, 10, 16, 10);
 
     public BlockTurbineRotor() {
         super(GeneratorsBlockTypes.TURBINE_ROTOR);
@@ -31,51 +31,46 @@ public class BlockTurbineRotor extends BlockTileModel<TileEntityTurbineRotor, Bl
 
     @Override
     @Deprecated
-    public void onReplaced(BlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull BlockState newState, boolean isMoving) {
-        if (!world.isRemote && state.hasTileEntity() && state.getBlock() != newState.getBlock()) {
-            TileEntityTurbineRotor tile = MekanismUtils.getTileEntity(TileEntityTurbineRotor.class, world, pos);
+    public void onRemove(@Nonnull BlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull BlockState newState, boolean isMoving) {
+        if (!world.isClientSide && state.hasTileEntity() && (!state.is(newState.getBlock()) || !newState.hasTileEntity())) {
+            TileEntityTurbineRotor tile = WorldUtils.getTileEntity(TileEntityTurbineRotor.class, world, pos);
             if (tile != null) {
                 int amount = tile.getHousedBlades();
                 if (amount > 0) {
-                    spawnAsEntity(world, pos, GeneratorsItems.TURBINE_BLADE.getItemStack(amount));
+                    popResource(world, pos, GeneratorsItems.TURBINE_BLADE.getItemStack(amount));
                 }
             }
         }
-        super.onReplaced(state, world, pos, newState, isMoving);
+        super.onRemove(state, world, pos, newState, isMoving);
     }
 
     @Nonnull
     @Override
     @Deprecated
-    public ActionResultType onBlockActivated(@Nonnull BlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull PlayerEntity player, @Nonnull Hand hand,
+    public ActionResultType use(@Nonnull BlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull PlayerEntity player, @Nonnull Hand hand,
           @Nonnull BlockRayTraceResult hit) {
-        TileEntityTurbineRotor tile = MekanismUtils.getTileEntity(TileEntityTurbineRotor.class, world, pos);
+        TileEntityTurbineRotor tile = WorldUtils.getTileEntity(TileEntityTurbineRotor.class, world, pos);
         if (tile == null) {
             return ActionResultType.PASS;
-        }
-        if (world.isRemote) {
-            return genericClientActivated(player, hand, hit);
-        }
-        if (tile.tryWrench(state, player, hand, hit) != WrenchResult.PASS) {
+        } else if (world.isClientSide) {
+            return genericClientActivated(player, hand);
+        } else if (tile.tryWrench(state, player, hand, hit) != WrenchResult.PASS) {
             return ActionResultType.SUCCESS;
         }
-        ItemStack stack = player.getHeldItem(hand);
-        if (!player.isSneaking()) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (!player.isShiftKeyDown()) {
             if (!stack.isEmpty() && stack.getItem() instanceof ItemTurbineBlade) {
-                if (tile.addBlade()) {
+                if (tile.addBlade(true)) {
                     if (!player.isCreative()) {
                         stack.shrink(1);
-                        if (stack.getCount() == 0) {
-                            player.setHeldItem(hand, ItemStack.EMPTY);
-                        }
                     }
                 }
             }
         } else if (stack.isEmpty()) {
             if (tile.removeBlade()) {
                 if (!player.isCreative()) {
-                    player.setHeldItem(hand, GeneratorsItems.TURBINE_BLADE.getItemStack());
-                    player.inventory.markDirty();
+                    player.setItemInHand(hand, GeneratorsItems.TURBINE_BLADE.getItemStack());
+                    player.inventory.setChanged();
                 }
             }
         } else if (stack.getItem() instanceof ItemTurbineBlade) {
@@ -83,7 +78,7 @@ public class BlockTurbineRotor extends BlockTileModel<TileEntityTurbineRotor, Bl
                 if (tile.removeBlade()) {
                     if (!player.isCreative()) {
                         stack.grow(1);
-                        player.inventory.markDirty();
+                        player.inventory.setChanged();
                     }
                 }
             }

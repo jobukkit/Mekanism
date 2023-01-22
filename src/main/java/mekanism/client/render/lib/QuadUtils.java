@@ -1,5 +1,6 @@
 package mekanism.client.render.lib;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -7,6 +8,9 @@ import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 public class QuadUtils {
+
+    private QuadUtils() {
+    }
 
     private static final float eps = 1F / 0x100;
 
@@ -23,24 +27,40 @@ public class QuadUtils {
     }
 
     public static List<Quad> transformQuads(List<Quad> orig, QuadTransformation transformation) {
-        return orig.stream().peek(transformation::transform).collect(Collectors.toList());
+        List<Quad> list = new ArrayList<>(orig.size());
+        for (Quad quad : orig) {
+            transformation.transform(quad);
+            list.add(quad);
+        }
+        return list;
     }
 
     public static List<BakedQuad> transformBakedQuads(List<BakedQuad> orig, QuadTransformation transformation) {
-        return orig.stream().map(Quad::new).peek(transformation::transform).map(Quad::bake).collect(Collectors.toList());
+        List<BakedQuad> list = new ArrayList<>(orig.size());
+        for (BakedQuad bakedQuad : orig) {
+            Quad quad = new Quad(bakedQuad);
+            transformation.transform(quad);
+            list.add(quad.bake());
+        }
+        return list;
     }
 
     public static List<BakedQuad> transformAndBake(List<Quad> orig, QuadTransformation transformation) {
-        return orig.stream().peek(transformation::transform).map(Quad::bake).collect(Collectors.toList());
+        List<BakedQuad> list = new ArrayList<>(orig.size());
+        for (Quad quad : orig) {
+            transformation.transform(quad);
+            list.add(quad.bake());
+        }
+        return list;
     }
 
     public static void remapUVs(Quad quad, TextureAtlasSprite newTexture) {
-        float uMin = quad.getTexture().getMinU(), uMax = quad.getTexture().getMaxU();
-        float vMin = quad.getTexture().getMinV(), vMax = quad.getTexture().getMaxV();
+        float uMin = quad.getTexture().getU0(), uMax = quad.getTexture().getU1();
+        float vMin = quad.getTexture().getV0(), vMax = quad.getTexture().getV1();
         for (Vertex v : quad.getVertices()) {
             float newU = (v.getTexU() - uMin) * 16F / (uMax - uMin);
             float newV = (v.getTexV() - vMin) * 16F / (vMax - vMin);
-            v.texRaw(newTexture.getInterpolatedU(newU), newTexture.getInterpolatedV(newV));
+            v.texRaw(newTexture.getU(newU), newTexture.getV(newV));
         }
     }
 
@@ -48,8 +68,8 @@ public class QuadUtils {
     // ultimately this fixes UVs bleeding over the edge slightly when dealing with smaller models or tight UV bounds
     public static void contractUVs(Quad quad) {
         TextureAtlasSprite texture = quad.getTexture();
-        float sizeX = texture.getWidth() / (texture.getMaxU() - texture.getMinU());
-        float sizeY = texture.getHeight() / (texture.getMaxV() - texture.getMinV());
+        float sizeX = texture.getWidth() / (texture.getU1() - texture.getU0());
+        float sizeY = texture.getHeight() / (texture.getV1() - texture.getV0());
         float ep = 1F / (Math.max(sizeX, sizeY) * 0x100);
         float[] newUs = contract(quad, Vertex::getTexU, ep);
         float[] newVs = contract(quad, Vertex::getTexV, ep);

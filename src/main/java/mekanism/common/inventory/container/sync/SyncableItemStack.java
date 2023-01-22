@@ -4,9 +4,9 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import mekanism.api.annotations.NonNull;
-import mekanism.common.network.container.property.IntPropertyData;
-import mekanism.common.network.container.property.ItemStackPropertyData;
-import mekanism.common.network.container.property.PropertyData;
+import mekanism.common.network.to_client.container.property.IntPropertyData;
+import mekanism.common.network.to_client.container.property.ItemStackPropertyData;
+import mekanism.common.network.to_client.container.property.PropertyData;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -48,7 +48,14 @@ public class SyncableItemStack implements ISyncableData {
     @Override
     public DirtyType isDirty() {
         ItemStack value = get();
-        boolean sameItem = value.isItemEqual(this.lastKnownValue) && ItemStack.areItemStackTagsEqual(value, this.lastKnownValue);
+        if (value.isEmpty() && this.lastKnownValue.isEmpty()) {
+            //If they are both empty, we don't need to update anything they are identical
+            // Note: isItemEqual returns false if one is empty, even if the other may also be empty
+            return DirtyType.CLEAN;
+        }
+        //TODO: Should same item be replaced with ItemHandlerHelper#canItemStacksStack so that we take cap NBT into account?
+        // Cap NBT isn't synced so in a sense it doesn't matter, though maybe it will at some point?
+        boolean sameItem = value.sameItem(this.lastKnownValue) && ItemStack.tagMatches(value, this.lastKnownValue);
         if (!sameItem || value.getCount() != this.lastKnownValue.getCount()) {
             //Make sure to copy it in case our item stack object is the same object so would be getting modified
             // only do so though if it is dirty, as we don't need to spam object creation

@@ -15,6 +15,9 @@ import net.minecraftforge.registries.IRegistryDelegate;
 @MethodsReturnNonnullByDefault
 public class PigmentStack extends ChemicalStack<Pigment> {
 
+    /**
+     * Empty PigmentStack instance.
+     */
     public static final PigmentStack EMPTY = new PigmentStack(MekanismAPI.EMPTY_PIGMENT, 0);
 
     /**
@@ -84,16 +87,9 @@ public class PigmentStack extends ChemicalStack<Pigment> {
      */
     @Override
     public PigmentStack copy() {
+        if (isEmpty()) {
+            return EMPTY;
+        }
         return new PigmentStack(this, getAmount());
-    }
-
-    /**
-     * Default equality comparison for a PigmentStack. Same functionality as isTypeEqual().
-     *
-     * This is included for use in data structures.
-     */
-    @Override
-    public final boolean equals(Object o) {
-        return o instanceof PigmentStack && isTypeEqual((PigmentStack) o);
     }
 }

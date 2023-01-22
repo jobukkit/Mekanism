@@ -14,7 +14,7 @@ import mekanism.api.energy.ISidedStrictEnergyHandler;
 import mekanism.api.energy.IStrictEnergyHandler;
 import mekanism.common.capabilities.holder.energy.IEnergyContainerHolder;
 import mekanism.common.capabilities.proxy.ProxyStrictEnergyHandler;
-import mekanism.common.capabilities.resolver.basic.EnergyCapabilityResolver;
+import mekanism.common.capabilities.resolver.EnergyCapabilityResolver;
 import mekanism.common.integration.energy.EnergyCompatUtils;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
@@ -79,18 +79,15 @@ public class EnergyHandlerManager implements ICapabilityHandlerManager<IEnergyCo
         }
         if (side == null) {
             if (readOnlyHandler == null) {
-                //Note: Only should enter this if statement if we don't already have a cache
-                // so we just check it before hand as it is a quick check and simplifies the code
+                //Note: Only should enter this if statement if we don't already have a cache,
+                // so we just check it beforehand as it is a quick check and simplifies the code
                 readOnlyHandler = new ProxyStrictEnergyHandler(baseHandler, null, holder);
             }
             return EnergyCapabilityResolver.getCachedOrResolve(capability, cachedReadOnlyCapabilities, readOnlyHandler);
         }
-        IStrictEnergyHandler handler = handlers.get(side);
-        if (handler == null) {
-            //Note: Only should enter this if statement if we don't already have a cache
-            // so we just check it before hand as it is a quick check and simplifies the code
-            handlers.put(side, handler = new ProxyStrictEnergyHandler(baseHandler, side, holder));
-        }
+        //Note: Only should enter this if statement if we don't already have a cache,
+        // so we just check it beforehand as it is a quick check and simplifies the code
+        IStrictEnergyHandler handler = handlers.computeIfAbsent(side, s -> new ProxyStrictEnergyHandler(baseHandler, s, holder));
         return EnergyCapabilityResolver.getCachedOrResolve(capability, cachedCapabilities.computeIfAbsent(side, key -> new HashMap<>()), handler);
     }
 

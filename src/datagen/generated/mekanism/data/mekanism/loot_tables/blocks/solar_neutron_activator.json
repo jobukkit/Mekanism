@@ -2,6 +2,7 @@
   "type": "minecraft:block",
   "pools": [
     {
+      "name": "main",
       "rolls": 1,
       "entries": [
         {
@@ -19,6 +20,16 @@
                 {
                   "source": "componentSecurity.securityMode",
                   "target": "mekData.securityMode",
+                  "op": "replace"
+                },
+                {
+                  "source": "componentConfig",
+                  "target": "mekData.componentConfig",
+                  "op": "replace"
+                },
+                {
+                  "source": "componentEjector",
+                  "target": "mekData.componentEjector",
                   "op": "replace"
                 },
                 {
@@ -40,11 +51,6 @@
             }
           ],
           "name": "mekanism:solar_neutron_activator"
-        }
-      ],
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
         }
       ]
     }

@@ -16,11 +16,14 @@ import mekanism.client.gui.element.tab.GuiBoilerTab.BoilerTab;
 import mekanism.client.gui.element.tab.GuiHeatTab;
 import mekanism.common.MekanismLang;
 import mekanism.common.config.MekanismConfig;
+import mekanism.common.content.boiler.BoilerMultiblockData;
 import mekanism.common.inventory.container.tile.MekanismTileContainer;
+import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tile.multiblock.TileEntityBoilerCasing;
 import mekanism.common.util.HeatUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.UnitDisplayUtils.TemperatureUnit;
+import mekanism.common.util.text.TextUtils;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.text.ITextComponent;
 
@@ -29,63 +32,63 @@ public class GuiThermoelectricBoiler extends GuiMekanismTile<TileEntityBoilerCas
     public GuiThermoelectricBoiler(MekanismTileContainer<TileEntityBoilerCasing> container, PlayerInventory inv, ITextComponent title) {
         super(container, inv, title);
         dynamicSlots = true;
-        xSize += 40;
+        imageWidth += 40;
+        inventoryLabelY += 2;
+        titleLabelY = 5;
     }
 
     @Override
-    public void init() {
-        super.init();
-        addButton(new GuiInnerScreen(this, 60, 23, 96, 40, () -> Arrays.asList(
-              MekanismLang.TEMPERATURE.translate(MekanismUtils.getTemperatureDisplay(tile.getMultiblock().getTotalTemperature(), TemperatureUnit.KELVIN, true)),
-              MekanismLang.BOIL_RATE.translate(formatInt(tile.getMultiblock().lastBoilRate)),
-              MekanismLang.MAX_BOIL_RATE.translate(formatInt(tile.getMultiblock().lastMaxBoil))
-        )));
+    protected void addGuiElements() {
+        super.addGuiElements();
+        addButton(new GuiInnerScreen(this, 60, 23, 96, 40, () -> {
+            BoilerMultiblockData multiblock = tile.getMultiblock();
+            return Arrays.asList(MekanismLang.TEMPERATURE.translate(MekanismUtils.getTemperatureDisplay(multiblock.getTotalTemperature(), TemperatureUnit.KELVIN, true)),
+                  MekanismLang.BOIL_RATE.translate(TextUtils.format(multiblock.lastBoilRate)), MekanismLang.MAX_BOIL_RATE.translate(TextUtils.format(multiblock.lastMaxBoil)));
+        }).jeiCategories(MekanismBlocks.BOILER_CASING.getRegistryName()));
         addButton(new GuiBoilerTab(this, tile, BoilerTab.STAT));
         addButton(new GuiVerticalRateBar(this, new IBarInfoHandler() {
             @Override
             public ITextComponent getTooltip() {
-                return MekanismLang.BOIL_RATE.translate(formatInt(tile.getMultiblock().lastBoilRate));
+                return MekanismLang.BOIL_RATE.translate(TextUtils.format(tile.getMultiblock().lastBoilRate));
             }
 
             @Override
             public double getLevel() {
-                return (double) tile.getMultiblock().lastBoilRate / (double) tile.getMultiblock().lastMaxBoil;
+                BoilerMultiblockData multiblock = tile.getMultiblock();
+                return Math.min(1, multiblock.lastBoilRate / (double) multiblock.lastMaxBoil);
             }
         }, 44, 13));
         addButton(new GuiVerticalRateBar(this, new IBarInfoHandler() {
             @Override
             public ITextComponent getTooltip() {
-                return MekanismLang.MAX_BOIL_RATE.translate(formatInt(tile.getMultiblock().lastMaxBoil));
+                return MekanismLang.MAX_BOIL_RATE.translate(TextUtils.format(tile.getMultiblock().lastMaxBoil));
             }
 
             @Override
             public double getLevel() {
-                return tile.getMultiblock().lastMaxBoil * HeatUtils.getWaterThermalEnthalpy() /
-                       (tile.getMultiblock().superheatingElements * MekanismConfig.general.superheatingHeatTransfer.get());
+                BoilerMultiblockData multiblock = tile.getMultiblock();
+                return Math.min(1, multiblock.lastMaxBoil * HeatUtils.getWaterThermalEnthalpy() /
+                                   (multiblock.superheatingElements * MekanismConfig.general.superheatingHeatTransfer.get()));
             }
         }, 164, 13));
-        addButton(new GuiGasGauge(() -> tile.getMultiblock().superheatedCoolantTank,
-              () -> tile.getMultiblock().getGasTanks(null), GaugeType.STANDARD, this, 6, 13)
+        addButton(new GuiGasGauge(() -> tile.getMultiblock().superheatedCoolantTank, () -> tile.getMultiblock().getGasTanks(null), GaugeType.STANDARD, this, 6, 13)
               .setLabel(MekanismLang.BOILER_HEATED_COOLANT_TANK.translateColored(EnumColor.ORANGE)));
-        addButton(new GuiFluidGauge(() -> tile.getMultiblock().waterTank,
-              () -> tile.getMultiblock().getFluidTanks(null), GaugeType.STANDARD, this, 26, 13)
+        addButton(new GuiFluidGauge(() -> tile.getMultiblock().waterTank, () -> tile.getMultiblock().getFluidTanks(null), GaugeType.STANDARD, this, 26, 13)
               .setLabel(MekanismLang.BOILER_WATER_TANK.translateColored(EnumColor.INDIGO)));
-        addButton(new GuiGasGauge(() -> tile.getMultiblock().steamTank,
-              () -> tile.getMultiblock().getGasTanks(null), GaugeType.STANDARD, this, 172, 13)
+        addButton(new GuiGasGauge(() -> tile.getMultiblock().steamTank, () -> tile.getMultiblock().getGasTanks(null), GaugeType.STANDARD, this, 172, 13)
               .setLabel(MekanismLang.BOILER_STEAM_TANK.translateColored(EnumColor.GRAY)));
-        addButton(new GuiGasGauge(() -> tile.getMultiblock().cooledCoolantTank,
-              () -> tile.getMultiblock().getGasTanks(null), GaugeType.STANDARD, this, 192, 13)
+        addButton(new GuiGasGauge(() -> tile.getMultiblock().cooledCoolantTank, () -> tile.getMultiblock().getGasTanks(null), GaugeType.STANDARD, this, 192, 13)
               .setLabel(MekanismLang.BOILER_COOLANT_TANK.translateColored(EnumColor.AQUA)));
-        addButton(new GuiHeatTab(() -> {
+        addButton(new GuiHeatTab(this, () -> {
             ITextComponent environment = MekanismUtils.getTemperatureDisplay(tile.getMultiblock().lastEnvironmentLoss, TemperatureUnit.KELVIN, false);
             return Collections.singletonList(MekanismLang.DISSIPATED_RATE.translate(environment));
-        }, this));
+        }));
     }
 
     @Override
     protected void drawForegroundText(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        drawTitleText(matrix, MekanismLang.BOILER.translate(), 5);
-        drawString(matrix, MekanismLang.INVENTORY.translate(), 8, (getYSize() - 96) + 4, titleTextColor());
+        drawTitleText(matrix, MekanismLang.BOILER.translate(), titleLabelY);
+        drawString(matrix, inventory.getDisplayName(), inventoryLabelX, inventoryLabelY, titleTextColor());
         super.drawForegroundText(matrix, mouseX, mouseY);
     }
 }

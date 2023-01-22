@@ -4,7 +4,8 @@ import javax.annotation.Nonnull;
 import mekanism.api.lasers.ILaserReceptor;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.capabilities.Capabilities;
-import mekanism.common.capabilities.resolver.basic.BasicCapabilityResolver;
+import mekanism.common.capabilities.resolver.BasicCapabilityResolver;
+import mekanism.generators.common.content.fusion.FusionReactorMultiblockData;
 import mekanism.generators.common.registries.GeneratorsBlocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ActionResultType;
@@ -19,18 +20,22 @@ public class TileEntityLaserFocusMatrix extends TileEntityFusionReactorBlock imp
 
     @Override
     public void receiveLaserEnergy(@Nonnull FloatingLong energy, Direction side) {
-        if (getMultiblock().isFormed()) {
-            getMultiblock().addTemperatureFromEnergyInput(energy);
+        FusionReactorMultiblockData multiblock = getMultiblock();
+        if (multiblock.isFormed()) {
+            multiblock.addTemperatureFromEnergyInput(energy);
         }
     }
 
     @Override
     public ActionResultType onRightClick(PlayerEntity player, Direction side) {
-        if (!isRemote() && player.isCreative() && getMultiblock().isFormed()) {
-            getMultiblock().setPlasmaTemp(1_000_000_000);
-            return ActionResultType.SUCCESS;
+        if (!isRemote() && player.isCreative()) {
+            FusionReactorMultiblockData multiblock = getMultiblock();
+            if (multiblock.isFormed()) {
+                multiblock.setPlasmaTemp(1_000_000_000);
+                return ActionResultType.SUCCESS;
+            }
         }
-        return ActionResultType.PASS;
+        return super.onRightClick(player, side);
     }
 
     @Override

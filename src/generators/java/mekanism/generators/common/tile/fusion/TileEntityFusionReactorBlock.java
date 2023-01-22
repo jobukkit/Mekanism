@@ -35,17 +35,18 @@ public class TileEntityFusionReactorBlock extends TileEntityMultiblock<FusionRea
     }
 
     public void setInjectionRateFromPacket(int rate) {
-        if (getMultiblock().isFormed()) {
-            getMultiblock().setInjectionRate(Math.min(FusionReactorMultiblockData.MAX_INJECTION, Math.max(0, rate - (rate % 2))));
+        FusionReactorMultiblockData multiblock = getMultiblock();
+        if (multiblock.isFormed()) {
+            multiblock.setInjectionRate(Math.min(FusionReactorMultiblockData.MAX_INJECTION, Math.max(0, rate - (rate % 2))));
             markDirty(false);
         }
     }
 
     public void addFuelTabContainerTrackers(MekanismContainer container) {
-        SyncMapper.setup(container, FusionReactorMultiblockData.class, this::getMultiblock, "fuel");
+        SyncMapper.INSTANCE.setup(container, FusionReactorMultiblockData.class, this::getMultiblock, "fuel");
     }
 
     public void addHeatTabContainerTrackers(MekanismContainer container) {
-        SyncMapper.setup(container, FusionReactorMultiblockData.class, this::getMultiblock, "heat");
+        SyncMapper.INSTANCE.setup(container, FusionReactorMultiblockData.class, this::getMultiblock, "heat");
     }
 }

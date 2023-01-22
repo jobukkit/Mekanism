@@ -4,6 +4,9 @@ import java.util.Locale;
 
 public class WildcardMatcher {
 
+    private WildcardMatcher() {
+    }
+
     public static boolean matches(String wildcard, String text) {
         return matches(wildcard.toLowerCase(Locale.ROOT), text.toLowerCase(Locale.ROOT), 0, 0, false);
     }
@@ -30,7 +33,7 @@ public class WildcardMatcher {
             }
             textIndex++;
         }
-        // break if there's more text left and we didn't our query with a wildcard char
+        // break if there's more text left, and we didn't end our query with a wildcard char
         return textIndex >= text.length() || (!wildcard.isEmpty() && wildcard.charAt(wildcard.length() - 1) == '*');
     }
 }

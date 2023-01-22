@@ -12,11 +12,13 @@ public interface IBlockProvider extends IItemProvider {
     @Nonnull
     Block getBlock();
 
+    @Deprecated//TODO - 1.18: Remove this as we don't actually use this
     default boolean blockMatches(ItemStack otherStack) {
         Item item = otherStack.getItem();
         return item instanceof BlockItem && blockMatches(((BlockItem) item).getBlock());
     }
 
+    @Deprecated//TODO - 1.18: Remove this as we don't actually use this
     default boolean blockMatches(Block other) {
         return getBlock() == other;
     }
@@ -29,6 +31,6 @@ public interface IBlockProvider extends IItemProvider {
 
     @Override
     default String getTranslationKey() {
-        return getBlock().getTranslationKey();
+        return getBlock().getDescriptionId();
     }
 }

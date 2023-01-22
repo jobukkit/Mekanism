@@ -17,21 +17,21 @@ import net.minecraft.state.Property;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.text.ITextComponent;
 
-public class AttributeStateFissionPortMode extends AttributeState {
+public class AttributeStateFissionPortMode implements AttributeState {
 
     public static final EnumProperty<FissionPortMode> modeProperty = EnumProperty.create("mode", FissionPortMode.class);
 
     @Override
     public BlockState copyStateData(BlockState oldState, BlockState newState) {
-        if (Attribute.has(newState.getBlock(), AttributeStateFissionPortMode.class)) {
-            newState = newState.with(modeProperty, oldState.get(modeProperty));
+        if (Attribute.has(newState, AttributeStateFissionPortMode.class)) {
+            newState = newState.setValue(modeProperty, oldState.getValue(modeProperty));
         }
         return newState;
     }
 
     @Override
     public BlockState getDefaultState(@Nonnull BlockState state) {
-        return state.with(modeProperty, FissionPortMode.INPUT);
+        return state.setValue(modeProperty, FissionPortMode.INPUT);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class AttributeStateFissionPortMode extends AttributeState {
 
         @Nonnull
         @Override
-        public String getString() {
+        public String getSerializedName() {
             return name;
         }
 

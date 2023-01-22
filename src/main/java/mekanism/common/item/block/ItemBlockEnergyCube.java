@@ -18,8 +18,6 @@ import mekanism.common.util.SecurityUtils;
 import mekanism.common.util.StorageUtils;
 import mekanism.common.util.text.BooleanStateDisplay.YesNo;
 import mekanism.common.util.text.EnergyDisplay;
-import mekanism.common.util.text.OwnerDisplay;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -34,7 +32,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 public class ItemBlockEnergyCube extends ItemBlockTooltip<BlockEnergyCube> implements IItemSustainedInventory, ISecurityItem {
 
     public ItemBlockEnergyCube(BlockEnergyCube block) {
-        super(block, true, ItemDeferredRegister.getMekBaseProperties().maxStackSize(1).setNoRepair().setISTER(ISTERProvider::energyCube));
+        super(block, true, ItemDeferredRegister.getMekBaseProperties().stacksTo(1).setNoRepair().setISTER(ISTERProvider::energyCube));
     }
 
     @Nonnull
@@ -45,28 +43,23 @@ public class ItemBlockEnergyCube extends ItemBlockTooltip<BlockEnergyCube> imple
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void addInformation(@Nonnull ItemStack stack, World world, @Nonnull List<ITextComponent> tooltip, @Nonnull ITooltipFlag flag) {
+    public void appendHoverText(@Nonnull ItemStack stack, World world, @Nonnull List<ITextComponent> tooltip, @Nonnull ITooltipFlag flag) {
         StorageUtils.addStoredEnergy(stack, tooltip, true);
         tooltip.add(MekanismLang.CAPACITY.translateColored(EnumColor.INDIGO, EnumColor.GRAY, EnergyDisplay.of(getTier().getMaxEnergy())));
-        super.addInformation(stack, world, tooltip, flag);
+        super.appendHoverText(stack, world, tooltip, flag);
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
     public void addDetails(@Nonnull ItemStack stack, World world, @Nonnull List<ITextComponent> tooltip, boolean advanced) {
-        tooltip.add(OwnerDisplay.of(Minecraft.getInstance().player, getOwnerUUID(stack)).getTextComponent());
-        tooltip.add(MekanismLang.SECURITY.translateColored(EnumColor.GRAY, SecurityUtils.getSecurity(stack, Dist.CLIENT)));
-        if (SecurityUtils.isOverridden(stack, Dist.CLIENT)) {
-            tooltip.add(MekanismLang.SECURITY_OVERRIDDEN.translateColored(EnumColor.RED));
-        }
+        SecurityUtils.addSecurityTooltip(stack, tooltip);
         tooltip.add(MekanismLang.HAS_INVENTORY.translateColored(EnumColor.AQUA, EnumColor.GRAY, YesNo.of(hasInventory(stack))));
     }
 
     @Override
-    public void fillItemGroup(@Nonnull ItemGroup group, @Nonnull NonNullList<ItemStack> items) {
-        super.fillItemGroup(group, items);
+    public void fillItemCategory(@Nonnull ItemGroup group, @Nonnull NonNullList<ItemStack> items) {
+        super.fillItemCategory(group, items);
         //Add the charged variant
-        if (isInGroup(group)) {
+        if (allowdedIn(group)) {
             EnergyCubeTier tier = Attribute.getTier(getBlock(), EnergyCubeTier.class);
             ItemStack stack = StorageUtils.getFilledEnergyVariant(new ItemStack(this), tier.getMaxEnergy());
             if (tier == EnergyCubeTier.CREATIVE) {
@@ -94,5 +87,17 @@ public class ItemBlockEnergyCube extends ItemBlockTooltip<BlockEnergyCube> imple
     @Override
     public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT nbt) {
         return new ItemCapabilityWrapper(stack, RateLimitEnergyHandler.create(Attribute.getTier(getBlock(), EnergyCubeTier.class)));
+    }
+
+    @Override
+    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
+        //Ignore NBT for energized items causing re-equip animations
+        return oldStack.getItem() != newStack.getItem();
+    }
+
+    @Override
+    public boolean shouldCauseBlockBreakReset(ItemStack oldStack, ItemStack newStack) {
+        //Ignore NBT for energized items causing block break reset
+        return oldStack.getItem() != newStack.getItem();
     }
 }

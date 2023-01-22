@@ -1,6 +1,7 @@
 package mekanism.common.content.network.transmitter;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import mekanism.api.NBTConstants;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.api.text.EnumColor;
@@ -9,6 +10,9 @@ import mekanism.common.block.attribute.Attribute;
 import mekanism.common.content.transporter.PathfinderCache;
 import mekanism.common.tier.TransporterTier;
 import mekanism.common.tile.transmitter.TileEntityTransmitter;
+import mekanism.common.upgrade.transmitter.LogisticalTransporterUpgradeData;
+import mekanism.common.upgrade.transmitter.TransmitterUpgradeData;
+import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
 import mekanism.common.util.TransporterUtils;
 import net.minecraft.entity.player.PlayerEntity;
@@ -17,14 +21,15 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Util;
 
-public class LogisticalTransporter extends LogisticalTransporterBase {
+public class LogisticalTransporter extends LogisticalTransporterBase implements IUpgradeableTransmitter<LogisticalTransporterUpgradeData> {
 
     private EnumColor color;
 
     public LogisticalTransporter(IBlockProvider blockProvider, TileEntityTransmitter tile) {
-        super(tile, Attribute.getTier(blockProvider.getBlock(), TransporterTier.class));
+        super(tile, Attribute.getTier(blockProvider, TransporterTier.class));
     }
 
+    @Override
     public TransporterTier getTier() {
         return tier;
     }
@@ -44,17 +49,38 @@ public class LogisticalTransporter extends LogisticalTransporterBase {
         PathfinderCache.onChanged(getTransmitterNetwork());
         getTransmitterTile().sendUpdatePacket();
         EnumColor color = getColor();
-        player.sendMessage(MekanismLang.LOG_FORMAT.translateColored(EnumColor.DARK_BLUE, MekanismLang.MEKANISM,
-              MekanismLang.TOGGLE_COLOR.translateColored(EnumColor.GRAY, color != null ? color.getColoredName() : MekanismLang.NONE)), Util.DUMMY_UUID);
+        player.sendMessage(MekanismUtils.logFormat(MekanismLang.TOGGLE_COLOR.translate(color == null ? MekanismLang.NONE : color.getColoredName())), Util.NIL_UUID);
         return ActionResultType.SUCCESS;
     }
 
     @Override
     public ActionResultType onRightClick(PlayerEntity player, Direction side) {
         EnumColor color = getColor();
-        player.sendMessage(MekanismLang.LOG_FORMAT.translateColored(EnumColor.DARK_BLUE, MekanismLang.MEKANISM,
-              MekanismLang.CURRENT_COLOR.translateColored(EnumColor.GRAY, color != null ? color.getColoredName() : MekanismLang.NONE)), Util.DUMMY_UUID);
+        player.sendMessage(MekanismUtils.logFormat(MekanismLang.CURRENT_COLOR.translate(color == null ? MekanismLang.NONE : color.getColoredName())), Util.NIL_UUID);
         return super.onRightClick(player, side);
+    }
+
+    @Nullable
+    @Override
+    public LogisticalTransporterUpgradeData getUpgradeData() {
+        return new LogisticalTransporterUpgradeData(redstoneReactive, getConnectionTypesRaw(), getColor(), transit, needsSync, nextId, delay, delayCount);
+    }
+
+    @Override
+    public boolean dataTypeMatches(@Nonnull TransmitterUpgradeData data) {
+        return data instanceof LogisticalTransporterUpgradeData;
+    }
+
+    @Override
+    public void parseUpgradeData(@Nonnull LogisticalTransporterUpgradeData data) {
+        redstoneReactive = data.redstoneReactive;
+        setConnectionTypesRaw(data.connectionTypes);
+        setColor(data.color);
+        transit.putAll(data.transit);
+        needsSync.putAll(data.needsSync);
+        nextId = data.nextId;
+        delay = data.delay;
+        delayCount = data.delayCount;
     }
 
     @Override

@@ -11,6 +11,9 @@ import net.minecraftforge.fluids.ForgeFlowingFluid.Source;
 
 public class GeneratorsFluids {
 
+    private GeneratorsFluids() {
+    }
+
     public static final FluidDeferredRegister FLUIDS = new FluidDeferredRegister(MekanismGenerators.MODID);
 
     public static final FluidRegistryObject<Source, Flowing, FlowingFluidBlock, BucketItem> BIOETHANOL = FLUIDS.register("bioethanol",
@@ -20,6 +23,6 @@ public class GeneratorsFluids {
     public static final FluidRegistryObject<Source, Flowing, FlowingFluidBlock, BucketItem> TRITIUM = registerLiquidGas("tritium", 0xFF64FF70);
 
     private static FluidRegistryObject<Source, Flowing, FlowingFluidBlock, BucketItem> registerLiquidGas(String name, int tint) {
-        return FLUIDS.register(name, fluidAttributes -> fluidAttributes.gaseous().color(tint));
+        return FLUIDS.register(name, fluidAttributes -> fluidAttributes.color(tint));
     }
 }

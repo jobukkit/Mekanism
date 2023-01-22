@@ -33,16 +33,34 @@ public class TileEntitySPSCasing extends TileEntityMultiblock<SPSMultiblockData>
     @Override
     protected void onUpdateClient() {
         super.onUpdateClient();
-        orbitEffects.removeIf(effect -> !isMaster || effect.tick());
+        if (isMaster()) {
+            //If we are still the master tick each effect and remove it if it is done
+            orbitEffects.removeIf(SPSOrbitEffect::tick);
+        } else {
+            //Otherwise, if we are no longer master just clear them all directly rather than removing each in a removeIf
+            orbitEffects.clear();
+        }
     }
 
     @Override
-    protected void onUpdateServer() {
-        super.onUpdateServer();
-        boolean active = getMultiblock().isFormed() && getMultiblock().handlesSound(this) && getMultiblock().lastProcessed > 0;
+    protected boolean onUpdateServer(SPSMultiblockData multiblock) {
+        boolean needsPacket = super.onUpdateServer(multiblock);
+        boolean active = multiblock.isFormed() && multiblock.handlesSound(this) && multiblock.lastProcessed > 0;
         if (active != prevActive) {
             prevActive = active;
-            sendUpdatePacket();
+            needsPacket = true;
+        }
+        return needsPacket;
+    }
+
+    @Override
+    protected void structureChanged(SPSMultiblockData multiblock) {
+        super.structureChanged(multiblock);
+        //Transition the orbit effects over to the new multiblock
+        if (multiblock.isFormed()) {
+            for (SPSOrbitEffect orbitEffect : orbitEffects) {
+                orbitEffect.updateMultiblock(multiblock);
+            }
         }
     }
 
@@ -58,17 +76,16 @@ public class TileEntitySPSCasing extends TileEntityMultiblock<SPSMultiblockData>
 
     @Override
     protected boolean canPlaySound() {
-        return getMultiblock().isFormed() && getMultiblock().lastProcessed > 0 && handleSound;
+        SPSMultiblockData multiblock = getMultiblock();
+        return multiblock.isFormed() && handleSound;
     }
 
     @Nonnull
     @Override
     public CompoundNBT getReducedUpdateTag() {
         CompoundNBT updateTag = super.getReducedUpdateTag();
-        updateTag.putBoolean(NBTConstants.HANDLE_SOUND, getMultiblock().isFormed() && getMultiblock().handlesSound(this));
-        if (getMultiblock().isFormed()) {
-            updateTag.putDouble(NBTConstants.LAST_PROCESSED, getMultiblock().lastProcessed);
-        }
+        SPSMultiblockData multiblock = getMultiblock();
+        updateTag.putBoolean(NBTConstants.HANDLE_SOUND, multiblock.isFormed() && multiblock.handlesSound(this) && multiblock.lastProcessed > 0);
         return updateTag;
     }
 
@@ -76,8 +93,5 @@ public class TileEntitySPSCasing extends TileEntityMultiblock<SPSMultiblockData>
     public void handleUpdateTag(BlockState state, @Nonnull CompoundNBT tag) {
         super.handleUpdateTag(state, tag);
         NBTUtils.setBooleanIfPresent(tag, NBTConstants.HANDLE_SOUND, value -> handleSound = value);
-        if (getMultiblock().isFormed()) {
-            getMultiblock().lastProcessed = tag.getDouble(NBTConstants.LAST_PROCESSED);
-        }
     }
 }

@@ -35,7 +35,7 @@ public class BasicInventorySlot implements IInventorySlot {
     public static final BiPredicate<@NonNull ItemStack, @NonNull AutomationType> manualOnly = (stack, automationType) -> automationType == AutomationType.MANUAL;
     public static final BiPredicate<@NonNull ItemStack, @NonNull AutomationType> internalOnly = (stack, automationType) -> automationType == AutomationType.INTERNAL;
     public static final BiPredicate<@NonNull ItemStack, @NonNull AutomationType> notExternal = (stack, automationType) -> automationType != AutomationType.EXTERNAL;
-    private static final int DEFAULT_LIMIT = 64;
+    public static final int DEFAULT_LIMIT = 64;
 
     public static BasicInventorySlot at(@Nullable IContentsListener listener, int x, int y) {
         return at(alwaysTrue, listener, x, y);
@@ -115,6 +115,10 @@ public class BasicInventorySlot implements IInventorySlot {
 
     private void setStack(ItemStack stack, boolean validateStack) {
         if (stack.isEmpty()) {
+            if (current.isEmpty()) {
+                //If we are already empty just exit, to not fire onContentsChanged
+                return;
+            }
             current = ItemStack.EMPTY;
         } else if (!validateStack || isItemValid(stack)) {
             current = stack.copy();
@@ -129,7 +133,7 @@ public class BasicInventorySlot implements IInventorySlot {
     @Override
     public ItemStack insertItem(ItemStack stack, Action action, AutomationType automationType) {
         if (stack.isEmpty() || !isItemValid(stack) || !canInsert.test(stack, automationType)) {
-            //"Fail quick" if the given stack is empty or we can never insert the item or currently are unable to insert it
+            //"Fail quick" if the given stack is empty, or we can never insert the item or currently are unable to insert it
             return stack;
         }
         int needed = getLimit(stack) - getCount();
@@ -210,15 +214,28 @@ public class BasicInventorySlot implements IInventorySlot {
     @Nullable
     @Override
     public InventoryContainerSlot createContainerSlot() {
-        return new InventoryContainerSlot(this, x, y, slotType, slotOverlay);
+        return new InventoryContainerSlot(this, x, y, slotType, slotOverlay, this::setStackUnchecked);
     }
 
     public void setSlotType(ContainerSlotType slotType) {
+        //TODO - 1.18: Re-evaluate this method as for the most part we now seem to be handling this in GuiMekanism
+        // and figuring it out based on the data type; which at the very least means we can probably remove some
+        // calls to this. Though there are also some cases where we want to override it where it doesn't now as
+        // the fallback sets it to normal basically regardless (see evaporation multiblock and input slots)
         this.slotType = slotType;
     }
 
     public void setSlotOverlay(@Nullable SlotOverlay slotOverlay) {
         this.slotOverlay = slotOverlay;
+    }
+
+    @Nullable
+    protected final SlotOverlay getSlotOverlay() {
+        return slotOverlay;
+    }
+
+    protected final ContainerSlotType getSlotType() {
+        return slotType;
     }
 
     /**
@@ -233,7 +250,7 @@ public class BasicInventorySlot implements IInventorySlot {
             return 0;
         } else if (amount <= 0) {
             if (action.execute()) {
-                setStack(ItemStack.EMPTY);
+                setEmpty();
             }
             return 0;
         }
@@ -242,7 +259,7 @@ public class BasicInventorySlot implements IInventorySlot {
             amount = maxStackSize;
         }
         if (getCount() == amount || action.simulate()) {
-            //If our size is not changing or we are only simulating the change, don't do anything
+            //If our size is not changing, or we are only simulating the change, don't do anything
             return amount;
         }
         current.setCount(amount);
@@ -290,7 +307,7 @@ public class BasicInventorySlot implements IInventorySlot {
     public CompoundNBT serializeNBT() {
         CompoundNBT nbt = new CompoundNBT();
         if (!isEmpty()) {
-            nbt.put(NBTConstants.ITEM, current.write(new CompoundNBT()));
+            nbt.put(NBTConstants.ITEM, current.save(new CompoundNBT()));
             if (getCount() > current.getMaxStackSize()) {
                 nbt.putInt(NBTConstants.SIZE_OVERRIDE, getCount());
             }
@@ -302,12 +319,11 @@ public class BasicInventorySlot implements IInventorySlot {
     public void deserializeNBT(CompoundNBT nbt) {
         ItemStack stack = ItemStack.EMPTY;
         if (nbt.contains(NBTConstants.ITEM, NBT.TAG_COMPOUND)) {
-            stack = ItemStack.read(nbt.getCompound(NBTConstants.ITEM));
+            stack = ItemStack.of(nbt.getCompound(NBTConstants.ITEM));
             NBTUtils.setIntIfPresent(nbt, NBTConstants.SIZE_OVERRIDE, stack::setCount);
         }
-        //Directly set the stack in case the item is no longer valid for the stack.
-        // We do this instead of using setStackUnchecked to avoid calling markDirty when we are loading
-        // the inventory and the world is still null on the tile
+        //Set the stack in an unchecked way so that if it is no longer valid, we don't end up
+        // crashing due to the stack not being valid
         setStackUnchecked(stack);
     }
 }

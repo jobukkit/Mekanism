@@ -5,13 +5,12 @@ import com.google.common.collect.Multimap;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import mekanism.tools.common.IHasRepairType;
-import mekanism.tools.common.ToolsLang;
 import mekanism.common.lib.attribute.AttributeCache;
 import mekanism.common.lib.attribute.IAttributeRefresher;
+import mekanism.tools.common.IHasRepairType;
 import mekanism.tools.common.material.MaterialCreator;
+import mekanism.tools.common.util.ToolsUtils;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -42,30 +41,30 @@ public class ItemMekanismAxe extends AxeItem implements IHasRepairType, IAttribu
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void addInformation(@Nonnull ItemStack stack, @Nullable World world, @Nonnull List<ITextComponent> tooltip, @Nonnull ITooltipFlag flag) {
-        tooltip.add(ToolsLang.HP.translate(stack.getMaxDamage() - stack.getDamage()));
+    public void appendHoverText(@Nonnull ItemStack stack, @Nullable World world, @Nonnull List<ITextComponent> tooltip, @Nonnull ITooltipFlag flag) {
+        super.appendHoverText(stack, world, tooltip, flag);
+        ToolsUtils.addDurability(tooltip, stack);
     }
 
+    @Override
     public float getAttackDamage() {
-        return material.getAxeDamage() + getTier().getAttackDamage();
+        return material.getAxeDamage() + getTier().getAttackDamageBonus();
     }
 
     public int getHarvestLevel() {
-        return getTier().getHarvestLevel();
+        return getTier().getLevel();
     }
 
     /**
      * {@inheritDoc}
      *
-     * @implNote Wrap {@link AxeItem#getDestroySpeed(ItemStack, BlockState)} and  {@link net.minecraft.item.ToolItem#getDestroySpeed(ItemStack, BlockState)} to return our
+     * @implNote Wrap {@link AxeItem#getDestroySpeed(ItemStack, BlockState)} and {@link net.minecraft.item.ToolItem#getDestroySpeed(ItemStack, BlockState)} to return our
      * efficiency level
      */
     @Override
     public float getDestroySpeed(@Nonnull ItemStack stack, BlockState state) {
-        Material material = state.getMaterial();
-        if (material == Material.WOOD || material == Material.PLANTS || material == Material.TALL_PLANTS || material == Material.BAMBOO ||
-            getToolTypes(stack).stream().anyMatch(state::isToolEffective) || effectiveBlocks.contains(state.getBlock())) {
-            return getTier().getEfficiency();
+        if (DIGGABLE_MATERIALS.contains(state.getMaterial()) || getToolTypes(stack).stream().anyMatch(state::isToolEffective) || blocks.contains(state.getBlock())) {
+            return getTier().getSpeed();
         }
         return 1;
     }
@@ -76,24 +75,24 @@ public class ItemMekanismAxe extends AxeItem implements IHasRepairType, IAttribu
      * @implNote Patches {@link AxeItem} to return true when the block's harvest tool is an axe
      */
     @Override
-    public boolean canHarvestBlock(BlockState state) {
-        return state.getHarvestTool() == ToolType.AXE ? getHarvestLevel() >= state.getHarvestLevel() : super.canHarvestBlock(state);
+    public boolean isCorrectToolForDrops(BlockState state) {
+        return state.getHarvestTool() == ToolType.AXE ? getHarvestLevel() >= state.getHarvestLevel() : super.isCorrectToolForDrops(state);
     }
 
     @Nonnull
     @Override
     public Ingredient getRepairMaterial() {
-        return getTier().getRepairMaterial();
+        return getTier().getRepairIngredient();
     }
 
     @Override
     public int getMaxDamage(ItemStack stack) {
-        return getTier().getMaxUses();
+        return getTier().getUses();
     }
 
     @Override
-    public boolean isDamageable() {
-        return getTier().getMaxUses() > 0;
+    public boolean canBeDepleted() {
+        return getTier().getUses() > 0;
     }
 
     @Override
@@ -109,7 +108,7 @@ public class ItemMekanismAxe extends AxeItem implements IHasRepairType, IAttribu
 
     @Override
     public void addToBuilder(ImmutableMultimap.Builder<Attribute, AttributeModifier> builder) {
-        builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Tool modifier", getAttackDamage(), Operation.ADDITION));
-        builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Tool modifier", material.getAxeAtkSpeed(), Operation.ADDITION));
+        builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Tool modifier", getAttackDamage(), Operation.ADDITION));
+        builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Tool modifier", material.getAxeAtkSpeed(), Operation.ADDITION));
     }
 }

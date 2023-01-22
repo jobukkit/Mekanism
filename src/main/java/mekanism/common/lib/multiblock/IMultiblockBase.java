@@ -30,7 +30,14 @@ public interface IMultiblockBase extends ITileWrapper {
 
     void setStructure(MultiblockManager<?> manager, Structure structure);
 
-    default void resetStructure(MultiblockManager<?> manager) {
-        setStructure(manager, new Structure(this));
+    default Structure resetStructure(MultiblockManager<?> manager) {
+        Structure structure = new Structure(this);
+        setStructure(manager, structure);
+        return structure;
+    }
+
+    //Not that great a name, but is used for when we go from one formed multiblock directly to another formed multiblock
+    // this allows resetting some information that normally would then get reset when going to unformed and then formed again
+    default void resetForFormed() {
     }
 }

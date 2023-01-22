@@ -8,8 +8,8 @@ import mekanism.client.gui.element.GuiInsetElement;
 import mekanism.client.render.MekanismRenderer;
 import mekanism.common.Mekanism;
 import mekanism.common.MekanismLang;
-import mekanism.common.network.PacketGuiInteract;
-import mekanism.common.network.PacketGuiInteract.GuiInteraction;
+import mekanism.common.network.to_server.PacketGuiInteract;
+import mekanism.common.network.to_server.PacketGuiInteract.GuiInteraction;
 import mekanism.common.tile.factory.TileEntityFactory;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.MekanismUtils.ResourceType;
@@ -24,22 +24,23 @@ public class GuiSortingTab extends GuiInsetElement<TileEntityFactory<?>> {
     @Override
     public void drawBackground(@Nonnull MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
         super.drawBackground(matrix, mouseX, mouseY, partialTicks);
-        drawString(matrix, OnOff.of(tile.isSorting()).getTextComponent(), x + 5, y + 24, 0x0404040);
+        drawTextScaledBound(matrix, OnOff.of(dataSource.isSorting()).getTextComponent(), x + 3, y + 24, titleTextColor(), 21);
         MekanismRenderer.resetColor();
     }
 
     @Override
     public void renderToolTip(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
+        super.renderToolTip(matrix, mouseX, mouseY);
         displayTooltip(matrix, MekanismLang.AUTO_SORT.translate(), mouseX, mouseY);
     }
 
     @Override
     protected void colorTab() {
-        MekanismRenderer.color(SpecialColors.TAB_FACTORY_SORT.get());
+        MekanismRenderer.color(SpecialColors.TAB_FACTORY_SORT);
     }
 
     @Override
     public void onClick(double mouseX, double mouseY) {
-        Mekanism.packetHandler.sendToServer(new PacketGuiInteract(GuiInteraction.AUTO_SORT_BUTTON, tile));
+        Mekanism.packetHandler.sendToServer(new PacketGuiInteract(GuiInteraction.AUTO_SORT_BUTTON, dataSource));
     }
 }

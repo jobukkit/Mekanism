@@ -4,7 +4,6 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import java.util.Arrays;
 import java.util.Collections;
 import javax.annotation.Nonnull;
-import mekanism.api.text.ILangEntry;
 import mekanism.client.gui.element.GuiDownArrow;
 import mekanism.client.gui.element.GuiInnerScreen;
 import mekanism.client.gui.element.bar.GuiBar.IBarInfoHandler;
@@ -25,47 +24,45 @@ public class GuiThermalEvaporationController extends GuiMekanismTile<TileEntityT
 
     public GuiThermalEvaporationController(MekanismTileContainer<TileEntityThermalEvaporationController> container, PlayerInventory inv, ITextComponent title) {
         super(container, inv, title);
+        inventoryLabelY += 2;
+        titleLabelY = 4;
         dynamicSlots = true;
     }
 
     @Override
-    public void init() {
-        super.init();
-        addButton(new GuiInnerScreen(this, 48, 19, 80, 40, () -> Arrays.asList(
-              getStruct().translate(),
-              MekanismLang.EVAPORATION_HEIGHT.translate(tile.getMultiblock().height()),
-              MekanismLang.TEMPERATURE.translate(MekanismUtils.getTemperatureDisplay(tile.getMultiblock().getTemp(), TemperatureUnit.KELVIN, true)),
-              MekanismLang.FLUID_PRODUCTION.translate(Math.round(tile.getMultiblock().lastGain * 100D) / 100D)
-        )).spacing(1).jeiCategory(tile));
+    protected void addGuiElements() {
+        super.addGuiElements();
+        addButton(new GuiInnerScreen(this, 48, 19, 80, 40, () -> {
+            EvaporationMultiblockData multiblock = tile.getMultiblock();
+            return Arrays.asList(MekanismLang.MULTIBLOCK_FORMED.translate(), MekanismLang.EVAPORATION_HEIGHT.translate(multiblock.height()),
+                  MekanismLang.TEMPERATURE.translate(MekanismUtils.getTemperatureDisplay(multiblock.getTemperature(), TemperatureUnit.KELVIN, true)),
+                  MekanismLang.FLUID_PRODUCTION.translate(Math.round(multiblock.lastGain * 100D) / 100D));
+        }).spacing(1).jeiCategory(tile));
         addButton(new GuiDownArrow(this, 32, 39));
         addButton(new GuiDownArrow(this, 136, 39));
         addButton(new GuiHorizontalRateBar(this, new IBarInfoHandler() {
             @Override
             public ITextComponent getTooltip() {
-                return MekanismUtils.getTemperatureDisplay(tile.getMultiblock().getTemp(), TemperatureUnit.KELVIN, true);
+                return MekanismUtils.getTemperatureDisplay(tile.getMultiblock().getTemperature(), TemperatureUnit.KELVIN, true);
             }
 
             @Override
             public double getLevel() {
-                return Math.min(1, tile.getMultiblock().getTemp() / EvaporationMultiblockData.MAX_MULTIPLIER_TEMP);
+                return Math.min(1, tile.getMultiblock().getTemperature() / EvaporationMultiblockData.MAX_MULTIPLIER_TEMP);
             }
         }, 48, 63));
         addButton(new GuiFluidGauge(() -> tile.getMultiblock().inputTank, () -> tile.getMultiblock().getFluidTanks(null), GaugeType.STANDARD, this, 6, 13));
         addButton(new GuiFluidGauge(() -> tile.getMultiblock().outputTank, () -> tile.getMultiblock().getFluidTanks(null), GaugeType.STANDARD, this, 152, 13));
-        addButton(new GuiHeatTab(() -> {
-            ITextComponent environment = MekanismUtils.getTemperatureDisplay(tile.getMultiblock().totalLoss, TemperatureUnit.KELVIN, false);
+        addButton(new GuiHeatTab(this, () -> {
+            ITextComponent environment = MekanismUtils.getTemperatureDisplay(tile.getMultiblock().lastEnvironmentLoss, TemperatureUnit.KELVIN, false);
             return Collections.singletonList(MekanismLang.DISSIPATED_RATE.translate(environment));
-        }, this));
+        }));
     }
 
     @Override
     protected void drawForegroundText(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        drawTitleText(matrix, MekanismLang.EVAPORATION_PLANT.translate(), 4);
-        drawString(matrix, MekanismLang.INVENTORY.translate(), 8, (getYSize() - 96) + 4, titleTextColor());
+        drawTitleText(matrix, MekanismLang.EVAPORATION_PLANT.translate(), titleLabelY);
+        drawString(matrix, inventory.getDisplayName(), inventoryLabelX, inventoryLabelY, titleTextColor());
         super.drawForegroundText(matrix, mouseX, mouseY);
-    }
-
-    private ILangEntry getStruct() {
-        return MekanismLang.MULTIBLOCK_FORMED;
     }
 }

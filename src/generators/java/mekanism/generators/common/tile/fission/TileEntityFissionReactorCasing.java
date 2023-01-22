@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 import mekanism.api.NBTConstants;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.api.text.EnumColor;
+import mekanism.common.MekanismLang;
 import mekanism.common.lib.multiblock.MultiblockManager;
 import mekanism.common.tile.prefab.TileEntityMultiblock;
 import mekanism.common.util.NBTUtils;
@@ -12,6 +13,7 @@ import mekanism.generators.common.content.fission.FissionReactorMultiblockData;
 import mekanism.generators.common.registries.GeneratorsBlocks;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.text.ITextComponent;
 
 public class TileEntityFissionReactorCasing extends TileEntityMultiblock<FissionReactorMultiblockData> {
 
@@ -27,29 +29,26 @@ public class TileEntityFissionReactorCasing extends TileEntityMultiblock<Fission
     }
 
     @Override
-    protected void onUpdateServer() {
-        super.onUpdateServer();
-        boolean burning = getMultiblock().isFormed() && getMultiblock().handlesSound(this) && getMultiblock().isBurning();
+    protected boolean onUpdateServer(FissionReactorMultiblockData multiblock) {
+        boolean needsPacket = super.onUpdateServer(multiblock);
+        boolean burning = multiblock.isFormed() && multiblock.handlesSound(this) && multiblock.isBurning();
         if (burning != prevBurning) {
             prevBurning = burning;
-            sendUpdatePacket();
+            needsPacket = true;
         }
+        return needsPacket;
     }
 
     public double getBoilEfficiency() {
         return (double) Math.round(getMultiblock().getBoilEfficiency() * 1_000) / 1_000;
     }
 
-    public long getMaxBurnRate() {
-        return getMultiblock().fuelAssemblies * FissionReactorMultiblockData.BURN_PER_ASSEMBLY;
-    }
-
     public void setReactorActive(boolean active) {
         getMultiblock().setActive(active);
     }
 
-    public String getDamageString() {
-        return Math.round((getMultiblock().reactorDamage / FissionReactorMultiblockData.MAX_DAMAGE) * 100) + "%";
+    public ITextComponent getDamageString() {
+        return MekanismLang.GENERIC_PERCENT.translate(getMultiblock().getDamagePercent());
     }
 
     public EnumColor getDamageColor() {
@@ -64,8 +63,7 @@ public class TileEntityFissionReactorCasing extends TileEntityMultiblock<Fission
     }
 
     public void setRateLimitFromPacket(double rate) {
-        getMultiblock().rateLimit = Math.min(getMaxBurnRate(), rate);
-        markDirty(false);
+        getMultiblock().setRateLimit(rate);
     }
 
     @Override
@@ -80,16 +78,18 @@ public class TileEntityFissionReactorCasing extends TileEntityMultiblock<Fission
 
     @Override
     protected boolean canPlaySound() {
-        return getMultiblock().isFormed() && getMultiblock().isBurning() && handleSound;
+        FissionReactorMultiblockData multiblock = getMultiblock();
+        return multiblock.isFormed() && multiblock.isBurning() && handleSound;
     }
 
     @Nonnull
     @Override
     public CompoundNBT getReducedUpdateTag() {
         CompoundNBT updateTag = super.getReducedUpdateTag();
-        updateTag.putBoolean(NBTConstants.HANDLE_SOUND, getMultiblock().isFormed() && getMultiblock().handlesSound(this));
-        if (getMultiblock().isFormed()) {
-            updateTag.putDouble(NBTConstants.BURNING, getMultiblock().lastBurnRate);
+        FissionReactorMultiblockData multiblock = getMultiblock();
+        updateTag.putBoolean(NBTConstants.HANDLE_SOUND, multiblock.isFormed() && multiblock.handlesSound(this));
+        if (multiblock.isFormed()) {
+            updateTag.putDouble(NBTConstants.BURNING, multiblock.lastBurnRate);
         }
         return updateTag;
     }
@@ -98,8 +98,9 @@ public class TileEntityFissionReactorCasing extends TileEntityMultiblock<Fission
     public void handleUpdateTag(BlockState state, @Nonnull CompoundNBT tag) {
         super.handleUpdateTag(state, tag);
         NBTUtils.setBooleanIfPresent(tag, NBTConstants.HANDLE_SOUND, value -> handleSound = value);
-        if (getMultiblock().isFormed()) {
-            NBTUtils.setDoubleIfPresent(tag, NBTConstants.BURNING, value -> getMultiblock().lastBurnRate = value);
+        FissionReactorMultiblockData multiblock = getMultiblock();
+        if (multiblock.isFormed()) {
+            NBTUtils.setDoubleIfPresent(tag, NBTConstants.BURNING, value -> multiblock.lastBurnRate = value);
         }
     }
 }

@@ -9,9 +9,9 @@ import mekanism.client.render.MekanismRenderer;
 import mekanism.common.Mekanism;
 import mekanism.common.MekanismLang;
 import mekanism.common.config.MekanismConfig;
-import mekanism.common.network.PacketGuiButtonPress;
-import mekanism.common.network.PacketGuiButtonPress.ClickedItemButton;
-import mekanism.common.network.PacketGuiButtonPress.ClickedTileButton;
+import mekanism.common.network.to_server.PacketGuiButtonPress;
+import mekanism.common.network.to_server.PacketGuiButtonPress.ClickedItemButton;
+import mekanism.common.network.to_server.PacketGuiButtonPress.ClickedTileButton;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.MekanismUtils.ResourceType;
@@ -38,11 +38,12 @@ public class GuiQIOFrequencyTab extends GuiInsetElement<TileEntityMekanism> {
 
     @Override
     protected void colorTab() {
-        MekanismRenderer.color(SpecialColors.TAB_QIO_FREQUENCY.get());
+        MekanismRenderer.color(SpecialColors.TAB_QIO_FREQUENCY);
     }
 
     @Override
     public void renderToolTip(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
+        super.renderToolTip(matrix, mouseX, mouseY);
         displayTooltip(matrix, MekanismLang.SET_FREQUENCY.translate(), mouseX, mouseY);
     }
 
@@ -52,7 +53,7 @@ public class GuiQIOFrequencyTab extends GuiInsetElement<TileEntityMekanism> {
             if (isItem) {
                 Mekanism.packetHandler.sendToServer(new PacketGuiButtonPress(ClickedItemButton.QIO_FREQUENCY_SELECT, currentHand));
             } else {
-                Mekanism.packetHandler.sendToServer(new PacketGuiButtonPress(ClickedTileButton.QIO_FREQUENCY_SELECT, tile));
+                Mekanism.packetHandler.sendToServer(new PacketGuiButtonPress(ClickedTileButton.QIO_FREQUENCY_SELECT, dataSource));
             }
         }
     }

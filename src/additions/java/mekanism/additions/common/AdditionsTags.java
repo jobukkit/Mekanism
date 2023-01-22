@@ -10,7 +10,25 @@ import net.minecraft.tags.ItemTags;
 
 public class AdditionsTags {
 
+    /**
+     * Call to force make sure this is all initialized
+     */
+    public static void init() {
+        Items.init();
+        Blocks.init();
+        Entities.init();
+    }
+
+    private AdditionsTags() {
+    }
+
     public static class Items {
+
+        private static void init() {
+        }
+
+        private Items() {
+        }
 
         public static final INamedTag<Item> BALLOONS = tag("balloons");
 
@@ -34,15 +52,21 @@ public class AdditionsTags {
         public static final INamedTag<Item> PLASTIC_BLOCKS_TRANSPARENT = tag("plastic_blocks/transparent");
 
         private static INamedTag<Item> forgeTag(String name) {
-            return ItemTags.makeWrapperTag("forge:" + name);
+            return ItemTags.bind("forge:" + name);
         }
 
         private static INamedTag<Item> tag(String name) {
-            return ItemTags.makeWrapperTag(MekanismAdditions.rl(name).toString());
+            return ItemTags.bind(MekanismAdditions.rl(name).toString());
         }
     }
 
     public static class Blocks {
+
+        private static void init() {
+        }
+
+        private Blocks() {
+        }
 
         public static final INamedTag<Block> FENCES_PLASTIC = forgeTag("fences/plastic");
         public static final INamedTag<Block> FENCE_GATES_PLASTIC = forgeTag("fence_gates/plastic");
@@ -64,21 +88,27 @@ public class AdditionsTags {
         public static final INamedTag<Block> PLASTIC_BLOCKS_TRANSPARENT = tag("plastic_blocks/transparent");
 
         private static INamedTag<Block> forgeTag(String name) {
-            return BlockTags.makeWrapperTag("forge:" + name);
+            return BlockTags.bind("forge:" + name);
         }
 
         private static INamedTag<Block> tag(String name) {
-            return BlockTags.makeWrapperTag(MekanismAdditions.rl(name).toString());
+            return BlockTags.bind(MekanismAdditions.rl(name).toString());
         }
     }
 
     public static class Entities {
 
+        private static void init() {
+        }
+
+        private Entities() {
+        }
+
         public static final INamedTag<EntityType<?>> CREEPERS = forgeTag("creepers");
         public static final INamedTag<EntityType<?>> ENDERMEN = forgeTag("endermen");
 
         private static INamedTag<EntityType<?>> forgeTag(String name) {
-            return EntityTypeTags.func_232896_a_("forge:" + name);
+            return EntityTypeTags.bind("forge:" + name);
         }
     }
 }

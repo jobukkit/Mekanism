@@ -20,6 +20,9 @@ import net.minecraftforge.registries.IRegistryDelegate;
 @MethodsReturnNonnullByDefault
 public class GasStack extends ChemicalStack<Gas> {
 
+    /**
+     * Empty GasStack instance.
+     */
     public static final GasStack EMPTY = new GasStack(MekanismAPI.EMPTY_GAS, 0);
 
     /**
@@ -88,16 +91,9 @@ public class GasStack extends ChemicalStack<Gas> {
      */
     @Override
     public GasStack copy() {
+        if (isEmpty()) {
+            return EMPTY;
+        }
         return new GasStack(this, getAmount());
-    }
-
-    /**
-     * Default equality comparison for a GasStack. Same functionality as isTypeEqual().
-     *
-     * This is included for use in data structures.
-     */
-    @Override
-    public boolean equals(Object o) {
-        return o instanceof GasStack && isTypeEqual((GasStack) o);
     }
 }

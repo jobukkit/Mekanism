@@ -2,34 +2,24 @@ package mekanism.additions.common.block.plastic;
 
 import javax.annotation.Nonnull;
 import mekanism.api.text.EnumColor;
-import mekanism.common.block.interfaces.IColoredBlock;
-import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
-public class BlockPlasticRoad extends Block implements IColoredBlock {
-
-    private final EnumColor color;
+public class BlockPlasticRoad extends BlockPlastic {
 
     public BlockPlasticRoad(EnumColor color) {
-        super(Block.Properties.create(BlockPlastic.PLASTIC, color.getMapColor()).hardnessAndResistance(5F, 10F));
-        this.color = color;
+        super(color, properties -> properties.strength(5, 6));
     }
 
     @Override
-    public EnumColor getColor() {
-        return color;
-    }
-
-    @Override
-    public void onEntityWalk(@Nonnull World world, @Nonnull BlockPos pos, Entity entity) {
+    public void stepOn(@Nonnull World world, @Nonnull BlockPos pos, Entity entity) {
         double boost = 1.6;
-        Vector3d motion = entity.getMotion();
-        double a = Math.atan2(motion.getX(), motion.getZ());
-        float slipperiness = getSlipperiness(world.getBlockState(pos), world, pos, entity);
+        Vector3d motion = entity.getDeltaMovement();
+        double a = Math.atan2(motion.x(), motion.z());
+        float slipperiness = world.getBlockState(pos).getSlipperiness(world, pos, entity);
         motion = motion.add(Math.sin(a) * boost * slipperiness, 0, Math.cos(a) * boost * slipperiness);
-        entity.setMotion(motion);
+        entity.setDeltaMovement(motion);
     }
 }

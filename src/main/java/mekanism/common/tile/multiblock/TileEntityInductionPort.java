@@ -2,13 +2,15 @@ package mekanism.common.tile.multiblock;
 
 import javax.annotation.Nonnull;
 import mekanism.api.IConfigurable;
-import mekanism.api.text.EnumColor;
 import mekanism.common.MekanismLang;
 import mekanism.common.capabilities.holder.energy.IEnergyContainerHolder;
 import mekanism.common.capabilities.holder.energy.ProxiedEnergyContainerHolder;
+import mekanism.common.content.matrix.MatrixMultiblockData;
+import mekanism.common.integration.computer.annotation.ComputerMethod;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tile.base.SubstanceType;
 import mekanism.common.util.CableUtils;
+import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.text.BooleanStateDisplay.InputOutput;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ActionResultType;
@@ -26,16 +28,16 @@ public class TileEntityInductionPort extends TileEntityInductionCasing implement
     @Override
     protected IEnergyContainerHolder getInitialEnergyContainers() {
         //Don't allow inserting if we are on output mode, or extracting if we are on input mode
-        return ProxiedEnergyContainerHolder.create(side -> !getActive(), side -> getActive(),
-              side -> getMultiblock().getEnergyContainers(side));
+        return ProxiedEnergyContainerHolder.create(side -> !getActive(), side -> getActive(), side -> getMultiblock().getEnergyContainers(side));
     }
 
     @Override
-    protected void onUpdateServer() {
-        super.onUpdateServer();
-        if (getMultiblock().isFormed() && getActive()) {
-            CableUtils.emit(getMultiblock().getDirectionsToEmit(getPos()), getMultiblock().getEnergyContainer(), this);
+    protected boolean onUpdateServer(MatrixMultiblockData multiblock) {
+        boolean needsPacket = super.onUpdateServer(multiblock);
+        if (multiblock.isFormed() && getActive()) {
+            CableUtils.emit(multiblock.getDirectionsToEmit(getBlockPos()), multiblock.getEnergyContainer(), this);
         }
+        return needsPacket;
     }
 
     @Override
@@ -52,19 +54,25 @@ public class TileEntityInductionPort extends TileEntityInductionCasing implement
         if (!isRemote()) {
             boolean oldMode = getActive();
             setActive(!oldMode);
-            player.sendMessage(MekanismLang.LOG_FORMAT.translateColored(EnumColor.DARK_BLUE, MekanismLang.MEKANISM,
-                  MekanismLang.INDUCTION_PORT_MODE.translateColored(EnumColor.GRAY, InputOutput.of(oldMode, true))), Util.DUMMY_UUID);
+            player.sendMessage(MekanismUtils.logFormat(MekanismLang.INDUCTION_PORT_MODE.translate(InputOutput.of(oldMode, true))), Util.NIL_UUID);
         }
         return ActionResultType.SUCCESS;
-    }
-
-    @Override
-    public boolean renderUpdate() {
-        return true;
     }
 
     @Override
     public int getRedstoneLevel() {
         return getMultiblock().getCurrentRedstoneLevel();
     }
+
+    //Methods relating to IComputerTile
+    @ComputerMethod
+    private boolean getMode() {
+        return getActive();
+    }
+
+    @ComputerMethod
+    private void setMode(boolean output) {
+        setActive(output);
+    }
+    //End methods IComputerTile
 }

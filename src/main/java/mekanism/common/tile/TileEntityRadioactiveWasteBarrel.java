@@ -1,6 +1,6 @@
 package mekanism.common.tile;
 
-import java.util.EnumSet;
+import java.util.Collections;
 import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.api.IConfigurable;
@@ -13,8 +13,12 @@ import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.chemical.StackedWasteBarrel;
 import mekanism.common.capabilities.holder.chemical.ChemicalTankHelper;
 import mekanism.common.capabilities.holder.chemical.IChemicalTankHolder;
-import mekanism.common.capabilities.resolver.basic.BasicCapabilityResolver;
+import mekanism.common.capabilities.resolver.BasicCapabilityResolver;
+import mekanism.common.config.MekanismConfig;
+import mekanism.common.integration.computer.SpecialComputerMethodWrapper.ComputerChemicalTankWrapper;
+import mekanism.common.integration.computer.annotation.WrappingComputerMethod;
 import mekanism.common.registries.MekanismBlocks;
+import mekanism.common.tags.MekanismTags;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.util.ChemicalUtil;
 import mekanism.common.util.MekanismUtils;
@@ -30,10 +34,8 @@ import net.minecraft.world.World;
 
 public class TileEntityRadioactiveWasteBarrel extends TileEntityMekanism implements IConfigurable {
 
-    private static final float TOLERANCE = 0.05F;
-    private static final int MAX_PROCESS_TICKS = 1_200;
-
     private long lastProcessTick;
+    @WrappingComputerMethod(wrapper = ComputerChemicalTankWrapper.class, methodNames = {"getStored", "getCapacity", "getNeeded", "getFilledPercentage"})
     private StackedWasteBarrel gasTank;
     private float prevScale;
     private int processTicks;
@@ -52,24 +54,24 @@ public class TileEntityRadioactiveWasteBarrel extends TileEntityMekanism impleme
     }
 
     @Override
-    public void onUpdateServer() {
+    protected void onUpdateServer() {
         super.onUpdateServer();
-        if (world.getGameTime() > lastProcessTick) {
-            //If we are not on the same tick do stuff, otherwise ignore it (anti tick accellerator protection)
-            lastProcessTick = world.getGameTime();
-            if (++processTicks >= MAX_PROCESS_TICKS) {
+        if (level.getGameTime() > lastProcessTick) {
+            //If we are not on the same tick do stuff, otherwise ignore it (anti tick accelerator protection)
+            lastProcessTick = level.getGameTime();
+            if (MekanismConfig.general.radioactiveWasteBarrelDecayAmount.get() > 0 && !gasTank.isEmpty() &&
+                !gasTank.getType().isIn(MekanismTags.Gases.WASTE_BARREL_DECAY_BLACKLIST) &&
+                ++processTicks >= MekanismConfig.general.radioactiveWasteBarrelProcessTicks.get()) {
                 processTicks = 0;
-                gasTank.shrinkStack(1, Action.EXECUTE);
+                gasTank.shrinkStack(MekanismConfig.general.radioactiveWasteBarrelDecayAmount.get(), Action.EXECUTE);
             }
             if (getActive()) {
-                ChemicalUtil.emit(EnumSet.of(Direction.DOWN), gasTank, this);
+                ChemicalUtil.emit(Collections.singleton(Direction.DOWN), gasTank, this);
             }
-
-            float scale = getGasScale();
-            if (Math.abs(scale - prevScale) > TOLERANCE) {
-                sendUpdatePacket();
-                prevScale = scale;
-            }
+            //Note: We don't need to do any checking here if the packet needs due to capacity changing as we do it
+            // in TileentityMekanism after this method is called. And given radioactive waste barrels can only contain
+            // radioactive substances the check for radiation scale also will work for syncing capacity for purposes
+            // of when the client sneak right-clicks on the barrel
         }
     }
 
@@ -77,8 +79,8 @@ public class TileEntityRadioactiveWasteBarrel extends TileEntityMekanism impleme
         return gasTank;
     }
 
-    public float getGasScale() {
-        return gasTank.getStored() / (float) gasTank.getCapacity();
+    public double getGasScale() {
+        return gasTank.getStored() / (double) gasTank.getCapacity();
     }
 
     public GasStack getGas() {
@@ -86,22 +88,12 @@ public class TileEntityRadioactiveWasteBarrel extends TileEntityMekanism impleme
     }
 
     @Override
-    public boolean renderUpdate() {
-        return true;
-    }
-
-    @Override
-    public boolean lightUpdate() {
-        return true;
-    }
-
-    @Override
     public ActionResultType onSneakRightClick(PlayerEntity player, Direction side) {
         if (!isRemote()) {
             setActive(!getActive());
-            World world = getWorld();
+            World world = getLevel();
             if (world != null) {
-                world.playSound(null, getPos().getX(), getPos().getY(), getPos().getZ(), SoundEvents.UI_BUTTON_CLICK, SoundCategory.BLOCKS, 0.3F, 1);
+                world.playSound(null, getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), SoundEvents.UI_BUTTON_CLICK, SoundCategory.BLOCKS, 0.3F, 1);
             }
         }
         return ActionResultType.SUCCESS;

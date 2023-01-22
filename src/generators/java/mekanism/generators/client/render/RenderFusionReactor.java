@@ -10,6 +10,7 @@ import mekanism.client.render.MekanismRenderer;
 import mekanism.client.render.tileentity.MekanismTileEntityRenderer;
 import mekanism.client.render.tileentity.RenderEnergyCube;
 import mekanism.generators.common.GeneratorsProfilerConstants;
+import mekanism.generators.common.content.fusion.FusionReactorMultiblockData;
 import mekanism.generators.common.tile.fusion.TileEntityFusionReactorController;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
@@ -29,11 +30,12 @@ public class RenderFusionReactor extends MekanismTileEntityRenderer<TileEntityFu
     @Override
     protected void render(TileEntityFusionReactorController tile, float partialTick, MatrixStack matrix, IRenderTypeBuffer renderer, int light, int overlayLight,
           IProfiler profiler) {
-        if (tile.getMultiblock().isFormed() && tile.getMultiblock().isBurning()) {
-            matrix.push();
+        FusionReactorMultiblockData multiblock = tile.getMultiblock();
+        if (multiblock.isFormed() && multiblock.isBurning()) {
+            matrix.pushPose();
             matrix.translate(0.5, -1.5, 0.5);
 
-            long scaledTemp = Math.round(tile.getMultiblock().getLastPlasmaTemp() / SCALE);
+            long scaledTemp = Math.round(multiblock.getLastPlasmaTemp() / SCALE);
             float ticks = MekanismClient.ticksPassed + partialTick;
             double scale = 1 + 0.7 * Math.sin(Math.toRadians(ticks * 3.14 * scaledTemp + 135F));
             IVertexBuilder buffer = core.getBuffer(renderer);
@@ -45,7 +47,7 @@ public class RenderFusionReactor extends MekanismTileEntityRenderer<TileEntityFu
             scale = 1 - 0.9 * Math.sin(Math.toRadians(ticks * 4 * scaledTemp + 90F));
             renderPart(matrix, buffer, overlayLight, EnumColor.ORANGE, scale, ticks, scaledTemp, 5, -3, -35, 106);
 
-            matrix.pop();
+            matrix.popPose();
         }
     }
 
@@ -57,16 +59,17 @@ public class RenderFusionReactor extends MekanismTileEntityRenderer<TileEntityFu
     private void renderPart(MatrixStack matrix, IVertexBuilder buffer, int overlayLight, EnumColor color, double scale, float ticks, long scaledTemp, int mult1,
           int mult2, int shift1, int shift2) {
         float ticksScaledTemp = ticks * scaledTemp;
-        matrix.push();
+        matrix.pushPose();
         matrix.scale((float) scale, (float) scale, (float) scale);
-        matrix.rotate(Vector3f.YP.rotationDegrees(ticksScaledTemp * mult1 + shift1));
-        matrix.rotate(RenderEnergyCube.coreVec.rotationDegrees(ticksScaledTemp * mult2 + shift2));
+        matrix.mulPose(Vector3f.YP.rotationDegrees(ticksScaledTemp * mult1 + shift1));
+        matrix.mulPose(RenderEnergyCube.coreVec.rotationDegrees(ticksScaledTemp * mult2 + shift2));
         core.render(matrix, buffer, MekanismRenderer.FULL_LIGHT, overlayLight, color, 1);
-        matrix.pop();
+        matrix.popPose();
     }
 
     @Override
-    public boolean isGlobalRenderer(TileEntityFusionReactorController tile) {
-        return tile.getMultiblock().isFormed() && tile.getMultiblock().isBurning();
+    public boolean shouldRenderOffScreen(TileEntityFusionReactorController tile) {
+        FusionReactorMultiblockData multiblock = tile.getMultiblock();
+        return multiblock.isFormed() && multiblock.isBurning();
     }
 }
