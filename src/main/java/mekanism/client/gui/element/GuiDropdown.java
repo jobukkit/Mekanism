@@ -84,7 +84,7 @@ public class GuiDropdown<TYPE extends Enum<TYPE> & IDropdownEnum<TYPE>> extends 
             for (int i = 0; i < options.length; i++) {
                 ResourceLocation icon = options[i].getIcon();
                 if (icon != null) {
-                    minecraft.textureManager.bindTexture(options[i].getIcon());
+                    minecraft.textureManager.bindTexture(icon);
                     blit(x + width - 9, y + 12 + 2 + 10 * i, 0, 0, 6, 6, 6, 6);
                 }
             }

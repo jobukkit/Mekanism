@@ -10,14 +10,17 @@ import mekanism.client.gui.GuiUtils;
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.render.IFancyFontRenderer;
 import mekanism.client.render.MekanismRenderer;
+import mekanism.common.config.MekanismConfig;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.MekanismUtils.ResourceType;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 
@@ -110,7 +113,20 @@ public abstract class GuiElement extends Widget implements IFancyFontRenderer {
     }
 
     public void syncFrom(GuiElement element) {
-        children.forEach(child -> child.syncFrom(element));
+        int numChildren = children.size();
+        if (numChildren > 0) {
+            for (int i = 0; i < element.children.size(); i++) {
+                GuiElement prevChild = element.children.get(i);
+                if (prevChild.hasPersistentData() && i < numChildren) {
+                    GuiElement child = children.get(i);
+                    // we're forced to assume that the children list is the same before and after the resize.
+                    // for verification, we run a lightweight class equality check
+                    if (child.getClass() == prevChild.getClass()) {
+                        child.syncFrom(prevChild);
+                    }
+                }
+            }
+        }
     }
 
     public final void onRenderForeground(int mouseX, int mouseY, int zOffset, int totalOffset) {
@@ -346,7 +362,8 @@ public abstract class GuiElement extends Widget implements IFancyFontRenderer {
     @Override
     public void playDownSound(@Nonnull SoundHandler soundHandler) {
         if (playClickSound) {
-            super.playDownSound(soundHandler);
+            //Respect the sound config
+            soundHandler.play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1, MekanismConfig.client.baseSoundVolume.get()));
         }
     }
 

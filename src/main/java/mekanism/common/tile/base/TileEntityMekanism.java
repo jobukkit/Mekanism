@@ -427,8 +427,7 @@ public abstract class TileEntityMekanism extends CapabilityTileEntity implements
                         return WrenchResult.DISMANTLED;
                     }
                     //Special ITileDirectional handling
-                    if (isDirectional()) {
-                        //TODO: Extract this out into a handleRotation method?
+                    if (isDirectional() && Attribute.get(getBlockType(), AttributeStateFacing.class).canRotate()) {
                         setFacing(getDirection().rotateY());
                     }
                     return WrenchResult.SUCCESS;
@@ -614,6 +613,9 @@ public abstract class TileEntityMekanism extends CapabilityTileEntity implements
         if (isActivatable()) {
             nbtTags.putBoolean(NBTConstants.ACTIVE_STATE, currentActive);
             nbtTags.putInt(NBTConstants.UPDATE_DELAY, updateDelay);
+        }
+        if (supportsComparator()) {
+            nbtTags.putInt(NBTConstants.CURRENT_REDSTONE, currentRedstoneLevel);
         }
         return nbtTags;
     }

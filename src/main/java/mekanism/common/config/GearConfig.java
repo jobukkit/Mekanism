@@ -85,6 +85,7 @@ public class GearConfig extends BaseMekanismConfig {
     public final CachedFloatingLongValue seismicReaderEnergyUsage;
     //Canteen
     public final CachedLongValue canteenMaxStorage;
+    public final CachedLongValue canteenTransferRate;
     //Meka-Tool
     public final CachedFloatingLongValue mekaToolEnergyUsageWeapon;
     public final CachedFloatingLongValue mekaToolEnergyUsageTeleport;
@@ -98,6 +99,7 @@ public class GearConfig extends BaseMekanismConfig {
     public final CachedFloatingLongValue mekaToolEnergyUsageHoe;
     public final CachedFloatingLongValue mekaToolEnergyUsageShovel;
     public final CachedFloatingLongValue mekaToolEnergyUsageAxe;
+    public final CachedBooleanValue mekaToolExtendedMining;
     //MekaSuit
     public final CachedFloatingLongValue mekaSuitBaseEnergyCapacity;
     public final CachedFloatingLongValue mekaSuitBaseChargeRate;
@@ -112,6 +114,10 @@ public class GearConfig extends BaseMekanismConfig {
     public final CachedFloatingLongValue mekaSuitEnergyUsageNutritionalInjection;
     public final CachedFloatingLongValue mekaSuitEnergyUsageDamage;
     public final CachedFloatingLongValue mekaSuitEnergyUsageItemAttraction;
+    public final CachedLongValue mekaSuitNutritionalMaxStorage;
+    public final CachedLongValue mekaSuitNutritionalTransferRate;
+    public final CachedLongValue mekaSuitJetpackMaxStorage;
+    public final CachedLongValue mekaSuitJetpackTransferRate;
 
     GearConfig() {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -237,7 +243,9 @@ public class GearConfig extends BaseMekanismConfig {
 
         builder.comment("Canteen Settings").push(CANTEEN_CATEGORY);
         canteenMaxStorage = CachedLongValue.wrap(this, builder.comment("Maximum amount of Nutritional Paste storable by the Canteen.")
-              .defineInRange("maxStorage", 64_000L, 1, Long.MAX_VALUE));
+              .defineInRange("maxStorage", 64_000, 1, Long.MAX_VALUE));
+        canteenTransferRate = CachedLongValue.wrap(this, builder.comment("Rate at which Nutritional Paste can be transferred into a Canteen.")
+              .defineInRange("transferRate", 128, 1, Long.MAX_VALUE));
         builder.pop();
 
         builder.comment("Meka-Tool Settings").push(MEKATOOL_CATEGORY);
@@ -265,6 +273,8 @@ public class GearConfig extends BaseMekanismConfig {
               "energyUsageShovel", FloatingLong.createConst(10));
         mekaToolEnergyUsageAxe = CachedFloatingLongValue.define(this, builder, "Cost in Joules of using the Meka-Tool as an axe for stripping logs.",
               "energyUsageAxe", FloatingLong.createConst(10));
+        mekaToolExtendedMining = CachedBooleanValue.wrap(this, builder.comment("Enable the 'Extended Vein Mining' mode for the Meka-Tool. (Allows vein mining everything not just ores/logs)")
+              .define("extendedMining", true));
         builder.pop();
 
         builder.comment("MekaSuit Settings").push(MEKASUIT_CATEGORY);
@@ -294,6 +304,14 @@ public class GearConfig extends BaseMekanismConfig {
               "energyUsageDamage", FloatingLong.createConst(100_000));
         mekaSuitEnergyUsageItemAttraction = CachedFloatingLongValue.define(this, builder, "Energy usage (Joules) of MekaSuit per tick of attracting a single item.",
               "energyUsageItemAttraction", FloatingLong.createConst(250));
+        mekaSuitNutritionalMaxStorage = CachedLongValue.wrap(this, builder.comment("Maximum amount of Nutritional Paste storable by the nutritional injection unit.")
+              .defineInRange("nutritionalMaxStorage", 128_000, 1, Long.MAX_VALUE));
+        mekaSuitNutritionalTransferRate = CachedLongValue.wrap(this, builder.comment("Rate at which Nutritional Paste can be transferred into the nutritional injection unit.")
+              .defineInRange("nutritionalTransferRate", 256, 1, Long.MAX_VALUE));
+        mekaSuitJetpackMaxStorage = CachedLongValue.wrap(this, builder.comment("Maximum amount of Hydrogen storable in the jetpack unit.")
+              .defineInRange("jetpackMaxStorage", 48_000, 1, Long.MAX_VALUE));
+        mekaSuitJetpackTransferRate = CachedLongValue.wrap(this, builder.comment("Rate at which Hydrogen can be transferred into the jetpack unit.")
+              .defineInRange("jetpackTransferRate", 256, 1, Long.MAX_VALUE));
         builder.pop();
 
         builder.pop();
