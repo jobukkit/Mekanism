@@ -465,6 +465,14 @@ public class TileEntityFormulaicAssemblicator extends TileEntityMekanism impleme
                 unused.add(i);
             } else if (storedMap.containsKey(stockControlMap[i])) {
                 inputSlots.get(i).setStack(getStackFromMap(storedMap, stockControlMap[i]));
+            } else {
+                //If we don't have the item stored anymore (already filled all previous slots with it),
+                // then we need to empty the slot as the items in it has been moved to a more "optimal" slot
+                //Note: We only set them to empty if they are not already empty to avoid onContentsChanged being called
+                IInventorySlot slot = inputSlots.get(i);
+                if (!slot.isEmpty()) {
+                    slot.setStack(ItemStack.EMPTY);
+                }
             }
         }
         // if we still have items, first try to add remaining items to known unused (non-controlled) slots
