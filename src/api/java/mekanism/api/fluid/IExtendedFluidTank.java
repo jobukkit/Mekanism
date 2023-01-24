@@ -1,20 +1,18 @@
 package mekanism.api.fluid;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
+import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
 import mekanism.api.NBTConstants;
-import mekanism.api.inventory.AutomationType;
-import net.minecraft.nbt.CompoundNBT;
+import mekanism.api.annotations.NothingNullByDefault;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
-public interface IExtendedFluidTank extends IFluidTank, INBTSerializable<CompoundNBT>, IContentsListener {
+@NothingNullByDefault
+public interface IExtendedFluidTank extends IFluidTank, INBTSerializable<CompoundTag>, IContentsListener {
 
     /**
      * Overrides the stack in this {@link IExtendedFluidTank}.
@@ -25,6 +23,18 @@ public interface IExtendedFluidTank extends IFluidTank, INBTSerializable<Compoun
      * @implNote If the internal stack does get updated make sure to call {@link #onContentsChanged()}
      */
     void setStack(FluidStack stack);
+
+    /**
+     * Overrides the stack in this {@link IExtendedFluidTank}.
+     *
+     * @param stack {@link FluidStack} to set this tank's contents to (may be empty).
+     *
+     * @apiNote Unsafe version of {@link #setStack(FluidStack)}. This method is exposed for implementation and code deduplication reasons only and should
+     * <strong>NOT</strong> be directly called outside your own {@link IExtendedFluidTank} where you already know the given {@link FluidStack} is valid, or on the
+     * client side for purposes of receiving sync data and rendering.
+     * @implNote If the internal stack does get updated make sure to call {@link #onContentsChanged()}
+     */
+    void setStackUnchecked(FluidStack stack);
 
     /**
      * <p>
@@ -45,7 +55,7 @@ public interface IExtendedFluidTank extends IFluidTank, INBTSerializable<Compoun
      */
     default FluidStack insert(FluidStack stack, Action action, AutomationType automationType) {
         if (stack.isEmpty() || !isFluidValid(stack)) {
-            //"Fail quick" if the given stack is empty or we can never insert the item or currently are unable to insert it
+            //"Fail quick" if the given stack is empty, or we can never insert the item or currently are unable to insert it
             return stack;
         }
         int needed = getNeeded();
@@ -131,7 +141,7 @@ public interface IExtendedFluidTank extends IFluidTank, INBTSerializable<Compoun
             amount = maxStackSize;
         }
         if (getFluidAmount() == amount || action.simulate()) {
-            //If our size is not changing or we are only simulating the change, don't do anything
+            //If our size is not changing, or we are only simulating the change, don't do anything
             return amount;
         }
         setStack(new FluidStack(getFluid(), amount));
@@ -221,10 +231,10 @@ public interface IExtendedFluidTank extends IFluidTank, INBTSerializable<Compoun
     }
 
     @Override
-    default CompoundNBT serializeNBT() {
-        CompoundNBT nbt = new CompoundNBT();
+    default CompoundTag serializeNBT() {
+        CompoundTag nbt = new CompoundTag();
         if (!isEmpty()) {
-            nbt.put(NBTConstants.STORED, getFluid().writeToNBT(new CompoundNBT()));
+            nbt.put(NBTConstants.STORED, getFluid().writeToNBT(new CompoundTag()));
         }
         return nbt;
     }

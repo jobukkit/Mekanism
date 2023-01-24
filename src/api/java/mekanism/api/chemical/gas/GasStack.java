@@ -1,25 +1,26 @@
 package mekanism.api.chemical.gas;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.MekanismAPI;
 import mekanism.api.NBTConstants;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.providers.IGasProvider;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.registries.IRegistryDelegate;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.registries.IForgeRegistry;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * GasStack - a specified amount of a defined Gas with certain properties.
  *
  * @author aidancbrady
  */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
-public class GasStack extends ChemicalStack<Gas> {
+@NothingNullByDefault
+public final class GasStack extends ChemicalStack<Gas> {
 
+    /**
+     * Empty GasStack instance.
+     */
     public static final GasStack EMPTY = new GasStack(MekanismAPI.EMPTY_GAS, 0);
 
     /**
@@ -37,12 +38,8 @@ public class GasStack extends ChemicalStack<Gas> {
     }
 
     @Override
-    protected IRegistryDelegate<Gas> getDelegate(Gas gas) {
-        if (MekanismAPI.gasRegistry().getKey(gas) == null) {
-            MekanismAPI.logger.fatal("Failed attempt to create a GasStack for an unregistered Gas {} (type {})", gas.getRegistryName(), gas.getClass().getName());
-            throw new IllegalArgumentException("Cannot create a GasStack from an unregistered Gas");
-        }
-        return gas.delegate;
+    protected IForgeRegistry<Gas> getRegistry() {
+        return MekanismAPI.gasRegistry();
     }
 
     @Override
@@ -57,7 +54,7 @@ public class GasStack extends ChemicalStack<Gas> {
      *
      * @return GasStack stored in the tag compound
      */
-    public static GasStack readFromNBT(@Nullable CompoundNBT nbtTags) {
+    public static GasStack readFromNBT(@Nullable CompoundTag nbtTags) {
         if (nbtTags == null || nbtTags.isEmpty()) {
             return EMPTY;
         }
@@ -72,13 +69,12 @@ public class GasStack extends ChemicalStack<Gas> {
         return new GasStack(type, amount);
     }
 
-    public static GasStack readFromPacket(PacketBuffer buf) {
-        Gas gas = buf.readRegistryId();
-        long amount = buf.readVarLong();
+    public static GasStack readFromPacket(FriendlyByteBuf buf) {
+        Gas gas = buf.readRegistryIdSafe(Gas.class);
         if (gas.isEmptyType()) {
             return EMPTY;
         }
-        return new GasStack(gas, amount);
+        return new GasStack(gas, buf.readVarLong());
     }
 
     /**
@@ -88,16 +84,9 @@ public class GasStack extends ChemicalStack<Gas> {
      */
     @Override
     public GasStack copy() {
+        if (isEmpty()) {
+            return EMPTY;
+        }
         return new GasStack(this, getAmount());
-    }
-
-    /**
-     * Default equality comparison for a GasStack. Same functionality as isTypeEqual().
-     *
-     * This is included for use in data structures.
-     */
-    @Override
-    public boolean equals(Object o) {
-        return o instanceof GasStack && isTypeEqual((GasStack) o);
     }
 }

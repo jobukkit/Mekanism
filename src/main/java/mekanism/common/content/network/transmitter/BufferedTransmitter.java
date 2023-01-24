@@ -1,25 +1,20 @@
 package mekanism.common.content.network.transmitter;
 
-import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.common.lib.transmitter.DynamicBufferedNetwork;
 import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.tile.transmitter.TileEntityTransmitter;
 import mekanism.common.util.EnumUtils;
-import mekanism.common.util.MekanismUtils;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Direction;
+import mekanism.common.util.WorldUtils;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class BufferedTransmitter<ACCEPTOR, NETWORK extends DynamicBufferedNetwork<ACCEPTOR, NETWORK, BUFFER, TRANSMITTER>, BUFFER,
       TRANSMITTER extends BufferedTransmitter<ACCEPTOR, NETWORK, BUFFER, TRANSMITTER>> extends Transmitter<ACCEPTOR, NETWORK, TRANSMITTER> {
 
     public BufferedTransmitter(TileEntityTransmitter tile, TransmissionType... transmissionTypes) {
         super(tile, transmissionTypes);
-    }
-
-    public long getTransmitterNetworkCapacity() {
-        return hasTransmitterNetwork() ? getTransmitterNetwork().getCapacity() : getCapacity();
     }
 
     /**
@@ -34,7 +29,7 @@ public abstract class BufferedTransmitter<ACCEPTOR, NETWORK extends DynamicBuffe
      *
      * @return The transmitter's buffer, or if null the network's buffer.
      */
-    @Nonnull
+    @NotNull
     public abstract BUFFER getBufferWithFallback();
 
     /**
@@ -47,19 +42,20 @@ public abstract class BufferedTransmitter<ACCEPTOR, NETWORK extends DynamicBuffe
     }
 
     @Override
-    public boolean isValidTransmitter(Transmitter<?, ?, ?> transmitter) {
-        if (canHaveIncompatibleNetworks() && transmitter instanceof BufferedTransmitter) {
-            BufferedTransmitter<?, ?, ?, ?> other = (BufferedTransmitter<?, ?, ?, ?>) transmitter;
-            if (other.canHaveIncompatibleNetworks()) {
-                //If it is a transmitter, only allow declare it as valid, if we don't have a combination
-                // of a transmitter with a network and an orphaned transmitter, but only bother if
-                // we can have incompatible networks
-                if (hasTransmitterNetwork() && other.isOrphan() || other.hasTransmitterNetwork() && isOrphan()) {
-                    return false;
-                }
+    public boolean isValidTransmitter(TileEntityTransmitter transmitter, Direction side) {
+        if (canHaveIncompatibleNetworks() && transmitter.getTransmitter() instanceof BufferedTransmitter<?, ?, ?, ?> other && other.canHaveIncompatibleNetworks()) {
+            //If it is a transmitter, only declare it as valid, if we don't have a combination
+            // of a transmitter with a network and an orphaned transmitter, but only bother if
+            // we can have incompatible networks
+            // This makes it so that we don't let a network connect to an orphan until the orphan has had a chance
+            // to figure out where it belongs
+            //TODO: Because of the reworks done and the creation of CompatibleTransmitterValidator, this potentially
+            // should just fail if either transmitter is an orphan as it is not needed otherwise??
+            if (hasTransmitterNetwork() && other.isOrphan() || other.hasTransmitterNetwork() && isOrphan()) {
+                return false;
             }
         }
-        return super.isValidTransmitter(transmitter);
+        return super.isValidTransmitter(transmitter, side);
     }
 
     @Override
@@ -84,7 +80,7 @@ public abstract class BufferedTransmitter<ACCEPTOR, NETWORK extends DynamicBuffe
                 // This happens because we are no longer an orphan and want to tell the neighboring tiles about it
                 for (Direction side : EnumUtils.DIRECTIONS) {
                     if (connectionMapContainsSide(changedTransmitters, side)) {
-                        TileEntityTransmitter tile = MekanismUtils.getTileEntity(TileEntityTransmitter.class, getTileWorld(), getTilePos().offset(side));
+                        TileEntityTransmitter tile = WorldUtils.getTileEntity(TileEntityTransmitter.class, getTileWorld(), getTilePos().relative(side));
                         if (tile != null) {
                             tile.getTransmitter().refreshConnections(side.getOpposite());
                         }
@@ -122,7 +118,7 @@ public abstract class BufferedTransmitter<ACCEPTOR, NETWORK extends DynamicBuffe
     }
 
     private void recheckConnectionPrechecked(Direction side) {
-        TileEntityTransmitter otherTile = MekanismUtils.getTileEntity(TileEntityTransmitter.class, getTileWorld(), getTilePos().offset(side));
+        TileEntityTransmitter otherTile = WorldUtils.getTileEntity(TileEntityTransmitter.class, getTileWorld(), getTilePos().relative(side));
         if (otherTile != null) {
             NETWORK network = getTransmitterNetwork();
             //The other one should always have the same incompatible networks state as us
@@ -131,8 +127,8 @@ public abstract class BufferedTransmitter<ACCEPTOR, NETWORK extends DynamicBuffe
             if (other instanceof BufferedTransmitter && ((BufferedTransmitter<?, ?, ?, ?>) other).canHaveIncompatibleNetworks() && other.hasTransmitterNetwork()) {
                 NETWORK otherNetwork = (NETWORK) other.getTransmitterNetwork();
                 if (network != otherNetwork && network.isCompatibleWith(otherNetwork)) {
-                    //We have two networks that are now compatible and they are not the same source network
-                    // The most common cause they would be same source network is that they would merge
+                    //We have two networks that are now compatible, and they are not the same source network
+                    // The most common cause that they would be same source network is that they would merge
                     // from the first pipe checking when it attempts to reconnect, and then the second
                     // pipe still is going to be checking the connection.
 
@@ -149,8 +145,7 @@ public abstract class BufferedTransmitter<ACCEPTOR, NETWORK extends DynamicBuffe
                     // point where we can make some assumptions about the networks and if it is actually
                     // valid to merge them when otherwise people may try to merge things when they shouldn't
                     // be merged causing unexpected bugs.
-                    network.adoptTransmittersAndAcceptorsFrom(otherNetwork);
-                    List<TRANSMITTER> otherTransmitters = new ArrayList<>(otherNetwork.getTransmitters());
+                    List<TRANSMITTER> otherTransmitters = network.adoptTransmittersAndAcceptorsFrom(otherNetwork);
 
                     //Unregister the other network
                     otherNetwork.deregister();
@@ -164,6 +159,8 @@ public abstract class BufferedTransmitter<ACCEPTOR, NETWORK extends DynamicBuffe
                     other.refreshConnections(side.getOpposite());
                     //Force all the newly merged transmitters to send a sync update to the client
                     // to ensure that they now have the proper network id on the client
+                    // Note: adoptTransmittersAndAcceptorsFrom will return all the new transmitters except for
+                    // those that already have our network as their network (which should be none of them)
                     for (TRANSMITTER otherTransmitter : otherTransmitters) {
                         otherTransmitter.requestsUpdate();
                     }
@@ -173,12 +170,12 @@ public abstract class BufferedTransmitter<ACCEPTOR, NETWORK extends DynamicBuffe
     }
 
     @Override
-    protected void handleContentsUpdateTag(@Nonnull NETWORK network, @Nonnull CompoundNBT tag) {
+    protected void handleContentsUpdateTag(@NotNull NETWORK network, @NotNull CompoundTag tag) {
         network.updateCapacity();
     }
 
     @Override
-    protected void updateClientNetwork(@Nonnull NETWORK network) {
+    protected void updateClientNetwork(@NotNull NETWORK network) {
         super.updateClientNetwork(network);
         network.updateCapacity();
     }
@@ -193,6 +190,6 @@ public abstract class BufferedTransmitter<ACCEPTOR, NETWORK extends DynamicBuffe
     /**
      * @return Gets the transmitter's buffer.
      */
-    @Nonnull
+    @NotNull
     public abstract BUFFER getShare();
 }

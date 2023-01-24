@@ -1,75 +1,47 @@
 package mekanism.additions.common.block.plastic;
 
-import javax.annotation.Nonnull;
 import mekanism.api.text.EnumColor;
-import mekanism.common.block.interfaces.IColoredBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SlabBlock;
-import net.minecraft.entity.EntitySpawnPlacementRegistry.PlacementType;
-import net.minecraft.entity.EntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.IBooleanFunction;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockReader;
+import mekanism.common.block.attribute.Attributes.AttributeMobSpawn;
+import mekanism.common.block.states.BlockStateHelper;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
-public class BlockPlasticTransparentSlab extends SlabBlock implements IColoredBlock {
-
-    private final EnumColor color;
+public class BlockPlasticTransparentSlab extends BlockPlasticSlab {
 
     public BlockPlasticTransparentSlab(EnumColor color) {
-        super(Block.Properties.create(BlockPlastic.PLASTIC, color.getMapColor()).hardnessAndResistance(5F, 10F).notSolid());
-        this.color = color;
-    }
-
-    @Override
-    public EnumColor getColor() {
-        return color;
+        super(color, properties -> properties.noOcclusion().isValidSpawn(AttributeMobSpawn.NEVER_PREDICATE).isSuffocating(BlockStateHelper.NEVER_PREDICATE)
+              .isViewBlocking(BlockStateHelper.NEVER_PREDICATE));
     }
 
     @Override
     @Deprecated
-    public float getAmbientOcclusionLightValue(@Nonnull BlockState state, @Nonnull IBlockReader world, @Nonnull BlockPos pos) {
+    public float getShadeBrightness(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos) {
         return 0.8F;
     }
 
     @Override
     @Deprecated
-    public boolean isTransparent(@Nonnull BlockState state) {
+    public boolean useShapeForLightOcclusion(@NotNull BlockState state) {
         return true;
     }
 
     @Override
-    public boolean propagatesSkylightDown(@Nonnull BlockState state, @Nonnull IBlockReader reader, @Nonnull BlockPos pos) {
+    public boolean propagatesSkylightDown(@NotNull BlockState state, @NotNull BlockGetter reader, @NotNull BlockPos pos) {
         return true;
     }
 
     @Override
-    public boolean canCreatureSpawn(BlockState state, IBlockReader world, BlockPos pos, PlacementType type, EntityType<?> entityType) {
-        return false;
+    @Deprecated
+    public boolean skipRendering(@NotNull BlockState state, @NotNull BlockState adjacentBlockState, @NotNull Direction side) {
+        return BlockPlasticTransparent.isSideInvisible(this, state, adjacentBlockState, side);
     }
 
     @Override
-    public boolean isSideInvisible(@Nonnull BlockState state, @Nonnull BlockState adjacentBlockState, @Nonnull Direction side) {
-        final Block adjacentBlock = adjacentBlockState.getBlock();
-        if (adjacentBlock instanceof BlockPlasticTransparent || adjacentBlock instanceof BlockPlasticTransparentSlab
-            || adjacentBlock instanceof BlockPlasticTransparentStairs) {
-            IColoredBlock plastic = ((IColoredBlock) adjacentBlock);
-            if (plastic.getColor() == getColor()) {
-                try {
-                    VoxelShape shape = state.getShape(null, null);
-                    VoxelShape adjacentShape = adjacentBlockState.getShape(null, null);
-
-                    VoxelShape faceShape = shape.project(side);
-                    VoxelShape adjacentFaceShape = adjacentShape.project(side.getOpposite());
-                    return !VoxelShapes.compare(faceShape, adjacentFaceShape, IBooleanFunction.ONLY_FIRST);
-                } catch (Exception ignored) {
-                    //Something might have errored due to the null world and position
-                }
-            }
-        }
-        return false;
+    public float[] getBeaconColorMultiplier(BlockState state, LevelReader world, BlockPos pos, BlockPos beaconPos) {
+        return getColor().getRgbCodeFloat();
     }
 }

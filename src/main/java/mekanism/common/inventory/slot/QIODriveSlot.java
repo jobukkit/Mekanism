@@ -1,27 +1,27 @@
 package mekanism.common.inventory.slot;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
-import mekanism.api.annotations.FieldsAreNonnullByDefault;
-import mekanism.api.inventory.AutomationType;
+import mekanism.api.AutomationType;
+import mekanism.api.IContentsListener;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.inventory.IMekanismInventory;
 import mekanism.common.content.qio.IQIODriveHolder;
 import mekanism.common.content.qio.IQIODriveItem;
 import mekanism.common.content.qio.QIODriveData.QIODriveKey;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
+import mekanism.common.content.qio.QIOFrequency;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jetbrains.annotations.Nullable;
 
-@FieldsAreNonnullByDefault
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public class QIODriveSlot extends BasicInventorySlot {
 
     private final IQIODriveHolder driveHolder;
     private final QIODriveKey key;
 
-    public <TILE extends IMekanismInventory & IQIODriveHolder> QIODriveSlot(TILE inventory, int slot, int x, int y) {
-        super(notExternal, notExternal, (stack) -> stack.getItem() instanceof IQIODriveItem, inventory, x, y);
+    public <TILE extends IMekanismInventory & IQIODriveHolder> QIODriveSlot(TILE inventory, int slot, @Nullable IContentsListener listener, int x, int y) {
+        super(notExternal, notExternal, stack -> stack.getItem() instanceof IQIODriveItem, listener, x, y);
         key = new QIODriveKey(inventory, slot);
         driveHolder = inventory;
     }
@@ -29,13 +29,29 @@ public class QIODriveSlot extends BasicInventorySlot {
     @Override
     public void setStack(ItemStack stack) {
         // if we're about to empty this slot and a drive already exists here, remove the current drive from the frequency
-        if (!isRemote() && !getStack().isEmpty() && stack.isEmpty()) {
+        // Note: We don't check to see if the new stack is empty so that we properly are able to handle direct changes
+        if (!isRemote() && !isEmpty()) {
             removeDrive();
         }
         super.setStack(stack);
         // if we just added a new drive, add it to the frequency
         // (note that both of these operations can happen in this order if a user replaces the drive in the slot)
-        if (!isRemote() && !getStack().isEmpty()) {
+        if (!isRemote() && !isEmpty()) {
+            addDrive(getStack());
+        }
+    }
+
+    @Override
+    protected void setStackUnchecked(ItemStack stack) {
+        // if we're about to empty this slot and a drive already exists here, remove the current drive from the frequency
+        // Note: We don't check to see if the new stack is empty so that we properly are able to handle direct changes
+        if (!isRemote() && !isEmpty()) {
+            removeDrive();
+        }
+        super.setStackUnchecked(stack);
+        // if we just added a new drive, add it to the frequency
+        // (note that both of these operations can happen in this order if a user replaces the drive in the slot)
+        if (!isRemote() && !isEmpty()) {
             addDrive(getStack());
         }
     }
@@ -65,18 +81,23 @@ public class QIODriveSlot extends BasicInventorySlot {
     }
 
     private boolean isRemote() {
-        return ((TileEntity) driveHolder).getWorld().isRemote();
+        Level world = ((BlockEntity) driveHolder).getLevel();
+        //Treat world as remote if it is null (hasn't been assigned yet)
+        // which may happen when loading the drives from memory
+        return world == null || world.isClientSide();
     }
 
     private void addDrive(ItemStack stack) {
-        if (driveHolder.getQIOFrequency() != null) {
-            driveHolder.getQIOFrequency().addDrive(key);
+        QIOFrequency frequency = driveHolder.getQIOFrequency();
+        if (frequency != null) {
+            frequency.addDrive(key);
         }
     }
 
     private void removeDrive() {
-        if (driveHolder.getQIOFrequency() != null) {
-            driveHolder.getQIOFrequency().removeDrive(key, true);
+        QIOFrequency frequency = driveHolder.getQIOFrequency();
+        if (frequency != null) {
+            frequency.removeDrive(key, true);
         }
     }
 }

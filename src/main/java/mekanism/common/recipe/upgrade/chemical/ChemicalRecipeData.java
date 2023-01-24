@@ -4,14 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
 import mekanism.api.DataHandlerUtils;
 import mekanism.api.NBTConstants;
-import mekanism.api.annotations.FieldsAreNonnullByDefault;
-import mekanism.api.annotations.NonNull;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.ChemicalTankBuilder;
@@ -22,23 +18,22 @@ import mekanism.common.recipe.upgrade.RecipeUpgradeData;
 import mekanism.common.tile.base.SubstanceType;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.util.ItemDataUtils;
-import mekanism.common.util.MekanismUtils;
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-@FieldsAreNonnullByDefault
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public abstract class ChemicalRecipeData<CHEMICAL extends Chemical<CHEMICAL>, STACK extends ChemicalStack<CHEMICAL>, TANK extends IChemicalTank<CHEMICAL, STACK>,
       HANDLER extends IChemicalHandler<CHEMICAL, STACK>> implements RecipeUpgradeData<ChemicalRecipeData<CHEMICAL, STACK, TANK, HANDLER>> {
 
     protected final List<TANK> tanks;
 
-    protected ChemicalRecipeData(ListNBT tanks) {
+    protected ChemicalRecipeData(ListTag tanks) {
         int count = DataHandlerUtils.getMaxId(tanks, NBTConstants.TANK);
         this.tanks = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
@@ -54,8 +49,7 @@ public abstract class ChemicalRecipeData<CHEMICAL extends Chemical<CHEMICAL>, ST
     @Nullable
     @Override
     public ChemicalRecipeData<CHEMICAL, STACK, TANK, HANDLER> merge(ChemicalRecipeData<CHEMICAL, STACK, TANK, HANDLER> other) {
-        List<TANK> allTanks = new ArrayList<>(tanks.size() + other.tanks.size());
-        allTanks.addAll(tanks);
+        List<TANK> allTanks = new ArrayList<>(tanks);
         allTanks.addAll(other.tanks);
         return create(allTanks);
     }
@@ -70,7 +64,7 @@ public abstract class ChemicalRecipeData<CHEMICAL extends Chemical<CHEMICAL>, ST
 
     protected abstract Capability<HANDLER> getCapability();
 
-    protected abstract Predicate<@NonNull CHEMICAL> cloneValidator(HANDLER handler, int tank);
+    protected abstract Predicate<@NotNull CHEMICAL> cloneValidator(HANDLER handler, int tank);
 
     protected abstract HANDLER getHandlerFromTile(TileEntityMekanism tile);
 
@@ -80,14 +74,14 @@ public abstract class ChemicalRecipeData<CHEMICAL extends Chemical<CHEMICAL>, ST
             return true;
         }
         HANDLER handler;
-        Optional<HANDLER> capability = MekanismUtils.toOptional(stack.getCapability(getCapability()));
+        Optional<HANDLER> capability = stack.getCapability(getCapability()).resolve();
         if (capability.isPresent()) {
             handler = capability.get();
-        } else if (stack.getItem() instanceof BlockItem) {
+        } else if (stack.getItem() instanceof BlockItem blockItem) {
             TileEntityMekanism tile = null;
-            Block block = ((BlockItem) stack.getItem()).getBlock();
-            if (block instanceof IHasTileEntity) {
-                TileEntity tileEntity = ((IHasTileEntity<?>) block).getTileType().create();
+            Block block = blockItem.getBlock();
+            if (block instanceof IHasTileEntity<?> hasTileEntity) {
+                BlockEntity tileEntity = hasTileEntity.createDummyBlockEntity();
                 if (tileEntity instanceof TileEntityMekanism) {
                     tile = (TileEntityMekanism) tileEntity;
                 }
@@ -125,7 +119,7 @@ public abstract class ChemicalRecipeData<CHEMICAL extends Chemical<CHEMICAL>, ST
         }
         if (hasData) {
             //We managed to transfer it all into valid slots, so save it to the stack
-            ItemDataUtils.setList(stack, getSubstanceType().getContainerTag(), DataHandlerUtils.writeContainers(tanks));
+            ItemDataUtils.writeContainers(stack, getSubstanceType().getContainerTag(), tanks);
         }
         return true;
     }

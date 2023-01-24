@@ -1,22 +1,18 @@
 package mekanism.api.datagen.recipe.builder;
 
 import com.google.gson.JsonObject;
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.JsonConstants;
 import mekanism.api.SerializerHelper;
-import mekanism.api.annotations.FieldsAreNonnullByDefault;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.merged.BoxedChemicalStack;
 import mekanism.api.datagen.recipe.MekanismRecipeBuilder;
-import mekanism.api.recipes.inputs.ItemStackIngredient;
-import mekanism.api.recipes.inputs.chemical.GasStackIngredient;
-import net.minecraft.util.ResourceLocation;
+import mekanism.api.recipes.ingredients.ChemicalStackIngredient.GasStackIngredient;
+import mekanism.api.recipes.ingredients.ItemStackIngredient;
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
-@FieldsAreNonnullByDefault
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public class ChemicalDissolutionRecipeBuilder extends MekanismRecipeBuilder<ChemicalDissolutionRecipeBuilder> {
 
     private final ItemStackIngredient itemInput;
@@ -31,6 +27,13 @@ public class ChemicalDissolutionRecipeBuilder extends MekanismRecipeBuilder<Chem
         this.output = BoxedChemicalStack.box(output);
     }
 
+    /**
+     * Creates a Chemical Dissolution recipe builder.
+     *
+     * @param itemInput Item Input.
+     * @param gasInput  Gas Input.
+     * @param output    Output.
+     */
     public static ChemicalDissolutionRecipeBuilder dissolution(ItemStackIngredient itemInput, GasStackIngredient gasInput, ChemicalStack<?> output) {
         if (output.isEmpty()) {
             throw new IllegalArgumentException("This dissolution chamber recipe requires a non empty chemical output.");
@@ -50,7 +53,7 @@ public class ChemicalDissolutionRecipeBuilder extends MekanismRecipeBuilder<Chem
         }
 
         @Override
-        public void serialize(@Nonnull JsonObject json) {
+        public void serializeRecipeData(@NotNull JsonObject json) {
             json.add(JsonConstants.ITEM_INPUT, itemInput.serialize());
             json.add(JsonConstants.GAS_INPUT, gasInput.serialize());
             json.add(JsonConstants.OUTPUT, SerializerHelper.serializeBoxedChemicalStack(output));

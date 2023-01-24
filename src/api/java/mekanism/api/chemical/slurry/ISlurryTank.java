@@ -1,17 +1,15 @@
 package mekanism.api.chemical.slurry;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.NBTConstants;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.chemical.IChemicalTank;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 
 /**
  * Convenience extension to make working with generics easier.
  */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public interface ISlurryTank extends IChemicalTank<Slurry, SlurryStack>, IEmptySlurryProvider {
 
     @Override
@@ -20,8 +18,8 @@ public interface ISlurryTank extends IChemicalTank<Slurry, SlurryStack>, IEmptyS
     }
 
     @Override
-    default void deserializeNBT(CompoundNBT nbt) {
-        if (nbt.contains(NBTConstants.STORED, NBT.TAG_COMPOUND)) {
+    default void deserializeNBT(CompoundTag nbt) {
+        if (nbt.contains(NBTConstants.STORED, Tag.TAG_COMPOUND)) {
             setStackUnchecked(SlurryStack.readFromNBT(nbt.getCompound(NBTConstants.STORED)));
         }
     }

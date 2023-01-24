@@ -1,21 +1,20 @@
 package mekanism.common.item;
 
-import javax.annotation.Nonnull;
 import mekanism.api.IAlloyInteraction;
 import mekanism.api.tier.AlloyTier;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.util.CapabilityUtils;
-import mekanism.common.util.MekanismUtils;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import mekanism.common.util.WorldUtils;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.util.LazyOptional;
+import org.jetbrains.annotations.NotNull;
 
 public class ItemAlloy extends Item {
 
@@ -26,24 +25,23 @@ public class ItemAlloy extends Item {
         this.tier = tier;
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public ActionResultType onItemUse(ItemUseContext context) {
-        PlayerEntity player = context.getPlayer();
+    public InteractionResult useOn(UseOnContext context) {
+        Player player = context.getPlayer();
         if (player != null && MekanismConfig.general.transmitterAlloyUpgrade.get()) {
-            World world = context.getWorld();
-            BlockPos pos = context.getPos();
-            TileEntity tile = MekanismUtils.getTileEntity(world, pos);
-            LazyOptional<IAlloyInteraction> capability = CapabilityUtils.getCapability(tile, Capabilities.ALLOY_INTERACTION_CAPABILITY, context.getFace());
+            Level world = context.getLevel();
+            BlockPos pos = context.getClickedPos();
+            BlockEntity tile = WorldUtils.getTileEntity(world, pos);
+            LazyOptional<IAlloyInteraction> capability = CapabilityUtils.getCapability(tile, Capabilities.ALLOY_INTERACTION, context.getClickedFace());
             if (capability.isPresent()) {
-                if (!world.isRemote) {
-                    Hand hand = context.getHand();
-                    MekanismUtils.toOptional(capability).get().onAlloyInteraction(player, hand, player.getHeldItem(hand), tier);
+                if (!world.isClientSide) {
+                    capability.resolve().get().onAlloyInteraction(player, context.getItemInHand(), tier);
                 }
-                return ActionResultType.SUCCESS;
+                return InteractionResult.sidedSuccess(world.isClientSide);
             }
         }
-        return ActionResultType.PASS;
+        return InteractionResult.PASS;
     }
 
     public AlloyTier getTier() {

@@ -2,10 +2,7 @@ package mekanism.common.recipe.upgrade.chemical;
 
 import java.util.List;
 import java.util.function.Predicate;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.chemical.ChemicalTankBuilder;
 import mekanism.api.chemical.infuse.IInfusionHandler;
 import mekanism.api.chemical.infuse.IInfusionHandler.IMekanismInfusionHandler;
@@ -15,15 +12,16 @@ import mekanism.api.chemical.infuse.InfusionStack;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.tile.base.SubstanceType;
 import mekanism.common.tile.base.TileEntityMekanism;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.ListTag;
 import net.minecraftforge.common.capabilities.Capability;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public class InfusionRecipeData extends ChemicalRecipeData<InfuseType, InfusionStack, IInfusionTank, IInfusionHandler> {
 
-    public InfusionRecipeData(ListNBT tanks) {
+    public InfusionRecipeData(ListTag tanks) {
         super(tanks);
     }
 
@@ -49,7 +47,7 @@ public class InfusionRecipeData extends ChemicalRecipeData<InfuseType, InfusionS
     @Override
     protected IInfusionHandler getOutputHandler(List<IInfusionTank> tanks) {
         return new IMekanismInfusionHandler() {
-            @Nonnull
+            @NotNull
             @Override
             public List<IInfusionTank> getChemicalTanks(@Nullable Direction side) {
                 return tanks;
@@ -63,7 +61,7 @@ public class InfusionRecipeData extends ChemicalRecipeData<InfuseType, InfusionS
 
     @Override
     protected Capability<IInfusionHandler> getCapability() {
-        return Capabilities.INFUSION_HANDLER_CAPABILITY;
+        return Capabilities.INFUSION_HANDLER;
     }
 
     @Override

@@ -1,10 +1,9 @@
 package mekanism.common.capabilities.chemical.item;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
+import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.ChemicalTankBuilder;
@@ -25,12 +24,11 @@ import mekanism.api.chemical.slurry.ISlurryHandler;
 import mekanism.api.chemical.slurry.ISlurryTank;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
-import mekanism.api.inventory.AutomationType;
 import mekanism.common.capabilities.chemical.variable.RateLimitChemicalTank;
 import mekanism.common.tier.ChemicalTankTier;
+import org.jetbrains.annotations.Nullable;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public abstract class ChemicalTankRateLimitChemicalTank<CHEMICAL extends Chemical<CHEMICAL>, STACK extends ChemicalStack<CHEMICAL>>
       extends RateLimitChemicalTank<CHEMICAL, STACK> {
 

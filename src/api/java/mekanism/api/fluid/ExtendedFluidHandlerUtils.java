@@ -5,15 +5,15 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import java.util.function.IntSupplier;
 import mekanism.api.Action;
-import mekanism.api.annotations.NonNull;
 import net.minecraftforge.fluids.FluidStack;
+import org.jetbrains.annotations.NotNull;
 
 public class ExtendedFluidHandlerUtils {
 
     /**
      * Util method for a generic insert implementation for various handlers. Mainly for internal use only
      */
-    public static FluidStack insert(FluidStack stack, Action action, IntSupplier tankCount, Int2ObjectFunction<@NonNull FluidStack> inTankGetter, InsertFluid insertFluid) {
+    public static FluidStack insert(FluidStack stack, Action action, IntSupplier tankCount, Int2ObjectFunction<@NotNull FluidStack> inTankGetter, InsertFluid insertFluid) {
         int tanks = tankCount.getAsInt();
         if (tanks == 1) {
             return insertFluid.insert(0, stack, action);
@@ -54,7 +54,7 @@ public class ExtendedFluidHandlerUtils {
     /**
      * Util method for a generic extraction implementation for various handlers. Mainly for internal use only
      */
-    public static FluidStack extract(int amount, Action action, IntSupplier tankCount, Int2ObjectFunction<@NonNull FluidStack> inTankGetter, ExtractFluid extractFluid) {
+    public static FluidStack extract(int amount, Action action, IntSupplier tankCount, Int2ObjectFunction<@NotNull FluidStack> inTankGetter, ExtractFluid extractFluid) {
         int tanks = tankCount.getAsInt();
         if (tanks == 1) {
             return extractFluid.extract(0, amount, action);
@@ -77,7 +77,7 @@ public class ExtendedFluidHandlerUtils {
                         //If we are done draining break and return the amount extracted
                         break;
                     }
-                    //Otherwise keep looking and attempt to drain more from the handler, making sure that it is of
+                    //Otherwise, keep looking and attempt to drain more from the handler, making sure that it is of
                     // the same type as we have found
                 }
             }
@@ -88,7 +88,7 @@ public class ExtendedFluidHandlerUtils {
     /**
      * Util method for a generic extraction implementation for various handlers. Mainly for internal use only
      */
-    public static FluidStack extract(FluidStack stack, Action action, IntSupplier tankCount, Int2ObjectFunction<@NonNull FluidStack> inTankGetter, ExtractFluid extractFluid) {
+    public static FluidStack extract(FluidStack stack, Action action, IntSupplier tankCount, Int2ObjectFunction<@NotNull FluidStack> inTankGetter, ExtractFluid extractFluid) {
         int tanks = tankCount.getAsInt();
         if (tanks == 1) {
             FluidStack inTank = inTankGetter.get(0);
@@ -101,7 +101,7 @@ public class ExtendedFluidHandlerUtils {
         int toDrain = stack.getAmount();
         for (int tank = 0; tank < tanks; tank++) {
             if (stack.isFluidEqual(inTankGetter.get(tank))) {
-                //If there is fluid in the tank that matches the type we are trying to drain, try to draining from it
+                //If there is fluid in the tank that matches the type we are trying to drain, try to drain from it
                 FluidStack drained = extractFluid.extract(tank, toDrain, action);
                 if (!drained.isEmpty()) {
                     //If we were able to drain something, set it as the type we have extracted/increase how much we have extracted
@@ -115,7 +115,7 @@ public class ExtendedFluidHandlerUtils {
                         //If we are done draining break and return the amount extracted
                         break;
                     }
-                    //Otherwise keep looking and attempt to drain more from the handler
+                    //Otherwise, keep looking and attempt to drain more from the handler
                 }
             }
         }

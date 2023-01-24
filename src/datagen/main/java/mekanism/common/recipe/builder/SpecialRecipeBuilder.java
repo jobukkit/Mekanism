@@ -2,59 +2,55 @@ package mekanism.common.recipe.builder;
 
 import com.google.gson.JsonObject;
 import java.util.function.Consumer;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
-import mekanism.common.registration.impl.IRecipeSerializerRegistryObject;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.util.ResourceLocation;
+import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.common.registration.impl.RecipeSerializerRegistryObject;
+import mekanism.common.util.RegistryUtils;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import org.jetbrains.annotations.Nullable;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
-public class SpecialRecipeBuilder implements IFinishedRecipe {
+@NothingNullByDefault
+public class SpecialRecipeBuilder implements FinishedRecipe {
 
-    private final IRecipeSerializer<?> serializer;
+    private final RecipeSerializer<?> serializer;
 
-    private SpecialRecipeBuilder(IRecipeSerializer<?> serializer) {
+    private SpecialRecipeBuilder(RecipeSerializer<?> serializer) {
         this.serializer = serializer;
     }
 
-    public static void build(Consumer<IFinishedRecipe> consumer, IRecipeSerializerRegistryObject<?> serializer) {
-        build(consumer, serializer.getRecipeSerializer());
+    public static void build(Consumer<FinishedRecipe> consumer, RecipeSerializerRegistryObject<?> serializer) {
+        build(consumer, serializer.get());
     }
 
-    public static void build(Consumer<IFinishedRecipe> consumer, IRecipeSerializer<?> serializer) {
+    public static void build(Consumer<FinishedRecipe> consumer, RecipeSerializer<?> serializer) {
         consumer.accept(new SpecialRecipeBuilder(serializer));
     }
 
-    @Nonnull
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getType() {
         return serializer;
     }
 
     @Override
-    public void serialize(JsonObject json) {
+    public void serializeRecipeData(JsonObject json) {
         //NO-OP
     }
 
-    @Nonnull
     @Override
-    public ResourceLocation getID() {
-        return serializer.getRegistryName();
+    public ResourceLocation getId() {
+        return RegistryUtils.getName(getType());
     }
 
     @Nullable
     @Override
-    public JsonObject getAdvancementJson() {
+    public JsonObject serializeAdvancement() {
         return null;
     }
 
     @Nullable
     @Override
-    public ResourceLocation getAdvancementID() {
+    public ResourceLocation getAdvancementId() {
         return null;
     }
 }

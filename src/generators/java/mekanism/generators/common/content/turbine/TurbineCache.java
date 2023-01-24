@@ -1,20 +1,18 @@
 package mekanism.generators.common.content.turbine;
 
-import java.util.List;
 import mekanism.api.NBTConstants;
 import mekanism.common.lib.multiblock.MultiblockCache;
 import mekanism.common.tile.TileEntityChemicalTank.GasMode;
 import mekanism.common.util.NBTUtils;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 public class TurbineCache extends MultiblockCache<TurbineMultiblockData> {
 
-    public GasMode dumpMode = GasMode.IDLE;
+    private GasMode dumpMode = GasMode.IDLE;
 
     @Override
-    public void merge(MultiblockCache<TurbineMultiblockData> mergeCache, List<ItemStack> rejectedItems) {
-        super.merge(mergeCache, rejectedItems);
+    public void merge(MultiblockCache<TurbineMultiblockData> mergeCache, RejectContents rejectContents) {
+        super.merge(mergeCache, rejectContents);
         dumpMode = ((TurbineCache) mergeCache).dumpMode;
     }
 
@@ -31,14 +29,14 @@ public class TurbineCache extends MultiblockCache<TurbineMultiblockData> {
     }
 
     @Override
-    public void load(CompoundNBT nbtTags) {
+    public void load(CompoundTag nbtTags) {
         super.load(nbtTags);
         NBTUtils.setEnumIfPresent(nbtTags, NBTConstants.DUMP_MODE, GasMode::byIndexStatic, mode -> dumpMode = mode);
     }
 
     @Override
-    public void save(CompoundNBT nbtTags) {
+    public void save(CompoundTag nbtTags) {
         super.save(nbtTags);
-        nbtTags.putInt(NBTConstants.DUMP_MODE, dumpMode.ordinal());
+        NBTUtils.writeEnum(nbtTags, NBTConstants.DUMP_MODE, dumpMode);
     }
 }

@@ -1,123 +1,162 @@
 package mekanism.common.tile.qio;
 
-import javax.annotation.Nonnull;
+import java.util.Map;
 import mekanism.api.NBTConstants;
 import mekanism.common.content.qio.QIOFrequency;
+import mekanism.common.integration.computer.ComputerException;
+import mekanism.common.integration.computer.annotation.ComputerMethod;
 import mekanism.common.inventory.container.MekanismContainer;
+import mekanism.common.inventory.container.sync.SyncableBoolean;
 import mekanism.common.inventory.container.sync.SyncableItemStack;
 import mekanism.common.inventory.container.sync.SyncableLong;
 import mekanism.common.lib.inventory.HashedItem;
 import mekanism.common.registries.MekanismBlocks;
-import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.world.World;
-import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.data.ModelDataMap;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
+import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 
 public class TileEntityQIORedstoneAdapter extends TileEntityQIOComponent {
 
-    public static final ModelProperty<Boolean> POWERING_PROPERTY = new ModelProperty<>();
+    public static final ModelProperty<Void> POWERING_PROPERTY = new ModelProperty<>();
 
     private boolean prevPowering;
     private HashedItem itemType = null;
+    private boolean fuzzy;
     private long count = 0;
     private long clientStoredCount = 0;
 
-    public TileEntityQIORedstoneAdapter() {
-        super(MekanismBlocks.QIO_REDSTONE_ADAPTER);
+    public TileEntityQIORedstoneAdapter(BlockPos pos, BlockState state) {
+        super(MekanismBlocks.QIO_REDSTONE_ADAPTER, pos, state);
     }
 
     public boolean isPowering() {
         if (isRemote()) {
             return prevPowering;
         }
+        long stored = getFreqStored();
+        return stored > 0 && stored >= count;
+    }
+
+    private long getFreqStored() {
         QIOFrequency freq = getQIOFrequency();
-        if (freq != null && itemType != null) {
-            long stored = freq.getStored(itemType);
-            return stored > 0 && stored >= count;
+        if (freq == null || itemType == null) {
+            return 0;
+        } else if (fuzzy) {
+            return freq.getTypesForItem(itemType.getStack().getItem()).stream().mapToLong(freq::getStored).sum();
         }
-        return false;
+        return freq.getStored(itemType);
     }
 
     public void handleStackChange(ItemStack stack) {
-        itemType = stack.isEmpty() ? null : new HashedItem(stack);
-        markDirty(false);
+        itemType = stack.isEmpty() ? null : HashedItem.create(stack);
+        markForSave();
     }
 
-    public void handleCountChange(int count) {
-        this.count = count;
-        markDirty(false);
+    public void handleCountChange(long count) {
+        if (this.count != count) {
+            this.count = count;
+            markForSave();
+        }
+    }
+
+    public void toggleFuzzyMode() {
+        setFuzzyMode(!fuzzy);
+    }
+
+    private void setFuzzyMode(boolean fuzzy) {
+        if (this.fuzzy != fuzzy) {
+            this.fuzzy = fuzzy;
+            markForSave();
+        }
     }
 
     @Override
-    public void onUpdateServer() {
+    protected void onUpdateServer() {
         super.onUpdateServer();
         boolean powering = isPowering();
         if (powering != prevPowering) {
-            World world = getWorld();
+            Level world = getLevel();
             if (world != null) {
-                world.notifyNeighborsOfStateChange(getPos(), getBlockType());
+                world.updateNeighborsAt(getBlockPos(), getBlockType());
             }
             prevPowering = powering;
             sendUpdatePacket();
         }
+    }
 
-        if (world.getGameTime() % 10 == 0) {
-            QIOFrequency frequency = getQIOFrequency();
-            setActive(frequency != null);
+    @NotNull
+    @Override
+    public ModelData getModelData() {
+        return prevPowering ? ModelData.builder().with(POWERING_PROPERTY, null).build() : super.getModelData();
+    }
+
+    @Override
+    public void writeSustainedData(CompoundTag dataMap) {
+        super.writeSustainedData(dataMap);
+        if (itemType != null) {
+            dataMap.put(NBTConstants.SINGLE_ITEM, itemType.getStack().serializeNBT());
         }
+        dataMap.putLong(NBTConstants.AMOUNT, count);
+        dataMap.putBoolean(NBTConstants.FUZZY_MODE, fuzzy);
     }
 
-    @Nonnull
     @Override
-    public IModelData getModelData() {
-        return new ModelDataMap.Builder().withInitial(POWERING_PROPERTY, prevPowering).build();
+    public void readSustainedData(CompoundTag dataMap) {
+        super.readSustainedData(dataMap);
+        NBTUtils.setItemStackIfPresent(dataMap, NBTConstants.SINGLE_ITEM, item -> itemType = HashedItem.create(item));
+        NBTUtils.setLongIfPresent(dataMap, NBTConstants.AMOUNT, value -> count = value);
+        NBTUtils.setBooleanIfPresent(dataMap, NBTConstants.FUZZY_MODE, value -> fuzzy = value);
     }
 
-    @Nonnull
     @Override
-    public CompoundNBT getReducedUpdateTag() {
-        CompoundNBT updateTag = super.getReducedUpdateTag();
+    public Map<String, String> getTileDataRemap() {
+        Map<String, String> remap = super.getTileDataRemap();
+        remap.put(NBTConstants.SINGLE_ITEM, NBTConstants.SINGLE_ITEM);
+        remap.put(NBTConstants.AMOUNT, NBTConstants.AMOUNT);
+        remap.put(NBTConstants.FUZZY_MODE, NBTConstants.FUZZY_MODE);
+        return remap;
+    }
+
+    @NotNull
+    @Override
+    public CompoundTag getReducedUpdateTag() {
+        CompoundTag updateTag = super.getReducedUpdateTag();
         updateTag.putBoolean(NBTConstants.ACTIVE, prevPowering);
         return updateTag;
     }
 
     @Override
-    public void handleUpdateTag(BlockState state, @Nonnull CompoundNBT tag) {
-        super.handleUpdateTag(state, tag);
-        prevPowering = tag.getBoolean(NBTConstants.ACTIVE);
-        requestModelDataUpdate();
-        MekanismUtils.updateBlock(getWorld(), getPos());
-    }
-
-    @Override
-    public void read(@Nonnull BlockState state, @Nonnull CompoundNBT nbtTags) {
-        super.read(state, nbtTags);
-        NBTUtils.setItemStackIfPresent(nbtTags, NBTConstants.SINGLE_ITEM, (item) -> itemType = new HashedItem(item));
-        NBTUtils.setLongIfPresent(nbtTags, NBTConstants.AMOUNT, (value) -> count = value);
-    }
-
-    @Nonnull
-    @Override
-    public CompoundNBT write(@Nonnull CompoundNBT nbtTags) {
-        super.write(nbtTags);
-        if (itemType != null) {
-            nbtTags.put(NBTConstants.SINGLE_ITEM, itemType.getStack().write(new CompoundNBT()));
+    public void handleUpdateTag(@NotNull CompoundTag tag) {
+        super.handleUpdateTag(tag);
+        if (prevPowering != tag.getBoolean(NBTConstants.ACTIVE)) {
+            prevPowering = !prevPowering;
+            updateModelData();
         }
-        nbtTags.putLong(NBTConstants.AMOUNT, count);
-        return nbtTags;
     }
 
+    @ComputerMethod(nameOverride = "getTargetItem")
     public ItemStack getItemType() {
-        return itemType != null ? itemType.getStack() : ItemStack.EMPTY;
+        return itemType == null ? ItemStack.EMPTY : itemType.getStack();
     }
 
+    @ComputerMethod(nameOverride = "getTriggerAmount")
     public long getCount() {
         return count;
+    }
+
+    @ComputerMethod
+    public boolean getFuzzyMode() {
+        return fuzzy;
     }
 
     public long getStoredCount() {
@@ -125,24 +164,56 @@ public class TileEntityQIORedstoneAdapter extends TileEntityQIOComponent {
     }
 
     @Override
-    public boolean renderUpdate() {
-        return true;
-    }
-
-    @Override
     public void addContainerTrackers(MekanismContainer container) {
         super.addContainerTrackers(container);
-        container.track(SyncableItemStack.create(this::getItemType, (value) -> {
+        container.track(SyncableItemStack.create(this::getItemType, value -> {
             if (value.isEmpty()) {
                 itemType = null;
             } else {
-                itemType = new HashedItem(value);
+                itemType = HashedItem.create(value);
             }
         }));
-        container.track(SyncableLong.create(this::getCount, (value) -> count = value));
-        container.track(SyncableLong.create(() -> {
-            QIOFrequency freq = getQIOFrequency();
-            return freq != null && itemType != null ? freq.getStored(itemType) : 0;
-        }, (value) -> clientStoredCount = value));
+        container.track(SyncableLong.create(this::getCount, value -> count = value));
+        container.track(SyncableBoolean.create(this::getFuzzyMode, value -> fuzzy = value));
+        container.track(SyncableLong.create(this::getFreqStored, value -> clientStoredCount = value));
     }
+
+    //Methods relating to IComputerTile
+    @ComputerMethod
+    private void clearTargetItem() throws ComputerException {
+        validateSecurityIsPublic();
+        handleStackChange(ItemStack.EMPTY);
+    }
+
+    @ComputerMethod
+    private void setTargetItem(ResourceLocation itemName) throws ComputerException {
+        validateSecurityIsPublic();
+        Item item = ForgeRegistries.ITEMS.getValue(itemName);
+        if (item == null || item == Items.AIR) {
+            throw new ComputerException("Target item '%s' could not be found. If you are trying to clear it consider using clearTargetItem instead.", itemName);
+        }
+        handleStackChange(new ItemStack(item));
+    }
+
+    @ComputerMethod
+    private void setTriggerAmount(long amount) throws ComputerException {
+        validateSecurityIsPublic();
+        if (amount < 0) {
+            throw new ComputerException("Trigger amount cannot be negative. Received: %d", amount);
+        }
+        handleCountChange(amount);
+    }
+
+    @ComputerMethod(nameOverride = "toggleFuzzyMode")
+    private void computerToggleFuzzyMode() throws ComputerException {
+        validateSecurityIsPublic();
+        toggleFuzzyMode();
+    }
+
+    @ComputerMethod(nameOverride = "setFuzzyMode")
+    private void computerSetFuzzyMode(boolean fuzzy) throws ComputerException {
+        validateSecurityIsPublic();
+        setFuzzyMode(fuzzy);
+    }
+    //End methods IComputerTile
 }

@@ -1,14 +1,20 @@
 package mekanism.common.content.filter;
 
-import javax.annotation.Nonnull;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Material;
+import org.jetbrains.annotations.NotNull;
 
 public interface IMaterialFilter<FILTER extends IMaterialFilter<FILTER>> extends IFilter<FILTER> {
 
-    @Nonnull
+    default Material getMaterial() {
+        return Block.byItem(getMaterialItem().getItem()).defaultBlockState().getMaterial();
+    }
+
+    @NotNull
     ItemStack getMaterialItem();
 
-    void setMaterialItem(@Nonnull ItemStack stack);
+    void setMaterialItem(@NotNull ItemStack stack);
 
     @Override
     default boolean hasFilter() {

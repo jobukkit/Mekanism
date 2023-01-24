@@ -1,28 +1,25 @@
 package mekanism.common.capabilities.resolver.manager;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
-import mekanism.api.annotations.FieldsAreNonnullByDefault;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.energy.ISidedStrictEnergyHandler;
 import mekanism.api.energy.IStrictEnergyHandler;
 import mekanism.common.capabilities.holder.energy.IEnergyContainerHolder;
 import mekanism.common.capabilities.proxy.ProxyStrictEnergyHandler;
-import mekanism.common.capabilities.resolver.basic.EnergyCapabilityResolver;
+import mekanism.common.capabilities.resolver.EnergyCapabilityResolver;
 import mekanism.common.integration.energy.EnergyCompatUtils;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+import org.jetbrains.annotations.Nullable;
 
-@FieldsAreNonnullByDefault
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public class EnergyHandlerManager implements ICapabilityHandlerManager<IEnergyContainer> {
 
     private final Map<Direction, Map<Capability<?>, LazyOptional<?>>> cachedCapabilities;
@@ -79,18 +76,15 @@ public class EnergyHandlerManager implements ICapabilityHandlerManager<IEnergyCo
         }
         if (side == null) {
             if (readOnlyHandler == null) {
-                //Note: Only should enter this if statement if we don't already have a cache
-                // so we just check it before hand as it is a quick check and simplifies the code
+                //Note: Only should enter this if statement if we don't already have a cache,
+                // so we just check it beforehand as it is a quick check and simplifies the code
                 readOnlyHandler = new ProxyStrictEnergyHandler(baseHandler, null, holder);
             }
             return EnergyCapabilityResolver.getCachedOrResolve(capability, cachedReadOnlyCapabilities, readOnlyHandler);
         }
-        IStrictEnergyHandler handler = handlers.get(side);
-        if (handler == null) {
-            //Note: Only should enter this if statement if we don't already have a cache
-            // so we just check it before hand as it is a quick check and simplifies the code
-            handlers.put(side, handler = new ProxyStrictEnergyHandler(baseHandler, side, holder));
-        }
+        //Note: Only should enter this if statement if we don't already have a cache,
+        // so we just check it beforehand as it is a quick check and simplifies the code
+        IStrictEnergyHandler handler = handlers.computeIfAbsent(side, s -> new ProxyStrictEnergyHandler(baseHandler, s, holder));
         return EnergyCapabilityResolver.getCachedOrResolve(capability, cachedCapabilities.computeIfAbsent(side, key -> new HashMap<>()), handler);
     }
 
@@ -113,9 +107,13 @@ public class EnergyHandlerManager implements ICapabilityHandlerManager<IEnergyCo
         //Note: We don't invalidate the base handlers as they are still valid regardless, and the holder just removes slots when they shouldn't be accessible
         // we only bother invalidating the lazy optionals
         for (Map<Capability<?>, LazyOptional<?>> cachedSide : cachedCapabilities.values()) {
-            cachedSide.values().forEach(this::invalidate);
+            for (LazyOptional<?> lazyOptional : new ArrayList<>(cachedSide.values())) {
+                invalidate(lazyOptional);
+            }
         }
-        cachedReadOnlyCapabilities.values().forEach(this::invalidate);
+        for (LazyOptional<?> lazyOptional : new ArrayList<>(cachedReadOnlyCapabilities.values())) {
+            invalidate(lazyOptional);
+        }
     }
 
     protected void invalidate(@Nullable LazyOptional<?> cachedCapability) {

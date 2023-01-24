@@ -4,23 +4,19 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
-import mekanism.api.annotations.FieldsAreNonnullByDefault;
+import mekanism.api.AutomationType;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.energy.IEnergyContainer;
-import mekanism.api.inventory.AutomationType;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.capabilities.energy.MachineEnergyContainer;
 import mekanism.common.tier.InductionProviderTier;
 import mekanism.common.tile.multiblock.TileEntityInductionCell;
 import mekanism.common.tile.multiblock.TileEntityInductionProvider;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 
-@FieldsAreNonnullByDefault
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public class MatrixEnergyContainer implements IEnergyContainer {
 
     private final Map<BlockPos, InductionProviderTier> providers = new Object2ObjectOpenHashMap<>();
@@ -62,7 +58,7 @@ public class MatrixEnergyContainer implements IEnergyContainer {
     // We need to validate that does properly happen even if the cell is floating in the middle and not touching any walls
     // We may also want to make cells and providers extend TileEntityInternalMultiblock
     public void removeInternal(BlockPos pos) {
-        if (!invalidPositions.contains(pos)) {
+        if (invalidPositions.add(pos)) {
             if (providers.containsKey(pos)) {
                 //It is a provider
                 transferCap = transferCap.minusEqual(providers.get(pos).getOutput());
@@ -74,7 +70,6 @@ public class MatrixEnergyContainer implements IEnergyContainer {
                 storageCap = storageCap.plusEqual(cellContainer.getMaxEnergy());
                 cachedTotal = cachedTotal.minusEqual(cellContainer.getEnergy());
             }
-            invalidPositions.add(pos);
         }
     }
 
@@ -173,7 +168,7 @@ public class MatrixEnergyContainer implements IEnergyContainer {
         FloatingLong toAdd = amount.min(getRemainingInput()).min(getNeeded());
         if (toAdd.isZero()) {
             //Exit if we don't actually have anything to add, either due to how much we need
-            // or due to the our remaining rate limit
+            // or due to the remaining rate limit
             return amount;
         }
         if (action.execute()) {
@@ -211,13 +206,13 @@ public class MatrixEnergyContainer implements IEnergyContainer {
     }
 
     @Override
-    public CompoundNBT serializeNBT() {
+    public CompoundTag serializeNBT() {
         //Note: We don't actually have any specific serialization
-        return new CompoundNBT();
+        return new CompoundTag();
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT nbt) {
+    public void deserializeNBT(CompoundTag nbt) {
 
     }
 

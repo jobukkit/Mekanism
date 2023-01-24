@@ -1,75 +1,57 @@
 package mekanism.api.chemical;
 
-import java.util.List;
-import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Supplier;
+import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.infuse.InfuseType;
 import mekanism.api.chemical.pigment.Pigment;
 import mekanism.api.chemical.slurry.Slurry;
-import net.minecraft.tags.ITag;
-import net.minecraft.tags.ITag.INamedTag;
-import net.minecraft.tags.TagCollection;
-import net.minecraft.tags.TagRegistry;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.tags.ITagManager;
 
 public class ChemicalTags<CHEMICAL extends Chemical<CHEMICAL>> {
 
-    public static final ChemicalTags<Gas> GAS = new ChemicalTags<>();
-    public static final ChemicalTags<InfuseType> INFUSE_TYPE = new ChemicalTags<>();
-    public static final ChemicalTags<Pigment> PIGMENT = new ChemicalTags<>();
-    public static final ChemicalTags<Slurry> SLURRY = new ChemicalTags<>();
+    public static final ChemicalTags<Gas> GAS = new ChemicalTags<>(MekanismAPI::gasRegistryName, MekanismAPI::gasRegistry);
+    public static final ChemicalTags<InfuseType> INFUSE_TYPE = new ChemicalTags<>(MekanismAPI::infuseTypeRegistryName, MekanismAPI::infuseTypeRegistry);
+    public static final ChemicalTags<Pigment> PIGMENT = new ChemicalTags<>(MekanismAPI::pigmentRegistryName, MekanismAPI::pigmentRegistry);
+    public static final ChemicalTags<Slurry> SLURRY = new ChemicalTags<>(MekanismAPI::slurryRegistryName, MekanismAPI::slurryRegistry);
 
-    private final TagRegistry<CHEMICAL> collection = new TagRegistry<>();
+    private final Supplier<IForgeRegistry<CHEMICAL>> registrySupplier;
+    private final Supplier<ResourceKey<? extends Registry<CHEMICAL>>> registryKeySupplier;
 
-    private ChemicalTags() {
+    private ChemicalTags(Supplier<ResourceKey<? extends Registry<CHEMICAL>>> registryKeySupplier, Supplier<IForgeRegistry<CHEMICAL>> registrySupplier) {
+        this.registrySupplier = registrySupplier;
+        this.registryKeySupplier = registryKeySupplier;
     }
 
-    public void setCollection(TagCollection<CHEMICAL> collectionIn) {
-        collection.func_232935_a_(collectionIn);
+    /**
+     * Helper to create a chemical tag.
+     *
+     * @param name Tag name.
+     *
+     * @return Tag reference.
+     *
+     * @apiNote For statically initializing optional tags, {@link net.minecraftforge.registries.DeferredRegister#createOptionalTagKey(String, Set)} must be used instead.
+     */
+    public TagKey<CHEMICAL> tag(ResourceLocation name) {
+        return getManager().map(manager -> manager.createTagKey(name))
+              .orElseGet(() -> TagKey.create(registryKeySupplier.get(), name));
     }
 
-    public TagCollection<CHEMICAL> getCollection() {
-        return collection.func_232939_b_();
-    }
-
-    public ResourceLocation lookupTag(ITag<CHEMICAL> tag) {
-        //Manual and slightly modified implementation of TagCollection#func_232975_b_ to have better reverse lookup handling
-        TagCollection<CHEMICAL> collection = getCollection();
-        ResourceLocation resourceLocation = collection.func_232973_a_(tag);
-        if (resourceLocation == null) {
-            //If we failed to get the resource location, try manually looking it up by a "matching" entry
-            // as the objects are different and neither Tag nor NamedTag override equals and hashCode
-            List<CHEMICAL> chemicals = tag.getAllElements();
-            for (Entry<ResourceLocation, ITag<CHEMICAL>> entry : collection.getTagMap().entrySet()) {
-                if (chemicals.equals(entry.getValue().getAllElements())) {
-                    resourceLocation = entry.getKey();
-                    break;
-                }
-            }
+    /**
+     * Gets the tag manager for this type of tag if it is after the registry has been created.
+     */
+    public Optional<ITagManager<CHEMICAL>> getManager() {
+        IForgeRegistry<CHEMICAL> registry = registrySupplier.get();
+        if (registry == null) {
+            return Optional.empty();
         }
-        if (resourceLocation == null) {
-            throw new IllegalStateException("Unrecognized tag");
-        }
-        return resourceLocation;
-    }
-
-    public static INamedTag<Gas> gasTag(ResourceLocation resourceLocation) {
-        return chemicalTag(resourceLocation, GAS);
-    }
-
-    public static INamedTag<InfuseType> infusionTag(ResourceLocation resourceLocation) {
-        return chemicalTag(resourceLocation, INFUSE_TYPE);
-    }
-
-    public static INamedTag<Pigment> pigmentTag(ResourceLocation resourceLocation) {
-        return chemicalTag(resourceLocation, PIGMENT);
-    }
-
-    public static INamedTag<Slurry> slurryTag(ResourceLocation resourceLocation) {
-        return chemicalTag(resourceLocation, SLURRY);
-    }
-
-    public static <CHEMICAL extends Chemical<CHEMICAL>> INamedTag<CHEMICAL> chemicalTag(ResourceLocation resourceLocation, ChemicalTags<CHEMICAL> chemicalTags) {
-        return chemicalTags.collection.func_232937_a_(resourceLocation.toString());
+        return Optional.ofNullable(registry.tags());
     }
 }

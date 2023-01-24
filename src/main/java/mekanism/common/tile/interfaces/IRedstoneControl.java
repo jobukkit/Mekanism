@@ -1,12 +1,12 @@
 package mekanism.common.tile.interfaces;
 
-import javax.annotation.Nonnull;
 import mekanism.api.IIncrementalEnum;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.math.MathUtils;
 import mekanism.api.text.IHasTextComponent;
 import mekanism.api.text.ILangEntry;
 import mekanism.common.MekanismLang;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.Component;
 
 public interface IRedstoneControl {
 
@@ -41,6 +41,7 @@ public interface IRedstoneControl {
      */
     boolean canPulse();
 
+    @NothingNullByDefault
     enum RedstoneControl implements IIncrementalEnum<RedstoneControl>, IHasTextComponent {
         DISABLED(MekanismLang.REDSTONE_CONTROL_DISABLED),
         HIGH(MekanismLang.REDSTONE_CONTROL_HIGH),
@@ -55,11 +56,10 @@ public interface IRedstoneControl {
         }
 
         @Override
-        public ITextComponent getTextComponent() {
+        public Component getTextComponent() {
             return langEntry.translate();
         }
 
-        @Nonnull
         @Override
         public RedstoneControl byIndex(int index) {
             return byIndexStatic(index);

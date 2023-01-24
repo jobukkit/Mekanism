@@ -1,16 +1,15 @@
 package mekanism.api.inventory;
 
 import java.util.List;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
+import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
+import mekanism.api.annotations.NothingNullByDefault;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public interface IMekanismInventory extends ISidedItemHandler, IContentsListener {
 
     /**

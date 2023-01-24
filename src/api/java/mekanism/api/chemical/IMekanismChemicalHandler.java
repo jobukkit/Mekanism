@@ -1,16 +1,14 @@
 package mekanism.api.chemical;
 
 import java.util.List;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
+import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
-import mekanism.api.inventory.AutomationType;
-import net.minecraft.util.Direction;
+import mekanism.api.annotations.NothingNullByDefault;
+import net.minecraft.core.Direction;
+import org.jetbrains.annotations.Nullable;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public interface IMekanismChemicalHandler<CHEMICAL extends Chemical<CHEMICAL>, STACK extends ChemicalStack<CHEMICAL>, TANK extends IChemicalTank<CHEMICAL, STACK>>
       extends ISidedChemicalHandler<CHEMICAL, STACK>, IContentsListener {
 

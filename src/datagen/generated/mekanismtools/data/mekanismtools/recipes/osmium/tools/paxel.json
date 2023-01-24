@@ -1,25 +1,25 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "result": {
-    "item": "mekanismtools:osmium_paxel"
+  "type": "mekanismtools:paxel",
+  "key": {
+    "A": {
+      "tag": "forge:tools/axes/osmium"
+    },
+    "P": {
+      "tag": "forge:tools/pickaxes/osmium"
+    },
+    "R": {
+      "tag": "forge:rods/wooden"
+    },
+    "S": {
+      "tag": "forge:tools/shovels/osmium"
+    }
   },
   "pattern": [
     "APS",
     " R ",
     " R "
   ],
-  "key": {
-    "A": {
-      "item": "mekanismtools:osmium_axe"
-    },
-    "P": {
-      "item": "mekanismtools:osmium_pickaxe"
-    },
-    "S": {
-      "item": "mekanismtools:osmium_shovel"
-    },
-    "R": {
-      "tag": "forge:rods/wooden"
-    }
+  "result": {
+    "item": "mekanismtools:osmium_paxel"
   }
 }

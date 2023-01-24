@@ -1,12 +1,13 @@
 package mekanism.client.gui.element.tab;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.Nonnull;
+import com.mojang.blaze3d.vertex.PoseStack;
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.GuiInsetElement;
-import net.minecraft.tileentity.TileEntity;
+import mekanism.client.render.MekanismRenderer;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jetbrains.annotations.NotNull;
 
-public abstract class GuiTabElementType<TILE extends TileEntity, TAB extends Enum<?> & TabType<TILE>> extends GuiInsetElement<TILE> {
+public abstract class GuiTabElementType<TILE extends BlockEntity, TAB extends Enum<?> & TabType<TILE>> extends GuiInsetElement<TILE> {
 
     private final TAB tabType;
 
@@ -17,11 +18,17 @@ public abstract class GuiTabElementType<TILE extends TileEntity, TAB extends Enu
 
     @Override
     public void onClick(double mouseX, double mouseY) {
-        tabType.onClick(tile);
+        tabType.onClick(dataSource);
     }
 
     @Override
-    public void renderToolTip(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        displayTooltip(matrix, tabType.getDescription(), mouseX, mouseY);
+    public void renderToolTip(@NotNull PoseStack matrix, int mouseX, int mouseY) {
+        super.renderToolTip(matrix, mouseX, mouseY);
+        displayTooltips(matrix, mouseX, mouseY, tabType.getDescription());
+    }
+
+    @Override
+    protected void colorTab() {
+        MekanismRenderer.color(tabType.getTabColor());
     }
 }

@@ -1,144 +1,107 @@
 package mekanism.client.gui.element.tab;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.Arrays;
-import java.util.UUID;
-import javax.annotation.Nonnull;
+import com.mojang.blaze3d.vertex.PoseStack;
+import java.util.function.Supplier;
+import mekanism.api.MekanismAPI;
 import mekanism.api.text.EnumColor;
-import mekanism.client.MekanismClient;
 import mekanism.client.SpecialColors;
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.GuiInsetElement;
 import mekanism.client.render.MekanismRenderer;
 import mekanism.common.Mekanism;
 import mekanism.common.MekanismLang;
-import mekanism.common.config.MekanismConfig;
-import mekanism.common.lib.security.ISecurityItem;
-import mekanism.common.lib.security.ISecurityTile;
-import mekanism.common.lib.security.ISecurityTile.SecurityMode;
+import mekanism.common.capabilities.Capabilities;
 import mekanism.common.lib.security.SecurityData;
-import mekanism.common.network.PacketGuiInteract;
-import mekanism.common.network.PacketGuiInteract.GuiInteraction;
-import mekanism.common.network.PacketSecurityMode;
+import mekanism.common.network.to_server.PacketGuiInteract;
+import mekanism.common.network.to_server.PacketGuiInteract.GuiInteraction;
+import mekanism.common.network.to_server.PacketGuiInteract.GuiInteractionEntity;
+import mekanism.common.network.to_server.PacketSecurityMode;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.MekanismUtils.ResourceType;
 import mekanism.common.util.SecurityUtils;
 import mekanism.common.util.text.OwnerDisplay;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraftforge.api.distmarker.Dist;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class GuiSecurityTab<TILE extends TileEntity & ISecurityTile> extends GuiInsetElement<TILE> {
+public class GuiSecurityTab extends GuiInsetElement<Supplier<@Nullable ICapabilityProvider>> {
 
     private static final ResourceLocation PUBLIC = MekanismUtils.getResource(ResourceType.GUI, "public.png");
     private static final ResourceLocation PRIVATE = MekanismUtils.getResource(ResourceType.GUI, "private.png");
     private static final ResourceLocation PROTECTED = MekanismUtils.getResource(ResourceType.GUI, "protected.png");
 
-    private final Hand currentHand;
-    private boolean isItem;
+    @Nullable
+    private final InteractionHand currentHand;
 
-    public GuiSecurityTab(IGuiWrapper gui, TILE tile) {
-        super(PUBLIC, gui, tile, gui.getWidth(), 34, 26, 18, false);
-        this.currentHand = Hand.MAIN_HAND;
+    public GuiSecurityTab(IGuiWrapper gui, ICapabilityProvider provider) {
+        this(gui, provider, 34);
     }
 
-    public GuiSecurityTab(IGuiWrapper gui, Hand hand) {
-        super(PUBLIC, gui, null, gui.getWidth(), 34, 26, 18, false);
-        isItem = true;
-        currentHand = hand;
+    public GuiSecurityTab(IGuiWrapper gui, ICapabilityProvider provider, int y) {
+        this(gui, () -> provider, y, null);
+    }
+
+    public GuiSecurityTab(IGuiWrapper gui, @NotNull InteractionHand hand) {
+        this(gui, () -> minecraft.player.getItemInHand(hand), 34, hand);
+    }
+
+    private GuiSecurityTab(IGuiWrapper gui, Supplier<ICapabilityProvider> provider, int y, @Nullable InteractionHand hand) {
+        super(PUBLIC, gui, provider, gui.getWidth(), y, 26, 18, false);
+        this.currentHand = hand;
     }
 
     @Override
     protected void colorTab() {
-        MekanismRenderer.color(SpecialColors.TAB_SECURITY.get());
+        MekanismRenderer.color(SpecialColors.TAB_SECURITY);
     }
 
     @Override
     protected ResourceLocation getOverlay() {
-        SecurityMode mode = getSecurity();
-        SecurityData data = MekanismClient.clientSecurityMap.get(getOwner());
-        if (data != null && data.override) {
-            mode = data.mode;
-        }
-        switch (mode) {
-            case PRIVATE:
-                return PRIVATE;
-            case TRUSTED:
-                return PROTECTED;
-        }
-        return super.getOverlay();
+        return switch (MekanismAPI.getSecurityUtils().getSecurityMode(dataSource.get(), true)) {
+            case PUBLIC -> super.getOverlay();
+            case PRIVATE -> PRIVATE;
+            case TRUSTED -> PROTECTED;
+        };
     }
 
     @Override
-    public void renderToolTip(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        ITextComponent securityComponent = MekanismLang.SECURITY.translateColored(EnumColor.GRAY, isItem ? SecurityUtils.getSecurity(getItem(), Dist.CLIENT)
-                                                                                                         : SecurityUtils.getSecurity(tile, Dist.CLIENT));
-        ITextComponent ownerComponent = OwnerDisplay.of(minecraft.player, getOwner(), getOwnerUsername()).getTextComponent();
-        if (isItem ? SecurityUtils.isOverridden(getItem(), Dist.CLIENT) : SecurityUtils.isOverridden(tile, Dist.CLIENT)) {
-            displayTooltips(matrix, Arrays.asList(securityComponent, ownerComponent, MekanismLang.SECURITY_OVERRIDDEN.translateColored(EnumColor.RED)), mouseX, mouseY);
-        } else {
-            displayTooltips(matrix, Arrays.asList(securityComponent, ownerComponent), mouseX, mouseY);
+    public void renderToolTip(@NotNull PoseStack matrix, int mouseX, int mouseY) {
+        super.renderToolTip(matrix, mouseX, mouseY);
+        ICapabilityProvider provider = dataSource.get();
+        if (provider != null) {
+            provider.getCapability(Capabilities.SECURITY_OBJECT).ifPresent(security -> {
+                SecurityData data = SecurityUtils.INSTANCE.getFinalData(security, true);
+                Component securityComponent = MekanismLang.SECURITY.translateColored(EnumColor.GRAY, data.mode());
+                Component ownerComponent = OwnerDisplay.of(minecraft.player, security.getOwnerUUID(), security.getOwnerName()).getTextComponent();
+                if (data.override()) {
+                    displayTooltips(matrix, mouseX, mouseY, securityComponent, ownerComponent, MekanismLang.SECURITY_OVERRIDDEN.translateColored(EnumColor.RED));
+                } else {
+                    displayTooltips(matrix, mouseX, mouseY, securityComponent, ownerComponent);
+                }
+            });
         }
-    }
-
-    private SecurityMode getSecurity() {
-        if (!MekanismConfig.general.allowProtection.get()) {
-            return SecurityMode.PUBLIC;
-        }
-
-        if (isItem) {
-            ItemStack stack = getItem();
-            if (stack.isEmpty() || !(stack.getItem() instanceof ISecurityItem)) {
-                minecraft.player.closeScreen();
-                return SecurityMode.PUBLIC;
-            }
-            return ((ISecurityItem) stack.getItem()).getSecurity(stack);
-        }
-        return tile.getSecurity().getMode();
-    }
-
-    private UUID getOwner() {
-        if (isItem) {
-            ItemStack stack = getItem();
-            if (stack.isEmpty() || !(stack.getItem() instanceof ISecurityItem)) {
-                minecraft.player.closeScreen();
-                return null;
-            }
-            return ((ISecurityItem) stack.getItem()).getOwnerUUID(stack);
-        }
-        return tile.getSecurity().getOwnerUUID();
-    }
-
-    private String getOwnerUsername() {
-        if (isItem) {
-            ItemStack stack = getItem();
-            if (stack.isEmpty() || !(stack.getItem() instanceof ISecurityItem)) {
-                minecraft.player.closeScreen();
-                return null;
-            }
-            return MekanismClient.clientUUIDMap.get(((ISecurityItem) stack.getItem()).getOwnerUUID(stack));
-        }
-        return tile.getSecurity().getClientOwner();
-    }
-
-    private ItemStack getItem() {
-        return minecraft.player.getHeldItem(currentHand);
     }
 
     @Override
     public void onClick(double mouseX, double mouseY) {
-        if (MekanismConfig.general.allowProtection.get()) {
-            UUID owner = getOwner();
-            if (owner != null && minecraft.player.getUniqueID().equals(owner)) {
-                if (isItem) {
-                    Mekanism.packetHandler.sendToServer(new PacketSecurityMode(currentHand, getSecurity().getNext()));
-                } else {
-                    Mekanism.packetHandler.sendToServer(new PacketGuiInteract(GuiInteraction.NEXT_SECURITY_MODE, tile));
+        ICapabilityProvider provider = dataSource.get();
+        if (provider != null) {
+            provider.getCapability(Capabilities.SECURITY_OBJECT).ifPresent(security -> {
+                if (security.ownerMatches(minecraft.player)) {
+                    if (currentHand != null) {
+                        Mekanism.packetHandler().sendToServer(new PacketSecurityMode(currentHand));
+                    } else if (provider instanceof BlockEntity tile) {
+                        Mekanism.packetHandler().sendToServer(new PacketGuiInteract(GuiInteraction.NEXT_SECURITY_MODE, tile));
+                    } else if (provider instanceof Entity entity) {
+                        Mekanism.packetHandler().sendToServer(new PacketGuiInteract(GuiInteractionEntity.NEXT_SECURITY_MODE, entity));
+                    }
                 }
-            }
+            });
         }
     }
 }

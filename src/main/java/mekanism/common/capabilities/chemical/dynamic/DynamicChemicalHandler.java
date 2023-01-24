@@ -2,12 +2,9 @@ package mekanism.common.capabilities.chemical.dynamic;
 
 import java.util.List;
 import java.util.function.Function;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
 import mekanism.api.IContentsListener;
-import mekanism.api.annotations.FieldsAreNonnullByDefault;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalTank;
@@ -28,34 +25,22 @@ import mekanism.api.chemical.slurry.ISlurryHandler.IMekanismSlurryHandler;
 import mekanism.api.chemical.slurry.ISlurryTank;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
-import net.minecraft.util.Direction;
+import mekanism.common.capabilities.DynamicHandler;
+import net.minecraft.core.Direction;
+import org.jetbrains.annotations.Nullable;
 
-@FieldsAreNonnullByDefault
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public abstract class DynamicChemicalHandler<CHEMICAL extends Chemical<CHEMICAL>, STACK extends ChemicalStack<CHEMICAL>, TANK extends IChemicalTank<CHEMICAL, STACK>>
-      implements IMekanismChemicalHandler<CHEMICAL, STACK, TANK> {
+      extends DynamicHandler<TANK> implements IMekanismChemicalHandler<CHEMICAL, STACK, TANK> {
 
-    private final Function<Direction, List<TANK>> tankSupplier;
-    private final InteractPredicate canExtract;
-    private final InteractPredicate canInsert;
-    private final IContentsListener listener;
-
-    protected DynamicChemicalHandler(Function<Direction, List<TANK>> tankSupplier, InteractPredicate canExtract, InteractPredicate canInsert, IContentsListener listener) {
-        this.tankSupplier = tankSupplier;
-        this.canExtract = canExtract;
-        this.canInsert = canInsert;
-        this.listener = listener;
+    protected DynamicChemicalHandler(Function<Direction, List<TANK>> tankSupplier, InteractPredicate canExtract, InteractPredicate canInsert,
+          @Nullable IContentsListener listener) {
+        super(tankSupplier, canExtract, canInsert, listener);
     }
 
     @Override
     public List<TANK> getChemicalTanks(@Nullable Direction side) {
-        return tankSupplier.apply(side);
-    }
-
-    @Override
-    public void onContentsChanged() {
-        listener.onContentsChanged();
+        return containerSupplier.apply(side);
     }
 
     @Override
@@ -70,38 +55,34 @@ public abstract class DynamicChemicalHandler<CHEMICAL extends Chemical<CHEMICAL>
         return canExtract.test(tank, side) ? IMekanismChemicalHandler.super.extractChemical(tank, amount, side, action) : getEmptyStack();
     }
 
-    @FunctionalInterface
-    public interface InteractPredicate {
-
-        InteractPredicate ALWAYS_TRUE = (tank, side) -> true;
-
-        boolean test(int tank, @Nullable Direction side);
-    }
-
     public static class DynamicGasHandler extends DynamicChemicalHandler<Gas, GasStack, IGasTank> implements IMekanismGasHandler {
 
-        public DynamicGasHandler(Function<Direction, List<IGasTank>> tankSupplier, InteractPredicate canExtract, InteractPredicate canInsert, IContentsListener listener) {
+        public DynamicGasHandler(Function<Direction, List<IGasTank>> tankSupplier, InteractPredicate canExtract, InteractPredicate canInsert,
+              @Nullable IContentsListener listener) {
             super(tankSupplier, canExtract, canInsert, listener);
         }
     }
 
     public static class DynamicInfusionHandler extends DynamicChemicalHandler<InfuseType, InfusionStack, IInfusionTank> implements IMekanismInfusionHandler {
 
-        public DynamicInfusionHandler(Function<Direction, List<IInfusionTank>> tankSupplier, InteractPredicate canExtract, InteractPredicate canInsert, IContentsListener listener) {
+        public DynamicInfusionHandler(Function<Direction, List<IInfusionTank>> tankSupplier, InteractPredicate canExtract, InteractPredicate canInsert,
+              @Nullable IContentsListener listener) {
             super(tankSupplier, canExtract, canInsert, listener);
         }
     }
 
     public static class DynamicPigmentHandler extends DynamicChemicalHandler<Pigment, PigmentStack, IPigmentTank> implements IMekanismPigmentHandler {
 
-        public DynamicPigmentHandler(Function<Direction, List<IPigmentTank>> tankSupplier, InteractPredicate canExtract, InteractPredicate canInsert, IContentsListener listener) {
+        public DynamicPigmentHandler(Function<Direction, List<IPigmentTank>> tankSupplier, InteractPredicate canExtract, InteractPredicate canInsert,
+              @Nullable IContentsListener listener) {
             super(tankSupplier, canExtract, canInsert, listener);
         }
     }
 
     public static class DynamicSlurryHandler extends DynamicChemicalHandler<Slurry, SlurryStack, ISlurryTank> implements IMekanismSlurryHandler {
 
-        public DynamicSlurryHandler(Function<Direction, List<ISlurryTank>> tankSupplier, InteractPredicate canExtract, InteractPredicate canInsert, IContentsListener listener) {
+        public DynamicSlurryHandler(Function<Direction, List<ISlurryTank>> tankSupplier, InteractPredicate canExtract, InteractPredicate canInsert,
+              @Nullable IContentsListener listener) {
             super(tankSupplier, canExtract, canInsert, listener);
         }
     }

@@ -1,91 +1,89 @@
 package mekanism.additions.common.entity.baby;
 
-import java.util.Random;
-import javax.annotation.Nonnull;
-import mekanism.additions.common.MekanismAdditions;
-import mekanism.additions.common.registries.AdditionsItems;
-import net.minecraft.entity.EntitySize;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.Pose;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
-import net.minecraft.entity.monster.StrayEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.monster.Stray;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraftforge.network.NetworkHooks;
+import org.jetbrains.annotations.NotNull;
 
-public class EntityBabyStray extends StrayEntity {
+public class EntityBabyStray extends Stray implements IBabyEntity {
 
-    private static final DataParameter<Boolean> IS_CHILD = EntityDataManager.createKey(EntityBabyStray.class, DataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> IS_CHILD = SynchedEntityData.defineId(EntityBabyStray.class, EntityDataSerializers.BOOLEAN);
 
     //Copy of stray spawn restrictions
-    public static boolean spawnRestrictions(EntityType<EntityBabyStray> type, IWorld world, SpawnReason reason, BlockPos pos, Random random) {
-        return canMonsterSpawnInLight(type, world, reason, pos, random) && (reason == SpawnReason.SPAWNER || world.canSeeSky(pos));
+    public static boolean spawnRestrictions(EntityType<EntityBabyStray> type, ServerLevelAccessor world, MobSpawnType reason, BlockPos pos, RandomSource random) {
+        BlockPos blockpos = pos;
+        do {
+            blockpos = blockpos.above();
+        } while (world.getBlockState(blockpos).is(Blocks.POWDER_SNOW));
+        return checkMonsterSpawnRules(type, world, reason, pos, random) && (reason == MobSpawnType.SPAWNER || world.canSeeSky(blockpos.below()));
     }
 
-    public EntityBabyStray(EntityType<EntityBabyStray> type, World world) {
+    public EntityBabyStray(EntityType<EntityBabyStray> type, Level world) {
         super(type, world);
-        setChild(true);
+        setBaby(true);
     }
 
     @Override
-    protected void registerData() {
-        super.registerData();
-        this.getDataManager().register(IS_CHILD, false);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        getEntityData().define(IS_CHILD, false);
     }
 
     @Override
-    public boolean isChild() {
-        return getDataManager().get(IS_CHILD);
+    public boolean isBaby() {
+        return getEntityData().get(IS_CHILD);
     }
 
     @Override
-    public void setChild(boolean child) {
-        getDataManager().set(IS_CHILD, child);
-        if (world != null && !world.isRemote) {
-            ModifiableAttributeInstance attributeInstance = getAttribute(Attributes.MOVEMENT_SPEED);
-            attributeInstance.removeModifier(MekanismAdditions.babySpeedBoostModifier);
-            if (child) {
-                attributeInstance.applyNonPersistentModifier(MekanismAdditions.babySpeedBoostModifier);
-            }
-        }
+    public void setBaby(boolean child) {
+        setChild(IS_CHILD, child);
     }
 
     @Override
-    public void notifyDataManagerChange(@Nonnull DataParameter<?> key) {
+    public void onSyncedDataUpdated(@NotNull EntityDataAccessor<?> key) {
         if (IS_CHILD.equals(key)) {
-            recalculateSize();
+            refreshDimensions();
         }
-        super.notifyDataManagerChange(key);
+        super.onSyncedDataUpdated(key);
     }
 
     @Override
-    protected int getExperiencePoints(@Nonnull PlayerEntity player) {
-        if (isChild()) {
-            experienceValue = (int) (experienceValue * 2.5F);
+    public int getExperienceReward() {
+        if (isBaby()) {
+            int oldXp = xpReward;
+            xpReward = (int) (xpReward * 2.5F);
+            int reward = super.getExperienceReward();
+            xpReward = oldXp;
+            return reward;
         }
-        return super.getExperiencePoints(player);
+        return super.getExperienceReward();
     }
 
     @Override
-    public double getYOffset() {
-        return isChild() ? 0.0D : super.getYOffset();
+    public double getMyRidingOffset() {
+        return isBaby() ? 0 : super.getMyRidingOffset();
     }
 
     @Override
-    protected float getStandingEyeHeight(@Nonnull Pose pose, @Nonnull EntitySize size) {
-        return this.isChild() ? 0.93F : super.getStandingEyeHeight(pose, size);
+    protected float getStandingEyeHeight(@NotNull Pose pose, @NotNull EntityDimensions size) {
+        return this.isBaby() ? 0.93F : super.getStandingEyeHeight(pose, size);
     }
 
+    @NotNull
     @Override
-    public ItemStack getPickedResult(RayTraceResult target) {
-        return AdditionsItems.BABY_STRAY_SPAWN_EGG.getItemStack();
+    public Packet<?> getAddEntityPacket() {
+        return NetworkHooks.getEntitySpawningPacket(this);
     }
 }

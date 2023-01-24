@@ -1,19 +1,19 @@
 package mekanism.common.item.block;
 
-import javax.annotation.Nonnull;
 import mekanism.common.registration.impl.ItemDeferredRegister;
-import mekanism.common.util.MekanismUtils;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import mekanism.common.util.WorldUtils;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by Thiakil on 19/11/2017.
@@ -28,42 +28,42 @@ public abstract class ItemBlockMultipartAble<BLOCK extends Block> extends ItemBl
     /**
      * Reimplementation of onItemUse that will divert to MCMultipart placement functions if applicable
      */
-    @Nonnull
+    @NotNull
     @Override
-    public ActionResultType onItemUse(ItemUseContext context) {
-        PlayerEntity player = context.getPlayer();
+    public InteractionResult useOn(UseOnContext context) {
+        Player player = context.getPlayer();
         if (player == null) {
-            return ActionResultType.PASS;
+            return InteractionResult.PASS;
         }
-        ItemStack stack = player.getHeldItem(context.getHand());
+        ItemStack stack = context.getItemInHand();
         if (stack.isEmpty()) {
-            return ActionResultType.FAIL;//WTF
+            return InteractionResult.FAIL;//WTF
         }
-        World world = context.getWorld();
-        BlockPos pos = context.getPos();
-        if (!MekanismUtils.isValidReplaceableBlock(world, pos)) {
-            pos = pos.offset(context.getFace());
+        Level world = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        if (!WorldUtils.isValidReplaceableBlock(world, pos)) {
+            pos = pos.relative(context.getClickedFace());
         }
-        if (player.canPlayerEdit(pos, context.getFace(), stack)) {
-            BlockItemUseContext blockItemUseContext = new BlockItemUseContext(context);
-            BlockState state = getStateForPlacement(blockItemUseContext);
+        if (player.mayUseItemAt(pos, context.getClickedFace(), stack)) {
+            BlockPlaceContext blockItemUseContext = new BlockPlaceContext(context);
+            BlockState state = getPlacementState(blockItemUseContext);
             if (state == null) {
-                return ActionResultType.FAIL;
+                return InteractionResult.FAIL;
             }
             if (placeBlock(blockItemUseContext, state)) {
                 state = world.getBlockState(pos);
                 SoundType soundtype = state.getSoundType(world, pos, player);
-                world.playSound(player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1) / 2F, soundtype.getPitch() * 0.8F);
+                world.playSound(player, pos, soundtype.getPlaceSound(), SoundSource.BLOCKS, (soundtype.getVolume() + 1) / 2F, soundtype.getPitch() * 0.8F);
                 stack.shrink(1);
             }
-            return ActionResultType.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
-        return ActionResultType.FAIL;
+        return InteractionResult.FAIL;
     }
 
     @Override
-    public boolean placeBlock(@Nonnull BlockItemUseContext context, @Nonnull BlockState state) {
-        if (MekanismUtils.isValidReplaceableBlock(context.getWorld(), context.getPos())) {
+    public boolean placeBlock(@NotNull BlockPlaceContext context, @NotNull BlockState state) {
+        if (WorldUtils.isValidReplaceableBlock(context.getLevel(), context.getClickedPos())) {
             return super.placeBlock(context, state);
         }
         return false;

@@ -1,15 +1,14 @@
 package mekanism.common.capabilities.chemical.item;
 
 import java.util.Objects;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.NBTConstants;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.chemical.merged.MergedChemicalTank;
+import mekanism.common.capabilities.DynamicHandler.InteractPredicate;
 import mekanism.common.capabilities.chemical.dynamic.DynamicChemicalHandler.DynamicGasHandler;
 import mekanism.common.capabilities.chemical.dynamic.DynamicChemicalHandler.DynamicInfusionHandler;
 import mekanism.common.capabilities.chemical.dynamic.DynamicChemicalHandler.DynamicPigmentHandler;
 import mekanism.common.capabilities.chemical.dynamic.DynamicChemicalHandler.DynamicSlurryHandler;
-import mekanism.common.capabilities.chemical.dynamic.DynamicChemicalHandler.InteractPredicate;
 import mekanism.common.capabilities.chemical.item.ChemicalTankRateLimitChemicalTank.GasTankRateLimitChemicalTank;
 import mekanism.common.capabilities.chemical.item.ChemicalTankRateLimitChemicalTank.InfusionTankRateLimitChemicalTank;
 import mekanism.common.capabilities.chemical.item.ChemicalTankRateLimitChemicalTank.PigmentTankRateLimitChemicalTank;
@@ -17,8 +16,7 @@ import mekanism.common.capabilities.chemical.item.ChemicalTankRateLimitChemicalT
 import mekanism.common.capabilities.merged.MergedTankContentsHandler;
 import mekanism.common.tier.ChemicalTankTier;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public class ChemicalTankContentsHandler extends MergedTankContentsHandler<MergedChemicalTank> {
 
     public static ChemicalTankContentsHandler create(ChemicalTankTier tier) {

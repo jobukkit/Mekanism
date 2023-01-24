@@ -1,9 +1,7 @@
 package mekanism.common.item.block;
 
 import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.api.text.EnumColor;
-import mekanism.api.text.TextComponentUtil;
 import mekanism.common.MekanismLang;
 import mekanism.common.block.attribute.Attribute;
 import mekanism.common.block.basic.BlockBin;
@@ -13,14 +11,16 @@ import mekanism.common.item.interfaces.IItemSustainedInventory;
 import mekanism.common.registration.impl.ItemDeferredRegister;
 import mekanism.common.tier.BinTier;
 import mekanism.common.util.text.TextUtils;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 public class ItemBlockBin extends ItemBlockTooltip<BlockBin> implements IItemSustainedInventory {
 
     public ItemBlockBin(BlockBin block) {
-        super(block, ItemDeferredRegister.getMekBaseProperties().maxStackSize(1));
+        super(block, ItemDeferredRegister.getMekBaseProperties().stacksTo(1));
     }
 
     @Override
@@ -29,7 +29,7 @@ public class ItemBlockBin extends ItemBlockTooltip<BlockBin> implements IItemSus
     }
 
     @Override
-    public void addStats(@Nonnull ItemStack stack, World world, @Nonnull List<ITextComponent> tooltip, boolean advanced) {
+    protected void addStats(@NotNull ItemStack stack, Level world, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
         BinMekanismInventory inventory = BinMekanismInventory.create(stack);
         BinTier tier = getTier();
         if (inventory != null && tier != null) {
@@ -37,12 +37,15 @@ public class ItemBlockBin extends ItemBlockTooltip<BlockBin> implements IItemSus
             if (slot.isEmpty()) {
                 tooltip.add(MekanismLang.EMPTY.translateColored(EnumColor.DARK_RED));
             } else {
-                tooltip.add(TextComponentUtil.build(EnumColor.BRIGHT_GREEN, slot.getStack().getDisplayName()));
+                tooltip.add(MekanismLang.STORING.translateColored(EnumColor.BRIGHT_GREEN, EnumColor.GRAY, slot.getStack()));
                 if (tier == BinTier.CREATIVE) {
                     tooltip.add(MekanismLang.ITEM_AMOUNT.translateColored(EnumColor.PURPLE, EnumColor.GRAY, MekanismLang.INFINITE));
                 } else {
                     tooltip.add(MekanismLang.ITEM_AMOUNT.translateColored(EnumColor.PURPLE, EnumColor.GRAY, TextUtils.format(slot.getCount())));
                 }
+            }
+            if (slot.isLocked()) {
+                tooltip.add(MekanismLang.LOCKED.translateColored(EnumColor.AQUA, EnumColor.GRAY, slot.getLockStack()));
             }
             if (tier == BinTier.CREATIVE) {
                 tooltip.add(MekanismLang.CAPACITY.translateColored(EnumColor.INDIGO, EnumColor.GRAY, MekanismLang.INFINITE));
@@ -50,5 +53,10 @@ public class ItemBlockBin extends ItemBlockTooltip<BlockBin> implements IItemSus
                 tooltip.add(MekanismLang.CAPACITY_ITEMS.translateColored(EnumColor.INDIGO, EnumColor.GRAY, TextUtils.format(tier.getStorage())));
             }
         }
+    }
+
+    @Override
+    public boolean canContentsDrop(ItemStack stack) {
+        return getTier() != BinTier.CREATIVE;
     }
 }

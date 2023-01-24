@@ -63,7 +63,7 @@ class SearchQueryParserTest {
     @Test
     @DisplayName("Test random queries, trying to cause a crash")
     void testRandomQueries() {
-        SearchQueryParser.parse("|4434|'f1419879182749182^?%#@*&$1@(#*$\"'");
+        Assertions.assertDoesNotThrow(() -> SearchQueryParser.parse("|4434|'f1419879182749182^?%#@*&$1@(#*$\"'"));
     }
 
     private void queryAssert(String query, String mapResult) {
@@ -77,8 +77,8 @@ class SearchQueryParserTest {
     @SuppressWarnings("unused")
     private void readout(String queryStr) {
         ISearchQuery query = SearchQueryParser.parse(queryStr);
-        if (query instanceof SearchQueryList) {
-            System.out.println(((SearchQueryList) query).getQueries());
+        if (query instanceof SearchQueryList searchQueryList) {
+            System.out.println(searchQueryList.getQueries());
         }
         System.out.println(query.isInvalid());
     }

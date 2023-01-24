@@ -2,10 +2,7 @@ package mekanism.common.recipe.upgrade.chemical;
 
 import java.util.List;
 import java.util.function.Predicate;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.chemical.ChemicalTankBuilder;
 import mekanism.api.chemical.slurry.ISlurryHandler;
 import mekanism.api.chemical.slurry.ISlurryHandler.IMekanismSlurryHandler;
@@ -15,15 +12,16 @@ import mekanism.api.chemical.slurry.SlurryStack;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.tile.base.SubstanceType;
 import mekanism.common.tile.base.TileEntityMekanism;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.ListTag;
 import net.minecraftforge.common.capabilities.Capability;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public class SlurryRecipeData extends ChemicalRecipeData<Slurry, SlurryStack, ISlurryTank, ISlurryHandler> {
 
-    public SlurryRecipeData(ListNBT tanks) {
+    public SlurryRecipeData(ListTag tanks) {
         super(tanks);
     }
 
@@ -49,7 +47,7 @@ public class SlurryRecipeData extends ChemicalRecipeData<Slurry, SlurryStack, IS
     @Override
     protected ISlurryHandler getOutputHandler(List<ISlurryTank> tanks) {
         return new IMekanismSlurryHandler() {
-            @Nonnull
+            @NotNull
             @Override
             public List<ISlurryTank> getChemicalTanks(@Nullable Direction side) {
                 return tanks;
@@ -63,7 +61,7 @@ public class SlurryRecipeData extends ChemicalRecipeData<Slurry, SlurryStack, IS
 
     @Override
     protected Capability<ISlurryHandler> getCapability() {
-        return Capabilities.SLURRY_HANDLER_CAPABILITY;
+        return Capabilities.SLURRY_HANDLER;
     }
 
     @Override

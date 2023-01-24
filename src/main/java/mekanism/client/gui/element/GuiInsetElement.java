@@ -1,23 +1,23 @@
 package mekanism.client.gui.element;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.Nonnull;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import mekanism.client.gui.IGuiWrapper;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
-public abstract class GuiInsetElement<TILE extends TileEntity> extends GuiSideHolder {
+public abstract class GuiInsetElement<DATA_SOURCE> extends GuiSideHolder {
 
     protected final int border;
     protected final int innerWidth;
     protected final int innerHeight;
-    protected final TILE tile;
+    protected final DATA_SOURCE dataSource;
     protected final ResourceLocation overlay;
 
-    public GuiInsetElement(ResourceLocation overlay, IGuiWrapper gui, TILE tile, int x, int y, int height, int innerSize, boolean left) {
-        super(gui, x, y, height, left);
+    public GuiInsetElement(ResourceLocation overlay, IGuiWrapper gui, DATA_SOURCE dataSource, int x, int y, int height, int innerSize, boolean left) {
+        super(gui, x, y, height, left, false);
         this.overlay = overlay;
-        this.tile = tile;
+        this.dataSource = dataSource;
         this.innerWidth = innerSize;
         this.innerHeight = innerSize;
         //TODO: decide what to do if this doesn't divide nicely
@@ -57,12 +57,15 @@ public abstract class GuiInsetElement<TILE extends TileEntity> extends GuiSideHo
     }
 
     @Override
-    public void drawBackground(@Nonnull MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
+    public void drawBackground(@NotNull PoseStack matrix, int mouseX, int mouseY, float partialTicks) {
         super.drawBackground(matrix, mouseX, mouseY, partialTicks);
         //Draw the button background
         drawButton(matrix, mouseX, mouseY);
-        //Draw the overlay onto the button
-        minecraft.textureManager.bindTexture(getOverlay());
+        drawBackgroundOverlay(matrix);
+    }
+
+    protected void drawBackgroundOverlay(@NotNull PoseStack matrix) {
+        RenderSystem.setShaderTexture(0, getOverlay());
         blit(matrix, getButtonX(), getButtonY(), 0, 0, innerWidth, innerHeight, innerWidth, innerHeight);
     }
 }

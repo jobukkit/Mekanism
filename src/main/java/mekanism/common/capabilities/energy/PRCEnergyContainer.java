@@ -1,38 +1,30 @@
 package mekanism.common.capabilities.energy;
 
 import java.util.function.Predicate;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
-import mekanism.api.annotations.FieldsAreNonnullByDefault;
-import mekanism.api.annotations.NonNull;
-import mekanism.api.inventory.AutomationType;
+import mekanism.api.AutomationType;
+import mekanism.api.IContentsListener;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.math.FloatingLong;
-import mekanism.api.recipes.PressurizedReactionRecipe;
-import mekanism.api.recipes.cache.CachedRecipe;
 import mekanism.common.block.attribute.AttributeEnergy;
 import mekanism.common.tile.machine.TileEntityPressurizedReactionChamber;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-@FieldsAreNonnullByDefault
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public class PRCEnergyContainer extends MachineEnergyContainer<TileEntityPressurizedReactionChamber> {
 
-    public static PRCEnergyContainer input(TileEntityPressurizedReactionChamber tile) {
+    public static PRCEnergyContainer input(TileEntityPressurizedReactionChamber tile, @Nullable IContentsListener listener) {
         AttributeEnergy electricBlock = validateBlock(tile);
-        return new PRCEnergyContainer(electricBlock.getStorage(), electricBlock.getUsage(), notExternal, alwaysTrue, tile);
+        return new PRCEnergyContainer(electricBlock.getStorage(), electricBlock.getUsage(), notExternal, alwaysTrue, tile, listener);
     }
 
-    private PRCEnergyContainer(FloatingLong maxEnergy, FloatingLong energyPerTick, Predicate<@NonNull AutomationType> canExtract,
-          Predicate<@NonNull AutomationType> canInsert, TileEntityPressurizedReactionChamber tile) {
-        super(maxEnergy, energyPerTick, canExtract, canInsert, tile);
+    private PRCEnergyContainer(FloatingLong maxEnergy, FloatingLong energyPerTick, Predicate<@NotNull AutomationType> canExtract,
+          Predicate<@NotNull AutomationType> canInsert, TileEntityPressurizedReactionChamber tile, @Nullable IContentsListener listener) {
+        super(maxEnergy, energyPerTick, canExtract, canInsert, tile, listener);
     }
 
     @Override
     public FloatingLong getBaseEnergyPerTick() {
-        CachedRecipe<PressurizedReactionRecipe> recipe = tile.getUpdatedCache(0);
-        if (recipe == null) {
-            return super.getBaseEnergyPerTick();
-        }
-        return super.getBaseEnergyPerTick().add(recipe.getRecipe().getEnergyRequired());
+        return super.getBaseEnergyPerTick().add(tile.getRecipeEnergyRequired());
     }
 }

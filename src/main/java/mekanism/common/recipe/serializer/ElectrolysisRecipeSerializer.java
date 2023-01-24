@@ -3,21 +3,21 @@ package mekanism.common.recipe.serializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import javax.annotation.Nonnull;
 import mekanism.api.JsonConstants;
 import mekanism.api.SerializerHelper;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.recipes.ElectrolysisRecipe;
-import mekanism.api.recipes.inputs.FluidStackIngredient;
+import mekanism.api.recipes.ingredients.FluidStackIngredient;
+import mekanism.api.recipes.ingredients.creator.IngredientCreatorAccess;
 import mekanism.common.Mekanism;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistryEntry;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import org.jetbrains.annotations.NotNull;
 
-public class ElectrolysisRecipeSerializer<RECIPE extends ElectrolysisRecipe> extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<RECIPE> {
+public class ElectrolysisRecipeSerializer<RECIPE extends ElectrolysisRecipe> implements RecipeSerializer<RECIPE> {
 
     private final IFactory<RECIPE> factory;
 
@@ -25,12 +25,12 @@ public class ElectrolysisRecipeSerializer<RECIPE extends ElectrolysisRecipe> ext
         this.factory = factory;
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public RECIPE read(@Nonnull ResourceLocation recipeId, @Nonnull JsonObject json) {
-        JsonElement input = JSONUtils.isJsonArray(json, JsonConstants.INPUT) ? JSONUtils.getJsonArray(json, JsonConstants.INPUT) :
-                            JSONUtils.getJsonObject(json, JsonConstants.INPUT);
-        FluidStackIngredient inputIngredient = FluidStackIngredient.deserialize(input);
+    public RECIPE fromJson(@NotNull ResourceLocation recipeId, @NotNull JsonObject json) {
+        JsonElement input = GsonHelper.isArrayNode(json, JsonConstants.INPUT) ? GsonHelper.getAsJsonArray(json, JsonConstants.INPUT) :
+                            GsonHelper.getAsJsonObject(json, JsonConstants.INPUT);
+        FluidStackIngredient inputIngredient = IngredientCreatorAccess.fluid().deserialize(input);
         GasStack leftGasOutput = SerializerHelper.getGasStack(json, JsonConstants.LEFT_GAS_OUTPUT);
         GasStack rightGasOutput = SerializerHelper.getGasStack(json, JsonConstants.RIGHT_GAS_OUTPUT);
         FloatingLong energyMultiplier = FloatingLong.ONE;
@@ -47,9 +47,9 @@ public class ElectrolysisRecipeSerializer<RECIPE extends ElectrolysisRecipe> ext
     }
 
     @Override
-    public RECIPE read(@Nonnull ResourceLocation recipeId, @Nonnull PacketBuffer buffer) {
+    public RECIPE fromNetwork(@NotNull ResourceLocation recipeId, @NotNull FriendlyByteBuf buffer) {
         try {
-            FluidStackIngredient input = FluidStackIngredient.read(buffer);
+            FluidStackIngredient input = IngredientCreatorAccess.fluid().read(buffer);
             FloatingLong energyMultiplier = FloatingLong.readFromBuffer(buffer);
             GasStack leftGasOutput = GasStack.readFromPacket(buffer);
             GasStack rightGasOutput = GasStack.readFromPacket(buffer);
@@ -61,7 +61,7 @@ public class ElectrolysisRecipeSerializer<RECIPE extends ElectrolysisRecipe> ext
     }
 
     @Override
-    public void write(@Nonnull PacketBuffer buffer, @Nonnull RECIPE recipe) {
+    public void toNetwork(@NotNull FriendlyByteBuf buffer, @NotNull RECIPE recipe) {
         try {
             recipe.write(buffer);
         } catch (Exception e) {

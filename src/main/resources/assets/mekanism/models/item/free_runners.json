@@ -1,12 +1,9 @@
 {
     "parent": "builtin/entity",
-    "textures": {
-        "particle": "mekanism:block/steel_casing"
-    },
     "display": {
         "gui": {
             "rotation": [ 30, 45, 0 ],
-            "translation": [ -1, 6.5, 0],
+            "translation": [ -1, 5.5, 0],
             "scale":[ 1.25, 1.25, 1.25 ]
         },
         "ground": {

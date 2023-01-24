@@ -1,23 +1,27 @@
 package mekanism.client.render.data;
 
-import javax.annotation.Nonnull;
+import java.util.Objects;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.client.render.MekanismRenderer;
-import mekanism.client.render.MekanismRenderer.FluidType;
+import mekanism.client.render.MekanismRenderer.FluidTextureType;
+import mekanism.common.util.MekanismUtils;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.fluids.FluidStack;
 
+@NothingNullByDefault
 public class FluidRenderData extends RenderData {
 
-    @Nonnull
     public final FluidStack fluidType;
 
-    public FluidRenderData(@Nonnull FluidStack fluidType) {
+    public FluidRenderData(BlockPos renderLocation, int width, int height, int length, FluidStack fluidType) {
+        super(renderLocation, width, height, length);
         this.fluidType = fluidType;
     }
 
     @Override
     public boolean isGaseous() {
-        return fluidType.getFluid().getAttributes().isGaseous(fluidType);
+        return MekanismUtils.lighterThanAirGas(fluidType);
     }
 
     public int getColorARGB() {
@@ -36,21 +40,16 @@ public class FluidRenderData extends RenderData {
 
     @Override
     public TextureAtlasSprite getTexture() {
-        return MekanismRenderer.getFluidTexture(fluidType, FluidType.STILL);
+        return MekanismRenderer.getFluidTexture(fluidType, FluidTextureType.STILL);
     }
 
     @Override
     public int hashCode() {
-        int code = super.hashCode();
-        code = 31 * code + fluidType.getFluid().getRegistryName().hashCode();
-        if (fluidType.hasTag()) {
-            code = 31 * code + fluidType.getTag().hashCode();
-        }
-        return code;
+        return Objects.hash(super.hashCode(), fluidType.getFluid(), fluidType.getTag());
     }
 
     @Override
     public boolean equals(Object data) {
-        return super.equals(data) && data instanceof FluidRenderData && fluidType.isFluidEqual(((FluidRenderData) data).fluidType);
+        return super.equals(data) && data instanceof FluidRenderData other && fluidType.isFluidEqual(other.fluidType);
     }
 }

@@ -1,22 +1,23 @@
 package mekanism.api.datagen.recipe;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-import mekanism.api.annotations.FieldsAreNonnullByDefault;
-import net.minecraft.advancements.ICriterionInstance;
+import java.util.Objects;
+import net.minecraft.advancements.CriterionTriggerInstance;
+import org.jetbrains.annotations.NotNull;
 
-@FieldsAreNonnullByDefault
-@ParametersAreNonnullByDefault
-public class RecipeCriterion {
+/**
+ * Helper class to declare named criteria for repeated use.
+ *
+ * @param name      Name of the Recipe Criterion.
+ * @param criterion Criterion Instance.
+ */
+public record RecipeCriterion(@NotNull String name, @NotNull CriterionTriggerInstance criterion) {
 
-    public final String name;
-    public final ICriterionInstance criterion;
-
-    private RecipeCriterion(String name, ICriterionInstance criterion) {
-        this.name = name;
-        this.criterion = criterion;
-    }
-
-    public static RecipeCriterion of(String name, ICriterionInstance criterion) {
-        return new RecipeCriterion(name, criterion);
+    /**
+     * @param name      Name of the Recipe Criterion.
+     * @param criterion Criterion Instance.
+     */
+    public RecipeCriterion {
+        Objects.requireNonNull(name, "Criterion must have a name.");
+        Objects.requireNonNull(criterion, "Recipe criterion's must have a criterion to match.");
     }
 }

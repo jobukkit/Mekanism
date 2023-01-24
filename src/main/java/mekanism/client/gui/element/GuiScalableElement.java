@@ -1,9 +1,9 @@
 package mekanism.client.gui.element;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.Nonnull;
+import com.mojang.blaze3d.vertex.PoseStack;
 import mekanism.client.gui.IGuiWrapper;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class GuiScalableElement extends GuiTexturedElement {
 
@@ -18,7 +18,7 @@ public abstract class GuiScalableElement extends GuiTexturedElement {
     }
 
     @Override
-    public void drawBackground(@Nonnull MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
+    public void drawBackground(@NotNull PoseStack matrix, int mouseX, int mouseY, float partialTicks) {
         super.drawBackground(matrix, mouseX, mouseY, partialTicks);
         renderBackgroundTexture(matrix, getResource(), sideWidth, sideHeight);
     }

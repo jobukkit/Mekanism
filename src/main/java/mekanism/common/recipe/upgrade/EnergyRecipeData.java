@@ -3,39 +3,33 @@ package mekanism.common.recipe.upgrade;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.api.Action;
 import mekanism.api.DataHandlerUtils;
 import mekanism.api.NBTConstants;
-import mekanism.api.annotations.FieldsAreNonnullByDefault;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.energy.IMekanismStrictEnergyHandler;
 import mekanism.api.energy.IStrictEnergyHandler;
 import mekanism.api.math.FloatingLong;
-import mekanism.common.block.interfaces.IHasTileEntity;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.energy.BasicEnergyContainer;
 import mekanism.common.tile.base.SubstanceType;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.util.ItemDataUtils;
-import mekanism.common.util.MekanismUtils;
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-@FieldsAreNonnullByDefault
-@ParametersAreNonnullByDefault
+@NothingNullByDefault
 public class EnergyRecipeData implements RecipeUpgradeData<EnergyRecipeData> {
 
     private final List<IEnergyContainer> energyContainers;
 
-    EnergyRecipeData(ListNBT containers) {
+    EnergyRecipeData(ListTag containers) {
         int count = DataHandlerUtils.getMaxId(containers, NBTConstants.CONTAINER);
         energyContainers = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
@@ -51,8 +45,7 @@ public class EnergyRecipeData implements RecipeUpgradeData<EnergyRecipeData> {
     @Nullable
     @Override
     public EnergyRecipeData merge(EnergyRecipeData other) {
-        List<IEnergyContainer> allContainers = new ArrayList<>(energyContainers.size() + other.energyContainers.size());
-        allContainers.addAll(energyContainers);
+        List<IEnergyContainer> allContainers = new ArrayList<>(energyContainers);
         allContainers.addAll(other.energyContainers);
         return new EnergyRecipeData(allContainers);
     }
@@ -63,22 +56,15 @@ public class EnergyRecipeData implements RecipeUpgradeData<EnergyRecipeData> {
             return true;
         }
         Item item = stack.getItem();
-        Optional<IStrictEnergyHandler> capability = MekanismUtils.toOptional(stack.getCapability(Capabilities.STRICT_ENERGY_CAPABILITY));
+        Optional<IStrictEnergyHandler> capability = stack.getCapability(Capabilities.STRICT_ENERGY).resolve();
         List<IEnergyContainer> energyContainers = new ArrayList<>();
         if (capability.isPresent()) {
             IStrictEnergyHandler energyHandler = capability.get();
             for (int container = 0; container < energyHandler.getEnergyContainerCount(); container++) {
                 energyContainers.add(BasicEnergyContainer.create(energyHandler.getMaxEnergy(container), null));
             }
-        } else if (item instanceof BlockItem) {
-            TileEntityMekanism tile = null;
-            Block block = ((BlockItem) item).getBlock();
-            if (block instanceof IHasTileEntity) {
-                TileEntity tileEntity = ((IHasTileEntity<?>) block).getTileType().create();
-                if (tileEntity instanceof TileEntityMekanism) {
-                    tile = (TileEntityMekanism) tileEntity;
-                }
-            }
+        } else if (item instanceof BlockItem blockItem) {
+            TileEntityMekanism tile = getTileFromBlock(blockItem.getBlock());
             if (tile == null || !tile.handles(SubstanceType.ENERGY)) {
                 //Something went wrong
                 return false;
@@ -94,7 +80,7 @@ public class EnergyRecipeData implements RecipeUpgradeData<EnergyRecipeData> {
             return true;
         }
         IMekanismStrictEnergyHandler outputHandler = new IMekanismStrictEnergyHandler() {
-            @Nonnull
+            @NotNull
             @Override
             public List<IEnergyContainer> getEnergyContainers(@Nullable Direction side) {
                 return energyContainers;
@@ -116,7 +102,7 @@ public class EnergyRecipeData implements RecipeUpgradeData<EnergyRecipeData> {
         }
         if (hasData) {
             //We managed to transfer it all into valid slots, so save it to the stack
-            ItemDataUtils.setList(stack, NBTConstants.ENERGY_CONTAINERS, DataHandlerUtils.writeContainers(energyContainers));
+            ItemDataUtils.writeContainers(stack, NBTConstants.ENERGY_CONTAINERS, energyContainers);
         }
         return true;
     }

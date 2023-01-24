@@ -1,7 +1,9 @@
 package mekanism.common.content.matrix;
 
-import javax.annotation.Nonnull;
 import mekanism.api.math.FloatingLong;
+import mekanism.common.integration.computer.SpecialComputerMethodWrapper.ComputerIInventorySlotWrapper;
+import mekanism.common.integration.computer.annotation.ComputerMethod;
+import mekanism.common.integration.computer.annotation.WrappingComputerMethod;
 import mekanism.common.inventory.container.slot.SlotOverlay;
 import mekanism.common.inventory.container.sync.dynamic.ContainerSync;
 import mekanism.common.inventory.slot.EnergyInventorySlot;
@@ -11,11 +13,14 @@ import mekanism.common.tile.multiblock.TileEntityInductionCasing;
 import mekanism.common.tile.multiblock.TileEntityInductionCell;
 import mekanism.common.tile.multiblock.TileEntityInductionProvider;
 import mekanism.common.util.MekanismUtils;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 public class MatrixMultiblockData extends MultiblockData {
 
-    @Nonnull
+    public static final String STATS_TAB = "stats";
+
+    @NotNull
     private final MatrixEnergyContainer energyContainer;
 
     @ContainerSync(getter = "getLastOutput")
@@ -26,27 +31,29 @@ public class MatrixMultiblockData extends MultiblockData {
     @ContainerSync(getter = "getEnergy")
     private FloatingLong clientEnergy = FloatingLong.ZERO;
 
-    @ContainerSync(tags = "stats", getter = "getTransferCap")
+    @ContainerSync(tags = STATS_TAB, getter = "getTransferCap")
     private FloatingLong clientMaxTransfer = FloatingLong.ZERO;
 
     @ContainerSync(getter = "getStorageCap")
     private FloatingLong clientMaxEnergy = FloatingLong.ZERO;
 
-    @ContainerSync(tags = "stats", getter = "getProviderCount")
+    @ContainerSync(tags = STATS_TAB, getter = "getProviderCount")
     private int clientProviders;
-    @ContainerSync(tags = "stats", getter = "getCellCount")
+    @ContainerSync(tags = STATS_TAB, getter = "getCellCount")
     private int clientCells;
 
-    @Nonnull
-    public final EnergyInventorySlot energyInputSlot;
-    @Nonnull
-    public final EnergyInventorySlot energyOutputSlot;
+    @NotNull
+    @WrappingComputerMethod(wrapper = ComputerIInventorySlotWrapper.class, methodNames = "getInputItem")
+    private final EnergyInventorySlot energyInputSlot;
+    @NotNull
+    @WrappingComputerMethod(wrapper = ComputerIInventorySlotWrapper.class, methodNames = "getOutputItem")
+    private final EnergyInventorySlot energyOutputSlot;
 
     public MatrixMultiblockData(TileEntityInductionCasing tile) {
         super(tile);
         energyContainers.add(energyContainer = new MatrixEnergyContainer(this));
         inventorySlots.add(energyInputSlot = EnergyInventorySlot.drain(energyContainer, this, 146, 21));
-        inventorySlots.add(energyOutputSlot = EnergyInventorySlot.fillOrConvert(energyContainer, tile::getWorld, this, 146, 51));
+        inventorySlots.add(energyOutputSlot = EnergyInventorySlot.fillOrConvert(energyContainer, tile::getLevel, this, 146, 51));
         energyInputSlot.setSlotOverlay(SlotOverlay.PLUS);
         energyOutputSlot.setSlotOverlay(SlotOverlay.MINUS);
     }
@@ -57,19 +64,19 @@ public class MatrixMultiblockData extends MultiblockData {
     }
 
     @Override
-    protected boolean shouldCap(CacheSubstance type) {
+    protected boolean shouldCap(CacheSubstance<?, ?> type) {
         return type != CacheSubstance.ENERGY;
     }
 
     public void addCell(TileEntityInductionCell cell) {
-        energyContainer.addCell(cell.getPos(), cell);
+        energyContainer.addCell(cell.getBlockPos(), cell);
     }
 
     public void addProvider(TileEntityInductionProvider provider) {
-        energyContainer.addProvider(provider.getPos(), provider);
+        energyContainer.addProvider(provider.getBlockPos(), provider);
     }
 
-    @Nonnull
+    @NotNull
     public MatrixEnergyContainer getEnergyContainer() {
         return energyContainer;
     }
@@ -79,7 +86,7 @@ public class MatrixMultiblockData extends MultiblockData {
     }
 
     @Override
-    public boolean tick(World world) {
+    public boolean tick(Level world) {
         boolean ret = super.tick(world);
         energyContainer.tick();
         // We tick the main energy container before adding/draining from the slots, so that we make sure
@@ -95,7 +102,7 @@ public class MatrixMultiblockData extends MultiblockData {
     }
 
     @Override
-    public void remove(World world) {
+    public void remove(Level world) {
         energyContainer.invalidate();
         super.remove(world);
     }
@@ -104,22 +111,27 @@ public class MatrixMultiblockData extends MultiblockData {
         return isRemote() ? clientMaxEnergy : energyContainer.getMaxEnergy();
     }
 
+    @ComputerMethod
     public FloatingLong getTransferCap() {
         return isRemote() ? clientMaxTransfer : energyContainer.getMaxTransfer();
     }
 
+    @ComputerMethod
     public FloatingLong getLastInput() {
         return isRemote() ? clientLastInput : energyContainer.getLastInput();
     }
 
+    @ComputerMethod
     public FloatingLong getLastOutput() {
         return isRemote() ? clientLastOutput : energyContainer.getLastOutput();
     }
 
+    @ComputerMethod(nameOverride = "getInstalledCells")
     public int getCellCount() {
         return isRemote() ? clientCells : energyContainer.getCells();
     }
 
+    @ComputerMethod(nameOverride = "getInstalledProviders")
     public int getProviderCount() {
         return isRemote() ? clientProviders : energyContainer.getProviders();
     }

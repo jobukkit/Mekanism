@@ -1,12 +1,15 @@
 {
-  "parent": "mekanism:block/machine",
+  "loader": "forge:composite",
+  "parent": "block/block",
   "textures": {
-    "sides": "mekanism:block/nutritional_liquifier/right",
-    "front": "mekanism:block/nutritional_liquifier/front",
-    "west": "mekanism:block/nutritional_liquifier/right",
-    "east": "mekanism:block/nutritional_liquifier/left",
-    "south": "mekanism:block/nutritional_liquifier/back",
-    "up": "mekanism:block/nutritional_liquifier/top",
-    "down": "mekanism:block/nutritional_liquifier/bottom"
+    "particle": "mekanism:block/nutritional_liquifier"
+  },
+  "children": {
+    "base": {
+      "parent": "mekanism:block/nutritional_liquifier_base"
+    },
+    "blade": {
+      "parent": "mekanism:block/liquifier_blade"
+    }
   }
 }

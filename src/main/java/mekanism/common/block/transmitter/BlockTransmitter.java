@@ -1,16 +1,12 @@
 package mekanism.common.block.transmitter;
 
+import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectMaps;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import javax.annotation.Nonnull;
-import mekanism.api.IMekWrench;
 import mekanism.common.block.BlockMekanism;
 import mekanism.common.block.states.IStateFluidLoggable;
-import mekanism.common.block.states.TransmitterType.Size;
 import mekanism.common.content.network.transmitter.Transmitter;
 import mekanism.common.lib.transmitter.ConnectionType;
 import mekanism.common.registries.MekanismItems;
@@ -20,56 +16,58 @@ import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.MultipartUtils;
 import mekanism.common.util.MultipartUtils.AdvancedRayTraceResult;
 import mekanism.common.util.VoxelShapeUtils;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
-import org.apache.commons.lang3.tuple.Pair;
+import mekanism.common.util.WorldUtils;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.EntityCollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class BlockTransmitter extends BlockMekanism implements IStateFluidLoggable {
 
-    private static final Map<ConnectionInfo, VoxelShape> cachedShapes = new HashMap<>();
+    //Max retained size if we used a HashMap with a key of record(Size, ConnectionType[6]) ~= 1,343,576B
+    //Max retained size packing it like this 163,987B
+    private static final Short2ObjectMap<VoxelShape> cachedShapes = Short2ObjectMaps.synchronize(new Short2ObjectOpenHashMap<>());
 
     protected BlockTransmitter() {
-        super(Block.Properties.create(Material.PISTON).hardnessAndResistance(1F, 10F));
+        super(BlockBehaviour.Properties.of(Material.PISTON).strength(1, 6));
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public ActionResultType onBlockActivated(@Nonnull BlockState state, @Nonnull World world, @Nonnull BlockPos pos, PlayerEntity player, @Nonnull Hand hand,
-          @Nonnull BlockRayTraceResult hit) {
-        ItemStack stack = player.getHeldItem(hand);
-        if (stack.isEmpty()) {
-            return ActionResultType.PASS;
-        }
-        IMekWrench wrenchHandler = MekanismUtils.getWrench(stack);
-        if (wrenchHandler != null) {
-            if (wrenchHandler.canUseWrench(stack, player, hit.getPos()) && player.isSneaking()) {
-                if (!world.isRemote) {
-                    MekanismUtils.dismantleBlock(state, world, pos);
-                }
-                return ActionResultType.SUCCESS;
+    @Deprecated
+    public InteractionResult use(@NotNull BlockState state, @NotNull Level world, @NotNull BlockPos pos, Player player, @NotNull InteractionHand hand,
+          @NotNull BlockHitResult hit) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (MekanismUtils.canUseAsWrench(stack) && player.isShiftKeyDown()) {
+            if (!world.isClientSide) {
+                WorldUtils.dismantleBlock(state, world, pos);
             }
+            return InteractionResult.SUCCESS;
         }
-        return ActionResultType.PASS;
+        return InteractionResult.PASS;
     }
 
     @Override
-    public void onBlockPlacedBy(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull LivingEntity placer, @Nonnull ItemStack stack) {
-        TileEntityTransmitter tile = MekanismUtils.getTileEntity(TileEntityTransmitter.class, world, pos);
+    public void setPlacedBy(@NotNull Level world, @NotNull BlockPos pos, @NotNull BlockState state, @Nullable LivingEntity placer, @NotNull ItemStack stack) {
+        TileEntityTransmitter tile = WorldUtils.getTileEntity(TileEntityTransmitter.class, world, pos);
         if (tile != null) {
             tile.onAdded();
         }
@@ -77,44 +75,49 @@ public abstract class BlockTransmitter extends BlockMekanism implements IStateFl
 
     @Override
     @Deprecated
-    public void neighborChanged(@Nonnull BlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull Block neighborBlock, @Nonnull BlockPos neighborPos,
+    public void neighborChanged(@NotNull BlockState state, @NotNull Level world, @NotNull BlockPos pos, @NotNull Block neighborBlock, @NotNull BlockPos neighborPos,
           boolean isMoving) {
-        TileEntityTransmitter tile = MekanismUtils.getTileEntity(TileEntityTransmitter.class, world, pos);
+        TileEntityTransmitter tile = WorldUtils.getTileEntity(TileEntityTransmitter.class, world, pos);
         if (tile != null) {
-            Direction side = Direction.getFacingFromVector(neighborPos.getX() - pos.getX(), neighborPos.getY() - pos.getY(), neighborPos.getZ() - pos.getZ());
+            Direction side = Direction.getNearest(neighborPos.getX() - pos.getX(), neighborPos.getY() - pos.getY(), neighborPos.getZ() - pos.getZ());
             tile.onNeighborBlockChange(side);
         }
     }
 
     @Override
-    public void onNeighborChange(BlockState state, IWorldReader world, BlockPos pos, BlockPos neighbor) {
-        TileEntityTransmitter tile = MekanismUtils.getTileEntity(TileEntityTransmitter.class, world, pos);
+    public void onNeighborChange(BlockState state, LevelReader world, BlockPos pos, BlockPos neighbor) {
+        TileEntityTransmitter tile = WorldUtils.getTileEntity(TileEntityTransmitter.class, world, pos);
         if (tile != null) {
-            Direction side = Direction.getFacingFromVector(neighbor.getX() - pos.getX(), neighbor.getY() - pos.getY(), neighbor.getZ() - pos.getZ());
+            Direction side = Direction.getNearest(neighbor.getX() - pos.getX(), neighbor.getY() - pos.getY(), neighbor.getZ() - pos.getZ());
             tile.onNeighborTileChange(side);
         }
     }
 
-    @Nonnull
     @Override
     @Deprecated
-    public VoxelShape getShape(@Nonnull BlockState state, @Nonnull IBlockReader world, @Nonnull BlockPos pos, ISelectionContext context) {
-        if (!context.hasItem(MekanismItems.CONFIGURATOR.getItem())) {
+    public boolean isPathfindable(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos, @NotNull PathComputationType type) {
+        return false;
+    }
+
+    @NotNull
+    @Override
+    @Deprecated
+    public VoxelShape getShape(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos, CollisionContext context) {
+        if (!context.isHoldingItem(MekanismItems.CONFIGURATOR.asItem())) {
             return getRealShape(world, pos);
         }
         //Get the partial selection box if we are holding a configurator
-        if (context.getEntity() == null) {
+        if (!(context instanceof EntityCollisionContext entityContext) || entityContext.getEntity() == null) {
             //If we don't have an entity get the full VoxelShape
             return getRealShape(world, pos);
         }
-        TileEntityTransmitter tile = MekanismUtils.getTileEntity(TileEntityTransmitter.class, world, pos);
+        TileEntityTransmitter tile = WorldUtils.getTileEntity(TileEntityTransmitter.class, world, pos);
         if (tile == null) {
             //If we failed to get the tile, just give the center shape
             return getCenter();
         }
         //TODO: Try to cache some of this? At the very least the collision boxes
-        Pair<Vector3d, Vector3d> vecs = MultipartUtils.getRayTraceVectors(context.getEntity());
-        AdvancedRayTraceResult result = MultipartUtils.collisionRayTrace(pos, vecs.getLeft(), vecs.getRight(), tile.getCollisionBoxes());
+        AdvancedRayTraceResult result = MultipartUtils.collisionRayTrace(entityContext.getEntity(), pos, tile.getCollisionBoxes());
         if (result != null && result.valid()) {
             return result.bounds;
         }
@@ -122,18 +125,18 @@ public abstract class BlockTransmitter extends BlockMekanism implements IStateFl
         return getCenter();
     }
 
-    @Nonnull
+    @NotNull
     @Override
     @Deprecated
-    public VoxelShape getRenderShape(@Nonnull BlockState state, @Nonnull IBlockReader world, @Nonnull BlockPos pos) {
+    public VoxelShape getOcclusionShape(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos) {
         //Override this so that we ALWAYS have the full collision box, even if a configurator is being held
         return getRealShape(world, pos);
     }
 
-    @Nonnull
+    @NotNull
     @Override
     @Deprecated
-    public VoxelShape getCollisionShape(@Nonnull BlockState state, @Nonnull IBlockReader world, @Nonnull BlockPos pos, @Nonnull ISelectionContext context) {
+    public VoxelShape getCollisionShape(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos, @NotNull CollisionContext context) {
         //Override this so that we ALWAYS have the full collision box, even if a configurator is being held
         return getRealShape(world, pos);
     }
@@ -142,68 +145,43 @@ public abstract class BlockTransmitter extends BlockMekanism implements IStateFl
 
     protected abstract VoxelShape getSide(ConnectionType type, Direction side);
 
-    private VoxelShape getRealShape(IBlockReader world, BlockPos pos) {
-        TileEntityTransmitter tile = MekanismUtils.getTileEntity(TileEntityTransmitter.class, world, pos);
+    private VoxelShape getRealShape(BlockGetter world, BlockPos pos) {
+        TileEntityTransmitter tile = WorldUtils.getTileEntity(TileEntityTransmitter.class, world, pos);
         if (tile == null) {
             //If we failed to get the tile, just give the center shape
             return getCenter();
         }
         Transmitter<?, ?, ?> transmitter = tile.getTransmitter();
-        ConnectionType[] connectionTypes = new ConnectionType[transmitter.connectionTypes.length];
-        for (int i = 0; i < EnumUtils.DIRECTIONS.length; i++) {
-            //Get the actual connection types
-            connectionTypes[i] = transmitter.getConnectionType(EnumUtils.DIRECTIONS[i]);
-        }
-        ConnectionInfo info = new ConnectionInfo(tile.getTransmitterType().getSize(), connectionTypes);
-        if (cachedShapes.containsKey(info)) {
-            return cachedShapes.get(info);
-        }
-        //If we don't have a cached version of our shape, then we need to calculate it
-        List<VoxelShape> shapes = new ArrayList<>();
+        //Created a pack key as follows:
+        // first four bits of a short are used to represent size (realistically first three are ignored and fourth represents small or large)
+        // last 12 bits are separated into 6 sides each of 2 bits that represent the connection type
+        int packedKey = tile.getTransmitterType().getSize().ordinal() << 12;
         for (Direction side : EnumUtils.DIRECTIONS) {
-            ConnectionType connectionType = connectionTypes[side.ordinal()];
-            if (connectionType != ConnectionType.NONE) {
-                shapes.add(getSide(connectionType, side));
+            //Get the actual connection types
+            ConnectionType connectionType = transmitter.getConnectionType(side);
+            //Bit shift in increments of two based on which side we are on
+            packedKey |= connectionType.ordinal() << (side.ordinal() * 2);
+        }
+        //We can cast this to a short as we don't use more bits than are in a short, we just use an int to simplify bit shifting
+        return cachedShapes.computeIfAbsent((short) packedKey, packed -> {
+            //If we don't have a cached version of our shape, then we need to calculate it
+            //size = Size.byIndexStatic(packed >> 12);
+            List<VoxelShape> shapes = new ArrayList<>(EnumUtils.DIRECTIONS.length);
+            for (Direction side : EnumUtils.DIRECTIONS) {
+                //Unpack the ordinal of the connection type (shift so that significant bits are the two rightmost
+                // and then read those two bits
+                int index = (packed >> (side.ordinal() * 2)) & 0b11;
+                ConnectionType connectionType = ConnectionType.byIndexStatic(index);
+                if (connectionType != ConnectionType.NONE) {
+                    shapes.add(getSide(connectionType, side));
+                }
             }
-        }
-        VoxelShape center = getCenter();
-        if (shapes.isEmpty()) {
-            cachedShapes.put(info, center);
-            return center;
-        }
-        shapes.add(center);
-        VoxelShape shape = VoxelShapeUtils.combine(shapes);
-        cachedShapes.put(info, shape);
-        return shape;
-    }
-
-    private static class ConnectionInfo {
-
-        private final Size size;
-        private final ConnectionType[] connectionTypes;
-
-        private ConnectionInfo(Size size, ConnectionType[] connectionTypes) {
-            this.size = size;
-            this.connectionTypes = connectionTypes;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
+            VoxelShape center = getCenter();
+            if (shapes.isEmpty()) {
+                return center;
             }
-            if (o instanceof ConnectionInfo) {
-                ConnectionInfo other = (ConnectionInfo) o;
-                return size == other.size && Arrays.equals(connectionTypes, other.connectionTypes);
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = Objects.hash(size);
-            result = 31 * result + Arrays.hashCode(connectionTypes);
-            return result;
-        }
+            //Call batchCombine directly rather than just combine so that we can skip a few checks
+            return VoxelShapeUtils.batchCombine(center, BooleanOp.OR, true, shapes);
+        });
     }
 }

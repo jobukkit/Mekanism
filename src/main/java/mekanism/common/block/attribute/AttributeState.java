@@ -1,29 +1,30 @@
 package mekanism.common.block.attribute;
 
 import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.state.Property;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public abstract class AttributeState implements Attribute {
+public interface AttributeState extends Attribute {
 
-    public abstract BlockState copyStateData(BlockState oldState, BlockState newState);
+    BlockState copyStateData(BlockState oldState, BlockState newState);
 
-    public abstract void fillBlockStateContainer(Block block, List<Property<?>> properties);
+    void fillBlockStateContainer(Block block, List<Property<?>> properties);
 
-    public BlockState getDefaultState(@Nonnull BlockState state) {
+    default BlockState getDefaultState(@NotNull BlockState state) {
         return state;
     }
 
     @Contract("_, null, _, _, _, _ -> null")
-    public BlockState getStateForPlacement(Block block, @Nullable BlockState state, @Nonnull IWorld world, @Nonnull BlockPos pos, @Nullable PlayerEntity player, @Nonnull Direction face) {
+    default BlockState getStateForPlacement(Block block, @Nullable BlockState state, @NotNull LevelAccessor world, @NotNull BlockPos pos, @Nullable Player player,
+          @NotNull Direction face) {
         return state;
     }
 }

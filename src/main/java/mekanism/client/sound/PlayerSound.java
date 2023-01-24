@@ -1,36 +1,46 @@
 package mekanism.client.sound;
 
 import java.lang.ref.WeakReference;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.common.config.MekanismConfig;
-import net.minecraft.client.audio.ITickableSound;
-import net.minecraft.client.audio.LocatableSound;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
+import mekanism.common.registration.impl.SoundEventRegistryObject;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
+import net.minecraft.client.sounds.SoundEventListener;
+import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.client.sounds.WeighedSoundEvents;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public abstract class PlayerSound extends LocatableSound implements ITickableSound {
+public abstract class PlayerSound extends AbstractTickableSoundInstance {
 
-    @Nonnull
-    private WeakReference<PlayerEntity> playerReference;
+    @NotNull
+    private final WeakReference<Player> playerReference;
+    private final int subtitleFrequency;
     private float lastX;
     private float lastY;
     private float lastZ;
 
     private float fadeUpStep = 0.1f;
     private float fadeDownStep = 0.1f;
+    private int consecutiveTicks;
 
-    private boolean donePlaying = false;
+    public PlayerSound(@NotNull Player player, @NotNull SoundEventRegistryObject<?> sound) {
+        this(player, sound.get(), 60);
+        //Set it to repeat the subtitle every 3 seconds the sound is constantly playing
+    }
 
-    public PlayerSound(@Nonnull PlayerEntity player, @Nonnull SoundEvent sound) {
-        super(sound, SoundCategory.PLAYERS);
+    public PlayerSound(@NotNull Player player, @NotNull SoundEvent sound, int subtitleFrequency) {
+        super(sound, SoundSource.PLAYERS, player.level.getRandom());
         this.playerReference = new WeakReference<>(player);
-        this.lastX = (float) player.getPosX();
-        this.lastY = (float) player.getPosY();
-        this.lastZ = (float) player.getPosZ();
-        this.repeat = true;
-        this.repeatDelay = 0;
+        this.subtitleFrequency = subtitleFrequency;
+        this.lastX = (float) player.getX();
+        this.lastY = (float) player.getY();
+        this.lastZ = (float) player.getZ();
+        this.looping = true;
+        this.delay = 0;
 
         // N.B. the volume must be > 0 on first time it's processed by sound system or else it will not
         // get registered for tick events.
@@ -38,7 +48,7 @@ public abstract class PlayerSound extends LocatableSound implements ITickableSou
     }
 
     @Nullable
-    private PlayerEntity getPlayer() {
+    private Player getPlayer() {
         return playerReference.get();
     }
 
@@ -50,9 +60,9 @@ public abstract class PlayerSound extends LocatableSound implements ITickableSou
     @Override
     public double getX() {
         //Gracefully handle the player becoming null if this object is kept around after update marks us as donePlaying
-        PlayerEntity player = getPlayer();
+        Player player = getPlayer();
         if (player != null) {
-            this.lastX = (float) player.getPosX();
+            this.lastX = (float) player.getX();
         }
         return this.lastX;
     }
@@ -60,9 +70,9 @@ public abstract class PlayerSound extends LocatableSound implements ITickableSou
     @Override
     public double getY() {
         //Gracefully handle the player becoming null if this object is kept around after update marks us as donePlaying
-        PlayerEntity player = getPlayer();
+        Player player = getPlayer();
         if (player != null) {
-            this.lastY = (float) player.getPosY();
+            this.lastY = (float) player.getY();
         }
         return this.lastY;
     }
@@ -70,19 +80,20 @@ public abstract class PlayerSound extends LocatableSound implements ITickableSou
     @Override
     public double getZ() {
         //Gracefully handle the player becoming null if this object is kept around after update marks us as donePlaying
-        PlayerEntity player = getPlayer();
+        Player player = getPlayer();
         if (player != null) {
-            this.lastZ = (float) player.getPosZ();
+            this.lastZ = (float) player.getZ();
         }
         return this.lastZ;
     }
 
     @Override
     public void tick() {
-        PlayerEntity player = getPlayer();
+        Player player = getPlayer();
         if (player == null || !player.isAlive()) {
-            this.donePlaying = true;
-            this.volume = 0.0F;
+            stop();
+            volume = 0.0F;
+            consecutiveTicks = 0;
             return;
         }
 
@@ -91,22 +102,44 @@ public abstract class PlayerSound extends LocatableSound implements ITickableSou
                 // If we weren't max volume, start fading up
                 volume = Math.min(1.0F, volume + fadeUpStep);
             }
+            if (consecutiveTicks % subtitleFrequency == 0) {
+                SoundManager soundHandler = Minecraft.getInstance().getSoundManager();
+                for (SoundEventListener soundEventListener : soundHandler.soundEngine.listeners) {
+                    WeighedSoundEvents soundEventAccessor = resolve(soundHandler);
+                    if (soundEventAccessor != null) {
+                        soundEventListener.onPlaySound(this, soundEventAccessor);
+                    }
+                }
+                consecutiveTicks = 1;
+            } else {
+                consecutiveTicks++;
+            }
         } else if (volume > 0.0F) {
+            consecutiveTicks = 0;
             // Not yet fully muted, fade down
             volume = Math.max(0.0F, volume - fadeDownStep);
         }
     }
 
-    @Override
-    public boolean isDonePlaying() {
-        return donePlaying;
-    }
-
-    public abstract boolean shouldPlaySound(@Nonnull PlayerEntity player);
+    public abstract boolean shouldPlaySound(@NotNull Player player);
 
     @Override
     public float getVolume() {
         return super.getVolume() * MekanismConfig.client.baseSoundVolume.get();
+    }
+
+    @Override
+    public boolean canStartSilent() {
+        return true;
+    }
+
+    @Override
+    public boolean canPlaySound() {
+        Player player = getPlayer();
+        if (player == null) {
+            return super.canPlaySound();
+        }
+        return !player.isSilent();
     }
 
     public enum SoundType {

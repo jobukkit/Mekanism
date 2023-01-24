@@ -2,13 +2,13 @@ package mekanism.common.inventory.container.sync;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
 import mekanism.common.lib.frequency.Frequency;
-import mekanism.common.network.container.property.FrequencyPropertyData;
-import mekanism.common.network.container.property.PropertyData;
+import mekanism.common.network.to_client.container.property.FrequencyPropertyData;
+import mekanism.common.network.to_client.container.property.PropertyData;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * Version of {@link net.minecraft.util.IntReferenceHolder} for handling item stacks
+ * Version of {@link net.minecraft.world.inventory.DataSlot} for handling frequencies
  */
 public class SyncableFrequency<FREQUENCY extends Frequency> implements ISyncableData {
 

@@ -1,101 +1,95 @@
 package mekanism.common.block.prefab;
 
-import java.util.Random;
 import java.util.function.Function;
-import javax.annotation.Nonnull;
+import java.util.function.UnaryOperator;
+import mekanism.api.MekanismAPI;
 import mekanism.common.block.attribute.Attribute;
 import mekanism.common.block.attribute.AttributeGui;
 import mekanism.common.block.attribute.AttributeParticleFX;
 import mekanism.common.block.attribute.AttributeParticleFX.Particle;
-import mekanism.common.block.attribute.AttributeStateActive;
 import mekanism.common.block.attribute.Attributes.AttributeRedstoneEmitter;
 import mekanism.common.block.interfaces.IHasTileEntity;
 import mekanism.common.block.states.IStateFluidLoggable;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.content.blocktype.BlockTypeTile;
+import mekanism.common.registration.impl.TileEntityTypeRegistryObject;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.tile.base.WrenchResult;
-import mekanism.common.tile.interfaces.IActiveState;
-import mekanism.common.util.MekanismUtils;
-import mekanism.common.util.SecurityUtils;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import mekanism.common.util.WorldUtils;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class BlockTile<TILE extends TileEntityMekanism, TYPE extends BlockTypeTile<TILE>> extends BlockBase<TYPE> implements IHasTileEntity<TILE> {
 
     public BlockTile(TYPE type) {
-        this(type, Block.Properties.create(Material.IRON).hardnessAndResistance(3.5F, 16F).setRequiresTool());
+        this(type, UnaryOperator.identity());
     }
 
-    public BlockTile(TYPE type, Block.Properties properties) {
+    public BlockTile(TYPE type, UnaryOperator<BlockBehaviour.Properties> propertiesModifier) {
+        this(type, propertiesModifier.apply(BlockBehaviour.Properties.of(Material.METAL).strength(3.5F, 16).requiresCorrectToolForDrops()));
+        //TODO - 1.18: Figure out what the resistance should be (it used to be different in 1.12)
+    }
+
+    public BlockTile(TYPE type, BlockBehaviour.Properties properties) {
         super(type, properties);
     }
 
     @Override
-    public TileEntityType<TILE> getTileType() {
+    public TileEntityTypeRegistryObject<TILE> getTileType() {
         return type.getTileType();
     }
 
-    @Nonnull
+    @NotNull
     @Override
     @Deprecated
-    public ActionResultType onBlockActivated(@Nonnull BlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull PlayerEntity player, @Nonnull Hand hand,
-          @Nonnull BlockRayTraceResult hit) {
-        TileEntityMekanism tile = MekanismUtils.getTileEntity(TileEntityMekanism.class, world, pos);
+    public InteractionResult use(@NotNull BlockState state, @NotNull Level world, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand hand,
+          @NotNull BlockHitResult hit) {
+        TileEntityMekanism tile = WorldUtils.getTileEntity(TileEntityMekanism.class, world, pos);
         if (tile == null) {
-            return ActionResultType.PASS;
+            return InteractionResult.PASS;
+        } else if (world.isClientSide) {
+            return genericClientActivated(player, hand);
+        } else if (tile.tryWrench(state, player, hand, hit) != WrenchResult.PASS) {
+            return InteractionResult.SUCCESS;
         }
-        if (world.isRemote) {
-            return genericClientActivated(player, hand, hit);
-        }
-        if (tile.tryWrench(state, player, hand, hit) != WrenchResult.PASS) {
-            return ActionResultType.SUCCESS;
-        }
-        return type.has(AttributeGui.class) ? tile.openGui(player) : ActionResultType.PASS;
+        return type.has(AttributeGui.class) ? tile.openGui(player) : InteractionResult.PASS;
     }
 
     @Override
-    public int getLightValue(BlockState state, IBlockReader world, BlockPos pos) {
-        if (MekanismConfig.client.enableAmbientLighting.get() && type.has(AttributeStateActive.class)) {
-            TileEntity tile = MekanismUtils.getTileEntity(world, pos);
-            if (tile instanceof IActiveState && ((IActiveState) tile).lightUpdate() && ((IActiveState) tile).getActive()) {
-                return ((IActiveState) tile).getActiveLightValue();
-            }
-        }
-        return super.getLightValue(state, world, pos);
+    protected float getDestroyProgress(@NotNull BlockState state, @NotNull Player player, @NotNull BlockGetter world, @NotNull BlockPos pos,
+          @Nullable BlockEntity tile) {
+        return MekanismAPI.getSecurityUtils().canAccess(player, tile) ? super.getDestroyProgress(state, player, world, pos, tile) : 0.0F;
     }
 
     @Override
-    @Deprecated
-    public float getPlayerRelativeBlockHardness(@Nonnull BlockState state, @Nonnull PlayerEntity player, @Nonnull IBlockReader world, @Nonnull BlockPos pos) {
-        return SecurityUtils.canAccess(player, MekanismUtils.getTileEntity(world, pos)) ? super.getPlayerRelativeBlockHardness(state, player, world, pos) : 0.0F;
-    }
-
-    @Override
-    public void animateTick(@Nonnull BlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull Random random) {
-        TileEntityMekanism tile = MekanismUtils.getTileEntity(TileEntityMekanism.class, world, pos);
-        if (tile != null && MekanismUtils.isActive(world, pos) && Attribute.has(state.getBlock(), AttributeParticleFX.class)) {
-            for (Function<Random, Particle> particleFunction : type.get(AttributeParticleFX.class).getParticleFunctions()) {
+    public void animateTick(@NotNull BlockState state, @NotNull Level world, @NotNull BlockPos pos, @NotNull RandomSource random) {
+        super.animateTick(state, world, pos, random);
+        if (MekanismConfig.client.machineEffects.get() && type.has(AttributeParticleFX.class) && Attribute.isActive(state)) {
+            Direction facing = Attribute.getFacing(state);
+            for (Function<RandomSource, Particle> particleFunction : type.get(AttributeParticleFX.class).getParticleFunctions()) {
                 Particle particle = particleFunction.apply(random);
-                Vector3d particlePos = particle.getPos();
-                if (tile.getDirection() == Direction.WEST) {
-                    particlePos = particlePos.rotateYaw(90);
-                } else if (tile.getDirection() == Direction.EAST) {
-                    particlePos = particlePos.rotateYaw(270);
-                } else if (tile.getDirection() == Direction.NORTH) {
-                    particlePos = particlePos.rotateYaw(180);
+                Vec3 particlePos = particle.getPos();
+                if (facing == Direction.WEST) {
+                    particlePos = particlePos.yRot(90);
+                } else if (facing == Direction.EAST) {
+                    particlePos = particlePos.yRot(270);
+                } else if (facing == Direction.NORTH) {
+                    particlePos = particlePos.yRot(180);
                 }
                 particlePos = particlePos.add(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
                 world.addParticle(particle.getType(), particlePos.x, particlePos.y, particlePos.z, 0.0D, 0.0D, 0.0D);
@@ -105,10 +99,10 @@ public class BlockTile<TILE extends TileEntityMekanism, TYPE extends BlockTypeTi
 
     @Override
     @Deprecated
-    public void neighborChanged(@Nonnull BlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull Block neighborBlock, @Nonnull BlockPos neighborPos,
+    public void neighborChanged(@NotNull BlockState state, @NotNull Level world, @NotNull BlockPos pos, @NotNull Block neighborBlock, @NotNull BlockPos neighborPos,
           boolean isMoving) {
-        if (!world.isRemote) {
-            TileEntityMekanism tile = MekanismUtils.getTileEntity(TileEntityMekanism.class, world, pos);
+        if (!world.isClientSide) {
+            TileEntityMekanism tile = WorldUtils.getTileEntity(TileEntityMekanism.class, world, pos);
             if (tile != null) {
                 tile.onNeighborChange(neighborBlock, neighborPos);
             }
@@ -116,22 +110,27 @@ public class BlockTile<TILE extends TileEntityMekanism, TYPE extends BlockTypeTi
     }
 
     @Override
-    public boolean canProvidePower(@Nonnull BlockState state) {
+    @Deprecated
+    public boolean isSignalSource(@NotNull BlockState state) {
         return type.has(AttributeRedstoneEmitter.class);
     }
 
     @Override
-    public boolean canConnectRedstone(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
+    public boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos, Direction side) {
         return type.has(AttributeRedstoneEmitter.class) || super.canConnectRedstone(state, world, pos, side);
     }
 
     @Override
-    public int getWeakPower(@Nonnull BlockState state, @Nonnull IBlockReader world, @Nonnull BlockPos pos, @Nonnull Direction side) {
-        if (type.has(AttributeRedstoneEmitter.class)) {
-            TileEntityMekanism tile = MekanismUtils.getTileEntity(TileEntityMekanism.class, world, pos);
-            return type.get(AttributeRedstoneEmitter.class).getRedstoneLevel(tile);
+    @Deprecated
+    public int getSignal(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos, @NotNull Direction side) {
+        AttributeRedstoneEmitter<TileEntityMekanism> redstoneEmitter = type.get(AttributeRedstoneEmitter.class);
+        if (redstoneEmitter != null) {
+            TileEntityMekanism tile = WorldUtils.getTileEntity(TileEntityMekanism.class, world, pos);
+            if (tile != null) {
+                return redstoneEmitter.getRedstoneLevel(tile);
+            }
         }
-        return 0;
+        return super.getSignal(state, world, pos, side);
     }
 
     public static class BlockTileModel<TILE extends TileEntityMekanism, BLOCK extends BlockTypeTile<TILE>> extends BlockTile<TILE, BLOCK> implements IStateFluidLoggable {
@@ -140,7 +139,7 @@ public class BlockTile<TILE extends TileEntityMekanism, TYPE extends BlockTypeTi
             super(type);
         }
 
-        public BlockTileModel(BLOCK type, Block.Properties properties) {
+        public BlockTileModel(BLOCK type, BlockBehaviour.Properties properties) {
             super(type, properties);
         }
     }

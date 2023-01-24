@@ -1,20 +1,21 @@
 package mekanism.api.chemical.pigment;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.MekanismAPI;
 import mekanism.api.NBTConstants;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.providers.IPigmentProvider;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.registries.IRegistryDelegate;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.registries.IForgeRegistry;
+import org.jetbrains.annotations.Nullable;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
-public class PigmentStack extends ChemicalStack<Pigment> {
+@NothingNullByDefault
+public final class PigmentStack extends ChemicalStack<Pigment> {
 
+    /**
+     * Empty PigmentStack instance.
+     */
     public static final PigmentStack EMPTY = new PigmentStack(MekanismAPI.EMPTY_PIGMENT, 0);
 
     /**
@@ -32,13 +33,8 @@ public class PigmentStack extends ChemicalStack<Pigment> {
     }
 
     @Override
-    protected IRegistryDelegate<Pigment> getDelegate(Pigment pigment) {
-        if (MekanismAPI.pigmentRegistry().getKey(pigment) == null) {
-            MekanismAPI.logger.fatal("Failed attempt to create a PigmentStack for an unregistered Pigment {} (type {})", pigment.getRegistryName(),
-                  pigment.getClass().getName());
-            throw new IllegalArgumentException("Cannot create a PigmentStack from an unregistered Pigment");
-        }
-        return pigment.delegate;
+    protected IForgeRegistry<Pigment> getRegistry() {
+        return MekanismAPI.pigmentRegistry();
     }
 
     @Override
@@ -53,7 +49,7 @@ public class PigmentStack extends ChemicalStack<Pigment> {
      *
      * @return PigmentStack stored in the tag compound
      */
-    public static PigmentStack readFromNBT(@Nullable CompoundNBT nbtTags) {
+    public static PigmentStack readFromNBT(@Nullable CompoundTag nbtTags) {
         if (nbtTags == null || nbtTags.isEmpty()) {
             return EMPTY;
         }
@@ -68,13 +64,12 @@ public class PigmentStack extends ChemicalStack<Pigment> {
         return new PigmentStack(type, amount);
     }
 
-    public static PigmentStack readFromPacket(PacketBuffer buf) {
-        Pigment pigment = buf.readRegistryId();
-        long amount = buf.readVarLong();
+    public static PigmentStack readFromPacket(FriendlyByteBuf buf) {
+        Pigment pigment = buf.readRegistryIdSafe(Pigment.class);
         if (pigment.isEmptyType()) {
             return EMPTY;
         }
-        return new PigmentStack(pigment, amount);
+        return new PigmentStack(pigment, buf.readVarLong());
     }
 
     /**
@@ -84,16 +79,9 @@ public class PigmentStack extends ChemicalStack<Pigment> {
      */
     @Override
     public PigmentStack copy() {
+        if (isEmpty()) {
+            return EMPTY;
+        }
         return new PigmentStack(this, getAmount());
-    }
-
-    /**
-     * Default equality comparison for a PigmentStack. Same functionality as isTypeEqual().
-     *
-     * This is included for use in data structures.
-     */
-    @Override
-    public final boolean equals(Object o) {
-        return o instanceof PigmentStack && isTypeEqual((PigmentStack) o);
     }
 }

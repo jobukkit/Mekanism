@@ -1,9 +1,9 @@
 package mekanism.common.content.evaporation;
 
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import java.util.EnumSet;
-import java.util.Set;
 import mekanism.common.MekanismLang;
-import mekanism.common.content.blocktype.BlockTypeTile;
+import mekanism.common.content.blocktype.BlockType;
 import mekanism.common.lib.math.voxel.VoxelCuboid;
 import mekanism.common.lib.math.voxel.VoxelCuboid.CuboidSide;
 import mekanism.common.lib.math.voxel.VoxelCuboid.WallRelative;
@@ -15,9 +15,10 @@ import mekanism.common.lib.multiblock.FormationProtocol.StructureRequirement;
 import mekanism.common.lib.multiblock.StructureHelper;
 import mekanism.common.registries.MekanismBlockTypes;
 import mekanism.common.tile.multiblock.TileEntityThermalEvaporationController;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
 
 public class EvaporationValidator extends CuboidStructureValidator<EvaporationMultiblockData> {
 
@@ -30,7 +31,9 @@ public class EvaporationValidator extends CuboidStructureValidator<EvaporationMu
     protected FormationResult validateFrame(FormationProtocol<EvaporationMultiblockData> ctx, BlockPos pos, BlockState state, CasingType type, boolean needsFrame) {
         boolean controller = structure.getTile(pos) instanceof TileEntityThermalEvaporationController;
         if (foundController && controller) {
-            return FormationResult.fail(MekanismLang.MULTIBLOCK_INVALID_CONTROLLER_CONFLICT, pos);
+            //Ensure we don't allow ignoring the failure as if there are multiple in the corners which are ignored spots
+            // it is possible then we will form with multiple controllers
+            return FormationResult.fail(MekanismLang.MULTIBLOCK_INVALID_CONTROLLER_CONFLICT, pos, true);
         }
         foundController |= controller;
         return super.validateFrame(ctx, pos, state, type, needsFrame);
@@ -52,13 +55,13 @@ public class EvaporationValidator extends CuboidStructureValidator<EvaporationMu
     }
 
     @Override
-    protected CasingType getCasingType(BlockPos pos, BlockState state) {
+    protected CasingType getCasingType(BlockState state) {
         Block block = state.getBlock();
-        if (BlockTypeTile.is(block, MekanismBlockTypes.THERMAL_EVAPORATION_BLOCK)) {
+        if (BlockType.is(block, MekanismBlockTypes.THERMAL_EVAPORATION_BLOCK)) {
             return CasingType.FRAME;
-        } else if (BlockTypeTile.is(block, MekanismBlockTypes.THERMAL_EVAPORATION_VALVE)) {
+        } else if (BlockType.is(block, MekanismBlockTypes.THERMAL_EVAPORATION_VALVE)) {
             return CasingType.VALVE;
-        } else if (BlockTypeTile.is(block, MekanismBlockTypes.THERMAL_EVAPORATION_CONTROLLER)) {
+        } else if (BlockType.is(block, MekanismBlockTypes.THERMAL_EVAPORATION_CONTROLLER)) {
             return CasingType.OTHER;
         }
         return CasingType.INVALID;
@@ -71,7 +74,7 @@ public class EvaporationValidator extends CuboidStructureValidator<EvaporationMu
     }
 
     @Override
-    public FormationResult postcheck(EvaporationMultiblockData structure, Set<BlockPos> innerNodes) {
+    public FormationResult postcheck(EvaporationMultiblockData structure, Long2ObjectMap<ChunkAccess> chunkMap) {
         if (!foundController) {
             return FormationResult.fail(MekanismLang.MULTIBLOCK_INVALID_NO_CONTROLLER);
         }

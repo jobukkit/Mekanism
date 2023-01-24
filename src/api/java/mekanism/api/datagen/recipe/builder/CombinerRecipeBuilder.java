@@ -2,21 +2,17 @@ package mekanism.api.datagen.recipe.builder;
 
 import com.google.gson.JsonObject;
 import java.util.function.Consumer;
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.JsonConstants;
 import mekanism.api.SerializerHelper;
-import mekanism.api.annotations.FieldsAreNonnullByDefault;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.datagen.recipe.MekanismRecipeBuilder;
-import mekanism.api.recipes.inputs.ItemStackIngredient;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import mekanism.api.recipes.ingredients.ItemStackIngredient;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
-@FieldsAreNonnullByDefault
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public class CombinerRecipeBuilder extends MekanismRecipeBuilder<CombinerRecipeBuilder> {
 
     private final ItemStackIngredient mainInput;
@@ -30,6 +26,13 @@ public class CombinerRecipeBuilder extends MekanismRecipeBuilder<CombinerRecipeB
         this.output = output;
     }
 
+    /**
+     * Creates a Combining recipe builder.
+     *
+     * @param mainInput  Main Input.
+     * @param extraInput Extra/Secondary Input.
+     * @param output     Output.
+     */
     public static CombinerRecipeBuilder combining(ItemStackIngredient mainInput, ItemStackIngredient extraInput, ItemStack output) {
         if (output.isEmpty()) {
             throw new IllegalArgumentException("This combining recipe requires a non empty item output.");
@@ -42,8 +45,13 @@ public class CombinerRecipeBuilder extends MekanismRecipeBuilder<CombinerRecipeB
         return new CombinerRecipeResult(id);
     }
 
-    public void build(Consumer<IFinishedRecipe> consumer) {
-        build(consumer, output.getItem().getRegistryName());
+    /**
+     * Builds this recipe using the output item's name as the recipe name.
+     *
+     * @param consumer Finished Recipe Consumer.
+     */
+    public void build(Consumer<FinishedRecipe> consumer) {
+        build(consumer, output.getItem());
     }
 
     public class CombinerRecipeResult extends RecipeResult {
@@ -53,7 +61,7 @@ public class CombinerRecipeBuilder extends MekanismRecipeBuilder<CombinerRecipeB
         }
 
         @Override
-        public void serialize(@Nonnull JsonObject json) {
+        public void serializeRecipeData(@NotNull JsonObject json) {
             json.add(JsonConstants.MAIN_INPUT, mainInput.serialize());
             json.add(JsonConstants.EXTRA_INPUT, extraInput.serialize());
             json.add(JsonConstants.OUTPUT, SerializerHelper.serializeItemStack(output));

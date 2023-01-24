@@ -1,28 +1,23 @@
 package mekanism.common.lib.transmitter.acceptor;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
-import mekanism.api.annotations.FieldsAreNonnullByDefault;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.common.content.network.transmitter.Transmitter;
 import mekanism.common.tile.transmitter.TileEntityTransmitter;
 import mekanism.common.util.EmitUtils;
-import mekanism.common.util.MekanismUtils;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import mekanism.common.util.WorldUtils;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
+import org.jetbrains.annotations.NotNull;
 
-@FieldsAreNonnullByDefault
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public abstract class AbstractAcceptorCache<ACCEPTOR, INFO extends AbstractAcceptorInfo> {
 
     private final Map<Direction, NonNullConsumer<LazyOptional<ACCEPTOR>>> cachedListeners = new EnumMap<>(Direction.class);
@@ -61,7 +56,7 @@ public abstract class AbstractAcceptorCache<ACCEPTOR, INFO extends AbstractAccep
     }
 
     /**
-     * Similar to {@link EmitUtils#forEachSide(World, BlockPos, Iterable, BiConsumer)} except queries our cached acceptors.
+     * Similar to {@link EmitUtils#forEachSide(net.minecraft.world.level.Level, net.minecraft.core.BlockPos, Iterable, BiConsumer)} except queries our cached acceptors.
      *
      * @implNote Grabs the acceptors from cache
      */
@@ -78,21 +73,31 @@ public abstract class AbstractAcceptorCache<ACCEPTOR, INFO extends AbstractAccep
     /**
      * Gets the listener that will refresh connections on a given side.
      */
-    protected NonNullConsumer<LazyOptional<ACCEPTOR>> getRefreshListener(@Nonnull Direction side) {
-        return cachedListeners.computeIfAbsent(side, this::getUncachedRefreshListener);
+    protected NonNullConsumer<LazyOptional<ACCEPTOR>> getRefreshListener(@NotNull Direction side) {
+        return cachedListeners.computeIfAbsent(side, s -> new RefreshListener<>(transmitterTile, s));
     }
 
-    /**
-     * Computes the listener that will refresh connections on a given side.
-     */
-    private NonNullConsumer<LazyOptional<ACCEPTOR>> getUncachedRefreshListener(Direction side) {
-        return ignored -> {
+    private static class RefreshListener<ACCEPTOR> implements NonNullConsumer<LazyOptional<ACCEPTOR>> {
+
+        //Note: We only keep a weak reference to the tile from inside the listener so that if it gets unloaded it can be released from memory
+        // instead of being referenced by the listener still in the tile in a neighboring chunk
+        private final WeakReference<TileEntityTransmitter> tile;
+        private final Direction side;
+
+        private RefreshListener(TileEntityTransmitter tile, Direction side) {
+            this.tile = new WeakReference<>(tile);
+            this.side = side;
+        }
+
+        @Override
+        public void accept(@NotNull LazyOptional<ACCEPTOR> ignored) {
+            TileEntityTransmitter transmitterTile = tile.get();
             //Check to make sure the transmitter is still valid and that the position we are going to check is actually still loaded
-            if (!transmitterTile.isRemoved() && transmitterTile.hasWorld() && transmitterTile.isLoaded() &&
-                MekanismUtils.isBlockLoaded(transmitterTile.getWorld(), transmitterTile.getPos().offset(side))) {
+            if (transmitterTile != null && !transmitterTile.isRemoved() && transmitterTile.hasLevel() && transmitterTile.isLoaded() &&
+                WorldUtils.isBlockLoaded(transmitterTile.getLevel(), transmitterTile.getBlockPos().relative(side))) {
                 //If it is, then refresh the connection
-                transmitter.refreshConnections(side);
+                transmitterTile.getTransmitter().refreshConnections(side);
             }
-        };
+        }
     }
 }

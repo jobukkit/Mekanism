@@ -2,11 +2,12 @@ package mekanism.common.capabilities.holder.slot;
 
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import mekanism.api.RelativeSide;
 import mekanism.api.inventory.IInventorySlot;
 import mekanism.common.tile.component.TileComponentConfig;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class InventorySlotHelper {
 
@@ -17,11 +18,16 @@ public class InventorySlotHelper {
         this.slotHolder = slotHolder;
     }
 
-    public static InventorySlotHelper forSide(Supplier<Direction> facingSupplier) {
-        return forSide(facingSupplier, side -> true, side -> true);
+    public static InventorySlotHelper readOnly() {
+        return new InventorySlotHelper(new ReadOnlyInventorySlotHolder());
     }
 
-    public static InventorySlotHelper forSide(Supplier<Direction> facingSupplier, Predicate<RelativeSide> insertPredicate, Predicate<RelativeSide> extractPredicate) {
+    public static InventorySlotHelper forSide(Supplier<Direction> facingSupplier) {
+        return forSide(facingSupplier, null, null);
+    }
+
+    public static InventorySlotHelper forSide(Supplier<Direction> facingSupplier, @Nullable Predicate<RelativeSide> insertPredicate,
+          @Nullable Predicate<RelativeSide> extractPredicate) {
         return new InventorySlotHelper(new InventorySlotHolder(facingSupplier, insertPredicate, extractPredicate));
     }
 
@@ -29,28 +35,32 @@ public class InventorySlotHelper {
         return new InventorySlotHelper(new ConfigInventorySlotHolder(facingSupplier, configSupplier));
     }
 
-    public void addSlot(@Nonnull IInventorySlot slot) {
+    public <SLOT extends IInventorySlot> SLOT addSlot(@NotNull SLOT slot) {
         if (built) {
             throw new IllegalStateException("Builder has already built.");
         }
-        if (slotHolder instanceof InventorySlotHolder) {
-            ((InventorySlotHolder) slotHolder).addSlot(slot);
-        } else if (slotHolder instanceof ConfigInventorySlotHolder) {
-            ((ConfigInventorySlotHolder) slotHolder).addSlot(slot);
+        if (slotHolder instanceof InventorySlotHolder slotHolder) {
+            slotHolder.addSlot(slot);
+        } else if (slotHolder instanceof ReadOnlyInventorySlotHolder slotHolder) {
+            slotHolder.addSlot(slot);
+        } else if (slotHolder instanceof ConfigInventorySlotHolder slotHolder) {
+            slotHolder.addSlot(slot);
         } else {
             throw new IllegalArgumentException("Holder does not know how to add slots");
         }
+        return slot;
     }
 
-    public void addSlot(@Nonnull IInventorySlot slot, RelativeSide... sides) {
+    public <SLOT extends IInventorySlot> SLOT addSlot(@NotNull SLOT slot, RelativeSide... sides) {
         if (built) {
             throw new IllegalStateException("Builder has already built.");
         }
-        if (slotHolder instanceof InventorySlotHolder) {
-            ((InventorySlotHolder) slotHolder).addSlot(slot, sides);
+        if (slotHolder instanceof InventorySlotHolder slotHolder) {
+            slotHolder.addSlot(slot, sides);
         } else {
             throw new IllegalArgumentException("Holder does not know how to add slots on specific sides");
         }
+        return slot;
     }
 
     public IInventorySlotHolder build() {

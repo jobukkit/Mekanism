@@ -2,28 +2,23 @@ package mekanism.api.chemical;
 
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
+import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
 import mekanism.api.NBTConstants;
-import mekanism.api.annotations.FieldsAreNonnullByDefault;
-import mekanism.api.annotations.NonNull;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.chemical.attribute.ChemicalAttributeValidator;
-import mekanism.api.inventory.AutomationType;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-@FieldsAreNonnullByDefault
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public abstract class BasicChemicalTank<CHEMICAL extends Chemical<CHEMICAL>, STACK extends ChemicalStack<CHEMICAL>> implements IChemicalTank<CHEMICAL, STACK>,
       IChemicalHandler<CHEMICAL, STACK> {
 
-    private final Predicate<@NonNull CHEMICAL> validator;
-    protected final BiPredicate<@NonNull CHEMICAL, @NonNull AutomationType> canExtract;
-    protected final BiPredicate<@NonNull CHEMICAL, @NonNull AutomationType> canInsert;
+    private final Predicate<@NotNull CHEMICAL> validator;
+    protected final BiPredicate<@NotNull CHEMICAL, @NotNull AutomationType> canExtract;
+    protected final BiPredicate<@NotNull CHEMICAL, @NotNull AutomationType> canInsert;
     @Nullable
     private final ChemicalAttributeValidator attributeValidator;
     private final long capacity;
@@ -34,8 +29,8 @@ public abstract class BasicChemicalTank<CHEMICAL extends Chemical<CHEMICAL>, STA
     @Nullable
     private final IContentsListener listener;
 
-    protected BasicChemicalTank(long capacity, BiPredicate<@NonNull CHEMICAL, @NonNull AutomationType> canExtract,
-          BiPredicate<@NonNull CHEMICAL, @NonNull AutomationType> canInsert, Predicate<@NonNull CHEMICAL> validator,
+    protected BasicChemicalTank(long capacity, BiPredicate<@NotNull CHEMICAL, @NotNull AutomationType> canExtract,
+          BiPredicate<@NotNull CHEMICAL, @NotNull AutomationType> canInsert, Predicate<@NotNull CHEMICAL> validator,
           @Nullable ChemicalAttributeValidator attributeValidator, @Nullable IContentsListener listener) {
         this.capacity = capacity;
         this.canExtract = canExtract;
@@ -63,7 +58,7 @@ public abstract class BasicChemicalTank<CHEMICAL extends Chemical<CHEMICAL>, STA
      *
      * @return The rate this tank can insert/extract at.
      *
-     * @implNote By default this returns {@link Long#MAX_VALUE} so as to not actually limit the tank's rate. By default this is also ignored for direct setting of the
+     * @implNote By default, this returns {@link Long#MAX_VALUE} to not actually limit the tank's rate. By default, this is also ignored for direct setting of the
      * stack/stack size
      */
     protected long getRate(@Nullable AutomationType automationType) {
@@ -78,21 +73,25 @@ public abstract class BasicChemicalTank<CHEMICAL extends Chemical<CHEMICAL>, STA
 
     private void setStack(STACK stack, boolean validateStack) {
         if (stack.isEmpty()) {
+            if (stored.isEmpty()) {
+                //If we are already empty just exit, to not fire onContentsChanged
+                return;
+            }
             stored = getEmptyStack();
         } else if (!validateStack || isValid(stack)) {
             stored = createStack(stack, stack.getAmount());
         } else {
             //Throws a RuntimeException as specified is allowed when something unexpected happens
             // As setStack is more meant to be used as an internal method
-            throw new RuntimeException("Invalid chemical for tank: " + stack.getType().getRegistryName() + " " + stack.getAmount());
+            throw new RuntimeException("Invalid chemical for tank: " + stack.getTypeRegistryName() + " " + stack.getAmount());
         }
         onContentsChanged();
     }
 
     @Override
-    public STACK insert(@Nonnull STACK stack, Action action, AutomationType automationType) {
+    public STACK insert(@NotNull STACK stack, Action action, AutomationType automationType) {
         if (stack.isEmpty() || !isValid(stack) || !canInsert.test(stack.getType(), automationType)) {
-            //"Fail quick" if the given stack is empty or we can never insert the chemical or currently are unable to insert it
+            //"Fail quick" if the given stack is empty, or we can never insert the chemical or currently are unable to insert it
             return stack;
         }
         long needed = Math.min(getRate(automationType), getNeeded());
@@ -145,7 +144,7 @@ public abstract class BasicChemicalTank<CHEMICAL extends Chemical<CHEMICAL>, STA
 
     @Override
     public boolean isValid(STACK stack) {
-        return ChemicalAttributeValidator.process(stack, getAttributeValidator()) && validator.test(stack.getType());
+        return getAttributeValidator().process(stack) && validator.test(stack.getType());
     }
 
     /**
@@ -169,7 +168,7 @@ public abstract class BasicChemicalTank<CHEMICAL extends Chemical<CHEMICAL>, STA
             amount = maxStackSize;
         }
         if (getStored() == amount || action.simulate()) {
-            //If our size is not changing or we are only simulating the change, don't do anything
+            //If our size is not changing, or we are only simulating the change, don't do anything
             return amount;
         }
         stored.setAmount(amount);
@@ -259,7 +258,7 @@ public abstract class BasicChemicalTank<CHEMICAL extends Chemical<CHEMICAL>, STA
 
     @Override
     public ChemicalAttributeValidator getAttributeValidator() {
-        return attributeValidator != null ? attributeValidator : IChemicalTank.super.getAttributeValidator();
+        return attributeValidator == null ? IChemicalTank.super.getAttributeValidator() : attributeValidator;
     }
 
     /**
@@ -268,10 +267,10 @@ public abstract class BasicChemicalTank<CHEMICAL extends Chemical<CHEMICAL>, STA
      * @implNote Overwritten so that if we decide to change to returning a cached/copy of our stack in {@link #getStack()}, we can optimize out the copying.
      */
     @Override
-    public CompoundNBT serializeNBT() {
-        CompoundNBT nbt = new CompoundNBT();
+    public CompoundTag serializeNBT() {
+        CompoundTag nbt = new CompoundTag();
         if (!isEmpty()) {
-            nbt.put(NBTConstants.STORED, stored.write(new CompoundNBT()));
+            nbt.put(NBTConstants.STORED, stored.write(new CompoundTag()));
         }
         return nbt;
     }

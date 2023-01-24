@@ -1,21 +1,19 @@
 package mekanism.api.inventory;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
+import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import mekanism.api.annotations.NothingNullByDefault;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
+import org.jetbrains.annotations.Nullable;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
-public interface IInventorySlot extends INBTSerializable<CompoundNBT>, IContentsListener {
+@NothingNullByDefault
+public interface IInventorySlot extends INBTSerializable<CompoundTag>, IContentsListener {
 
     /**
      * Returns the {@link ItemStack} in this {@link IInventorySlot}.
@@ -67,7 +65,7 @@ public interface IInventorySlot extends INBTSerializable<CompoundNBT>, IContents
      */
     default ItemStack insertItem(ItemStack stack, Action action, AutomationType automationType) {
         if (stack.isEmpty() || !isItemValid(stack)) {
-            //"Fail quick" if the given stack is empty or we can never insert the item or currently are unable to insert it
+            //"Fail quick" if the given stack is empty, or we can never insert the item or currently are unable to insert it
             return stack;
         }
         int needed = getLimit(stack) - getCount();
@@ -158,9 +156,9 @@ public interface IInventorySlot extends INBTSerializable<CompoundNBT>, IContents
 
     /**
      * <p>
-     * This function re-implements the vanilla function {@link IInventory#isItemValidForSlot(int, ItemStack)}. It should be used instead of simulated insertions in cases
-     * where the contents and state of the inventory are irrelevant, mainly for the purpose of automation and logic (for instance, testing if a minecart can wait to
-     * deposit its items into a full inventory, or if the items in the minecart can never be placed into the inventory and should move on).
+     * This function re-implements the vanilla function {@link net.minecraft.world.Container#canPlaceItem(int, ItemStack)}. It should be used instead of simulated
+     * insertions in cases where the contents and state of the inventory are irrelevant, mainly for the purpose of automation and logic (for instance, testing if a
+     * minecart can wait to deposit its items into a full inventory, or if the items in the minecart can never be placed into the inventory and should move on).
      * </p>
      * <ul>
      * <li>isItemValid is false when insertion of the item is never valid.</li>
@@ -202,7 +200,7 @@ public interface IInventorySlot extends INBTSerializable<CompoundNBT>, IContents
             return 0;
         } else if (amount <= 0) {
             if (action.execute()) {
-                setStack(ItemStack.EMPTY);
+                setEmpty();
             }
             return 0;
         }
@@ -212,7 +210,7 @@ public interface IInventorySlot extends INBTSerializable<CompoundNBT>, IContents
             amount = maxStackSize;
         }
         if (stack.getCount() == amount || action.simulate()) {
-            //If our size is not changing or we are only simulating the change, don't do anything
+            //If our size is not changing, or we are only simulating the change, don't do anything
             return amount;
         }
         ItemStack newStack = stack.copy();
@@ -272,6 +270,13 @@ public interface IInventorySlot extends INBTSerializable<CompoundNBT>, IContents
      */
     default boolean isEmpty() {
         return getStack().isEmpty();
+    }
+
+    /**
+     * Convenience method for emptying this {@link IInventorySlot}.
+     */
+    default void setEmpty() {
+        setStack(ItemStack.EMPTY);
     }
 
     /**

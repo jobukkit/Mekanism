@@ -5,35 +5,33 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
+import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
-import mekanism.api.annotations.NonNull;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.fluid.IExtendedFluidTank;
-import mekanism.api.inventory.AutomationType;
 import mekanism.common.inventory.slot.FluidInventorySlot;
 import mekanism.common.util.MekanismUtils;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Extension of FluidInventorySlot to make it be able to handle raw items as fuels
  */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public class FluidFuelInventorySlot extends FluidInventorySlot {
 
-    public static FluidFuelInventorySlot forFuel(IExtendedFluidTank fluidTank, ToIntFunction<@NonNull ItemStack> fuelValue,
-          Int2ObjectFunction<@NonNull FluidStack> fuelCreator, @Nullable IContentsListener listener, int x, int y) {
+    public static FluidFuelInventorySlot forFuel(IExtendedFluidTank fluidTank, ToIntFunction<@NotNull ItemStack> fuelValue,
+          Int2ObjectFunction<@NotNull FluidStack> fuelCreator, @Nullable IContentsListener listener, int x, int y) {
         Objects.requireNonNull(fluidTank, "Fluid tank cannot be null");
         Objects.requireNonNull(fuelCreator, "Fuel fluid stack creator cannot be null");
         Objects.requireNonNull(fuelValue, "Fuel value calculator cannot be null");
         return new FluidFuelInventorySlot(fluidTank, fuelValue, fuelCreator, stack -> {
-            Optional<IFluidHandlerItem> cap = MekanismUtils.toOptional(FluidUtil.getFluidHandler(stack));
+            Optional<IFluidHandlerItem> cap = FluidUtil.getFluidHandler(stack).resolve();
             if (cap.isPresent()) {
                 IFluidHandlerItem fluidHandlerItem = cap.get();
                 for (int tank = 0; tank < fluidHandlerItem.getTanks(); tank++) {
@@ -44,11 +42,11 @@ public class FluidFuelInventorySlot extends FluidInventorySlot {
                 }
                 //Only allow extraction if our item is out of fluid, but also verify there is no conversion for it
             }
-            //Always allow extraction if something went horribly wrong and we are not a chemical item AND we can't provide a valid type of chemical
+            //Always allow extraction if something went horribly wrong, and we are not a chemical item AND we can't provide a valid type of chemical
             // This might happen after a reload for example
             return fuelValue.applyAsInt(stack) == 0;
         }, stack -> {
-            Optional<IFluidHandlerItem> cap = MekanismUtils.toOptional(FluidUtil.getFluidHandler(stack));
+            Optional<IFluidHandlerItem> cap = FluidUtil.getFluidHandler(stack).resolve();
             if (cap.isPresent()) {
                 IFluidHandlerItem fluidHandlerItem = cap.get();
                 for (int tank = 0; tank < fluidHandlerItem.getTanks(); tank++) {
@@ -62,23 +60,17 @@ public class FluidFuelInventorySlot extends FluidInventorySlot {
             }
             //Note: We recheck about this having a fuel value and that it is still valid as the fuel value might have changed, such as after a reload
             return fuelValue.applyAsInt(stack) > 0;
-        }, stack -> {
-            if (FluidUtil.getFluidHandler(stack).isPresent()) {
-                //Note: we mark all fluid items as valid and have a more restrictive insert check so that we allow empty buckets when we finish draining
-                return true;
-            }
-            //Allow items that have a fuel conversion value greater than one
-            return fuelValue.applyAsInt(stack) > 0;
         }, listener, x, y);
     }
 
-    private final Int2ObjectFunction<@NonNull FluidStack> fuelCreator;
-    private final ToIntFunction<@NonNull ItemStack> fuelValue;
+    private final Int2ObjectFunction<@NotNull FluidStack> fuelCreator;
+    private final ToIntFunction<@NotNull ItemStack> fuelValue;
 
-    private FluidFuelInventorySlot(IExtendedFluidTank fluidTank, ToIntFunction<@NonNull ItemStack> fuelValue, Int2ObjectFunction<@NonNull FluidStack> fuelCreator,
-          Predicate<@NonNull ItemStack> canExtract, Predicate<@NonNull ItemStack> canInsert, Predicate<@NonNull ItemStack> validator,
-          @Nullable IContentsListener listener, int x, int y) {
-        super(fluidTank, canExtract, canInsert, validator, listener, x, y);
+    private FluidFuelInventorySlot(IExtendedFluidTank fluidTank, ToIntFunction<@NotNull ItemStack> fuelValue, Int2ObjectFunction<@NotNull FluidStack> fuelCreator,
+          Predicate<@NotNull ItemStack> canExtract, Predicate<@NotNull ItemStack> canInsert, @Nullable IContentsListener listener, int x, int y) {
+        super(fluidTank, canExtract, canInsert, alwaysTrue, listener, x, y);
+        //Note: We pass alwaysTrue as the validator, so that if a mod only exposes a fluid handler on the filled item
+        // then we don't have it all of a sudden being invalid after it is emptied
         this.fuelCreator = fuelCreator;
         this.fuelValue = fuelValue;
     }
@@ -94,7 +86,7 @@ public class FluidFuelInventorySlot extends FluidInventorySlot {
                 //If filling from item failed, try doing it by conversion
                 int fuel = fuelValue.applyAsInt(current);
                 if (fuel > 0 && fuel <= needed) {
-                    boolean hasContainer = current.hasContainerItem();
+                    boolean hasContainer = current.hasCraftingRemainingItem();
                     if (hasContainer && current.getCount() > 1) {
                         //If we have a container but have more than a single stack of it somehow just exit
                         return;
@@ -102,9 +94,9 @@ public class FluidFuelInventorySlot extends FluidInventorySlot {
                     fluidTank.insert(fuelCreator.apply(fuel), Action.EXECUTE, AutomationType.INTERNAL);
                     if (hasContainer) {
                         //If the item has a container, then replace it with the container
-                        setStack(current.getContainerItem());
+                        setStack(current.getCraftingRemainingItem());
                     } else {
-                        //Otherwise shrink the size of the stack by one
+                        //Otherwise, shrink the size of the stack by one
                         MekanismUtils.logMismatchedStackSize(shrinkStack(1, Action.EXECUTE), 1);
                     }
                 }

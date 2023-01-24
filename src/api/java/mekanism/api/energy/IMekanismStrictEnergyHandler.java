@@ -1,17 +1,15 @@
 package mekanism.api.energy;
 
 import java.util.List;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
+import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
-import mekanism.api.inventory.AutomationType;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.math.FloatingLong;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
+import org.jetbrains.annotations.Nullable;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public interface IMekanismStrictEnergyHandler extends ISidedStrictEnergyHandler, IContentsListener {
 
     /**

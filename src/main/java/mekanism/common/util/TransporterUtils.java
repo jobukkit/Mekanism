@@ -1,9 +1,7 @@
 package mekanism.common.util;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
 import mekanism.api.RelativeSide;
 import mekanism.api.text.EnumColor;
 import mekanism.common.content.network.transmitter.LogisticalTransporter;
@@ -14,17 +12,21 @@ import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.tile.TileEntityLogisticalSorter;
 import mekanism.common.tile.interfaces.ISideConfiguration;
 import mekanism.common.tile.transmitter.TileEntityTransmitter;
-import net.minecraft.block.Block;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
+import org.jetbrains.annotations.Nullable;
 
 public final class TransporterUtils {
 
-    public static final List<EnumColor> colors = Arrays.asList(EnumColor.DARK_BLUE, EnumColor.DARK_GREEN, EnumColor.DARK_AQUA, EnumColor.DARK_RED, EnumColor.PURPLE,
+    private TransporterUtils() {
+    }
+
+    public static final List<EnumColor> colors = List.of(EnumColor.DARK_BLUE, EnumColor.DARK_GREEN, EnumColor.DARK_AQUA, EnumColor.DARK_RED, EnumColor.PURPLE,
           EnumColor.INDIGO, EnumColor.BRIGHT_GREEN, EnumColor.AQUA, EnumColor.RED, EnumColor.PINK, EnumColor.YELLOW, EnumColor.BLACK);
 
     @Nullable
@@ -36,8 +38,8 @@ public final class TransporterUtils {
         return color == null ? -1 : TransporterUtils.colors.indexOf(color);
     }
 
-    public static boolean isValidAcceptorOnSide(TileEntity tile, Direction side) {
-        if (tile instanceof TileEntityTransmitter && TransmissionType.ITEM.checkTransmissionType((TileEntityTransmitter) tile)) {
+    public static boolean isValidAcceptorOnSide(BlockEntity tile, Direction side) {
+        if (tile instanceof TileEntityTransmitter transmitter && TransmissionType.ITEM.checkTransmissionType(transmitter)) {
             return false;
         }
         return InventoryUtils.isItemHandler(tile, side.getOpposite());
@@ -63,16 +65,16 @@ public final class TransporterUtils {
         BlockPos blockPos = transporter.getTilePos();
         if (stack.hasPath()) {
             float[] pos = TransporterUtils.getStackPosition(transporter, stack, 0);
-            blockPos = blockPos.add(pos[0], pos[1], pos[2]);
+            blockPos = blockPos.offset(pos[0], pos[1], pos[2]);
         }
         TransporterManager.remove(transporter.getTileWorld(), stack);
-        Block.spawnAsEntity(transporter.getTileWorld(), blockPos, stack.itemStack);
+        Block.popResource(transporter.getTileWorld(), blockPos, stack.itemStack);
     }
 
     public static float[] getStackPosition(LogisticalTransporterBase transporter, TransporterStack stack, float partial) {
         Direction side = stack.getSide(transporter);
         float progress = ((stack.progress + partial) / 100F) - 0.5F;
-        return new float[]{0.5F + side.getXOffset() * progress, 0.25F + side.getYOffset() * progress, 0.5F + side.getZOffset() * progress};
+        return new float[]{0.5F + side.getStepX() * progress, 0.25F + side.getStepY() * progress, 0.5F + side.getStepZ() * progress};
     }
 
     public static void incrementColor(LogisticalTransporter tile) {
@@ -89,21 +91,18 @@ public final class TransporterUtils {
         }
     }
 
-    public static boolean canInsert(TileEntity tile, EnumColor color, ItemStack itemStack, Direction side, boolean force) {
-        if (force && tile instanceof TileEntityLogisticalSorter) {
-            return ((TileEntityLogisticalSorter) tile).canSendHome(itemStack);
+    public static boolean canInsert(BlockEntity tile, EnumColor color, ItemStack itemStack, Direction side, boolean force) {
+        if (force && tile instanceof TileEntityLogisticalSorter sorter) {
+            return sorter.canSendHome(itemStack);
         }
-        if (!force && tile instanceof ISideConfiguration) {
-            ISideConfiguration config = (ISideConfiguration) tile;
-            if (config.getEjector().hasStrictInput()) {
-                Direction tileSide = config.getOrientation();
-                EnumColor configColor = config.getEjector().getInputColor(RelativeSide.fromDirections(tileSide, side.getOpposite()));
-                if (configColor != null && configColor != color) {
-                    return false;
-                }
+        if (!force && tile instanceof ISideConfiguration config && config.getEjector().hasStrictInput()) {
+            Direction tileSide = config.getDirection();
+            EnumColor configColor = config.getEjector().getInputColor(RelativeSide.fromDirections(tileSide, side.getOpposite()));
+            if (configColor != null && configColor != color) {
+                return false;
             }
         }
-        Optional<IItemHandler> capability = MekanismUtils.toOptional(CapabilityUtils.getCapability(tile, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side.getOpposite()));
+        Optional<IItemHandler> capability = CapabilityUtils.getCapability(tile, ForgeCapabilities.ITEM_HANDLER, side.getOpposite()).resolve();
         if (capability.isPresent()) {
             IItemHandler inventory = capability.get();
             for (int i = 0; i < inventory.getSlots(); i++) {

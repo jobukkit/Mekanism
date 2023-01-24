@@ -1,20 +1,21 @@
 package mekanism.api.chemical.infuse;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.MekanismAPI;
 import mekanism.api.NBTConstants;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.providers.IInfuseTypeProvider;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.registries.IRegistryDelegate;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.registries.IForgeRegistry;
+import org.jetbrains.annotations.Nullable;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
-public class InfusionStack extends ChemicalStack<InfuseType> {
+@NothingNullByDefault
+public final class InfusionStack extends ChemicalStack<InfuseType> {
 
+    /**
+     * Empty InfusionStack instance.
+     */
     public static final InfusionStack EMPTY = new InfusionStack(MekanismAPI.EMPTY_INFUSE_TYPE, 0);
 
     /**
@@ -32,13 +33,8 @@ public class InfusionStack extends ChemicalStack<InfuseType> {
     }
 
     @Override
-    protected IRegistryDelegate<InfuseType> getDelegate(InfuseType infuseType) {
-        if (MekanismAPI.infuseTypeRegistry().getKey(infuseType) == null) {
-            MekanismAPI.logger.fatal("Failed attempt to create a InfusionStack for an unregistered InfuseType {} (type {})", infuseType.getRegistryName(),
-                  infuseType.getClass().getName());
-            throw new IllegalArgumentException("Cannot create a InfusionStack from an unregistered infusion type");
-        }
-        return infuseType.delegate;
+    protected IForgeRegistry<InfuseType> getRegistry() {
+        return MekanismAPI.infuseTypeRegistry();
     }
 
     @Override
@@ -53,7 +49,7 @@ public class InfusionStack extends ChemicalStack<InfuseType> {
      *
      * @return InfusionStack stored in the tag compound
      */
-    public static InfusionStack readFromNBT(@Nullable CompoundNBT nbtTags) {
+    public static InfusionStack readFromNBT(@Nullable CompoundTag nbtTags) {
         if (nbtTags == null || nbtTags.isEmpty()) {
             return EMPTY;
         }
@@ -68,13 +64,12 @@ public class InfusionStack extends ChemicalStack<InfuseType> {
         return new InfusionStack(type, amount);
     }
 
-    public static InfusionStack readFromPacket(PacketBuffer buf) {
-        InfuseType infuseType = buf.readRegistryId();
-        long amount = buf.readVarLong();
+    public static InfusionStack readFromPacket(FriendlyByteBuf buf) {
+        InfuseType infuseType = buf.readRegistryIdSafe(InfuseType.class);
         if (infuseType.isEmptyType()) {
             return EMPTY;
         }
-        return new InfusionStack(infuseType, amount);
+        return new InfusionStack(infuseType, buf.readVarLong());
     }
 
     /**
@@ -84,16 +79,9 @@ public class InfusionStack extends ChemicalStack<InfuseType> {
      */
     @Override
     public InfusionStack copy() {
+        if (isEmpty()) {
+            return EMPTY;
+        }
         return new InfusionStack(this, getAmount());
-    }
-
-    /**
-     * Default equality comparison for a InfusionStack. Same functionality as isTypeEqual().
-     *
-     * This is included for use in data structures.
-     */
-    @Override
-    public final boolean equals(Object o) {
-        return o instanceof InfusionStack && isTypeEqual((InfusionStack) o);
     }
 }

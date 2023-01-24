@@ -1,49 +1,51 @@
 package mekanism.generators.client.render;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.util.EnumMap;
 import java.util.Map;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mekanism.client.render.MekanismRenderType;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.client.render.MekanismRenderer;
-import mekanism.client.render.MekanismRenderer.FluidType;
+import mekanism.client.render.MekanismRenderer.FluidTextureType;
 import mekanism.client.render.MekanismRenderer.Model3D;
+import mekanism.client.render.ModelRenderer;
+import mekanism.client.render.RenderResizableCuboid.FaceDisplay;
 import mekanism.client.render.tileentity.MekanismTileEntityRenderer;
 import mekanism.generators.common.GeneratorsProfilerConstants;
-import mekanism.generators.common.registries.GeneratorsFluids;
 import mekanism.generators.common.tile.TileEntityBioGenerator;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.profiler.IProfiler;
-import net.minecraft.util.Direction;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.core.Direction;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fluids.FluidStack;
 
-@ParametersAreNonnullByDefault
+@NothingNullByDefault
 public class RenderBioGenerator extends MekanismTileEntityRenderer<TileEntityBioGenerator> {
 
-    private static final Map<Direction, Int2ObjectMap<Model3D>> energyDisplays = new EnumMap<>(Direction.class);
+    private static final Map<Direction, Int2ObjectMap<Model3D>> fuelModels = new EnumMap<>(Direction.class);
     private static final int stages = 40;
 
     public static void resetCachedModels() {
-        energyDisplays.clear();
+        fuelModels.clear();
     }
 
-    public RenderBioGenerator(TileEntityRendererDispatcher renderer) {
-        super(renderer);
+    public RenderBioGenerator(BlockEntityRendererProvider.Context context) {
+        super(context);
     }
 
     @Override
-    protected void render(TileEntityBioGenerator tile, float partialTick, MatrixStack matrix, IRenderTypeBuffer renderer, int light, int overlayLight, IProfiler profiler) {
-        if (!tile.bioFuelTank.isEmpty()) {
-            matrix.push();
-            FluidStack fluid = tile.bioFuelTank.getFluid();
-            float fluidScale = fluid.getAmount() / (float) tile.bioFuelTank.getCapacity();
-            MekanismRenderer.renderObject(getModel(tile.getDirection(), (int) (fluidScale * (stages - 1))), matrix, renderer.getBuffer(MekanismRenderType.resizableCuboid()),
-                  MekanismRenderer.getColorARGB(fluid, fluidScale), MekanismRenderer.FULL_LIGHT);
-            matrix.pop();
-        }
+    protected void render(TileEntityBioGenerator tile, float partialTick, PoseStack matrix, MultiBufferSource renderer, int light, int overlayLight, ProfilerFiller profiler) {
+        matrix.pushPose();
+        FluidStack fluid = tile.bioFuelTank.getFluid();
+        float fluidScale = fluid.getAmount() / (float) tile.bioFuelTank.getCapacity();
+        MekanismRenderer.renderObject(getModel(fluid, tile.getDirection(), fluidScale), matrix,
+              renderer.getBuffer(Sheets.translucentCullBlockSheet()), MekanismRenderer.getColorARGB(fluid, fluidScale), LightTexture.FULL_BRIGHT, overlayLight,
+              FaceDisplay.FRONT, getCamera(), tile.getBlockPos());
+        matrix.popPose();
     }
 
     @Override
@@ -51,46 +53,34 @@ public class RenderBioGenerator extends MekanismTileEntityRenderer<TileEntityBio
         return GeneratorsProfilerConstants.BIO_GENERATOR;
     }
 
-    @SuppressWarnings("incomplete-switch")
-    private Model3D getModel(Direction side, int stage) {
-        if (energyDisplays.containsKey(side) && energyDisplays.get(side).containsKey(stage)) {
-            return energyDisplays.get(side).get(stage);
-        }
-        Model3D model = new Model3D();
-        model.setTexture(MekanismRenderer.getFluidTexture(GeneratorsFluids.BIOETHANOL.getFluidStack(1), FluidType.STILL));
-        switch (side) {
-            case NORTH:
-                model.minZ = 0.499;
-                model.maxZ = 0.875;
+    @Override
+    public boolean shouldRender(TileEntityBioGenerator tile, Vec3 camera) {
+        return !tile.bioFuelTank.isEmpty() && super.shouldRender(tile, camera);
+    }
 
-                model.minX = 0.188;
-                model.maxX = 0.821;
-                break;
-            case SOUTH:
-                model.minZ = 0.125;
-                model.maxZ = 0.499;
-
-                model.minX = 0.188;
-                model.maxX = 0.821;
-                break;
-            case WEST:
-                model.minX = 0.499;
-                model.maxX = 0.875;
-
-                model.minZ = 0.187;
-                model.maxZ = 0.821;
-                break;
-            case EAST:
-                model.minX = 0.125;
-                model.maxX = 0.499;
-
-                model.minZ = 0.186;
-                model.maxZ = 0.821;
-                break;
-        }
-        model.minY = 0.4375 + 0.001;  //prevent z fighting at low fuel levels
-        model.maxY = 0.4375 + ((float) stage / stages) * 0.4375 + 0.001;
-        energyDisplays.computeIfAbsent(side, s -> new Int2ObjectOpenHashMap<>()).putIfAbsent(stage, model);
-        return model;
+    private Model3D getModel(FluidStack fluid, Direction side, float fluidScale) {
+        return fuelModels.computeIfAbsent(side, s -> new Int2ObjectOpenHashMap<>())
+              .computeIfAbsent(ModelRenderer.getStage(fluid, stages, fluidScale), stage -> {
+                  Direction opposite = side.getOpposite();
+                  Model3D model = new Model3D()
+                        .setTexture(MekanismRenderer.getFluidTexture(fluid, FluidTextureType.STILL))
+                        .yBounds(0.4385F, 0.4385F + 0.4375F * (stage / (float) stages))
+                        .setSideRender(dir -> dir == Direction.UP || dir == opposite);
+                  return switch (side) {
+                      case NORTH -> model
+                            .xBounds(0.188F, 0.821F)
+                            .zBounds(0.499F, 0.875F);
+                      case SOUTH -> model
+                            .xBounds(0.188F, 0.821F)
+                            .zBounds(0.125F, 0.499F);
+                      case WEST -> model
+                            .xBounds(0.499F, 0.875F)
+                            .zBounds(0.187F, 0.821F);
+                      case EAST -> model
+                            .xBounds(0.125F, 0.499F)
+                            .zBounds(0.186F, 0.821F);
+                      default -> model;
+                  };
+              });
     }
 }

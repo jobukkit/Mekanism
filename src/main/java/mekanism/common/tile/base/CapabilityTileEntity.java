@@ -3,23 +3,25 @@ package mekanism.common.tile.base;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BooleanSupplier;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.common.capabilities.CapabilityCache;
 import mekanism.common.capabilities.resolver.ICapabilityResolver;
 import mekanism.common.capabilities.resolver.manager.ICapabilityHandlerManager;
+import mekanism.common.registration.impl.TileEntityTypeRegistryObject;
 import mekanism.common.tile.component.TileComponentConfig;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class CapabilityTileEntity extends TileEntityUpdateable {
 
     private final CapabilityCache capabilityCache = new CapabilityCache();
 
-    public CapabilityTileEntity(TileEntityType<?> type) {
-        super(type);
+    public CapabilityTileEntity(TileEntityTypeRegistryObject<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
     }
 
     protected final void addCapabilityResolvers(List<ICapabilityHandlerManager<?>> capabilityHandlerManagers) {
@@ -51,9 +53,13 @@ public abstract class CapabilityTileEntity extends TileEntityUpdateable {
         capabilityCache.addConfigComponent(config);
     }
 
-    @Nonnull
+    protected <T> boolean canEverResolve(Capability<T> capability) {
+        return capabilityCache.canResolve(capability);
+    }
+
+    @NotNull
     @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable Direction side) {
+    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction side) {
         if (capabilityCache.isCapabilityDisabled(capability, side)) {
             return LazyOptional.empty();
         } else if (capabilityCache.canResolve(capability)) {
@@ -64,7 +70,7 @@ public abstract class CapabilityTileEntity extends TileEntityUpdateable {
     }
 
     @Override
-    protected void invalidateCaps() {
+    public void invalidateCaps() {
         super.invalidateCaps();
         //When the capabilities on our tile get invalidated, make sure to also invalidate all our cached ones
         invalidateCachedCapabilities();
@@ -74,11 +80,11 @@ public abstract class CapabilityTileEntity extends TileEntityUpdateable {
         capabilityCache.invalidateAll();
     }
 
-    public void invalidateCapability(@Nonnull Capability<?> capability, @Nullable Direction side) {
+    public void invalidateCapability(@NotNull Capability<?> capability, @Nullable Direction side) {
         capabilityCache.invalidate(capability, side);
     }
 
-    public void invalidateCapabilities(@Nonnull Collection<Capability<?>> capabilities, @Nullable Direction side) {
+    public void invalidateCapabilities(@NotNull Collection<Capability<?>> capabilities, @Nullable Direction side) {
         for (Capability<?> capability : capabilities) {
             invalidateCapability(capability, side);
         }

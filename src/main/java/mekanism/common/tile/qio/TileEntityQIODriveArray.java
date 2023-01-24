@@ -3,48 +3,51 @@ package mekanism.common.tile.qio;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.annotation.Nonnull;
+import mekanism.api.IContentsListener;
 import mekanism.api.NBTConstants;
 import mekanism.api.inventory.IInventorySlot;
+import mekanism.api.math.MathUtils;
 import mekanism.common.Mekanism;
 import mekanism.common.capabilities.holder.slot.IInventorySlotHolder;
 import mekanism.common.capabilities.holder.slot.InventorySlotHelper;
 import mekanism.common.content.qio.IQIODriveHolder;
 import mekanism.common.content.qio.QIODriveData;
 import mekanism.common.content.qio.QIOFrequency;
+import mekanism.common.integration.computer.ComputerException;
+import mekanism.common.integration.computer.annotation.ComputerMethod;
 import mekanism.common.inventory.slot.QIODriveSlot;
-import mekanism.common.lib.frequency.FrequencyType;
 import mekanism.common.registries.MekanismBlocks;
-import mekanism.common.util.MekanismUtils;
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.data.ModelDataMap;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
+import org.jetbrains.annotations.NotNull;
 
 public class TileEntityQIODriveArray extends TileEntityQIOComponent implements IQIODriveHolder {
 
     public static final ModelProperty<byte[]> DRIVE_STATUS_PROPERTY = new ModelProperty<>();
-    private static final int DRIVE_SLOTS = 12;
+    public static final int DRIVE_SLOTS = 12;
 
     private List<IInventorySlot> driveSlots;
     private byte[] driveStatus = new byte[DRIVE_SLOTS];
     private int prevDriveHash = -1;
 
-    public TileEntityQIODriveArray() {
-        super(MekanismBlocks.QIO_DRIVE_ARRAY);
+    public TileEntityQIODriveArray(BlockPos pos, BlockState state) {
+        super(MekanismBlocks.QIO_DRIVE_ARRAY, pos, state);
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    protected IInventorySlotHolder getInitialInventory() {
+    protected IInventorySlotHolder getInitialInventory(IContentsListener listener) {
         InventorySlotHelper builder = InventorySlotHelper.forSide(this::getDirection);
         final int xSize = 176;
         driveSlots = new ArrayList<>();
         for (int y = 0; y < 2; y++) {
             for (int x = 0; x < 6; x++) {
-                QIODriveSlot slot = new QIODriveSlot(this, y * 6 + x, xSize / 2 - (6 * 18 / 2) + x * 18, 70 + y * 18);
+                QIODriveSlot slot = new QIODriveSlot(this, y * 6 + x, listener, xSize / 2 - (6 * 18 / 2) + x * 18, 70 + y * 18);
                 driveSlots.add(slot);
                 builder.addSlot(slot);
             }
@@ -53,25 +56,25 @@ public class TileEntityQIODriveArray extends TileEntityQIOComponent implements I
     }
 
     @Override
-    public void onUpdateServer() {
+    protected void onUpdateServer() {
         super.onUpdateServer();
-
-        if (world.getGameTime() % 10 == 0) {
+        if (level.getGameTime() % 10 == 0) {
             QIOFrequency frequency = getQIOFrequency();
-            setActive(frequency != null);
             for (int i = 0; i < DRIVE_SLOTS; i++) {
                 QIODriveSlot slot = (QIODriveSlot) driveSlots.get(i);
-                QIODriveData data = frequency != null ? frequency.getDriveData(slot.getKey()) : null;
+                QIODriveData data = frequency == null ? null : frequency.getDriveData(slot.getKey());
                 if (frequency == null || data == null) {
-                    setDriveStatus(i, slot.getStack().isEmpty() ? DriveStatus.NONE : DriveStatus.OFFLINE);
+                    setDriveStatus(i, slot.isEmpty() ? DriveStatus.NONE : DriveStatus.OFFLINE);
                     continue;
                 }
-
-                if (data.getTotalCount() == data.getCountCapacity() && data.getTotalTypes() == data.getTypeCapacity()) {
+                if (data.getTotalCount() == data.getCountCapacity()) {
+                    //If we are at max item capacity: Full
                     setDriveStatus(i, DriveStatus.FULL);
-                } else if (data.getTotalCount() == data.getCountCapacity() && data.getTotalTypes() == data.getTypeCapacity()) {
+                } else if (data.getTotalTypes() == data.getTypeCapacity() || data.getTotalCount() >= data.getCountCapacity() * 0.75) {
+                    //If we are at max type capacity OR we are at 75% or more capacity: Near full
                     setDriveStatus(i, DriveStatus.NEAR_FULL);
                 } else {
+                    //Otherwise: Ready
                     setDriveStatus(i, DriveStatus.READY);
                 }
             }
@@ -85,52 +88,110 @@ public class TileEntityQIODriveArray extends TileEntityQIOComponent implements I
     }
 
     private void setDriveStatus(int slot, DriveStatus status) {
-        driveStatus[slot] = (byte) status.ordinal();
+        driveStatus[slot] = status.status();
     }
 
-    @Nonnull
     @Override
-    public CompoundNBT write(@Nonnull CompoundNBT tag) {
-        QIOFrequency freq = getFrequency(FrequencyType.QIO);
+    public void saveAdditional(@NotNull CompoundTag nbtTags) {
+        QIOFrequency freq = getQIOFrequency();
         if (freq != null) {
             // save all item data before we save
             freq.saveAll();
         }
-        super.write(tag);
-        return tag;
+        super.saveAdditional(nbtTags);
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public IModelData getModelData() {
-        return new ModelDataMap.Builder().withInitial(DRIVE_STATUS_PROPERTY, driveStatus).build();
+    public ModelData getModelData() {
+        return ModelData.builder().with(DRIVE_STATUS_PROPERTY, driveStatus).build();
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public CompoundNBT getReducedUpdateTag() {
-        CompoundNBT updateTag = super.getReducedUpdateTag();
+    public CompoundTag getReducedUpdateTag() {
+        CompoundTag updateTag = super.getReducedUpdateTag();
         updateTag.putByteArray(NBTConstants.DRIVES, driveStatus);
         return updateTag;
     }
 
     @Override
-    public void handleUpdateTag(BlockState state, @Nonnull CompoundNBT tag) {
-        super.handleUpdateTag(state, tag);
-        driveStatus = tag.getByteArray(NBTConstants.DRIVES);
-        requestModelDataUpdate();
-        MekanismUtils.updateBlock(getWorld(), getPos());
+    public void handleUpdateTag(@NotNull CompoundTag tag) {
+        super.handleUpdateTag(tag);
+        byte[] status = tag.getByteArray(NBTConstants.DRIVES);
+        if (!Arrays.equals(status, driveStatus)) {
+            driveStatus = status;
+            updateModelData();
+        }
     }
 
     @Override
     public void onDataUpdate() {
-        markDirty(false);
+        markForSave();
     }
 
     @Override
     public List<IInventorySlot> getDriveSlots() {
         return driveSlots;
     }
+
+    //Methods relating to IComputerTile
+    @ComputerMethod
+    private int getSlotCount() {
+        return DRIVE_SLOTS;
+    }
+
+    private void validateSlot(int slot) throws ComputerException {
+        int slots = getSlotCount();
+        if (slot < 0 || slot >= slots) {
+            throw new ComputerException("Slot: '%d' is out of bounds, as this QIO drive array only has '%d' drive slots (zero indexed).", slot, slots);
+        }
+    }
+
+    @ComputerMethod
+    private ItemStack getDrive(int slot) throws ComputerException {
+        validateSlot(slot);
+        return driveSlots.get(slot).getStack();
+    }
+
+    @ComputerMethod
+    private DriveStatus getDriveStatus(int slot) throws ComputerException {
+        validateSlot(slot);
+        return DriveStatus.byIndexStatic(driveStatus[slot]);
+    }
+
+    @ComputerMethod
+    private long getFrequencyItemCount() throws ComputerException {
+        return computerGetFrequency().getTotalItemCount();
+    }
+
+    @ComputerMethod
+    private long getFrequencyItemCapacity() throws ComputerException {
+        return computerGetFrequency().getTotalItemCountCapacity();
+    }
+
+    @ComputerMethod
+    private double getFrequencyItemPercentage() throws ComputerException {
+        QIOFrequency frequency = computerGetFrequency();
+        return frequency.getTotalItemCount() / (double) frequency.getTotalItemCountCapacity();
+    }
+
+    @ComputerMethod
+    private long getFrequencyItemTypeCount() throws ComputerException {
+        return computerGetFrequency().getTotalItemTypes(false);
+    }
+
+    @ComputerMethod
+    private long getFrequencyItemTypeCapacity() throws ComputerException {
+        return computerGetFrequency().getTotalItemTypeCapacity();
+    }
+
+    @ComputerMethod
+    private double getFrequencyItemTypePercentage() throws ComputerException {
+        QIOFrequency frequency = computerGetFrequency();
+        return frequency.getTotalItemTypes(false) / (double) frequency.getTotalItemTypeCapacity();
+    }
+    //End methods IComputerTile
 
     public enum DriveStatus {
         NONE(null),
@@ -153,6 +214,14 @@ public class TileEntityQIODriveArray extends TileEntityQIOComponent implements I
 
         public ResourceLocation getModel() {
             return model;
+        }
+
+        public byte status() {
+            return (byte) ordinal();
+        }
+
+        public static DriveStatus byIndexStatic(int index) {
+            return MathUtils.getByIndexMod(STATUSES, index);
         }
     }
 }

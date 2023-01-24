@@ -1,17 +1,24 @@
 package mekanism.api.providers;
 
-import javax.annotation.Nonnull;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
+@MethodsReturnNonnullByDefault
 public interface IChemicalProvider<CHEMICAL extends Chemical<CHEMICAL>> extends IBaseProvider {
 
-    @Nonnull
+    /**
+     * Gets the chemical this provider represents.
+     */
     CHEMICAL getChemical();
 
-    @Nonnull
+    /**
+     * Creates a chemical stack of the given size using the chemical this provider represents.
+     *
+     * @param size Size of the stack.
+     */
     ChemicalStack<CHEMICAL> getStack(long size);
 
     @Override
@@ -20,7 +27,7 @@ public interface IChemicalProvider<CHEMICAL extends Chemical<CHEMICAL>> extends 
     }
 
     @Override
-    default ITextComponent getTextComponent() {
+    default Component getTextComponent() {
         return getChemical().getTextComponent();
     }
 

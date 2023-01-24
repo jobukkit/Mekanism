@@ -1,8 +1,4 @@
-@ParametersAreNonnullByDefault
-@FieldsAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 package mekanism.client.jei.machine;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
-import mekanism.api.annotations.FieldsAreNonnullByDefault;
+import mekanism.api.annotations.NothingNullByDefault;

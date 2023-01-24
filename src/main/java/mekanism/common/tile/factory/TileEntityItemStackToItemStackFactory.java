@@ -1,125 +1,97 @@
 package mekanism.common.tile.factory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Set;
 import mekanism.api.inventory.IInventorySlot;
+import mekanism.api.math.MathUtils;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.api.recipes.ItemStackToItemStackRecipe;
 import mekanism.api.recipes.cache.CachedRecipe;
-import mekanism.api.recipes.cache.ItemStackToItemStackCachedRecipe;
+import mekanism.api.recipes.cache.CachedRecipe.OperationTracker.RecipeError;
+import mekanism.api.recipes.cache.OneInputCachedRecipe;
+import mekanism.common.recipe.IMekanismRecipeTypeProvider;
 import mekanism.common.recipe.MekanismRecipeType;
-import mekanism.common.tile.component.ITileComponent;
-import mekanism.common.upgrade.IUpgradeData;
+import mekanism.common.recipe.lookup.ISingleRecipeLookupHandler.ItemRecipeLookupHandler;
+import mekanism.common.recipe.lookup.cache.InputRecipeCache.SingleItem;
 import mekanism.common.upgrade.MachineUpgradeData;
+import mekanism.common.util.InventoryUtils;
 import mekanism.common.util.MekanismUtils;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 //Smelting, enriching, crushing
-public class TileEntityItemStackToItemStackFactory extends TileEntityItemToItemFactory<ItemStackToItemStackRecipe> {
+public class TileEntityItemStackToItemStackFactory extends TileEntityItemToItemFactory<ItemStackToItemStackRecipe> implements
+      ItemRecipeLookupHandler<ItemStackToItemStackRecipe> {
 
-    public TileEntityItemStackToItemStackFactory(IBlockProvider blockProvider) {
-        super(blockProvider);
+    private static final List<RecipeError> TRACKED_ERROR_TYPES = List.of(
+          RecipeError.NOT_ENOUGH_ENERGY,
+          RecipeError.NOT_ENOUGH_INPUT,
+          RecipeError.NOT_ENOUGH_OUTPUT_SPACE,
+          RecipeError.INPUT_DOESNT_PRODUCE_OUTPUT
+    );
+    private static final Set<RecipeError> GLOBAL_ERROR_TYPES = Set.of(RecipeError.NOT_ENOUGH_ENERGY);
+
+    public TileEntityItemStackToItemStackFactory(IBlockProvider blockProvider, BlockPos pos, BlockState state) {
+        super(blockProvider, pos, state, TRACKED_ERROR_TYPES, GLOBAL_ERROR_TYPES);
     }
 
     @Override
-    public boolean isValidInputItem(@Nonnull ItemStack stack) {
-        return containsRecipe(recipe -> recipe.getInput().testType(stack));
+    public boolean isValidInputItem(@NotNull ItemStack stack) {
+        return containsRecipe(stack);
     }
 
     @Override
-    public boolean inputProducesOutput(int process, @Nonnull ItemStack fallbackInput, @Nonnull IInventorySlot outputSlot, @Nullable IInventorySlot secondaryOutputSlot,
-          boolean updateCache) {
-        if (outputSlot.isEmpty()) {
-            return true;
-        }
-        CachedRecipe<ItemStackToItemStackRecipe> cached = getCachedRecipe(process);
-        if (cached != null && cached.getRecipe().getInput().testType(fallbackInput)) {
-            //Our input matches the recipe we have cached for this slot
-            return true;
-        }
-        //If there is no cached item input or it doesn't match our fallback then it is an out of date cache, so we ignore the fact that we have a cache
+    protected int getNeededInput(ItemStackToItemStackRecipe recipe, ItemStack inputStack) {
+        return MathUtils.clampToInt(recipe.getInput().getNeededAmount(inputStack));
+    }
+
+    @Override
+    protected boolean isCachedRecipeValid(@Nullable CachedRecipe<ItemStackToItemStackRecipe> cached, @NotNull ItemStack stack) {
+        return cached != null && cached.getRecipe().getInput().testType(stack);
+    }
+
+    @Override
+    protected ItemStackToItemStackRecipe findRecipe(int process, @NotNull ItemStack fallbackInput, @NotNull IInventorySlot outputSlot,
+          @Nullable IInventorySlot secondaryOutputSlot) {
         ItemStack output = outputSlot.getStack();
-        ItemStackToItemStackRecipe foundRecipe = findFirstRecipe(
-              recipe -> recipe.getInput().testType(fallbackInput) && ItemHandlerHelper.canItemStacksStack(recipe.getOutput(fallbackInput), output));
-        if (foundRecipe == null) {
-            //We could not find any valid recipe for the given item that matches the items in the current output slots
-            return false;
-        }
-        if (updateCache) {
-            //If we want to update the cache, then create a new cache with the recipe we found
-            CachedRecipe<ItemStackToItemStackRecipe> newCachedRecipe = createNewCachedRecipe(foundRecipe, process);
-            if (newCachedRecipe == null) {
-                //If we want to update the cache but failed to create a new cache then return that the item is not valid for the slot as something goes wrong
-                // I believe we can actually make createNewCachedRecipe Nonnull which will remove this if statement
-                return false;
-            }
-            updateCachedRecipe(newCachedRecipe, process);
-        }
-        return true;
+        return getRecipeType().getInputCache().findTypeBasedRecipe(level, fallbackInput,
+              recipe -> InventoryUtils.areItemsStackable(recipe.getOutput(fallbackInput), output));
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public MekanismRecipeType<ItemStackToItemStackRecipe> getRecipeType() {
-        switch (type) {
-            case ENRICHING:
-                return MekanismRecipeType.ENRICHING;
-            case CRUSHING:
-                return MekanismRecipeType.CRUSHING;
-            case SMELTING:
-            default:
-                //TODO: Make it so that it throws an error if it is not one of the three types
-                return MekanismRecipeType.SMELTING;
-        }
+    public IMekanismRecipeTypeProvider<ItemStackToItemStackRecipe, SingleItem<ItemStackToItemStackRecipe>> getRecipeType() {
+        return switch (type) {
+            case ENRICHING -> MekanismRecipeType.ENRICHING;
+            case CRUSHING -> MekanismRecipeType.CRUSHING;
+            //TODO: Make it so that it throws an error if it is not one of the three types
+            default -> MekanismRecipeType.SMELTING;
+        };
     }
 
     @Nullable
     @Override
     public ItemStackToItemStackRecipe getRecipe(int cacheIndex) {
-        ItemStack stack = inputHandlers[cacheIndex].getInput();
-        if (stack.isEmpty()) {
-            return null;
-        }
-        return findFirstRecipe(recipe -> recipe.test(stack));
+        return findFirstRecipe(inputHandlers[cacheIndex]);
     }
 
+    @NotNull
     @Override
-    public CachedRecipe<ItemStackToItemStackRecipe> createNewCachedRecipe(@Nonnull ItemStackToItemStackRecipe recipe, int cacheIndex) {
-        return new ItemStackToItemStackCachedRecipe(recipe, inputHandlers[cacheIndex], outputHandlers[cacheIndex])
+    public CachedRecipe<ItemStackToItemStackRecipe> createNewCachedRecipe(@NotNull ItemStackToItemStackRecipe recipe, int cacheIndex) {
+        return OneInputCachedRecipe.itemToItem(recipe, recheckAllRecipeErrors[cacheIndex], inputHandlers[cacheIndex], outputHandlers[cacheIndex])
+              .setErrorsChanged(errors -> errorTracker.onErrorsChanged(errors, cacheIndex))
               .setCanHolderFunction(() -> MekanismUtils.canFunction(this))
               .setActive(active -> setActiveState(active, cacheIndex))
               .setEnergyRequirements(energyContainer::getEnergyPerTick, energyContainer)
-              .setRequiredTicks(() -> ticksRequired)
-              .setOnFinish(() -> markDirty(false))
+              .setRequiredTicks(this::getTicksRequired)
+              .setOnFinish(this::markForSave)
               .setOperatingTicksChanged(operatingTicks -> progress[cacheIndex] = operatingTicks);
     }
 
-    @Override
-    public void parseUpgradeData(@Nonnull IUpgradeData upgradeData) {
-        if (upgradeData instanceof MachineUpgradeData) {
-            MachineUpgradeData data = (MachineUpgradeData) upgradeData;
-            redstone = data.redstone;
-            setControlType(data.controlType);
-            getEnergyContainer().setEnergy(data.energyContainer.getEnergy());
-            sorting = data.sorting;
-            energySlot.setStack(data.energySlot.getStack());
-            System.arraycopy(data.progress, 0, progress, 0, data.progress.length);
-            for (int i = 0; i < data.inputSlots.size(); i++) {
-                inputSlots.get(i).setStack(data.inputSlots.get(i).getStack());
-            }
-            for (int i = 0; i < data.outputSlots.size(); i++) {
-                outputSlots.get(i).setStack(data.outputSlots.get(i).getStack());
-            }
-            for (ITileComponent component : getComponents()) {
-                component.read(data.components);
-            }
-        } else {
-            super.parseUpgradeData(upgradeData);
-        }
-    }
-
-    @Nonnull
+    @NotNull
     @Override
     public MachineUpgradeData getUpgradeData() {
         return new MachineUpgradeData(redstone, getControlType(), getEnergyContainer(), progress, energySlot, inputSlots, outputSlots, isSorting(), getComponents());

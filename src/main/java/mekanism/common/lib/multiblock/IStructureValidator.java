@@ -1,20 +1,20 @@
 package mekanism.common.lib.multiblock;
 
-import java.util.Set;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import mekanism.common.lib.math.voxel.IShape;
 import mekanism.common.lib.multiblock.FormationProtocol.FormationResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.ChunkAccess;
 
 public interface IStructureValidator<T extends MultiblockData> {
 
-    void init(World world, MultiblockManager<T> manager, Structure structure);
+    void init(Level world, MultiblockManager<T> manager, Structure structure);
 
     boolean precheck();
 
-    FormationResult validate(FormationProtocol<T> ctx);
+    FormationResult validate(FormationProtocol<T> ctx, Long2ObjectMap<ChunkAccess> chunkMap);
 
-    FormationResult postcheck(T structure, Set<BlockPos> innerNodes);
+    FormationResult postcheck(T structure, Long2ObjectMap<ChunkAccess> chunkMap);
 
     IShape getShape();
 }

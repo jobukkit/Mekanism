@@ -1,12 +1,13 @@
 package mekanism.generators.common.tile.fission;
 
-import javax.annotation.Nonnull;
 import mekanism.api.NBTConstants;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.math.MathUtils;
 import mekanism.api.text.EnumColor;
 import mekanism.api.text.IHasTranslationKey;
 import mekanism.api.text.ILangEntry;
 import mekanism.common.MekanismLang;
+import mekanism.common.integration.computer.annotation.ComputerMethod;
 import mekanism.common.inventory.container.MekanismContainer;
 import mekanism.common.inventory.container.sync.SyncableEnum;
 import mekanism.common.util.NBTUtils;
@@ -16,36 +17,40 @@ import mekanism.generators.common.base.IReactorLogicMode;
 import mekanism.generators.common.content.fission.FissionReactorMultiblockData;
 import mekanism.generators.common.registries.GeneratorsBlocks;
 import mekanism.generators.common.tile.fission.TileEntityFissionReactorLogicAdapter.FissionReactorLogic;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
 public class TileEntityFissionReactorLogicAdapter extends TileEntityFissionReactorCasing implements IReactorLogic<FissionReactorLogic> {
 
     public FissionReactorLogic logicType = FissionReactorLogic.DISABLED;
     private RedstoneStatus prevStatus = RedstoneStatus.IDLE;
 
-    public TileEntityFissionReactorLogicAdapter() {
-        super(GeneratorsBlocks.FISSION_REACTOR_LOGIC_ADAPTER);
+    public TileEntityFissionReactorLogicAdapter(BlockPos pos, BlockState state) {
+        super(GeneratorsBlocks.FISSION_REACTOR_LOGIC_ADAPTER, pos, state);
     }
 
     @Override
-    protected void onUpdateServer() {
-        super.onUpdateServer();
+    protected boolean onUpdateServer(FissionReactorMultiblockData multiblock) {
+        boolean needsPacket = super.onUpdateServer(multiblock);
         RedstoneStatus status = getStatus();
         if (status != prevStatus) {
-            World world = getWorld();
+            Level world = getLevel();
             if (world != null) {
-                world.notifyNeighborsOfStateChange(getPos(), getBlockType());
+                world.updateNeighborsAt(getBlockPos(), getBlockType());
             }
+            prevStatus = status;
         }
-        prevStatus = status;
+        return needsPacket;
     }
 
     @Override
+    @ComputerMethod(nameOverride = "getLogicMode")
     public FissionReactorLogic getMode() {
         return logicType;
     }
@@ -55,62 +60,81 @@ public class TileEntityFissionReactorLogicAdapter extends TileEntityFissionReact
         return FissionReactorLogic.values();
     }
 
+    @ComputerMethod(nameOverride = "getRedstoneLogicStatus")
     public RedstoneStatus getStatus() {
         if (isRemote()) {
             return prevStatus;
         }
-        if (getMultiblock().isFormed()) {
+        FissionReactorMultiblockData multiblock = getMultiblock();
+        if (multiblock.isFormed()) {
             switch (logicType) {
-                case ACTIVATION:
-                    return isPowered() ? RedstoneStatus.POWERED : RedstoneStatus.IDLE;
-                case TEMPERATURE:
-                    return getMultiblock().heatCapacitor.getTemperature() >= FissionReactorMultiblockData.MIN_DAMAGE_TEMPERATURE ? RedstoneStatus.OUTPUTTING : RedstoneStatus.IDLE;
-                case EXCESS_WASTE:
-                    return getMultiblock().wasteTank.getNeeded() == 0 ? RedstoneStatus.OUTPUTTING : RedstoneStatus.IDLE;
-                case DAMAGED:
-                    return getMultiblock().reactorDamage >= FissionReactorMultiblockData.MAX_DAMAGE ? RedstoneStatus.OUTPUTTING : RedstoneStatus.IDLE;
-                case DEPLETED:
-                    return getMultiblock().fuelTank.isEmpty() ? RedstoneStatus.OUTPUTTING : RedstoneStatus.IDLE;
-                default:
-                    break;
+                case ACTIVATION -> {
+                    if (isPowered()) {
+                        return RedstoneStatus.POWERED;
+                    }
+                }
+                case TEMPERATURE -> {
+                    if (multiblock.heatCapacitor.getTemperature() >= FissionReactorMultiblockData.MIN_DAMAGE_TEMPERATURE) {
+                        return RedstoneStatus.OUTPUTTING;
+                    }
+                }
+                case EXCESS_WASTE -> {
+                    if (multiblock.wasteTank.getNeeded() == 0) {
+                        return RedstoneStatus.OUTPUTTING;
+                    }
+                }
+                case DAMAGED -> {
+                    if (multiblock.reactorDamage >= FissionReactorMultiblockData.MAX_DAMAGE) {
+                        return RedstoneStatus.OUTPUTTING;
+                    }
+                }
+                case DEPLETED -> {
+                    if (multiblock.fuelTank.isEmpty()) {
+                        return RedstoneStatus.OUTPUTTING;
+                    }
+                }
             }
         }
         return RedstoneStatus.IDLE;
     }
 
+    @ComputerMethod(nameOverride = "setLogicMode")
     public void setLogicTypeFromPacket(FissionReactorLogic logicType) {
-        this.logicType = logicType;
-        markDirty(false);
+        if (this.logicType != logicType) {
+            this.logicType = logicType;
+            markForSave();
+        }
     }
 
     @Override
     public void onPowerChange() {
         super.onPowerChange();
-        if (!isRemote() && getMultiblock().isFormed()) {
-            if (logicType == FissionReactorLogic.ACTIVATION) {
-                getMultiblock().setActive(isPowered());
+        if (!isRemote()) {
+            FissionReactorMultiblockData multiblock = getMultiblock();
+            if (multiblock.isFormed()) {
+                if (logicType == FissionReactorLogic.ACTIVATION) {
+                    multiblock.setActive(isPowered());
+                }
             }
         }
     }
 
     @Override
-    public void read(@Nonnull BlockState state, @Nonnull CompoundNBT nbtTags) {
-        super.read(state, nbtTags);
-        NBTUtils.setEnumIfPresent(nbtTags, NBTConstants.LOGIC_TYPE, FissionReactorLogic::byIndexStatic, logicType -> this.logicType = logicType);
+    public void load(@NotNull CompoundTag nbt) {
+        super.load(nbt);
+        NBTUtils.setEnumIfPresent(nbt, NBTConstants.LOGIC_TYPE, FissionReactorLogic::byIndexStatic, logicType -> this.logicType = logicType);
     }
 
-    @Nonnull
     @Override
-    public CompoundNBT write(@Nonnull CompoundNBT nbtTags) {
-        super.write(nbtTags);
-        nbtTags.putInt(NBTConstants.LOGIC_TYPE, logicType.ordinal());
-        return nbtTags;
+    public void saveAdditional(@NotNull CompoundTag nbtTags) {
+        super.saveAdditional(nbtTags);
+        NBTUtils.writeEnum(nbtTags, NBTConstants.LOGIC_TYPE, logicType);
     }
 
     @Override
     public void addContainerTrackers(MekanismContainer container) {
         super.addContainerTrackers(container);
-        container.track(SyncableEnum.create(FissionReactorLogic::byIndexStatic, FissionReactorLogic.DISABLED, () -> logicType, value -> logicType = value));
+        container.track(SyncableEnum.create(FissionReactorLogic::byIndexStatic, FissionReactorLogic.DISABLED, this::getMode, value -> logicType = value));
         container.track(SyncableEnum.create(RedstoneStatus::byIndexStatic, RedstoneStatus.IDLE, () -> prevStatus, value -> prevStatus = value));
     }
 
@@ -119,6 +143,7 @@ public class TileEntityFissionReactorLogicAdapter extends TileEntityFissionReact
         return false;
     }
 
+    @NothingNullByDefault
     public enum FissionReactorLogic implements IReactorLogicMode<FissionReactorLogic>, IHasTranslationKey {
         DISABLED(GeneratorsLang.REACTOR_LOGIC_DISABLED, GeneratorsLang.DESCRIPTION_REACTOR_DISABLED, new ItemStack(Items.GUNPOWDER), EnumColor.DARK_GRAY),
         ACTIVATION(GeneratorsLang.REACTOR_LOGIC_ACTIVATION, GeneratorsLang.DESCRIPTION_REACTOR_ACTIVATION, new ItemStack(Items.FLINT_AND_STEEL), EnumColor.AQUA),
@@ -152,7 +177,7 @@ public class TileEntityFissionReactorLogicAdapter extends TileEntityFissionReact
         }
 
         @Override
-        public ITextComponent getDescription() {
+        public Component getDescription() {
             return description.translate();
         }
 
@@ -166,6 +191,7 @@ public class TileEntityFissionReactorLogicAdapter extends TileEntityFissionReact
         }
     }
 
+    @NothingNullByDefault
     public enum RedstoneStatus implements IHasTranslationKey {
         IDLE(MekanismLang.IDLE),
         OUTPUTTING(GeneratorsLang.REACTOR_LOGIC_OUTPUTTING),

@@ -1,36 +1,42 @@
 package mekanism.generators.common.tile.fusion;
 
-import javax.annotation.Nonnull;
 import mekanism.api.lasers.ILaserReceptor;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.capabilities.Capabilities;
-import mekanism.common.capabilities.resolver.basic.BasicCapabilityResolver;
+import mekanism.common.capabilities.resolver.BasicCapabilityResolver;
+import mekanism.generators.common.content.fusion.FusionReactorMultiblockData;
 import mekanism.generators.common.registries.GeneratorsBlocks;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
 public class TileEntityLaserFocusMatrix extends TileEntityFusionReactorBlock implements ILaserReceptor {
 
-    public TileEntityLaserFocusMatrix() {
-        super(GeneratorsBlocks.LASER_FOCUS_MATRIX);
-        addCapabilityResolver(BasicCapabilityResolver.constant(Capabilities.LASER_RECEPTOR_CAPABILITY, this));
+    public TileEntityLaserFocusMatrix(BlockPos pos, BlockState state) {
+        super(GeneratorsBlocks.LASER_FOCUS_MATRIX, pos, state);
+        addCapabilityResolver(BasicCapabilityResolver.constant(Capabilities.LASER_RECEPTOR, this));
     }
 
     @Override
-    public void receiveLaserEnergy(@Nonnull FloatingLong energy, Direction side) {
-        if (getMultiblock().isFormed()) {
-            getMultiblock().addTemperatureFromEnergyInput(energy);
+    public void receiveLaserEnergy(@NotNull FloatingLong energy) {
+        FusionReactorMultiblockData multiblock = getMultiblock();
+        if (multiblock.isFormed()) {
+            multiblock.addTemperatureFromEnergyInput(energy);
         }
     }
 
     @Override
-    public ActionResultType onRightClick(PlayerEntity player, Direction side) {
-        if (!isRemote() && player.isCreative() && getMultiblock().isFormed()) {
-            getMultiblock().setPlasmaTemp(1_000_000_000);
-            return ActionResultType.SUCCESS;
+    public InteractionResult onRightClick(Player player) {
+        if (!isRemote() && player.isCreative()) {
+            FusionReactorMultiblockData multiblock = getMultiblock();
+            if (multiblock.isFormed()) {
+                multiblock.setPlasmaTemp(1_000_000_000);
+                return InteractionResult.sidedSuccess(isRemote());
+            }
         }
-        return ActionResultType.PASS;
+        return super.onRightClick(player);
     }
 
     @Override

@@ -1,17 +1,20 @@
 package mekanism.client.model;
 
-import javax.annotation.Nonnull;
 import mekanism.api.providers.IItemProvider;
-import mekanism.client.model.builder.BucketModelBuilder;
+import mekanism.common.item.ItemModule;
+import mekanism.common.registration.impl.FluidDeferredRegister;
 import mekanism.common.registration.impl.FluidRegistryObject;
+import mekanism.common.registration.impl.ItemDeferredRegister;
+import mekanism.common.util.RegistryUtils;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.item.BucketItem;
-import net.minecraft.resources.ResourcePackType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.generators.ExistingFileHelper;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
-import net.minecraftforge.client.model.generators.ModelFile.UncheckedModelFile;
+import net.minecraftforge.client.model.generators.loaders.DynamicFluidContainerModelBuilder;
+import net.minecraftforge.common.data.ExistingFileHelper;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class BaseItemModelProvider extends ItemModelProvider {
 
@@ -19,14 +22,14 @@ public abstract class BaseItemModelProvider extends ItemModelProvider {
         super(generator, modid, existingFileHelper);
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public String getName() {
         return "Item model provider: " + modid;
     }
 
     public boolean textureExists(ResourceLocation texture) {
-        return existingFileHelper.exists(texture, ResourcePackType.CLIENT_RESOURCES, ".png", "textures");
+        return existingFileHelper.exists(texture, PackType.CLIENT_RESOURCES, ".png", "textures");
     }
 
     protected ResourceLocation itemTexture(IItemProvider itemProvider) {
@@ -39,20 +42,33 @@ public abstract class BaseItemModelProvider extends ItemModelProvider {
         }
     }
 
+    protected void registerModules(ItemDeferredRegister register) {
+        for (IItemProvider itemProvider : register.getAllItems()) {
+            Item item = itemProvider.asItem();
+            if (item instanceof ItemModule) {
+                generated(itemProvider);
+            }
+        }
+    }
+
+    protected void registerBuckets(FluidDeferredRegister register) {
+        for (FluidRegistryObject<?, ?, ?, ?, ?> fluidRegistryObject : register.getAllFluids()) {
+            registerBucket(fluidRegistryObject);
+        }
+    }
+
     protected ItemModelBuilder generated(IItemProvider itemProvider) {
         return generated(itemProvider, itemTexture(itemProvider));
     }
 
     protected ItemModelBuilder generated(IItemProvider itemProvider, ResourceLocation texture) {
-        return getBuilder(itemProvider.getName()).parent(new UncheckedModelFile("item/generated")).texture("layer0", texture);
+        return withExistingParent(itemProvider.getName(), "item/generated").texture("layer0", texture);
     }
 
     protected ItemModelBuilder resource(IItemProvider itemProvider, String type) {
         //TODO: Try to come up with a better solution to this. Currently we have an empty texture for layer zero so that we can set
         // the tint only on layer one so that we only end up having the tint show for this fallback texture
-        ItemModelBuilder modelBuilder = getBuilder(itemProvider.getName()).parent(new UncheckedModelFile("item/generated"))
-              .texture("layer0", modLoc("item/empty"))
-              .texture("layer1", modLoc("item/" + type));
+        ItemModelBuilder modelBuilder = generated(itemProvider, modLoc("item/empty")).texture("layer1", modLoc("item/" + type));
         ResourceLocation overlay = modLoc("item/" + type + "_overlay");
         if (textureExists(overlay)) {
             //If we have an overlay type for that resource type then add that as another layer
@@ -76,21 +92,9 @@ public abstract class BaseItemModelProvider extends ItemModelProvider {
     }
 
     //Note: This isn't the best way to do this in terms of model file validation, but it works
-    protected void registerBucket(FluidRegistryObject<?, ?, ?, ?> fluidRO) {
-        BucketItem bucket = fluidRO.getBucket();
-        ResourceLocation outputLoc = extendWithFolder(bucket.getRegistryName());
-        if (generatedModels.containsKey(outputLoc)) {
-            throw new RuntimeException("Model with output loc: '" + outputLoc + "' has already been registered");
-        }
-        ItemModelBuilder modelBuilder = new BucketModelBuilder(outputLoc, existingFileHelper, fluidRO.getStillFluid().getRegistryName())
-              .parent(new UncheckedModelFile(new ResourceLocation("forge", "item/bucket")));
-        generatedModels.put(outputLoc, modelBuilder);
-    }
-
-    protected ResourceLocation extendWithFolder(ResourceLocation rl) {
-        if (rl.getPath().contains("/")) {
-            return rl;
-        }
-        return new ResourceLocation(rl.getNamespace(), folder + "/" + rl.getPath());
+    protected void registerBucket(FluidRegistryObject<?, ?, ?, ?, ?> fluidRO) {
+        withExistingParent(RegistryUtils.getPath(fluidRO.getBucket()), new ResourceLocation("forge", "item/bucket"))
+              .customLoader(DynamicFluidContainerModelBuilder::begin)
+              .fluid(fluidRO.getStillFluid());
     }
 }

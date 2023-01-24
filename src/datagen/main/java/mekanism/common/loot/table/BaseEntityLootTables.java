@@ -2,13 +2,13 @@ package mekanism.common.loot.table;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import mekanism.api.providers.IEntityTypeProvider;
-import net.minecraft.data.loot.EntityLootTables;
-import net.minecraft.entity.EntityType;
-import net.minecraft.loot.LootTable;
+import net.minecraft.data.loot.EntityLoot;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.storage.loot.LootTable;
+import org.jetbrains.annotations.NotNull;
 
-public abstract class BaseEntityLootTables extends EntityLootTables {
+public abstract class BaseEntityLootTables extends EntityLoot {
 
     private final Set<EntityType<?>> knownEntityTypes = new ObjectOpenHashSet<>();
 
@@ -16,20 +16,20 @@ public abstract class BaseEntityLootTables extends EntityLootTables {
     protected abstract void addTables();
 
     @Override
-    protected void registerLootTable(@Nonnull EntityType<?> type, @Nonnull LootTable.Builder table) {
+    protected void add(@NotNull EntityType<?> type, @NotNull LootTable.Builder table) {
         //Overwrite the core register method to add to our list of known entity types
         //Note: This isn't the actual core method as that one takes a ResourceLocation, but all our things wil pass through this one
-        super.registerLootTable(type, table);
+        super.add(type, table);
         knownEntityTypes.add(type);
     }
 
-    @Nonnull
+    @NotNull
     @Override
     protected Iterable<EntityType<?>> getKnownEntities() {
         return knownEntityTypes;
     }
 
-    protected void registerLootTable(@Nonnull IEntityTypeProvider typeProvider, @Nonnull LootTable.Builder table) {
-        registerLootTable(typeProvider.getEntityType(), table);
+    protected void add(@NotNull IEntityTypeProvider typeProvider, @NotNull LootTable.Builder table) {
+        add(typeProvider.getEntityType(), table);
     }
 }

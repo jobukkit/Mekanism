@@ -1,69 +1,51 @@
 package mekanism.common.block.prefab;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.common.content.blocktype.BlockTypeTile;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.tile.base.WrenchResult;
 import mekanism.common.tile.prefab.TileEntityMultiblock;
 import mekanism.common.util.MekanismUtils;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.EntitySpawnPlacementRegistry.PlacementType;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import mekanism.common.util.WorldUtils;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.NotNull;
 
 public class BlockBasicMultiblock<TILE extends TileEntityMekanism> extends BlockTile<TILE, BlockTypeTile<TILE>> {
 
     public BlockBasicMultiblock(BlockTypeTile<TILE> type) {
-        this(type, Block.Properties.create(Material.IRON).hardnessAndResistance(5F, 10F).setRequiresTool());
+        this(type, BlockBehaviour.Properties.of(Material.METAL).strength(5, 9).requiresCorrectToolForDrops());
     }
 
-    public BlockBasicMultiblock(BlockTypeTile<TILE> type, Block.Properties properties) {
+    public BlockBasicMultiblock(BlockTypeTile<TILE> type, BlockBehaviour.Properties properties) {
         super(type, properties);
     }
 
-    @Override
-    public boolean canCreatureSpawn(@Nonnull BlockState state, @Nonnull IBlockReader world, @Nonnull BlockPos pos, PlacementType type, @Nullable EntityType<?> entityType) {
-        TileEntityMultiblock<?> tile = MekanismUtils.getTileEntity(TileEntityMultiblock.class, world, pos);
-        if (tile != null && tile.getMultiblock().isFormed()) {
-            return false;
-        }
-        return super.canCreatureSpawn(state, world, pos, type, entityType);
-    }
-
-    @Nonnull
+    @NotNull
     @Override
     @Deprecated
-    public ActionResultType onBlockActivated(@Nonnull BlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull PlayerEntity player, @Nonnull Hand hand,
-          @Nonnull BlockRayTraceResult hit) {
-        TileEntityMultiblock<?> tile = MekanismUtils.getTileEntity(TileEntityMultiblock.class, world, pos);
+    public InteractionResult use(@NotNull BlockState state, @NotNull Level world, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand hand,
+          @NotNull BlockHitResult hit) {
+        TileEntityMultiblock<?> tile = WorldUtils.getTileEntity(TileEntityMultiblock.class, world, pos);
         if (tile == null) {
-            return ActionResultType.PASS;
-        }
-        if (world.isRemote) {
-            ItemStack stack = player.getHeldItem(hand);
-            if (stack.getItem() instanceof BlockItem && new BlockItemUseContext(player, hand, stack, hit).canPlace()) {
+            return InteractionResult.PASS;
+        } else if (world.isClientSide) {
+            if (!MekanismUtils.canUseAsWrench(player.getItemInHand(hand))) {
                 if (!tile.hasGui() || !tile.getMultiblock().isFormed()) {
                     //If the block doesn't have a gui (frames of things like the evaporation plant), or the multiblock is not formed then pass
-                    return ActionResultType.PASS;
+                    return InteractionResult.PASS;
                 }
             }
-            return ActionResultType.SUCCESS;
+            return InteractionResult.SUCCESS;
+        } else if (tile.tryWrench(state, player, hand, hit) != WrenchResult.PASS) {
+            return InteractionResult.SUCCESS;
         }
-        if (tile.tryWrench(state, player, hand, hit) != WrenchResult.PASS) {
-            return ActionResultType.SUCCESS;
-        }
-        return tile.onActivate(player, hand, player.getHeldItem(hand));
+        return tile.onActivate(player, hand, player.getItemInHand(hand));
     }
 }

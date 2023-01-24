@@ -1,84 +1,95 @@
 package mekanism.common.item;
 
-import javax.annotation.Nonnull;
-import mekanism.api.NBTConstants;
+import java.util.List;
+import mekanism.api.MekanismAPI;
 import mekanism.api.text.EnumColor;
-import mekanism.common.Mekanism;
 import mekanism.common.MekanismLang;
+import mekanism.common.capabilities.ItemCapabilityWrapper.ItemCapability;
+import mekanism.common.capabilities.security.item.ItemStackOwnerObject;
 import mekanism.common.content.qio.QIOFrequency;
-import mekanism.common.inventory.container.ContainerProvider;
 import mekanism.common.inventory.container.item.PortableQIODashboardContainer;
+import mekanism.common.item.interfaces.IColoredItem;
 import mekanism.common.item.interfaces.IGuiItem;
+import mekanism.common.item.interfaces.IItemSustainedInventory;
 import mekanism.common.lib.frequency.Frequency;
+import mekanism.common.lib.frequency.FrequencyType;
 import mekanism.common.lib.frequency.IFrequencyItem;
-import mekanism.common.network.PacketSecurityUpdate;
-import mekanism.common.util.ItemDataUtils;
+import mekanism.common.registration.impl.ContainerTypeRegistryObject;
+import mekanism.common.registries.MekanismContainerTypes;
+import mekanism.common.util.InventoryUtils;
+import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.SecurityUtils;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Rarity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.network.NetworkHooks;
+import mekanism.common.util.text.BooleanStateDisplay.YesNo;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
-public class ItemPortableQIODashboard extends Item implements IFrequencyItem, IGuiItem {
+public class ItemPortableQIODashboard extends CapabilityItem implements IFrequencyItem, IGuiItem, IItemSustainedInventory, IColoredItem {
 
     public ItemPortableQIODashboard(Properties properties) {
-        super(properties.maxStackSize(1).rarity(Rarity.RARE));
-    }
-
-    @Nonnull
-    @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, @Nonnull Hand hand) {
-        ItemStack stack = player.getHeldItem(hand);
-        if (!world.isRemote) {
-            if (getOwnerUUID(stack) == null) {
-                setOwnerUUID(stack, player.getUniqueID());
-                Mekanism.packetHandler.sendToAll(new PacketSecurityUpdate(player.getUniqueID(), null));
-                player.sendMessage(MekanismLang.LOG_FORMAT.translateColored(EnumColor.DARK_BLUE, MekanismLang.MEKANISM, MekanismLang.NOW_OWN.translateColored(EnumColor.GRAY)),
-                      Util.DUMMY_UUID);
-            } else if (SecurityUtils.canAccess(player, stack)) {
-                NetworkHooks.openGui((ServerPlayerEntity) player, getContainerProvider(stack, hand), buf -> {
-                    buf.writeEnumValue(hand);
-                    buf.writeItemStack(stack);
-                });
-            } else {
-                SecurityUtils.displayNoAccess(player);
-            }
-        }
-        return new ActionResult<>(ActionResultType.SUCCESS, stack);
+        super(properties.stacksTo(1).rarity(Rarity.RARE));
     }
 
     @Override
-    public INamedContainerProvider getContainerProvider(ItemStack stack, Hand hand) {
-        return new ContainerProvider(stack.getDisplayName(), (i, inv, p) -> new PortableQIODashboardContainer(i, inv, hand, stack));
+    public void onDestroyed(@NotNull ItemEntity item, @NotNull DamageSource damageSource) {
+        InventoryUtils.dropItemContents(item, damageSource);
+    }
+
+    @Override
+    public void appendHoverText(@NotNull ItemStack stack, Level world, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
+        MekanismAPI.getSecurityUtils().addSecurityTooltip(stack, tooltip);
+        MekanismUtils.addFrequencyItemTooltip(stack, tooltip);
+        tooltip.add(MekanismLang.HAS_INVENTORY.translateColored(EnumColor.AQUA, EnumColor.GRAY, YesNo.of(hasInventory(stack))));
+        super.appendHoverText(stack, world, tooltip, flag);
+    }
+
+    @NotNull
+    @Override
+    public InteractionResultHolder<ItemStack> use(@NotNull Level world, @NotNull Player player, @NotNull InteractionHand hand) {
+        return SecurityUtils.INSTANCE.claimOrOpenGui(world, player, hand, getContainerType()::tryOpenGui);
+    }
+
+    @Override
+    public ContainerTypeRegistryObject<PortableQIODashboardContainer> getContainerType() {
+        return MekanismContainerTypes.PORTABLE_QIO_DASHBOARD;
     }
 
     @Override
     public void setFrequency(ItemStack stack, Frequency frequency) {
         IFrequencyItem.super.setFrequency(stack, frequency);
-        setColor(stack, frequency != null ? ((QIOFrequency) frequency).getColor() : null);
+        setColor(stack, frequency == null ? null : ((QIOFrequency) frequency).getColor());
     }
 
-    public EnumColor getColor(ItemStack stack) {
-        if (ItemDataUtils.hasData(stack, NBTConstants.COLOR, NBT.TAG_INT)) {
-            return EnumColor.byIndexStatic(ItemDataUtils.getInt(stack, NBTConstants.COLOR));
-        }
-        return null;
+    @Override
+    public FrequencyType<?> getFrequencyType() {
+        return FrequencyType.QIO;
     }
 
-    public void setColor(ItemStack stack, EnumColor color) {
-        if (color == null) {
-            ItemDataUtils.removeData(stack, NBTConstants.COLOR);
-        } else {
-            ItemDataUtils.setInt(stack, NBTConstants.COLOR, color.ordinal());
+    @Override
+    public void inventoryTick(@NotNull ItemStack stack, @NotNull Level level, @NotNull Entity entity, int slotId, boolean isSelected) {
+        super.inventoryTick(stack, level, entity, slotId, isSelected);
+        if (!level.isClientSide && level.getGameTime() % 100 == 0) {
+            EnumColor frequencyColor = getFrequency(stack) instanceof QIOFrequency frequency ? frequency.getColor() : null;
+            EnumColor color = getColor(stack);
+            if (color != frequencyColor) {
+                setColor(stack, frequencyColor);
+            }
         }
+    }
+
+    @Override
+    protected void gatherCapabilities(List<ItemCapability> capabilities, ItemStack stack, CompoundTag nbt) {
+        capabilities.add(new ItemStackOwnerObject());
+        super.gatherCapabilities(capabilities, stack, nbt);
     }
 }

@@ -1,17 +1,18 @@
 package mekanism.common.tile.interfaces;
 
-import javax.annotation.Nonnull;
 import mekanism.api.IIncrementalEnum;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.math.MathUtils;
 import mekanism.api.text.IHasTextComponent;
 import mekanism.api.text.ILangEntry;
 import mekanism.common.MekanismLang;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.Component;
 
 public interface IFluidContainerManager extends IHasMode {
 
     ContainerEditMode getContainerEditMode();
 
+    @NothingNullByDefault
     enum ContainerEditMode implements IIncrementalEnum<ContainerEditMode>, IHasTextComponent {
         BOTH(MekanismLang.FLUID_CONTAINER_BOTH),
         FILL(MekanismLang.FLUID_CONTAINER_FILL),
@@ -25,11 +26,10 @@ public interface IFluidContainerManager extends IHasMode {
         }
 
         @Override
-        public ITextComponent getTextComponent() {
+        public Component getTextComponent() {
             return langEntry.translate();
         }
 
-        @Nonnull
         @Override
         public ContainerEditMode byIndex(int index) {
             return byIndexStatic(index);

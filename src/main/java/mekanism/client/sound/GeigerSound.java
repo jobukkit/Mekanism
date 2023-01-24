@@ -1,30 +1,43 @@
 package mekanism.client.sound;
 
-import javax.annotation.Nonnull;
-import mekanism.common.Mekanism;
+import java.util.Objects;
+import mekanism.common.lib.radiation.RadiationManager;
 import mekanism.common.lib.radiation.RadiationManager.RadiationScale;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class GeigerSound extends PlayerSound {
 
-    public static GeigerSound create(@Nonnull PlayerEntity player, RadiationScale scale) {
+    public static GeigerSound create(@NotNull Player player, RadiationScale scale) {
         if (scale == RadiationScale.NONE) {
             throw new IllegalArgumentException("Can't create a GeigerSound with a RadiationScale of NONE.");
         }
-        return new GeigerSound(player, scale);
+        int subtitleFrequency;
+        if (scale == RadiationScale.MEDIUM) {
+            subtitleFrequency = 50;
+        } else if (scale == RadiationScale.ELEVATED) {
+            subtitleFrequency = 40;
+        } else if (scale == RadiationScale.HIGH) {
+            subtitleFrequency = 30;
+        } else if (scale == RadiationScale.EXTREME) {
+            subtitleFrequency = 20;//Every second
+        } else {//LOW
+            subtitleFrequency = 60;
+        }
+        return new GeigerSound(player, scale, subtitleFrequency);
     }
 
     private final RadiationScale scale;
 
-    private GeigerSound(@Nonnull PlayerEntity player, RadiationScale scale) {
-        super(player, scale.getSoundEvent());
+    private GeigerSound(@NotNull Player player, RadiationScale scale, int subtitleFrequency) {
+        super(player, Objects.requireNonNull(scale.getSoundEvent()), subtitleFrequency);
         this.scale = scale;
         setFade(1, 1);
     }
 
     @Override
-    public boolean shouldPlaySound(@Nonnull PlayerEntity player) {
-        return scale == Mekanism.radiationManager.getClientScale();
+    public boolean shouldPlaySound(@NotNull Player player) {
+        return scale == RadiationManager.INSTANCE.getClientScale();
     }
 
     @Override

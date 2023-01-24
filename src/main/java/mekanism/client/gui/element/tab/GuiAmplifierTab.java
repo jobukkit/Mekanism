@@ -1,17 +1,20 @@
 package mekanism.client.gui.element.tab;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.Nonnull;
+import com.mojang.blaze3d.vertex.PoseStack;
+import mekanism.client.SpecialColors;
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.GuiInsetElement;
+import mekanism.client.render.MekanismRenderer;
 import mekanism.common.Mekanism;
 import mekanism.common.MekanismLang;
-import mekanism.common.network.PacketGuiInteract;
-import mekanism.common.network.PacketGuiInteract.GuiInteraction;
+import mekanism.common.network.to_server.PacketGuiInteract;
+import mekanism.common.network.to_server.PacketGuiInteract.GuiInteraction;
 import mekanism.common.tile.laser.TileEntityLaserAmplifier;
+import mekanism.common.tile.laser.TileEntityLaserAmplifier.RedstoneOutput;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.MekanismUtils.ResourceType;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
 public class GuiAmplifierTab extends GuiInsetElement<TileEntityLaserAmplifier> {
 
@@ -25,22 +28,27 @@ public class GuiAmplifierTab extends GuiInsetElement<TileEntityLaserAmplifier> {
 
     @Override
     protected ResourceLocation getOverlay() {
-        switch (tile.outputMode) {
-            case ENTITY_DETECTION:
-                return ENTITY;
-            case ENERGY_CONTENTS:
-                return CONTENTS;
+        if (dataSource.getOutputMode() == RedstoneOutput.ENTITY_DETECTION) {
+            return ENTITY;
+        } else if (dataSource.getOutputMode() == RedstoneOutput.ENERGY_CONTENTS) {
+            return CONTENTS;
         }
         return super.getOverlay();
     }
 
     @Override
-    public void renderToolTip(@Nonnull MatrixStack matrix, int mouseX, int mouseY) {
-        displayTooltip(matrix, MekanismLang.REDSTONE_OUTPUT.translate(tile.outputMode), mouseX, mouseY);
+    public void renderToolTip(@NotNull PoseStack matrix, int mouseX, int mouseY) {
+        super.renderToolTip(matrix, mouseX, mouseY);
+        displayTooltips(matrix, mouseX, mouseY, MekanismLang.REDSTONE_OUTPUT.translate(dataSource.getOutputMode()));
     }
 
     @Override
     public void onClick(double mouseX, double mouseY) {
-        Mekanism.packetHandler.sendToServer(new PacketGuiInteract(GuiInteraction.NEXT_MODE, tile));
+        Mekanism.packetHandler().sendToServer(new PacketGuiInteract(GuiInteraction.NEXT_MODE, dataSource));
+    }
+
+    @Override
+    protected void colorTab() {
+        MekanismRenderer.color(SpecialColors.TAB_LASER_AMPLIFIER);
     }
 }

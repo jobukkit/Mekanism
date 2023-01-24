@@ -1,22 +1,27 @@
 package mekanism.client.render.tileentity;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import java.util.EnumMap;
 import java.util.Map;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mekanism.client.render.MekanismRenderType;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.client.render.MekanismRenderer;
 import mekanism.client.render.MekanismRenderer.Model3D;
+import mekanism.client.render.MekanismRenderer.Model3D.ModelBoundsSetter;
+import mekanism.client.render.RenderResizableCuboid.FaceDisplay;
 import mekanism.common.base.ProfilerConstants;
-import mekanism.common.registries.MekanismGases;
 import mekanism.common.tile.TileEntityTeleporter;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.profiler.IProfiler;
-import net.minecraft.util.Direction;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
-@ParametersAreNonnullByDefault
+@NothingNullByDefault
 public class RenderTeleporter extends MekanismTileEntityRenderer<TileEntityTeleporter> {
 
     private static final Map<Direction, Model3D> modelCache = new EnumMap<>(Direction.class);
@@ -27,16 +32,14 @@ public class RenderTeleporter extends MekanismTileEntityRenderer<TileEntityTelep
         rotatedModelCache.clear();
     }
 
-    public RenderTeleporter(TileEntityRendererDispatcher renderer) {
-        super(renderer);
+    public RenderTeleporter(BlockEntityRendererProvider.Context context) {
+        super(context);
     }
 
     @Override
-    protected void render(TileEntityTeleporter tile, float partialTick, MatrixStack matrix, IRenderTypeBuffer renderer, int light, int overlayLight, IProfiler profiler) {
-        if (tile.shouldRender && tile.getWorld() != null) {
-            MekanismRenderer.renderObject(getOverlayModel(tile.frameDirection(), tile.frameRotated()), matrix, renderer.getBuffer(MekanismRenderType.resizableCuboid()),
-                  MekanismRenderer.getColorARGB(tile.getColor(), 0.75F), MekanismRenderer.FULL_LIGHT);
-        }
+    protected void render(TileEntityTeleporter tile, float partialTick, PoseStack matrix, MultiBufferSource renderer, int light, int overlayLight, ProfilerFiller profiler) {
+        MekanismRenderer.renderObject(getOverlayModel(tile.frameDirection(), tile.frameRotated()), matrix, renderer.getBuffer(Sheets.translucentCullBlockSheet()),
+              MekanismRenderer.getColorARGB(tile.getColor(), 0.75F), LightTexture.FULL_BRIGHT, overlayLight, FaceDisplay.FRONT, getCamera(), tile.getBlockPos());
     }
 
     @Override
@@ -49,83 +52,46 @@ public class RenderTeleporter extends MekanismTileEntityRenderer<TileEntityTelep
             direction = Direction.UP;
         }
         Map<Direction, Model3D> cache = rotated ? rotatedModelCache : modelCache;
-        if (!cache.containsKey(direction)) {
-            Model3D model = new Model3D();
-            model.setTexture(MekanismRenderer.getChemicalTexture(MekanismGases.HYDROGEN.getChemical()));
-            cache.put(direction, model);
-            if (direction == Direction.UP) {
-                model.minY = 1;
-                model.maxY = 3;
-                setUpDownDimensions(model, rotated);
-            } else if (direction == Direction.DOWN) {
-                model.minY = -2;
-                model.maxY = 0;
-                setUpDownDimensions(model, rotated);
-            } else if (direction == Direction.EAST) {
-                model.minX = 1;
-                model.maxX = 3;
-                setEastWestDimensions(model, rotated);
-            } else if (direction == Direction.WEST) {
-                model.minX = -2;
-                model.maxX = 0;
-                setEastWestDimensions(model, rotated);
-            } else if (direction == Direction.NORTH) {
-                model.minZ = -2;
-                model.maxZ = 0;
-                setNorthSouthDimensions(model, rotated);
-            } else if (direction == Direction.SOUTH) {
-                model.minZ = 0;
-                model.maxZ = 3;
-                setNorthSouthDimensions(model, rotated);
-            }
-        }
-        return cache.get(direction);
+        return cache.computeIfAbsent(direction, dir -> {
+            Axis renderAxis = dir.getAxis().isHorizontal() ? Axis.Y : rotated ? Axis.X : Axis.Z;
+            Model3D model = new Model3D()
+                  .setTexture(MekanismRenderer.teleporterPortal)
+                  .setSideRender(side -> side.getAxis() == renderAxis);
+            int min = dir.getAxisDirection() == AxisDirection.POSITIVE ? 1 : -2;
+            int max = dir.getAxisDirection() == AxisDirection.POSITIVE ? 3 : 0;
+            return switch (dir.getAxis()) {
+                case X -> {
+                    setDimensions(rotated, model::zBounds, model::yBounds);
+                    yield model.xBounds(min, max);
+                }
+                case Y -> {
+                    setDimensions(rotated, model::zBounds, model::xBounds);
+                    yield model.yBounds(min, max);
+                }
+                case Z -> {
+                    setDimensions(rotated, model::xBounds, model::yBounds);
+                    yield model.zBounds(min, max);
+                }
+            };
+        });
     }
 
-    private void setUpDownDimensions(Model3D model, boolean rotated) {
+    private void setDimensions(boolean rotated, ModelBoundsSetter setter1, ModelBoundsSetter setter2) {
         if (rotated) {
-            model.minX = 0.46;
-            model.maxX = 0.54;
-            model.minZ = 0;
-            model.maxZ = 1;
+            setDimensions(false, setter2, setter1);
         } else {
-            model.minX = 0;
-            model.maxX = 1;
-            model.minZ = 0.46;
-            model.maxZ = 0.54;
-        }
-    }
-
-    private void setEastWestDimensions(Model3D model, boolean rotated) {
-        if (rotated) {
-            model.minY = 0.46;
-            model.maxY = 0.54;
-            model.minZ = 0;
-            model.maxZ = 1;
-        } else {
-            model.minY = 0;
-            model.maxY = 1;
-            model.minZ = 0.46;
-            model.maxZ = 0.54;
-        }
-    }
-
-    private void setNorthSouthDimensions(Model3D model, boolean rotated) {
-        if (rotated) {
-            model.minY = 0.46;
-            model.maxY = 0.54;
-            model.minX = 0;
-            model.maxX = 1;
-        } else {
-            model.minY = 0;
-            model.maxY = 1;
-            model.minX = 0.46;
-            model.maxX = 0.54;
+            setter1.set(0.46F, 0.54F);
+            setter2.set(0, 1);
         }
     }
 
     @Override
-    public boolean isGlobalRenderer(TileEntityTeleporter tile) {
-        return tile.shouldRender && tile.getWorld() != null;
+    public boolean shouldRenderOffScreen(TileEntityTeleporter tile) {
+        return true;
+    }
+
+    @Override
+    public boolean shouldRender(TileEntityTeleporter tile, Vec3 camera) {
+        return tile.shouldRender && tile.getLevel() != null && super.shouldRender(tile, camera);
     }
 }

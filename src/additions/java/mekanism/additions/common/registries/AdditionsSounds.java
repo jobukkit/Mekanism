@@ -3,9 +3,12 @@ package mekanism.additions.common.registries;
 import mekanism.additions.common.MekanismAdditions;
 import mekanism.common.registration.impl.SoundEventDeferredRegister;
 import mekanism.common.registration.impl.SoundEventRegistryObject;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.sounds.SoundEvent;
 
 public class AdditionsSounds {
+
+    private AdditionsSounds() {
+    }
 
     public static final SoundEventDeferredRegister SOUND_EVENTS = new SoundEventDeferredRegister(MekanismAdditions.MODID);
 

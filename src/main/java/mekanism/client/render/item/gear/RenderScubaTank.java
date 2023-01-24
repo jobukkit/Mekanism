@@ -1,24 +1,31 @@
 package mekanism.client.render.item.gear;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.Nonnull;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
 import mekanism.client.model.ModelScubaTank;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
-import net.minecraft.client.renderer.tileentity.ItemStackTileEntityRenderer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.vector.Vector3f;
+import mekanism.client.render.item.MekanismISTER;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
-public class RenderScubaTank extends ItemStackTileEntityRenderer {
+public class RenderScubaTank extends MekanismISTER {
 
-    private static final ModelScubaTank scubaTank = new ModelScubaTank();
+    public static final RenderScubaTank RENDERER = new RenderScubaTank();
+    private ModelScubaTank scubaTank;
 
     @Override
-    public void func_239207_a_(@Nonnull ItemStack stack, @Nonnull TransformType transformType, @Nonnull MatrixStack matrix, @Nonnull IRenderTypeBuffer renderer, int light, int overlayLight) {
-        matrix.push();
+    public void onResourceManagerReload(@NotNull ResourceManager resourceManager) {
+        scubaTank = new ModelScubaTank(getEntityModels());
+    }
+
+    @Override
+    public void renderByItem(@NotNull ItemStack stack, @NotNull TransformType transformType, @NotNull PoseStack matrix, @NotNull MultiBufferSource renderer, int light, int overlayLight) {
+        matrix.pushPose();
         matrix.translate(0.5, 0.5, 0.5);
-        matrix.rotate(Vector3f.ZP.rotationDegrees(180));
-        scubaTank.render(matrix, renderer, light, overlayLight, stack.hasEffect());
-        matrix.pop();
+        matrix.mulPose(Vector3f.ZP.rotationDegrees(180));
+        scubaTank.render(matrix, renderer, light, overlayLight, stack.hasFoil());
+        matrix.popPose();
     }
 }

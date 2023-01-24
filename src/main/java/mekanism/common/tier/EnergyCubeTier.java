@@ -1,17 +1,16 @@
 package mekanism.common.tier;
 
 import java.util.Locale;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.tier.BaseTier;
 import mekanism.api.tier.ITier;
 import mekanism.common.config.value.CachedFloatingLongValue;
-import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.StringRepresentable;
+import org.jetbrains.annotations.Nullable;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
-public enum EnergyCubeTier implements ITier, IStringSerializable {
+@NothingNullByDefault
+public enum EnergyCubeTier implements ITier, StringRepresentable {
     BASIC(BaseTier.BASIC, FloatingLong.createConst(4_000_000), FloatingLong.createConst(4_000)),
     ADVANCED(BaseTier.ADVANCED, FloatingLong.createConst(16_000_000), FloatingLong.createConst(16_000)),
     ELITE(BaseTier.ELITE, FloatingLong.createConst(64_000_000), FloatingLong.createConst(64_000)),
@@ -21,7 +20,9 @@ public enum EnergyCubeTier implements ITier, IStringSerializable {
     private final FloatingLong baseMaxEnergy;
     private final FloatingLong baseOutput;
     private final BaseTier baseTier;
+    @Nullable
     private CachedFloatingLongValue storageReference;
+    @Nullable
     private CachedFloatingLongValue outputReference;
 
     EnergyCubeTier(BaseTier tier, FloatingLong max, FloatingLong out) {
@@ -36,7 +37,7 @@ public enum EnergyCubeTier implements ITier, IStringSerializable {
     }
 
     @Override
-    public String getString() {
+    public String getSerializedName() {
         return name().toLowerCase(Locale.ROOT);
     }
 

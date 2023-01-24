@@ -1,24 +1,32 @@
 package mekanism.common.item.block;
 
-import javax.annotation.Nonnull;
-import mekanism.common.block.basic.BlockSecurityDesk;
-import mekanism.common.registration.impl.ItemDeferredRegister;
-import mekanism.common.util.MekanismUtils;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.BlockItemUseContext;
+import java.util.List;
+import mekanism.api.text.EnumColor;
+import mekanism.common.MekanismLang;
+import mekanism.common.block.prefab.BlockTile.BlockTileModel;
+import mekanism.common.content.blocktype.BlockTypeTile;
+import mekanism.common.item.interfaces.IItemSustainedInventory;
+import mekanism.common.tile.TileEntitySecurityDesk;
+import mekanism.common.util.SecurityUtils;
+import mekanism.common.util.text.BooleanStateDisplay.YesNo;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
-public class ItemBlockSecurityDesk extends ItemBlockTooltip<BlockSecurityDesk> {
+public class ItemBlockSecurityDesk extends ItemBlockTooltip<BlockTileModel<TileEntitySecurityDesk, BlockTypeTile<TileEntitySecurityDesk>>> implements
+      IItemSustainedInventory {
 
-    public ItemBlockSecurityDesk(BlockSecurityDesk block) {
-        super(block, ItemDeferredRegister.getMekBaseProperties());
+    public ItemBlockSecurityDesk(BlockTileModel<TileEntitySecurityDesk, BlockTypeTile<TileEntitySecurityDesk>> block) {
+        super(block);
     }
 
     @Override
-    public boolean placeBlock(@Nonnull BlockItemUseContext context, @Nonnull BlockState state) {
-        if (!MekanismUtils.isValidReplaceableBlock(context.getWorld(), context.getPos().up())) {
-            //If there is not enough room, fail
-            return false;
-        }
-        return super.placeBlock(context, state);
+    protected void addDetails(@NotNull ItemStack stack, Level world, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
+        //Note: We manually override this as we don't want to display the security mode for the security desk as while it technically
+        // has one in reality it is always private
+        SecurityUtils.INSTANCE.addOwnerTooltip(stack, tooltip);
+        tooltip.add(MekanismLang.HAS_INVENTORY.translateColored(EnumColor.AQUA, EnumColor.GRAY, YesNo.of(hasInventory(stack))));
     }
 }

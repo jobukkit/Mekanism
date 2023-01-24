@@ -20,7 +20,7 @@ public class VoiceServerManager {
         Mekanism.logger.info("VoiceServer: Starting up server...");
         try {
             running = true;
-            serverSocket = new ServerSocket(MekanismAdditionsConfig.additions.VOICE_PORT.get());
+            serverSocket = new ServerSocket(MekanismAdditionsConfig.additions.voicePort.get());
             (listenThread = new ListenThread()).start();
         } catch (Exception ignored) {
         }
@@ -75,8 +75,8 @@ public class VoiceServerManager {
     private class ListenThread extends Thread {
 
         private ListenThread() {
+            super("VoiceServer Listen Thread");
             setDaemon(true);
-            setName("VoiceServer Listen Thread");
         }
 
         @Override

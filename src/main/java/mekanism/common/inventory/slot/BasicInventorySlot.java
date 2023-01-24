@@ -2,58 +2,58 @@ package mekanism.common.inventory.slot;
 
 import java.util.Objects;
 import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
+import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
 import mekanism.api.NBTConstants;
-import mekanism.api.annotations.FieldsAreNonnullByDefault;
-import mekanism.api.annotations.NonNull;
-import mekanism.api.inventory.AutomationType;
+import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.functions.ConstantPredicates;
 import mekanism.api.inventory.IInventorySlot;
 import mekanism.common.inventory.container.slot.ContainerSlotType;
 import mekanism.common.inventory.container.slot.InventoryContainerSlot;
 import mekanism.common.inventory.container.slot.SlotOverlay;
+import mekanism.common.inventory.warning.ISupportsWarning;
 import mekanism.common.util.NBTUtils;
+import mekanism.common.util.RegistryUtils;
 import mekanism.common.util.StackUtils;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.ItemHandlerHelper;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-@FieldsAreNonnullByDefault
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public class BasicInventorySlot implements IInventorySlot {
 
     //TODO: Should we make some sort of "ITickableSlot" or something that lets us tick a bunch of slots at once instead of having to manually call the relevant methods
-    public static final Predicate<@NonNull ItemStack> alwaysTrue = stack -> true;
-    public static final Predicate<@NonNull ItemStack> alwaysFalse = stack -> false;
-    public static final BiPredicate<@NonNull ItemStack, @NonNull AutomationType> alwaysTrueBi = (stack, automationType) -> true;
-    public static final BiPredicate<@NonNull ItemStack, @NonNull AutomationType> manualOnly = (stack, automationType) -> automationType == AutomationType.MANUAL;
-    public static final BiPredicate<@NonNull ItemStack, @NonNull AutomationType> internalOnly = (stack, automationType) -> automationType == AutomationType.INTERNAL;
-    public static final BiPredicate<@NonNull ItemStack, @NonNull AutomationType> notExternal = (stack, automationType) -> automationType != AutomationType.EXTERNAL;
-    private static final int DEFAULT_LIMIT = 64;
+    public static final Predicate<@NotNull ItemStack> alwaysTrue = ConstantPredicates.alwaysTrue();
+    public static final Predicate<@NotNull ItemStack> alwaysFalse = ConstantPredicates.alwaysFalse();
+    public static final BiPredicate<@NotNull ItemStack, @NotNull AutomationType> alwaysTrueBi = ConstantPredicates.alwaysTrueBi();
+    public static final BiPredicate<@NotNull ItemStack, @NotNull AutomationType> manualOnly = (stack, automationType) -> automationType == AutomationType.MANUAL;
+    public static final BiPredicate<@NotNull ItemStack, @NotNull AutomationType> internalOnly = ConstantPredicates.internalOnly();
+    public static final BiPredicate<@NotNull ItemStack, @NotNull AutomationType> notExternal = ConstantPredicates.notExternal();
+    public static final int DEFAULT_LIMIT = 64;
 
     public static BasicInventorySlot at(@Nullable IContentsListener listener, int x, int y) {
         return at(alwaysTrue, listener, x, y);
     }
 
-    public static BasicInventorySlot at(Predicate<@NonNull ItemStack> validator, @Nullable IContentsListener listener, int x, int y) {
+    public static BasicInventorySlot at(Predicate<@NotNull ItemStack> validator, @Nullable IContentsListener listener, int x, int y) {
         Objects.requireNonNull(validator, "Item validity check cannot be null");
         return new BasicInventorySlot(alwaysTrueBi, alwaysTrueBi, validator, listener, x, y);
     }
 
-    public static BasicInventorySlot at(Predicate<@NonNull ItemStack> canExtract, Predicate<@NonNull ItemStack> canInsert, @Nullable IContentsListener listener, int x, int y) {
+    public static BasicInventorySlot at(Predicate<@NotNull ItemStack> canExtract, Predicate<@NotNull ItemStack> canInsert, @Nullable IContentsListener listener, int x, int y) {
         Objects.requireNonNull(canExtract, "Extraction validity check cannot be null");
         Objects.requireNonNull(canInsert, "Insertion validity check cannot be null");
         return new BasicInventorySlot(canExtract, canInsert, alwaysTrue, listener, x, y);
     }
 
-    public static BasicInventorySlot at(BiPredicate<@NonNull ItemStack, @NonNull AutomationType> canExtract,
-          BiPredicate<@NonNull ItemStack, @NonNull AutomationType> canInsert, @Nullable IContentsListener listener, int x, int y) {
+    public static BasicInventorySlot at(BiPredicate<@NotNull ItemStack, @NotNull AutomationType> canExtract,
+          BiPredicate<@NotNull ItemStack, @NotNull AutomationType> canInsert, @Nullable IContentsListener listener, int x, int y) {
         Objects.requireNonNull(canExtract, "Extraction validity check cannot be null");
         Objects.requireNonNull(canInsert, "Insertion validity check cannot be null");
         return new BasicInventorySlot(canExtract, canInsert, alwaysTrue, listener, x, y);
@@ -64,9 +64,9 @@ public class BasicInventorySlot implements IInventorySlot {
      * instead.
      */
     protected ItemStack current = ItemStack.EMPTY;
-    private final BiPredicate<@NonNull ItemStack, @NonNull AutomationType> canExtract;
-    private final BiPredicate<@NonNull ItemStack, @NonNull AutomationType> canInsert;
-    private final Predicate<@NonNull ItemStack> validator;
+    private final BiPredicate<@NotNull ItemStack, @NotNull AutomationType> canExtract;
+    private final BiPredicate<@NotNull ItemStack, @NotNull AutomationType> canInsert;
+    private final Predicate<@NotNull ItemStack> validator;
     private final int limit;
     @Nullable
     private final IContentsListener listener;
@@ -76,20 +76,22 @@ public class BasicInventorySlot implements IInventorySlot {
     private ContainerSlotType slotType = ContainerSlotType.NORMAL;
     @Nullable
     private SlotOverlay slotOverlay;
+    @Nullable
+    private Consumer<ISupportsWarning<?>> warningAdder;
 
-    protected BasicInventorySlot(Predicate<@NonNull ItemStack> canExtract, Predicate<@NonNull ItemStack> canInsert, Predicate<@NonNull ItemStack> validator,
+    protected BasicInventorySlot(Predicate<@NotNull ItemStack> canExtract, Predicate<@NotNull ItemStack> canInsert, Predicate<@NotNull ItemStack> validator,
           @Nullable IContentsListener listener, int x, int y) {
         this((stack, automationType) -> automationType == AutomationType.MANUAL || canExtract.test(stack), (stack, automationType) -> canInsert.test(stack),
               validator, listener, x, y);
     }
 
-    protected BasicInventorySlot(BiPredicate<@NonNull ItemStack, @NonNull AutomationType> canExtract, BiPredicate<@NonNull ItemStack, @NonNull AutomationType> canInsert,
-          Predicate<@NonNull ItemStack> validator, @Nullable IContentsListener listener, int x, int y) {
+    protected BasicInventorySlot(BiPredicate<@NotNull ItemStack, @NotNull AutomationType> canExtract, BiPredicate<@NotNull ItemStack, @NotNull AutomationType> canInsert,
+          Predicate<@NotNull ItemStack> validator, @Nullable IContentsListener listener, int x, int y) {
         this(DEFAULT_LIMIT, canExtract, canInsert, validator, listener, x, y);
     }
 
-    protected BasicInventorySlot(int limit, BiPredicate<@NonNull ItemStack, @NonNull AutomationType> canExtract,
-          BiPredicate<@NonNull ItemStack, @NonNull AutomationType> canInsert, Predicate<@NonNull ItemStack> validator, @Nullable IContentsListener listener, int x, int y) {
+    protected BasicInventorySlot(int limit, BiPredicate<@NotNull ItemStack, @NotNull AutomationType> canExtract,
+          BiPredicate<@NotNull ItemStack, @NotNull AutomationType> canInsert, Predicate<@NotNull ItemStack> validator, @Nullable IContentsListener listener, int x, int y) {
         this.limit = limit;
         this.canExtract = canExtract;
         this.canInsert = canInsert;
@@ -115,13 +117,17 @@ public class BasicInventorySlot implements IInventorySlot {
 
     private void setStack(ItemStack stack, boolean validateStack) {
         if (stack.isEmpty()) {
+            if (current.isEmpty()) {
+                //If we are already empty just exit, to not fire onContentsChanged
+                return;
+            }
             current = ItemStack.EMPTY;
         } else if (!validateStack || isItemValid(stack)) {
             current = stack.copy();
         } else {
             //Throws a RuntimeException as IItemHandlerModifiable specifies is allowed when something unexpected happens
             // As setStack is more meant to be used as an internal method
-            throw new RuntimeException("Invalid stack for slot: " + stack.getItem().getRegistryName() + " " + stack.getCount() + " " + stack.getTag());
+            throw new RuntimeException("Invalid stack for slot: " + RegistryUtils.getName(stack.getItem()) + " " + stack.getCount() + " " + stack.getTag());
         }
         onContentsChanged();
     }
@@ -129,7 +135,7 @@ public class BasicInventorySlot implements IInventorySlot {
     @Override
     public ItemStack insertItem(ItemStack stack, Action action, AutomationType automationType) {
         if (stack.isEmpty() || !isItemValid(stack) || !canInsert.test(stack, automationType)) {
-            //"Fail quick" if the given stack is empty or we can never insert the item or currently are unable to insert it
+            //"Fail quick" if the given stack is empty, or we can never insert the item or currently are unable to insert it
             return stack;
         }
         int needed = getLimit(stack) - getCount();
@@ -210,15 +216,32 @@ public class BasicInventorySlot implements IInventorySlot {
     @Nullable
     @Override
     public InventoryContainerSlot createContainerSlot() {
-        return new InventoryContainerSlot(this, x, y, slotType, slotOverlay);
+        return new InventoryContainerSlot(this, x, y, slotType, slotOverlay, warningAdder, this::setStackUnchecked);
     }
 
     public void setSlotType(ContainerSlotType slotType) {
+        //TODO - 1.18: Re-evaluate this method as for the most part we now seem to be handling this in GuiMekanism
+        // and figuring it out based on the data type; which at the very least means we can probably remove some
+        // calls to this. Though there are also some cases where we want to override it where it doesn't now as
+        // the fallback sets it to normal basically regardless (see evaporation multiblock and input slots)
         this.slotType = slotType;
+    }
+
+    public void tracksWarnings(@Nullable Consumer<ISupportsWarning<?>> warningAdder) {
+        this.warningAdder = warningAdder;
     }
 
     public void setSlotOverlay(@Nullable SlotOverlay slotOverlay) {
         this.slotOverlay = slotOverlay;
+    }
+
+    @Nullable
+    protected final SlotOverlay getSlotOverlay() {
+        return slotOverlay;
+    }
+
+    protected final ContainerSlotType getSlotType() {
+        return slotType;
     }
 
     /**
@@ -233,7 +256,7 @@ public class BasicInventorySlot implements IInventorySlot {
             return 0;
         } else if (amount <= 0) {
             if (action.execute()) {
-                setStack(ItemStack.EMPTY);
+                setEmpty();
             }
             return 0;
         }
@@ -242,7 +265,7 @@ public class BasicInventorySlot implements IInventorySlot {
             amount = maxStackSize;
         }
         if (getCount() == amount || action.simulate()) {
-            //If our size is not changing or we are only simulating the change, don't do anything
+            //If our size is not changing, or we are only simulating the change, don't do anything
             return amount;
         }
         current.setCount(amount);
@@ -287,10 +310,10 @@ public class BasicInventorySlot implements IInventorySlot {
     }
 
     @Override
-    public CompoundNBT serializeNBT() {
-        CompoundNBT nbt = new CompoundNBT();
+    public CompoundTag serializeNBT() {
+        CompoundTag nbt = new CompoundTag();
         if (!isEmpty()) {
-            nbt.put(NBTConstants.ITEM, current.write(new CompoundNBT()));
+            nbt.put(NBTConstants.ITEM, current.serializeNBT());
             if (getCount() > current.getMaxStackSize()) {
                 nbt.putInt(NBTConstants.SIZE_OVERRIDE, getCount());
             }
@@ -299,15 +322,14 @@ public class BasicInventorySlot implements IInventorySlot {
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT nbt) {
+    public void deserializeNBT(CompoundTag nbt) {
         ItemStack stack = ItemStack.EMPTY;
-        if (nbt.contains(NBTConstants.ITEM, NBT.TAG_COMPOUND)) {
-            stack = ItemStack.read(nbt.getCompound(NBTConstants.ITEM));
+        if (nbt.contains(NBTConstants.ITEM, Tag.TAG_COMPOUND)) {
+            stack = ItemStack.of(nbt.getCompound(NBTConstants.ITEM));
             NBTUtils.setIntIfPresent(nbt, NBTConstants.SIZE_OVERRIDE, stack::setCount);
         }
-        //Directly set the stack in case the item is no longer valid for the stack.
-        // We do this instead of using setStackUnchecked to avoid calling markDirty when we are loading
-        // the inventory and the world is still null on the tile
+        //Set the stack in an unchecked way so that if it is no longer valid, we don't end up
+        // crashing due to the stack not being valid
         setStackUnchecked(stack);
     }
 }

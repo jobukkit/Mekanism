@@ -4,47 +4,46 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.common.DataGenJsonConstants;
-import net.minecraft.item.Item;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.ItemLike;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public class ExtendedShapelessRecipeBuilder extends BaseRecipeBuilder<ExtendedShapelessRecipeBuilder> {
 
     private final List<Ingredient> ingredients = new ArrayList<>();
 
-    private ExtendedShapelessRecipeBuilder(IItemProvider result, int count) {
-        super(IRecipeSerializer.CRAFTING_SHAPELESS, result, count);
+    private ExtendedShapelessRecipeBuilder(ItemLike result, int count) {
+        super(RecipeSerializer.SHAPELESS_RECIPE, result, count);
     }
 
-    public static ExtendedShapelessRecipeBuilder shapelessRecipe(IItemProvider result) {
+    public static ExtendedShapelessRecipeBuilder shapelessRecipe(ItemLike result) {
         return shapelessRecipe(result, 1);
     }
 
-    public static ExtendedShapelessRecipeBuilder shapelessRecipe(IItemProvider result, int count) {
+    public static ExtendedShapelessRecipeBuilder shapelessRecipe(ItemLike result, int count) {
         return new ExtendedShapelessRecipeBuilder(result, count);
     }
 
-    public ExtendedShapelessRecipeBuilder addIngredient(ITag<Item> tag) {
-        return addIngredient(Ingredient.fromTag(tag));
+    public ExtendedShapelessRecipeBuilder addIngredient(TagKey<Item> tag) {
+        return addIngredient(tag, 1);
     }
 
-    public ExtendedShapelessRecipeBuilder addIngredient(IItemProvider item) {
+    public ExtendedShapelessRecipeBuilder addIngredient(TagKey<Item> tag, int quantity) {
+        return addIngredient(Ingredient.of(tag), quantity);
+    }
+
+    public ExtendedShapelessRecipeBuilder addIngredient(ItemLike item) {
         return addIngredient(item, 1);
     }
 
-    public ExtendedShapelessRecipeBuilder addIngredient(IItemProvider item, int quantity) {
-        for (int i = 0; i < quantity; ++i) {
-            addIngredient(Ingredient.fromItems(item));
-        }
-        return this;
+    public ExtendedShapelessRecipeBuilder addIngredient(ItemLike item, int quantity) {
+        return addIngredient(Ingredient.of(item), quantity);
     }
 
     public ExtendedShapelessRecipeBuilder addIngredient(Ingredient ingredient) {
@@ -77,11 +76,11 @@ public class ExtendedShapelessRecipeBuilder extends BaseRecipeBuilder<ExtendedSh
         }
 
         @Override
-        public void serialize(JsonObject json) {
-            super.serialize(json);
+        public void serializeRecipeData(JsonObject json) {
+            super.serializeRecipeData(json);
             JsonArray jsonIngredients = new JsonArray();
             for (Ingredient ingredient : ingredients) {
-                jsonIngredients.add(ingredient.serialize());
+                jsonIngredients.add(ingredient.toJson());
             }
             json.add(DataGenJsonConstants.INGREDIENTS, jsonIngredients);
         }

@@ -1,15 +1,13 @@
 package mekanism.api.heat;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.util.Direction;
+import mekanism.api.annotations.NothingNullByDefault;
+import net.minecraft.core.Direction;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A sided variant of {@link IHeatHandler}
  */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public interface ISidedHeatHandler extends IHeatHandler {
 
     /**
@@ -59,7 +57,7 @@ public interface ISidedHeatHandler extends IHeatHandler {
      * A sided variant of {@link IHeatHandler#getInverseConduction(int)}, docs copied for convenience.
      *
      * Returns the inverse conduction coefficient of a given capacitor. This value defines how much heat is allowed to be dissipated. The larger the number the less heat
-     * can dissipate. The trade off is that it also allows for lower amounts of heat to be inserted.
+     * can dissipate. The trade-off is that it also allows for lower amounts of heat to be inserted.
      *
      * @param capacitor Capacitor to query.
      * @param side      The side we are interacting with the handler from (null for internal).

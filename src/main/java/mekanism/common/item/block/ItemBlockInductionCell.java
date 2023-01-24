@@ -1,7 +1,6 @@
 package mekanism.common.item.block;
 
 import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.api.text.EnumColor;
 import mekanism.common.MekanismLang;
 import mekanism.common.block.attribute.Attribute;
@@ -12,9 +11,11 @@ import mekanism.common.tier.InductionCellTier;
 import mekanism.common.tile.multiblock.TileEntityInductionCell;
 import mekanism.common.util.StorageUtils;
 import mekanism.common.util.text.EnergyDisplay;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 public class ItemBlockInductionCell extends ItemBlockTooltip<BlockTile<TileEntityInductionCell, BlockTypeTile<TileEntityInductionCell>>> {
 
@@ -22,16 +23,16 @@ public class ItemBlockInductionCell extends ItemBlockTooltip<BlockTile<TileEntit
         super(block, ItemDeferredRegister.getMekBaseProperties());
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public InductionCellTier getTier() {
         return Attribute.getTier(getBlock(), InductionCellTier.class);
     }
 
     @Override
-    public void addStats(@Nonnull ItemStack stack, World world, @Nonnull List<ITextComponent> tooltip, boolean advanced) {
+    protected void addStats(@NotNull ItemStack stack, Level world, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
         InductionCellTier tier = getTier();
-        tooltip.add(MekanismLang.CAPACITY.translateColored(tier.getBaseTier().getColor(), EnumColor.GRAY, EnergyDisplay.of(tier.getMaxEnergy())));
+        tooltip.add(MekanismLang.CAPACITY.translateColored(tier.getBaseTier().getTextColor(), EnumColor.GRAY, EnergyDisplay.of(tier.getMaxEnergy())));
         tooltip.add(MekanismLang.STORED_ENERGY.translateColored(EnumColor.BRIGHT_GREEN, EnumColor.GRAY, EnergyDisplay.of(StorageUtils.getStoredEnergyFromNBT(stack),
               tier.getMaxEnergy())));
     }

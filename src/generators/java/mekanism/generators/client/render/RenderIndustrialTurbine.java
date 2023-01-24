@@ -1,66 +1,60 @@
 package mekanism.generators.client.render;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mekanism.client.render.MekanismRenderType;
-import mekanism.client.render.MekanismRenderer;
-import mekanism.client.render.MekanismRenderer.Model3D;
-import mekanism.client.render.ModelRenderer;
-import mekanism.client.render.data.GasRenderData;
-import mekanism.client.render.tileentity.MekanismTileEntityRenderer;
-import mekanism.common.util.MekanismUtils;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.client.render.data.RenderData;
+import mekanism.client.render.tileentity.MultiblockTileEntityRenderer;
+import mekanism.common.util.WorldUtils;
 import mekanism.generators.common.GeneratorsProfilerConstants;
+import mekanism.generators.common.content.turbine.TurbineMultiblockData;
 import mekanism.generators.common.tile.turbine.TileEntityTurbineCasing;
 import mekanism.generators.common.tile.turbine.TileEntityTurbineRotor;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.profiler.IProfiler;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.phys.Vec3;
 
-@ParametersAreNonnullByDefault
-public class RenderIndustrialTurbine extends MekanismTileEntityRenderer<TileEntityTurbineCasing> {
+@NothingNullByDefault
+public class RenderIndustrialTurbine extends MultiblockTileEntityRenderer<TurbineMultiblockData, TileEntityTurbineCasing> {
 
-    public RenderIndustrialTurbine(TileEntityRendererDispatcher renderer) {
-        super(renderer);
+    public RenderIndustrialTurbine(BlockEntityRendererProvider.Context context) {
+        super(context);
     }
 
     @Override
-    protected void render(TileEntityTurbineCasing tile, float partialTick, MatrixStack matrix, IRenderTypeBuffer renderer, int light, int overlayLight, IProfiler profiler) {
-        if (tile.isMaster && tile.getMultiblock().isFormed() && tile.getMultiblock().complex != null && tile.getMultiblock().renderLocation != null) {
-            BlockPos pos = tile.getPos();
-            BlockPos complexPos = tile.getMultiblock().complex;
-            IVertexBuilder buffer = RenderTurbineRotor.INSTANCE.model.getBuffer(renderer);
-            profiler.startSection(GeneratorsProfilerConstants.TURBINE_ROTOR);
+    protected void render(TileEntityTurbineCasing tile, TurbineMultiblockData multiblock, float partialTick, PoseStack matrix, MultiBufferSource renderer, int light,
+          int overlayLight, ProfilerFiller profiler) {
+        BlockPos pos = tile.getBlockPos();
+        profiler.push(GeneratorsProfilerConstants.TURBINE_ROTOR);
+        if (RenderTurbineRotor.INSTANCE != null) {
+            BlockPos complexPos = multiblock.complex;
+            VertexConsumer buffer = RenderTurbineRotor.INSTANCE.getBuffer(renderer);
+            matrix.pushPose();
+            matrix.translate(complexPos.getX() - pos.getX(), complexPos.getY() - pos.getY(), complexPos.getZ() - pos.getZ());
             while (true) {
-                complexPos = complexPos.down();
-                TileEntityTurbineRotor rotor = MekanismUtils.getTileEntity(TileEntityTurbineRotor.class, tile.getWorld(), complexPos);
+                complexPos = complexPos.below();
+                TileEntityTurbineRotor rotor = WorldUtils.getTileEntity(TileEntityTurbineRotor.class, tile.getLevel(), complexPos);
                 if (rotor == null) {
                     break;
                 }
-                matrix.push();
-                matrix.translate(complexPos.getX() - pos.getX(), complexPos.getY() - pos.getY(), complexPos.getZ() - pos.getZ());
-                RenderTurbineRotor.INSTANCE.render(rotor, matrix, buffer, LightTexture.packLight(0, 15), overlayLight);
-                matrix.pop();
+                matrix.translate(0, -1, 0);
+                RenderTurbineRotor.INSTANCE.render(rotor, matrix, buffer, LightTexture.FULL_SKY, overlayLight);
             }
-            profiler.endSection();
-            if (!tile.getMultiblock().gasTank.isEmpty() && tile.getMultiblock().length() > 0) {
-                int height = tile.getMultiblock().lowerVolume / (tile.getMultiblock().length() * tile.getMultiblock().width());
-                if (height >= 1) {
-                    GasRenderData data = new GasRenderData(tile.getMultiblock().gasTank.getStack());
-                    data.location = tile.getMultiblock().renderLocation;
-                    data.height = height;
-                    data.length = tile.getMultiblock().length();
-                    data.width = tile.getMultiblock().width();
-                    int glow = data.calculateGlowLight(LightTexture.packLight(0, 15));
-                    matrix.push();
-                    matrix.translate(data.location.getX() - pos.getX(), data.location.getY() - pos.getY(), data.location.getZ() - pos.getZ());
-                    Model3D gasModel = ModelRenderer.getModel(data, 1);
-                    MekanismRenderer.renderObject(gasModel, matrix, renderer.getBuffer(MekanismRenderType.resizableCuboid()), data.getColorARGB(tile.getMultiblock().prevSteamScale),
-                          glow);
-                    matrix.pop();
-                }
+            matrix.popPose();
+        }
+        profiler.pop();
+        if (!multiblock.gasTank.isEmpty() && multiblock.length() > 0) {
+            int height = multiblock.lowerVolume / (multiblock.length() * multiblock.width());
+            if (height > 0) {
+                RenderData data = RenderData.Builder.create(multiblock.gasTank.getStack())
+                      .of(multiblock)
+                      .height(height)
+                      .build();
+                renderObject(data, pos, matrix, renderer.getBuffer(Sheets.translucentCullBlockSheet()), overlayLight, multiblock.prevSteamScale);
             }
         }
     }
@@ -71,7 +65,7 @@ public class RenderIndustrialTurbine extends MekanismTileEntityRenderer<TileEnti
     }
 
     @Override
-    public boolean isGlobalRenderer(TileEntityTurbineCasing tile) {
-        return tile.isMaster && tile.getMultiblock().isFormed() && tile.getMultiblock().complex != null && tile.getMultiblock().renderLocation != null;
+    protected boolean shouldRender(TileEntityTurbineCasing tile, TurbineMultiblockData multiblock, Vec3 camera) {
+        return super.shouldRender(tile, multiblock, camera) && multiblock.complex != null;
     }
 }

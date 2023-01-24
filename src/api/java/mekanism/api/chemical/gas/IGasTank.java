@@ -1,17 +1,15 @@
 package mekanism.api.chemical.gas;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.NBTConstants;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.chemical.IChemicalTank;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 
 /**
  * Convenience extension to make working with generics easier.
  */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public interface IGasTank extends IChemicalTank<Gas, GasStack>, IEmptyGasProvider {
 
     @Override
@@ -20,8 +18,8 @@ public interface IGasTank extends IChemicalTank<Gas, GasStack>, IEmptyGasProvide
     }
 
     @Override
-    default void deserializeNBT(CompoundNBT nbt) {
-        if (nbt.contains(NBTConstants.STORED, NBT.TAG_COMPOUND)) {
+    default void deserializeNBT(CompoundTag nbt) {
+        if (nbt.contains(NBTConstants.STORED, Tag.TAG_COMPOUND)) {
             setStackUnchecked(GasStack.readFromNBT(nbt.getCompound(NBTConstants.STORED)));
         }
     }

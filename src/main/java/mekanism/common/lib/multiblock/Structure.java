@@ -1,21 +1,26 @@
 package mekanism.common.lib.multiblock;
 
-import com.google.common.collect.Sets;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.ToIntFunction;
 import mekanism.common.lib.math.voxel.BlockPosBuilder;
 import mekanism.common.lib.math.voxel.VoxelPlane;
 import mekanism.common.lib.multiblock.FormationProtocol.FormationResult;
-import mekanism.common.util.MekanismUtils;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3i;
-import net.minecraft.world.World;
+import mekanism.common.util.WorldUtils;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.chunk.ChunkAccess;
 
 public class Structure {
 
@@ -23,8 +28,8 @@ public class Structure {
 
     private final Map<BlockPos, IMultiblockBase> nodes = new Object2ObjectOpenHashMap<>();
 
-    private final Map<Axis, TreeMap<Integer, VoxelPlane>> minorPlaneMap = new EnumMap<>(Axis.class);
-    private final Map<Axis, TreeMap<Integer, VoxelPlane>> planeMap = new EnumMap<>(Axis.class);
+    private final Map<Axis, NavigableMap<Integer, VoxelPlane>> minorPlaneMap = new EnumMap<>(Axis.class);
+    private final Map<Axis, NavigableMap<Integer, VoxelPlane>> planeMap = new EnumMap<>(Axis.class);
 
     private boolean valid;
 
@@ -43,12 +48,13 @@ public class Structure {
     }
 
     private void init(IMultiblockBase node) {
-        nodes.put(node.getTilePos(), node);
+        BlockPos pos = node.getTilePos();
+        nodes.put(pos, node);
         for (Axis axis : Axis.AXES) {
-            getMinorAxisMap(axis).put(axis.getCoord(node.getTilePos()), new VoxelPlane(axis, node.getTilePos(), node instanceof IMultiblock));
+            getMinorAxisMap(axis).put(axis.getCoord(pos), new VoxelPlane(axis, pos, node instanceof IMultiblock));
         }
-        if (node instanceof IMultiblock && (controller == null || ((IMultiblock<?>) node).canBeMaster())) {
-            controller = (IMultiblock<?>) node;
+        if (node instanceof IMultiblock<?> multiblock && (getController() == null || multiblock.canBeMaster())) {
+            controller = multiblock;
         }
     }
 
@@ -57,7 +63,14 @@ public class Structure {
     }
 
     public void setMultiblockData(MultiblockData multiblockData) {
+        boolean changed = this.multiblockData != multiblockData;
         this.multiblockData = multiblockData;
+        if (changed) {
+            //If the multiblock changed, then reset the formed status so that we don't potentially end up with multiple masters
+            for (IMultiblockBase node : this.nodes.values()) {
+                node.resetForFormed();
+            }
+        }
     }
 
     public IMultiblock<?> getController() {
@@ -65,22 +78,22 @@ public class Structure {
     }
 
     public MultiblockManager<?> getManager() {
-        return controller != null && valid ? controller.getManager() : null;
+        return getController() != null && valid ? getController().getManager() : null;
     }
 
     public IMultiblockBase getTile(BlockPos pos) {
         return nodes.get(pos);
     }
 
-    public TreeMap<Integer, VoxelPlane> getMinorAxisMap(Axis axis) {
+    public NavigableMap<Integer, VoxelPlane> getMinorAxisMap(Axis axis) {
         return minorPlaneMap.computeIfAbsent(axis, k -> new TreeMap<>(Integer::compare));
     }
 
-    public TreeMap<Integer, VoxelPlane> getMajorAxisMap(Axis axis) {
+    public NavigableMap<Integer, VoxelPlane> getMajorAxisMap(Axis axis) {
         return planeMap.computeIfAbsent(axis, k -> new TreeMap<>(Integer::compare));
     }
 
-    public void markForUpdate(World world, boolean invalidate) {
+    public void markForUpdate(Level world, boolean invalidate) {
         updateTimestamp = world.getGameTime();
         didUpdate = false;
         if (invalidate) {
@@ -90,61 +103,96 @@ public class Structure {
         }
     }
 
-    public <TILE extends TileEntity & IMultiblockBase> void tick(TILE tile) {
-        if (!didUpdate && updateTimestamp == tile.getWorld().getGameTime() - 1) {
+    public <TILE extends BlockEntity & IMultiblockBase> void doImmediateUpdate(TILE tile, boolean tryValidate) {
+        //Pretend it got marked for update last tick so that when we call tick it will update
+        updateTimestamp = tile.getLevel().getGameTime() - 1;
+        didUpdate = false;
+        invalidate(tile.getLevel());
+        tick(tile, tryValidate);
+    }
+
+    public <TILE extends BlockEntity & IMultiblockBase> void tick(TILE tile, boolean tryValidate) {
+        if (!didUpdate && updateTimestamp == tile.getLevel().getGameTime() - 1) {
             didUpdate = true;
             runUpdate(tile);
         }
-        if (!isValid()) {
-            validate(tile);
+        if (tryValidate && !isValid()) {
+            validate(tile, new Long2ObjectOpenHashMap<>());
         }
     }
 
-    public <TILE extends TileEntity & IMultiblockBase> FormationResult runUpdate(TILE tile) {
+    public <TILE extends BlockEntity & IMultiblockBase> FormationResult runUpdate(TILE tile) {
         if (getController() != null && multiblockData == null) {
             return getController().createFormationProtocol().doUpdate();
         }
-        removeMultiblock(tile.getWorld());
+        removeMultiblock(tile.getLevel());
         return FormationResult.FAIL;
     }
 
     public void add(Structure s) {
         if (s != this) {
-            if (s.controller != null) {
-                controller = s.controller;
+            if (s.getController() != null && s.getController().canBeMaster() && (getController() == null || !getController().canBeMaster())) {
+                //If the controller of the other structure isn't null, and it can be a master block override our structure's controller
+                // if our structure's controller is only the controller because of lack of a better and more proper one
+                controller = s.getController();
             }
+            //Merge nodes, and update their structure to point to our structure
+            MultiblockManager<?> manager = getManager();
             s.nodes.forEach((key, value) -> {
                 nodes.put(key, value);
-                value.setStructure(getManager(), this);
+                value.setStructure(manager, this);
             });
-            for (Axis axis : s.minorPlaneMap.keySet()) {
+            //Iterate through the over the other structure's minor plane map and merge
+            // the minor planes into our structure.
+            for (Entry<Axis, NavigableMap<Integer, VoxelPlane>> entry : s.minorPlaneMap.entrySet()) {
+                Axis axis = entry.getKey();
                 Map<Integer, VoxelPlane> minorMap = getMinorAxisMap(axis);
                 Map<Integer, VoxelPlane> majorMap = getMajorAxisMap(axis);
-                s.minorPlaneMap.get(axis).forEach((key, value) -> {
-                    if (majorMap.containsKey(key)) {
-                        majorMap.get(key).merge(value);
+                entry.getValue().forEach((key, value) -> {
+                    VoxelPlane majorPlane = majorMap.get(key);
+                    if (majorPlane != null) {
+                        //If the major map already has an entry for the position, merge them
+                        majorPlane.merge(value);
                         return;
                     }
-                    VoxelPlane p = minorMap.get(key);
-                    if (p != null) {
-                        p.merge(value);
+                    VoxelPlane minorPlane = minorMap.get(key);
+                    if (minorPlane == null) {
+                        //Otherwise, if the minor map also doesn't have an entry, copy it
+                        minorMap.put(key, value);
                     } else {
-                        minorMap.put(key, p = value);
-                    }
-                    if (p.hasController() && p.length() >= 2 && p.height() >= 2) {
-                        majorMap.put(key, p);
-                        minorMap.remove(key);
+                        //Otherwise, if the minor map does have an entry, merge them
+                        minorPlane.merge(value);
+                        //If after merging the planes
+                        if (minorPlane.hasFrame() && minorPlane.length() >= 2 && minorPlane.height() >= 2) {
+                            // the plane has a frame and is at least two by two
+                            // move it from the minor plane map to the major plane map
+                            majorMap.put(key, minorPlane);
+                            minorMap.remove(key);
+                        }
                     }
                 });
             }
-            for (Axis axis : s.planeMap.keySet()) {
-                Map<Integer, VoxelPlane> map = getMajorAxisMap(axis);
-                s.planeMap.get(axis).forEach((key, value) -> {
-                    VoxelPlane p = map.get(key);
-                    if (p == null) {
-                        map.put(key, p = value);
+            //Iterate through the over the other structure's major plane map and merge
+            // the major planes into our structure.
+            for (Entry<Axis, NavigableMap<Integer, VoxelPlane>> entry : s.planeMap.entrySet()) {
+                Axis axis = entry.getKey();
+                Map<Integer, VoxelPlane> minorMap = getMinorAxisMap(axis);
+                Map<Integer, VoxelPlane> majorMap = getMajorAxisMap(axis);
+                entry.getValue().forEach((key, value) -> {
+                    VoxelPlane majorPlane = majorMap.get(key);
+                    if (majorPlane == null) {
+                        //If the major map doesn't have an entry, copy it
+                        majorMap.put(key, majorPlane = value);
+                        VoxelPlane minorPlane = minorMap.get(key);
+                        if (minorPlane != null) {
+                            //If however we already have a matching minor plane, we need to then
+                            // remove our minor plane and merge it into our new major plane
+                            majorPlane.merge(minorPlane);
+                            minorMap.remove(key);
+                        }
                     } else {
-                        p.merge(value);
+                        //If the major map does have an entry, merge them
+                        majorPlane.merge(value);
                     }
                 });
             }
@@ -155,12 +203,12 @@ public class Structure {
         return valid;
     }
 
-    public void invalidate(World world) {
+    public void invalidate(Level world) {
         removeMultiblock(world);
         valid = false;
     }
 
-    public void removeMultiblock(World world) {
+    public void removeMultiblock(Level world) {
         if (multiblockData != null) {
             multiblockData.remove(world);
             multiblockData = null;
@@ -175,9 +223,8 @@ public class Structure {
         return nodes.size();
     }
 
-    private static void validate(IMultiblockBase node) {
-        if (node instanceof IMultiblock) {
-            IMultiblock<?> multiblock = (IMultiblock<?>) node;
+    private static void validate(IMultiblockBase node, Long2ObjectMap<ChunkAccess> chunkMap) {
+        if (node instanceof IMultiblock<?> multiblock) {
             if (!multiblock.getStructure().isValid()) {
                 // only validate if necessary; this will already be valid if we recursively call validate()
                 // from a structural multiblock's perspective
@@ -190,34 +237,39 @@ public class Structure {
             if (pos.equals(node.getTilePos())) {
                 return true;
             }
-            TileEntity tile = MekanismUtils.getTileEntity(node.getTileWorld(), pos);
-            if (tile instanceof IMultiblockBase) {
-                IMultiblockBase adj = (IMultiblockBase) tile;
-                if (isCompatible(node, adj)) {
-                    boolean didMerge = false;
-                    if (node instanceof IStructuralMultiblock && adj instanceof IStructuralMultiblock) {
-                        Set<MultiblockManager<?>> managers = Sets.newHashSet();
-                        managers.addAll(((IStructuralMultiblock) node).getStructureMap().keySet());
-                        managers.addAll(((IStructuralMultiblock) adj).getStructureMap().keySet());
-                        // if both are structural, they should merge all manager structures
-                        for (MultiblockManager<?> manager : managers) {
-                            didMerge = mergeIfNecessary(node, adj, manager);
-                        }
-                    } else if (node instanceof IStructuralMultiblock) {
-                        // validate from the perspective of the IMultiblock
-                        if (!hasStructure(node, (IMultiblock<?>) adj)) {
-                            validate(adj);
-                        }
-                        return false;
-                    } else if (adj instanceof IStructuralMultiblock) {
-                        didMerge = mergeIfNecessary(node, adj, getManager(node));
-                    } else { // both are regular IMultiblocks
-                        // we know the structures are compatible so managers must be the same for both
-                        didMerge = mergeIfNecessary(node, adj, getManager(node));
+            BlockEntity tile = WorldUtils.getTileEntity(node.getTileWorld(), chunkMap, pos);
+            if (tile instanceof IMultiblockBase adj && isCompatible(node, adj)) {
+                boolean didMerge = false;
+                if (node instanceof IStructuralMultiblock && adj instanceof IStructuralMultiblock) {
+                    Set<MultiblockManager<?>> managers = new HashSet<>();
+                    managers.addAll(((IStructuralMultiblock) node).getStructureMap().keySet());
+                    managers.addAll(((IStructuralMultiblock) adj).getStructureMap().keySet());
+                    // if both are structural, they should merge all manager structures
+                    //TODO - 1.18: Figure out what this should be as having it just be equals seems incorrect.
+                    // My guess is it should be the commented code down below but maybe it should be |= instead
+                    for (MultiblockManager<?> manager : managers) {
+                        didMerge = mergeIfNecessary(node, adj, manager);
                     }
-
-                    return didMerge;
+                        /*if (!managers.isEmpty()) {
+                            boolean merged = true;
+                            for (MultiblockManager<?> manager : managers) {
+                                merged &= mergeIfNecessary(node, adj, manager);
+                            }
+                            didMerge = merged;
+                        }*/
+                } else if (node instanceof IStructuralMultiblock) {
+                    // validate from the perspective of the IMultiblock
+                    if (!hasStructure(node, (IMultiblock<?>) adj)) {
+                        validate(adj, chunkMap);
+                    }
+                    return false;
+                } else if (adj instanceof IStructuralMultiblock) {
+                    didMerge = mergeIfNecessary(node, adj, getManager(node));
+                } else { // both are regular IMultiblocks
+                    // we know the structures are compatible so managers must be the same for both
+                    didMerge = mergeIfNecessary(node, adj, getManager(node));
                 }
+                return didMerge;
             }
             return false;
         });
@@ -229,35 +281,35 @@ public class Structure {
 
     private static boolean mergeIfNecessary(IMultiblockBase node, IMultiblockBase adj, MultiblockManager<?> manager) {
         // reset the structures if they're invalid
-        if (!node.getStructure(manager).isValid()) {
-            node.resetStructure(manager);
+        Structure nodeStructure = node.getStructure(manager);
+        if (!nodeStructure.isValid()) {
+            nodeStructure = node.resetStructure(manager);
         }
-        if (!adj.getStructure(manager).isValid()) {
-            adj.resetStructure(manager);
+        Structure adjStructure = adj.getStructure(manager);
+        if (!adjStructure.isValid()) {
+            adjStructure = adj.resetStructure(manager);
         }
         // only merge if the structures are different
-        if (!node.hasStructure(adj.getStructure(manager))) {
-            mergeStructures(node, adj, manager);
+        if (!node.hasStructure(adjStructure)) {
+            Structure changed;
+            // merge into the bigger structure for efficiency
+            if (nodeStructure.size() >= adjStructure.size() || (nodeStructure.getManager() != null && adjStructure.getManager() == null)) {
+                //Note: We do >= so that if both have size of one (a frame and a structural block), then we can
+                // properly add the structural to the frame, instead of trying to add the frame to the structural
+                // we also make sure this doesn't somehow happen in the future anyway, if there is some edge case
+                // that comes up where our node's manager isn't null but the adjacent one is because then we still
+                // need to be merging this direction anyway
+                changed = nodeStructure;
+                changed.add(adjStructure);
+            } else {
+                changed = adjStructure;
+                changed.add(nodeStructure);
+            }
+            // update the changed structure
+            changed.markForUpdate(node.getTileWorld(), false);
             return true;
         }
         return false;
-    }
-
-    private static void mergeStructures(IMultiblockBase node, IMultiblockBase adj, MultiblockManager<?> manager) {
-        Structure nodeStructure = node.getStructure(manager);
-        Structure adjStructure = adj.getStructure(manager);
-        Structure changed;
-
-        // merge into the bigger structure for efficiency
-        if (nodeStructure.size() > adjStructure.size()) {
-            changed = nodeStructure;
-            changed.add(adjStructure);
-        } else {
-            changed = adjStructure;
-            changed.add(nodeStructure);
-        }
-        // update the changed structure
-        changed.markForUpdate(node.getTileWorld(), false);
     }
 
     private static boolean isCompatible(IMultiblockBase node, IMultiblockBase other) {
@@ -266,22 +318,22 @@ public class Structure {
             return manager == otherManager;
         } else if (manager == null && otherManager == null) {
             return true;
-        } else if (manager == null && node instanceof IStructuralMultiblock) {
-            return ((IStructuralMultiblock) node).canInterface(otherManager);
-        } else if (otherManager == null && other instanceof IStructuralMultiblock) {
-            return ((IStructuralMultiblock) other).canInterface(manager);
+        } else if (manager == null && node instanceof IStructuralMultiblock multiblock) {
+            return multiblock.canInterface(otherManager);
+        } else if (otherManager == null && other instanceof IStructuralMultiblock multiblock) {
+            return multiblock.canInterface(manager);
         }
         return false;
     }
 
     private static MultiblockManager<?> getManager(IMultiblockBase node) {
-        return node instanceof IMultiblock ? ((IMultiblock<?>) node).getManager() : null;
+        return node instanceof IMultiblock<?> multiblock ? multiblock.getManager() : null;
     }
 
     public enum Axis {
-        X(Vector3i::getX),
-        Y(Vector3i::getY),
-        Z(Vector3i::getZ);
+        X(Vec3i::getX),
+        Y(Vec3i::getY),
+        Z(Vec3i::getZ);
 
         private final ToIntFunction<BlockPos> posMapper;
 
@@ -309,6 +361,6 @@ public class Structure {
             return AXES[side.getAxis().ordinal()];
         }
 
-        protected static final Axis[] AXES = values();
+        static final Axis[] AXES = values();
     }
 }

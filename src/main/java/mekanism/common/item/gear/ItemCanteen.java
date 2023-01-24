@@ -2,131 +2,126 @@ package mekanism.common.item.gear;
 
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import mekanism.api.chemical.ChemicalTankBuilder;
-import mekanism.api.chemical.gas.GasStack;
-import mekanism.api.chemical.gas.IGasHandler;
-import mekanism.api.chemical.gas.IGasHandler.IMekanismGasHandler;
-import mekanism.api.chemical.gas.IGasTank;
-import mekanism.api.inventory.AutomationType;
-import mekanism.common.capabilities.Capabilities;
-import mekanism.common.capabilities.ItemCapabilityWrapper;
-import mekanism.common.capabilities.chemical.item.RateLimitGasHandler;
+import mekanism.api.fluid.IExtendedFluidTank;
+import mekanism.api.fluid.IMekanismFluidHandler;
+import mekanism.common.MekanismLang;
+import mekanism.common.capabilities.ItemCapabilityWrapper.ItemCapability;
+import mekanism.common.capabilities.fluid.BasicFluidTank;
+import mekanism.common.capabilities.fluid.item.RateLimitFluidHandler;
 import mekanism.common.config.MekanismConfig;
-import mekanism.common.item.interfaces.IGasItem;
-import mekanism.common.registries.MekanismGases;
-import mekanism.common.util.ChemicalUtil;
-import mekanism.common.util.MekanismUtils;
+import mekanism.common.item.CapabilityItem;
+import mekanism.common.registries.MekanismFluids;
+import mekanism.common.util.FluidUtils;
 import mekanism.common.util.StorageUtils;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Rarity;
-import net.minecraft.item.UseAction;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class ItemCanteen extends Item implements IGasItem {
-
-    private static final long TRANSFER_RATE = 128;
+public class ItemCanteen extends CapabilityItem {
 
     public ItemCanteen(Properties properties) {
-        super(properties.rarity(Rarity.UNCOMMON).maxStackSize(1).setNoRepair());
+        super(properties.rarity(Rarity.UNCOMMON).stacksTo(1).setNoRepair());
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
-    public void addInformation(@Nonnull ItemStack stack, @Nullable World world, @Nonnull List<ITextComponent> tooltip, @Nonnull ITooltipFlag flag) {
-        StorageUtils.addStoredGas(stack, tooltip, true, false);
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level world, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
+        StorageUtils.addStoredFluid(stack, tooltip, true, MekanismLang.EMPTY);
     }
 
     @Override
-    public boolean showDurabilityBar(ItemStack stack) {
+    public boolean isBarVisible(@NotNull ItemStack stack) {
         return true;
     }
 
     @Override
-    public double getDurabilityForDisplay(ItemStack stack) {
-        return StorageUtils.getDurabilityForDisplay(stack);
+    public int getBarWidth(@NotNull ItemStack stack) {
+        return StorageUtils.getBarWidth(stack);
     }
 
     @Override
-    public int getRGBDurabilityForDisplay(ItemStack stack) {
-        return ChemicalUtil.getRGBDurabilityForDisplay(stack);
+    public int getBarColor(@NotNull ItemStack stack) {
+        return FluidUtils.getRGBDurabilityForDisplay(stack).orElse(0);
     }
 
     @Override
-    public void fillItemGroup(@Nonnull ItemGroup group, @Nonnull NonNullList<ItemStack> items) {
-        super.fillItemGroup(group, items);
-        if (isInGroup(group)) {
-            items.add(ChemicalUtil.getFilledVariant(new ItemStack(this), MekanismConfig.gear.canteenMaxStorage.get(), MekanismGases.NUTRITIONAL_PASTE));
+    public void fillItemCategory(@NotNull CreativeModeTab group, @NotNull NonNullList<ItemStack> items) {
+        super.fillItemCategory(group, items);
+        if (allowedIn(group)) {
+            items.add(FluidUtils.getFilledVariant(new ItemStack(this), MekanismConfig.gear.canteenMaxStorage.get(), MekanismFluids.NUTRITIONAL_PASTE));
         }
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public ItemStack onItemUseFinish(@Nonnull ItemStack stack, @Nonnull World world, @Nonnull LivingEntity entityLiving) {
-        if (!world.isRemote && entityLiving instanceof PlayerEntity) {
-            PlayerEntity player = (PlayerEntity) entityLiving;
-            long needed = Math.min(20 - player.getFoodStats().getFoodLevel(), getGas(stack).getAmount() / MekanismConfig.general.nutritionalPasteMBPerFood.get());
+    public ItemStack finishUsingItem(@NotNull ItemStack stack, @NotNull Level world, @NotNull LivingEntity entityLiving) {
+        if (!world.isClientSide && entityLiving instanceof Player player) {
+            int needed = Math.min(20 - player.getFoodData().getFoodLevel(), getFluid(stack).getAmount() / MekanismConfig.general.nutritionalPasteMBPerFood.get());
             if (needed > 0) {
-                player.getFoodStats().addStats((int) needed, MekanismConfig.general.nutritionalPasteSaturation.get());
-                useGas(stack, needed * MekanismConfig.general.nutritionalPasteMBPerFood.get());
+                player.getFoodData().eat(needed, needed * MekanismConfig.general.nutritionalPasteSaturation.get());
+                FluidUtil.getFluidHandler(stack).ifPresent(handler -> handler.drain(needed * MekanismConfig.general.nutritionalPasteMBPerFood.get(),
+                      FluidAction.EXECUTE));
+                entityLiving.gameEvent(GameEvent.DRINK);
             }
         }
         return stack;
     }
 
     @Override
-    public int getUseDuration(@Nonnull ItemStack stack) {
+    public int getUseDuration(@NotNull ItemStack stack) {
         return 32;
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public UseAction getUseAction(@Nonnull ItemStack stack) {
-        return UseAction.DRINK;
+    public UseAnim getUseAnimation(@NotNull ItemStack stack) {
+        return UseAnim.DRINK;
     }
 
     @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT nbt) {
-        return new ItemCapabilityWrapper(stack, RateLimitGasHandler.create(() -> TRANSFER_RATE, MekanismConfig.gear.canteenMaxStorage,
-              (item, automationType) -> automationType != AutomationType.EXTERNAL, ChemicalTankBuilder.GAS.alwaysTrueBi,
-              gas -> gas == MekanismGases.NUTRITIONAL_PASTE.getChemical()));
+    protected void gatherCapabilities(List<ItemCapability> capabilities, ItemStack stack, CompoundTag nbt) {
+        super.gatherCapabilities(capabilities, stack, nbt);
+        capabilities.add(RateLimitFluidHandler.create(MekanismConfig.gear.canteenTransferRate, MekanismConfig.gear.canteenMaxStorage,
+              BasicFluidTank.alwaysTrueBi, BasicFluidTank.alwaysTrueBi, fluid -> fluid.getFluid() == MekanismFluids.NUTRITIONAL_PASTE.getFluid()));
     }
 
-    private GasStack getGas(ItemStack stack) {
-        Optional<IGasHandler> capability = MekanismUtils.toOptional(stack.getCapability(Capabilities.GAS_HANDLER_CAPABILITY));
+    private FluidStack getFluid(ItemStack stack) {
+        Optional<IFluidHandlerItem> capability = FluidUtil.getFluidHandler(stack).resolve();
         if (capability.isPresent()) {
-            IGasHandler gasHandlerItem = capability.get();
-            if (gasHandlerItem instanceof IMekanismGasHandler) {
-                IGasTank gasTank = ((IMekanismGasHandler) gasHandlerItem).getChemicalTank(0, null);
-                if (gasTank != null) {
-                    return gasTank.getStack();
+            IFluidHandlerItem fluidHandlerItem = capability.get();
+            if (fluidHandlerItem instanceof IMekanismFluidHandler fluidHandler) {
+                IExtendedFluidTank fluidTank = fluidHandler.getFluidTank(0, null);
+                if (fluidTank != null) {
+                    return fluidTank.getFluid();
                 }
             }
-            return gasHandlerItem.getChemicalInTank(0);
+            return fluidHandlerItem.getFluidInTank(0);
         }
-        return GasStack.EMPTY;
+        return FluidStack.EMPTY;
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public ActionResult<ItemStack> onItemRightClick(@Nonnull World worldIn, PlayerEntity playerIn, @Nonnull Hand handIn) {
-        if (!playerIn.isCreative() && playerIn.canEat(false) && getGas(playerIn.getHeldItem(handIn)).getAmount() >= 50) {
-            playerIn.setActiveHand(handIn);
+    public InteractionResultHolder<ItemStack> use(@NotNull Level worldIn, Player playerIn, @NotNull InteractionHand handIn) {
+        if (!playerIn.isCreative() && playerIn.canEat(false) && getFluid(playerIn.getItemInHand(handIn)).getAmount() >= 50) {
+            playerIn.startUsingItem(handIn);
         }
-        return ActionResult.resultSuccess(playerIn.getHeldItem(handIn));
+        return InteractionResultHolder.success(playerIn.getItemInHand(handIn));
     }
 }

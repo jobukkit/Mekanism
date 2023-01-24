@@ -2,55 +2,91 @@ package mekanism.common.content.gear.mekasuit;
 
 import java.util.List;
 import java.util.Objects;
+import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.annotations.ParametersAreNotNullByDefault;
+import mekanism.api.energy.IEnergyContainer;
+import mekanism.api.gear.ICustomModule;
+import mekanism.api.gear.IModule;
+import mekanism.api.gear.config.IModuleConfigItem;
+import mekanism.api.gear.config.ModuleConfigItemCreator;
+import mekanism.api.gear.config.ModuleEnumData;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.text.IHasTextComponent;
+import mekanism.api.text.TextComponentUtil;
 import mekanism.common.Mekanism;
 import mekanism.common.MekanismLang;
 import mekanism.common.config.MekanismConfig;
-import mekanism.common.content.gear.ModuleConfigItem;
-import mekanism.common.content.gear.ModuleConfigItem.EnumData;
-import mekanism.common.network.PacketLightningRender;
-import mekanism.common.network.PacketLightningRender.LightningPreset;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import mekanism.common.network.to_client.PacketLightningRender;
+import mekanism.common.network.to_client.PacketLightningRender.LightningPreset;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 
-public class ModuleMagneticAttractionUnit extends ModuleMekaSuit {
+@ParametersAreNotNullByDefault
+public class ModuleMagneticAttractionUnit implements ICustomModule<ModuleMagneticAttractionUnit> {
 
-    private ModuleConfigItem<Range> range;
+    private IModuleConfigItem<Range> range;
 
     @Override
-    public void init() {
-        super.init();
-        addConfigItem(range = new ModuleConfigItem<>(this, "range", MekanismLang.MODULE_RANGE, new EnumData<>(Range.class, getInstalledCount() + 1), Range.LOW));
+    public void init(IModule<ModuleMagneticAttractionUnit> module, ModuleConfigItemCreator configItemCreator) {
+        range = configItemCreator.createConfigItem("range", MekanismLang.MODULE_RANGE, new ModuleEnumData<>(Range.LOW, module.getInstalledCount() + 1));
     }
 
     @Override
-    public void tickServer(PlayerEntity player) {
-        super.tickServer(player);
+    public void tickServer(IModule<ModuleMagneticAttractionUnit> module, Player player) {
         if (range.get() != Range.OFF) {
             float size = 4 + range.get().getRange();
-            List<ItemEntity> items = player.world.getEntitiesWithinAABB(ItemEntity.class, player.getBoundingBox().grow(size, size, size));
             FloatingLong usage = MekanismConfig.gear.mekaSuitEnergyUsageItemAttraction.get().multiply(range.get().getRange());
-            for (ItemEntity item : items) {
-                if (!getContainerEnergy().greaterOrEqual(usage)) {
-                    break;
-                }
-                if (item.getDistance(player) > 0.001) {
-                    useEnergy(player, usage);
-                    Vector3d diff = player.getPositionVec().subtract(item.getPositionVec());
-                    Vector3d motionNeeded = new Vector3d(Math.min(diff.x, 1), Math.min(diff.y, 1), Math.min(diff.z, 1));
-                    Vector3d motionDiff = motionNeeded.subtract(player.getMotion());
-                    item.setMotion(motionDiff.scale(0.2));
-                    Mekanism.packetHandler.sendToAllTrackingAndSelf(new PacketLightningRender(LightningPreset.MAGNETIC_ATTRACTION, Objects.hash(player, item),
-                          player.getPositionVec().add(0, 0.2, 0), item.getPositionVec(), (int) (diff.length() * 4)), player);
+            boolean free = usage.isZero() || player.isCreative();
+            IEnergyContainer energyContainer = free ? null : module.getEnergyContainer();
+            if (free || (energyContainer != null && energyContainer.getEnergy().greaterOrEqual(usage))) {
+                //If the energy cost is free, or we have enough energy for at least one pull grab all the items that can be picked up.
+                //Note: We check distance afterwards so that we aren't having to calculate a bunch of distances when we may run out
+                // of energy, and calculating distance is a bit more expensive than just checking if it can be picked up
+                List<ItemEntity> items = player.level.getEntitiesOfClass(ItemEntity.class, player.getBoundingBox().inflate(size, size, size), item -> !item.hasPickUpDelay());
+                for (ItemEntity item : items) {
+                    if (item.distanceTo(player) > 0.001) {
+                        if (free) {
+                            pullItem(player, item);
+                        } else if (module.useEnergy(player, energyContainer, usage, true).isZero()) {
+                            //If we can't actually extract energy, exit
+                            break;
+                        } else {
+                            pullItem(player, item);
+                            if (energyContainer.getEnergy().smallerThan(usage)) {
+                                //If after using energy, our energy is now smaller than how much we need to use, exit
+                                break;
+                            }
+                        }
+
+                    }
                 }
             }
         }
     }
 
+    private void pullItem(Player player, ItemEntity item) {
+        Vec3 diff = player.position().subtract(item.position());
+        Vec3 motionNeeded = new Vec3(Math.min(diff.x, 1), Math.min(diff.y, 1), Math.min(diff.z, 1));
+        Vec3 motionDiff = motionNeeded.subtract(player.getDeltaMovement());
+        item.setDeltaMovement(motionDiff.scale(0.2));
+        Mekanism.packetHandler().sendToAllTrackingAndSelf(new PacketLightningRender(LightningPreset.MAGNETIC_ATTRACTION, Objects.hash(player.getUUID(), item),
+              player.position().add(0, 0.2, 0), item.position(), (int) (diff.length() * 4)), player);
+    }
+
+    @Override
+    public boolean canChangeModeWhenDisabled(IModule<ModuleMagneticAttractionUnit> module) {
+        return true;
+    }
+
+    @Override
+    public void changeMode(IModule<ModuleMagneticAttractionUnit> module, Player player, ItemStack stack, int shift, boolean displayChangeMessage) {
+        module.toggleEnabled(player, MekanismLang.MODULE_MAGNETIC_ATTRACTION.translate());
+    }
+
+    @NothingNullByDefault
     public enum Range implements IHasTextComponent {
         OFF(0),
         LOW(1F),
@@ -59,15 +95,15 @@ public class ModuleMagneticAttractionUnit extends ModuleMekaSuit {
         ULTRA(10);
 
         private final float range;
-        private final ITextComponent label;
+        private final Component label;
 
         Range(float boost) {
             this.range = boost;
-            this.label = new StringTextComponent(Float.toString(boost));
+            this.label = TextComponentUtil.getString(Float.toString(boost));
         }
 
         @Override
-        public ITextComponent getTextComponent() {
+        public Component getTextComponent() {
             return label;
         }
 

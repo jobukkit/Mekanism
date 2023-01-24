@@ -2,22 +2,24 @@ package mekanism.common.lib.multiblock;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
 import mekanism.api.Coord4D;
 import mekanism.common.tile.prefab.TileEntityMultiblock;
-import mekanism.common.util.MekanismUtils;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
+import mekanism.common.util.WorldUtils;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jetbrains.annotations.Nullable;
 
 public class MultiblockManager<T extends MultiblockData> {
 
     private static final Set<MultiblockManager<?>> managers = new ObjectOpenHashSet<>();
 
     private final String name;
+    private final String nameLower;
 
     private final Supplier<MultiblockCache<T>> cacheSupplier;
     private final Supplier<IStructureValidator<T>> validatorSupplier;
@@ -29,6 +31,7 @@ public class MultiblockManager<T extends MultiblockData> {
 
     public MultiblockManager(String name, Supplier<MultiblockCache<T>> cacheSupplier, Supplier<IStructureValidator<T>> validatorSupplier) {
         this.name = name;
+        this.nameLower = name.toLowerCase(Locale.ROOT);
         this.cacheSupplier = cacheSupplier;
         this.validatorSupplier = validatorSupplier;
         managers.add(this);
@@ -46,14 +49,18 @@ public class MultiblockManager<T extends MultiblockData> {
         return name;
     }
 
+    public String getNameLower() {
+        return nameLower;
+    }
+
     @Nullable
     public static UUID getMultiblockID(TileEntityMultiblock<?> tile) {
         return tile.getMultiblock().inventoryID;
     }
 
-    public boolean isCompatible(TileEntity tile) {
-        if (tile instanceof IMultiblock) {
-            return ((IMultiblock<?>) tile).getManager() == this;
+    public boolean isCompatible(BlockEntity tile) {
+        if (tile instanceof IMultiblock<?> multiblock) {
+            return multiblock.getManager() == this;
         }
         return false;
     }
@@ -67,7 +74,7 @@ public class MultiblockManager<T extends MultiblockData> {
     public void invalidate(IMultiblock<?> multiblock) {
         CacheWrapper cache = inventories.get(multiblock.getCacheID());
         if (cache != null) {
-            cache.locations.remove(Coord4D.get((TileEntity) multiblock));
+            cache.locations.remove(multiblock.getTileCoord());
             if (cache.locations.isEmpty()) {
                 inventories.remove(multiblock.getCacheID());
             }
@@ -81,17 +88,21 @@ public class MultiblockManager<T extends MultiblockData> {
      * @param world - world the cache is stored in
      * @param id    - inventory ID to pull
      *
-     * @return correct multiblock inventory cache
+     * @return correct multiblock inventory cache or {@code null} if one could not be found for the given id.
      */
-    public MultiblockCache<T> pullInventory(World world, UUID id) {
-        CacheWrapper toReturn = inventories.get(id);
+    @Nullable
+    public MultiblockCache<T> pullInventory(Level world, UUID id) {
+        CacheWrapper toReturn = inventories.remove(id);
+        if (toReturn == null) {
+            //If there wasn't an inventory found return that we didn't have one
+            return null;
+        }
         for (Coord4D obj : toReturn.locations) {
-            TileEntity tile = MekanismUtils.getTileEntity(TileEntity.class, world, obj.getPos());
-            if (tile instanceof IMultiblock) {
-                ((IMultiblock<?>) tile).resetCache();
+            BlockEntity tile = WorldUtils.getTileEntity(world, obj.getPos());
+            if (tile instanceof IMultiblock<?> multiblock) {
+                multiblock.resetCache();
             }
         }
-        inventories.remove(id);
         return toReturn.getCache();
     }
 
@@ -104,40 +115,46 @@ public class MultiblockManager<T extends MultiblockData> {
         return UUID.randomUUID();
     }
 
-    public void updateCache(IMultiblock<T> tile) {
-        inventories.computeIfAbsent(tile.getCacheID(), id -> new CacheWrapper()).update(tile);
+    public void updateCache(IMultiblock<T> tile, T multiblock) {
+        inventories.computeIfAbsent(tile.getCacheID(), id -> new CacheWrapper()).update(tile, multiblock);
     }
 
-    private class CacheWrapper {
+    public class CacheWrapper {
 
         private MultiblockCache<T> cache;
         private final Set<Coord4D> locations = new ObjectOpenHashSet<>();
+
+        private CacheWrapper() {
+        }
 
         public MultiblockCache<T> getCache() {
             return cache;
         }
 
-        public void update(IMultiblock<T> tile) {
-            locations.add(Coord4D.get((TileEntity) tile));
-
-            if (tile.getMultiblock().isFormed()) {
+        public void update(IMultiblock<T> tile, T multiblock) {
+            if (multiblock.isFormed()) {
                 if (tile.isMaster()) {
                     // create a new cache for the tile if it needs one
                     if (!tile.hasCache()) {
                         tile.setCache(createCache());
+                        locations.add(tile.getTileCoord());
+                    } else if (cache != tile.getCache()) {
+                        locations.add(tile.getTileCoord());
                     }
                     // if this is the master tile, sync the cache with the multiblock and then update our reference
-                    tile.getCache().sync(tile.getMultiblock());
+                    tile.getCache().sync(multiblock);
                     cache = tile.getCache();
                 }
-            } else {
-                if (tile.hasCache()) {
+            } else if (tile.hasCache()) {
+                if (cache != tile.getCache()) {
                     // if the tile doesn't have a formed multiblock but has a cache, update our reference
                     cache = tile.getCache();
-                } else if (cache != null) {
-                    // if the tile doesn't have a cache but we do, update the tile's reference
-                    tile.setCache(cache);
+                    locations.add(tile.getTileCoord());
                 }
+            } else if (cache != null) {
+                // if the tile doesn't have a cache, but we do, update the tile's reference
+                tile.setCache(cache);
+                locations.add(tile.getTileCoord());
             }
         }
     }

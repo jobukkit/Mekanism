@@ -1,16 +1,13 @@
 package mekanism.common.lib.security;
 
-import javax.annotation.Nonnull;
-import mekanism.api.IIncrementalEnum;
-import mekanism.api.math.MathUtils;
-import mekanism.api.text.EnumColor;
-import mekanism.api.text.IHasTextComponent;
-import mekanism.api.text.ILangEntry;
-import mekanism.common.MekanismLang;
+import java.util.UUID;
+import mekanism.api.security.ISecurityObject;
+import mekanism.api.security.SecurityMode;
 import mekanism.common.tile.component.TileComponentSecurity;
-import net.minecraft.util.text.ITextComponent;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public interface ISecurityTile {
+public interface ISecurityTile extends ISecurityObject {
 
     TileComponentSecurity getSecurity();
 
@@ -18,37 +15,40 @@ public interface ISecurityTile {
         return true;
     }
 
-    default void onSecurityChanged(SecurityMode old, SecurityMode mode) {
+    @Nullable
+    @Override
+    default UUID getOwnerUUID() {
+        TileComponentSecurity security = getSecurity();
+        return security == null ? null : security.getOwnerUUID();
     }
 
-    enum SecurityMode implements IIncrementalEnum<SecurityMode>, IHasTextComponent {
-        PUBLIC(MekanismLang.PUBLIC, EnumColor.BRIGHT_GREEN),
-        PRIVATE(MekanismLang.PRIVATE, EnumColor.RED),
-        TRUSTED(MekanismLang.TRUSTED, EnumColor.INDIGO);
+    @Nullable
+    @Override
+    default String getOwnerName() {
+        TileComponentSecurity security = getSecurity();
+        return security == null ? null : security.getOwnerName();
+    }
 
-        private static final SecurityMode[] MODES = values();
+    @NotNull
+    @Override
+    default SecurityMode getSecurityMode() {
+        TileComponentSecurity security = getSecurity();
+        return security == null ? SecurityMode.PUBLIC : security.getMode();
+    }
 
-        private final ILangEntry langEntry;
-        private final EnumColor color;
-
-        SecurityMode(ILangEntry langEntry, EnumColor color) {
-            this.langEntry = langEntry;
-            this.color = color;
+    @Override
+    default void setSecurityMode(@NotNull SecurityMode mode) {
+        TileComponentSecurity security = getSecurity();
+        if (security != null) {
+            security.setMode(mode);
         }
+    }
 
-        @Override
-        public ITextComponent getTextComponent() {
-            return langEntry.translateColored(color);
-        }
-
-        @Nonnull
-        @Override
-        public SecurityMode byIndex(int index) {
-            return byIndexStatic(index);
-        }
-
-        public static SecurityMode byIndexStatic(int index) {
-            return MathUtils.getByIndexMod(MODES, index);
+    @Override
+    default void setOwnerUUID(@Nullable UUID owner) {
+        TileComponentSecurity security = getSecurity();
+        if (security != null) {
+            security.setOwnerUUID(owner);
         }
     }
 }

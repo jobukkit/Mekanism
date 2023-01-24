@@ -1,12 +1,13 @@
 package mekanism.client.gui.element.scroll;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
+import mekanism.api.text.TextComponentUtil;
 import mekanism.client.gui.IGuiWrapper;
+import mekanism.client.gui.element.GuiElement;
 import mekanism.client.gui.element.GuiInnerScreen;
-import net.minecraft.util.text.StringTextComponent;
+import org.jetbrains.annotations.Nullable;
 
 public class GuiTextScrollList extends GuiScrollList {
 
@@ -14,7 +15,7 @@ public class GuiTextScrollList extends GuiScrollList {
     private int selected = -1;
 
     public GuiTextScrollList(IGuiWrapper gui, int x, int y, int width, int height) {
-        super(gui, x, y, width, height, 10, new GuiInnerScreen(gui, x, y, width, height));
+        super(gui, x, y, width, height, 10, GuiInnerScreen.SCREEN, GuiInnerScreen.SCREEN_SIZE);
     }
 
     @Override
@@ -56,7 +57,7 @@ public class GuiTextScrollList extends GuiScrollList {
     }
 
     @Override
-    public void renderForeground(MatrixStack matrix, int mouseX, int mouseY) {
+    public void renderForeground(PoseStack matrix, int mouseX, int mouseY) {
         super.renderForeground(matrix, mouseX, mouseY);
         if (!textEntries.isEmpty()) {
             //Render the text into the entries
@@ -66,7 +67,7 @@ public class GuiTextScrollList extends GuiScrollList {
             for (int i = 0; i < focusedElements; i++) {
                 int index = scrollIndex + i;
                 if (index < maxElements) {
-                    drawScaledTextScaledBound(matrix, new StringTextComponent(textEntries.get(index)), relativeX + 2, relativeY + 2 + elementHeight * i,
+                    drawScaledTextScaledBound(matrix, TextComponentUtil.getString(textEntries.get(index)), relativeX + 2, relativeY + 2 + elementHeight * i,
                           screenTextColor(), barX - x - 2, 0.8F);
                 }
             }
@@ -74,12 +75,20 @@ public class GuiTextScrollList extends GuiScrollList {
     }
 
     @Override
-    public void renderElements(MatrixStack matrix, int mouseX, int mouseY, float partialTicks) {
+    public void renderElements(PoseStack matrix, int mouseX, int mouseY, float partialTicks) {
         //Draw Selected
         int scrollIndex = getCurrentSelection();
         if (selected != -1 && selected >= scrollIndex && selected <= scrollIndex + getFocusedElements() - 1) {
             blit(matrix, x + 1, y + 1 + (selected - scrollIndex) * elementHeight, barX - x - 2, elementHeight,
                   4, 2, 2, 2, TEXTURE_WIDTH, TEXTURE_HEIGHT);
         }
+    }
+
+    @Override
+    public void syncFrom(GuiElement element) {
+        GuiTextScrollList old = (GuiTextScrollList) element;
+        setText(old.textEntries);
+        setSelected(old.getSelection());
+        super.syncFrom(element);
     }
 }

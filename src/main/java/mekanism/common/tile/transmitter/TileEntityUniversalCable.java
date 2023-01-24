@@ -1,27 +1,47 @@
 package mekanism.common.tile.transmitter;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
 import mekanism.api.NBTConstants;
+import mekanism.api.energy.IEnergyContainer;
+import mekanism.api.math.FloatingLong;
 import mekanism.api.providers.IBlockProvider;
-import mekanism.api.tier.AlloyTier;
 import mekanism.api.tier.BaseTier;
 import mekanism.common.block.states.BlockStateHelper;
 import mekanism.common.block.states.TransmitterType;
-import mekanism.common.capabilities.resolver.advanced.AdvancedEnergyCapabilityResolver;
+import mekanism.common.capabilities.energy.DynamicStrictEnergyHandler;
+import mekanism.common.capabilities.resolver.manager.EnergyHandlerManager;
 import mekanism.common.content.network.EnergyNetwork;
 import mekanism.common.content.network.transmitter.UniversalCable;
+import mekanism.common.integration.computer.ComputerCapabilityHelper;
+import mekanism.common.integration.computer.IComputerTile;
+import mekanism.common.integration.computer.annotation.ComputerMethod;
+import mekanism.common.integration.energy.EnergyCompatUtils;
+import mekanism.common.lib.transmitter.ConnectionType;
 import mekanism.common.registries.MekanismBlocks;
-import mekanism.common.upgrade.transmitter.TransmitterUpgradeData;
-import mekanism.common.upgrade.transmitter.UniversalCableUpgradeData;
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
+import mekanism.common.util.WorldUtils;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class TileEntityUniversalCable extends TileEntityTransmitter {
+public class TileEntityUniversalCable extends TileEntityTransmitter implements IComputerTile {
 
-    public TileEntityUniversalCable(IBlockProvider blockProvider) {
-        super(blockProvider);
-        addCapabilityResolver(new AdvancedEnergyCapabilityResolver(getTransmitter()));
+    private final EnergyHandlerManager energyHandlerManager;
+
+    public TileEntityUniversalCable(IBlockProvider blockProvider, BlockPos pos, BlockState state) {
+        super(blockProvider, pos, state);
+        addCapabilityResolver(energyHandlerManager = new EnergyHandlerManager(direction -> {
+            UniversalCable cable = getTransmitter();
+            if (direction != null && cable.getConnectionTypeRaw(direction) == ConnectionType.NONE) {
+                //If we actually have a side, and our connection type on that side is none, then return that we have no containers
+                return Collections.emptyList();
+            }
+            return cable.getEnergyContainers(direction);
+        }, new DynamicStrictEnergyHandler(this::getEnergyContainers, getExtractPredicate(), getInsertPredicate(), null)));
+        ComputerCapabilityHelper.addComputerCapabilities(this, this::addCapabilityResolver);
     }
 
     @Override
@@ -35,11 +55,9 @@ public class TileEntityUniversalCable extends TileEntityTransmitter {
     }
 
     @Override
-    public void tick() {
-        if (!isRemote()) {
-            getTransmitter().pullFromAcceptors();
-        }
-        super.tick();
+    protected void onUpdateServer() {
+        getTransmitter().pullFromAcceptors();
+        super.onUpdateServer();
     }
 
     @Override
@@ -47,52 +65,23 @@ public class TileEntityUniversalCable extends TileEntityTransmitter {
         return TransmitterType.UNIVERSAL_CABLE;
     }
 
+    @NotNull
     @Override
-    protected boolean canUpgrade(AlloyTier alloyTier) {
-        return alloyTier.getBaseTier().ordinal() == getTransmitter().getTier().getBaseTier().ordinal() + 1;
+    protected BlockState upgradeResult(@NotNull BlockState current, @NotNull BaseTier tier) {
+        return switch (tier) {
+            case BASIC -> BlockStateHelper.copyStateData(current, MekanismBlocks.BASIC_UNIVERSAL_CABLE);
+            case ADVANCED -> BlockStateHelper.copyStateData(current, MekanismBlocks.ADVANCED_UNIVERSAL_CABLE);
+            case ELITE -> BlockStateHelper.copyStateData(current, MekanismBlocks.ELITE_UNIVERSAL_CABLE);
+            case ULTIMATE -> BlockStateHelper.copyStateData(current, MekanismBlocks.ULTIMATE_UNIVERSAL_CABLE);
+            default -> current;
+        };
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    protected BlockState upgradeResult(@Nonnull BlockState current, @Nonnull BaseTier tier) {
-        switch (tier) {
-            case BASIC:
-                return BlockStateHelper.copyStateData(current, MekanismBlocks.BASIC_UNIVERSAL_CABLE.getBlock().getDefaultState());
-            case ADVANCED:
-                return BlockStateHelper.copyStateData(current, MekanismBlocks.ADVANCED_UNIVERSAL_CABLE.getBlock().getDefaultState());
-            case ELITE:
-                return BlockStateHelper.copyStateData(current, MekanismBlocks.ELITE_UNIVERSAL_CABLE.getBlock().getDefaultState());
-            case ULTIMATE:
-                return BlockStateHelper.copyStateData(current, MekanismBlocks.ULTIMATE_UNIVERSAL_CABLE.getBlock().getDefaultState());
-        }
-        return current;
-    }
-
-    @Nullable
-    @Override
-    protected UniversalCableUpgradeData getUpgradeData() {
-        UniversalCable transmitter = getTransmitter();
-        return new UniversalCableUpgradeData(transmitter.redstoneReactive, transmitter.connectionTypes, transmitter.buffer);
-    }
-
-    @Override
-    protected void parseUpgradeData(@Nonnull TransmitterUpgradeData upgradeData) {
-        if (upgradeData instanceof UniversalCableUpgradeData) {
-            UniversalCableUpgradeData data = (UniversalCableUpgradeData) upgradeData;
-            UniversalCable transmitter = getTransmitter();
-            transmitter.redstoneReactive = data.redstoneReactive;
-            transmitter.connectionTypes = data.connectionTypes;
-            transmitter.buffer.setEnergy(data.buffer.getEnergy());
-        } else {
-            super.parseUpgradeData(upgradeData);
-        }
-    }
-
-    @Nonnull
-    @Override
-    public CompoundNBT getUpdateTag() {
+    public CompoundTag getUpdateTag() {
         //Note: We add the stored information to the initial update tag and not to the one we sync on side changes which uses getReducedUpdateTag
-        CompoundNBT updateTag = super.getUpdateTag();
+        CompoundTag updateTag = super.getUpdateTag();
         if (getTransmitter().hasTransmitterNetwork()) {
             EnergyNetwork network = getTransmitter().getTransmitterNetwork();
             updateTag.putString(NBTConstants.ENERGY_STORED, network.energyContainer.getEnergy().toString());
@@ -100,4 +89,49 @@ public class TileEntityUniversalCable extends TileEntityTransmitter {
         }
         return updateTag;
     }
+
+    private List<IEnergyContainer> getEnergyContainers(@Nullable Direction side) {
+        return energyHandlerManager.getContainers(side);
+    }
+
+    @Override
+    public void sideChanged(@NotNull Direction side, @NotNull ConnectionType old, @NotNull ConnectionType type) {
+        super.sideChanged(side, old, type);
+        if (type == ConnectionType.NONE) {
+            invalidateCapabilities(EnergyCompatUtils.getEnabledEnergyCapabilities(), side);
+            //Notify the neighbor on that side our state changed and we no longer have a capability
+            WorldUtils.notifyNeighborOfChange(level, side, worldPosition);
+        } else if (old == ConnectionType.NONE) {
+            //Notify the neighbor on that side our state changed, and we now do have a capability
+            WorldUtils.notifyNeighborOfChange(level, side, worldPosition);
+        }
+    }
+
+    //Methods relating to IComputerTile
+    @Override
+    public String getComputerName() {
+        return getTransmitter().getTier().getBaseTier().getLowerName() + "UniversalCable";
+    }
+
+    @ComputerMethod
+    private FloatingLong getBuffer() {
+        return getTransmitter().getBufferWithFallback();
+    }
+
+    @ComputerMethod
+    private FloatingLong getCapacity() {
+        UniversalCable cable = getTransmitter();
+        return cable.hasTransmitterNetwork() ? cable.getTransmitterNetwork().getCapacityAsFloatingLong() : cable.getCapacityAsFloatingLong();
+    }
+
+    @ComputerMethod
+    private FloatingLong getNeeded() {
+        return getCapacity().subtract(getBuffer());
+    }
+
+    @ComputerMethod
+    private double getFilledPercentage() {
+        return getBuffer().divideToLevel(getCapacity());
+    }
+    //End methods IComputerTile
 }

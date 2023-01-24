@@ -1,121 +1,80 @@
 package mekanism.common.world;
 
-import com.google.common.collect.Lists;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Random;
-import javax.annotation.Nullable;
-import mekanism.api.providers.IBlockProvider;
-import mekanism.common.config.MekanismConfig;
-import mekanism.common.config.WorldConfig.OreConfig;
-import mekanism.common.config.WorldConfig.SaltConfig;
-import mekanism.common.registries.MekanismBlocks;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.ToIntFunction;
+import mekanism.common.registration.impl.SetupFeatureDeferredRegister.MekFeature;
+import mekanism.common.registration.impl.SetupFeatureRegistryObject;
 import mekanism.common.registries.MekanismFeatures;
-import mekanism.common.registries.MekanismPlacements;
-import mekanism.common.resource.OreType;
-import mekanism.common.util.EnumUtils;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biome.Category;
-import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.OreFeatureConfig;
-import net.minecraft.world.gen.feature.OreFeatureConfig.FillerBlockType;
-import net.minecraft.world.gen.feature.SphereReplaceConfig;
-import net.minecraft.world.gen.placement.CountRangeConfig;
-import net.minecraft.world.gen.placement.FrequencyConfig;
-import net.minecraft.world.gen.placement.Placement;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.SharedConstants;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.StructureManager;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.biome.FeatureSorter;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.level.levelgen.RandomSupport;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
+import net.minecraft.world.level.levelgen.XoroshiroRandomSource;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.minecraft.world.level.levelgen.placement.PlacementContext;
 
 public class GenHandler {
 
-    private static final Map<OreType, ConfiguredFeature<?, ?>> ORES = new EnumMap<>(OreType.class);
-    private static final Map<OreType, ConfiguredFeature<?, ?>> ORE_RETROGENS = new EnumMap<>(OreType.class);
-
-    private static ConfiguredFeature<?, ?> SALT_FEATURE;
-    private static ConfiguredFeature<?, ?> SALT_RETROGEN_FEATURE;
-
-    public static void setupWorldGeneration() {
-        for (OreType type : EnumUtils.ORE_TYPES) {
-            ORES.put(type, getOreFeature(MekanismBlocks.ORES.get(type), MekanismConfig.world.ores.get(type), Feature.ORE));
-        }
-        SALT_FEATURE = getSaltFeature(MekanismBlocks.SALT_BLOCK, MekanismConfig.world.salt, Placement.COUNT_TOP_SOLID);
-        //Retrogen features
-        if (MekanismConfig.world.enableRegeneration.get()) {
-            for (OreType type : EnumUtils.ORE_TYPES) {
-                ORE_RETROGENS.put(type, getOreFeature(MekanismBlocks.ORES.get(type), MekanismConfig.world.ores.get(type), MekanismFeatures.ORE_RETROGEN.getFeature()));
-            }
-            SALT_RETROGEN_FEATURE = getSaltFeature(MekanismBlocks.SALT_BLOCK, MekanismConfig.world.salt, MekanismPlacements.TOP_SOLID_RETROGEN.getPlacement());
-        }
-        ForgeRegistries.BIOMES.forEach(biome -> {
-            if (isValidBiome(biome)) {
-                //Add ores
-                for (ConfiguredFeature<?, ?> feature : ORES.values()) {
-                    addFeature(biome, feature);
-                }
-                //Add salt
-                addFeature(biome, SALT_FEATURE);
-            }
-        });
-    }
-
-    private static boolean isValidBiome(Biome biome) {
-        //If this does weird things to unclassified biomes (Category.NONE), then we should also mark that biome as invalid
-        return biome.getCategory() != Category.THEEND && biome.getCategory() != Category.NETHER;
-    }
-
-    private static void addFeature(Biome biome, @Nullable ConfiguredFeature<?, ?> feature) {
-        if (feature != null) {
-            biome.addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, feature);
-        }
-    }
-
-    @Nullable
-    private static ConfiguredFeature<?, ?> getOreFeature(IBlockProvider blockProvider, OreConfig oreConfig, Feature<OreFeatureConfig> feature) {
-        if (oreConfig.shouldGenerate.get()) {
-            return feature.withConfiguration(new OreFeatureConfig(FillerBlockType.NATURAL_STONE,
-                  blockProvider.getBlock().getDefaultState(), oreConfig.maxVeinSize.get())).withPlacement(Placement.COUNT_RANGE.configure(
-                  new CountRangeConfig(oreConfig.perChunk.get(), oreConfig.bottomOffset.get(), oreConfig.topOffset.get(), oreConfig.maxHeight.get())));
-        }
-        return null;
-    }
-
-    @Nullable
-    private static ConfiguredFeature<?, ?> getSaltFeature(IBlockProvider blockProvider, SaltConfig saltConfig, Placement<FrequencyConfig> placement) {
-        if (saltConfig.shouldGenerate.get()) {
-            BlockState state = blockProvider.getBlock().getDefaultState();
-            return Feature.DISK.withConfiguration(new SphereReplaceConfig(state, saltConfig.maxVeinSize.get(), saltConfig.ySize.get(),
-                  Lists.newArrayList(Blocks.DIRT.getDefaultState(), Blocks.CLAY.getDefaultState(), state)))
-                  .withPlacement(placement.configure(new FrequencyConfig(saltConfig.perChunk.get())));
-        }
-        return null;
+    private GenHandler() {
     }
 
     /**
-     * @return True if some retro-generation happened, false otherwise
+     * @return {@code true} if some retro-generation happened.
+     *
+     * @apiNote Only call this method if the chunk at the given position is loaded.
+     * @implNote Adapted from {@link ChunkGenerator#applyBiomeDecoration(WorldGenLevel, ChunkAccess, StructureManager)}.
      */
-    public static boolean generate(ServerWorld world, Random random, int chunkX, int chunkZ) {
-        BlockPos blockPos = new BlockPos(chunkX * 16, 0, chunkZ * 16);
-        Biome biome = world.getBiome(blockPos);
+    public static boolean generate(ServerLevel world, ChunkPos chunkPos) {
         boolean generated = false;
-        if (isValidBiome(biome) && world.chunkExists(chunkX, chunkZ)) {
-            for (ConfiguredFeature<?, ?> feature : ORE_RETROGENS.values()) {
-                generated |= placeFeature(feature, world, random, blockPos);
+        if (!SharedConstants.debugVoidTerrain(chunkPos)) {
+            SectionPos sectionPos = SectionPos.of(chunkPos, world.getMinSection());
+            BlockPos blockPos = sectionPos.origin();
+            ChunkGenerator chunkGenerator = world.getChunkSource().getGenerator();
+            WorldgenRandom random = new WorldgenRandom(new XoroshiroRandomSource(RandomSupport.generateUniqueSeed()));
+            long decorationSeed = random.setDecorationSeed(world.getSeed(), blockPos.getX(), blockPos.getZ());
+            int decorationStep = GenerationStep.Decoration.UNDERGROUND_ORES.ordinal() - 1;
+            ToIntFunction<PlacedFeature> featureIndex;
+            List<FeatureSorter.StepFeatureData> list = chunkGenerator.featuresPerStep.get();
+            if (decorationStep < list.size()) {
+                //Use the feature index lookup mapping. We can skip a lot of vanilla's logic here that is needed
+                // for purposes of getting all the features we want to be doing, as we know which features we want
+                // to generate and only lookup those. We also don't need to worry about if the biome can actually
+                // support our feature as that is validated via the placement context and allows us to drastically
+                // cut down on calculating it here
+                featureIndex = list.get(decorationStep).indexMapping();
+            } else {
+                featureIndex = feature -> -1;
             }
-            generated |= placeFeature(SALT_RETROGEN_FEATURE, world, random, blockPos);
+            for (MekFeature<ResizableOreFeatureConfig, ResizableOreFeature>[] features : MekanismFeatures.ORES.values()) {
+                for (MekFeature<ResizableOreFeatureConfig, ResizableOreFeature> feature : features) {
+                    generated |= place(world, chunkGenerator, blockPos, random, decorationSeed, decorationStep, featureIndex, feature);
+                }
+            }
+            generated |= place(world, chunkGenerator, blockPos, random, decorationSeed, decorationStep, featureIndex, MekanismFeatures.SALT);
+            world.setCurrentlyGenerating(null);
         }
         return generated;
     }
 
-    private static boolean placeFeature(@Nullable ConfiguredFeature<?, ?> feature, ServerWorld world, Random random, BlockPos blockPos) {
-        if (feature != null) {
-            feature.func_236265_a_(world, world.func_241112_a_(), world.getChunkProvider().getChunkGenerator(), random, blockPos);
-            return true;
-        }
-        return false;
+    private static boolean place(WorldGenLevel world, ChunkGenerator chunkGenerator, BlockPos blockPos, WorldgenRandom random,
+          long decorationSeed, int decorationStep, ToIntFunction<PlacedFeature> featureIndex, MekFeature<?, ?> feature) {
+        SetupFeatureRegistryObject<?, ?> retrogen = feature.retrogen();
+        PlacedFeature baseFeature = feature.feature().getPlacedFeature();
+        //Check the index of the source feature instead of the retrogen feature
+        random.setFeatureSeed(decorationSeed, featureIndex.applyAsInt(baseFeature), decorationStep);
+        world.setCurrentlyGenerating(() -> retrogen.getPlacedFeatureKey().toString());
+        //Note: We call placeWithContext directly to allow for doing a placeWithBiomeCheck, except by having the context pretend
+        // it is the non retrogen feature which actually is added to the various biomes
+        return retrogen.getPlacedFeature().placeWithContext(new PlacementContext(world, chunkGenerator, Optional.of(baseFeature)), random, blockPos);
     }
 }

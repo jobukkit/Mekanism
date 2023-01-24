@@ -21,8 +21,8 @@ public class VoiceClient extends Thread {
     private Socket socket;
     private final String ip;
 
-    public VoiceClient(String s) {
-        ip = s;
+    public VoiceClient(String ip) {
+        this.ip = ip;
     }
 
     @Override
@@ -30,7 +30,7 @@ public class VoiceClient extends Thread {
         Mekanism.logger.info("VoiceServer: Starting client connection...");
 
         try {
-            socket = new Socket(ip, MekanismAdditionsConfig.additions.VOICE_PORT.get());
+            socket = new Socket(ip, MekanismAdditionsConfig.additions.voicePort.get());
             running = true;
 
             input = new DataInputStream(new BufferedInputStream(socket.getInputStream()));

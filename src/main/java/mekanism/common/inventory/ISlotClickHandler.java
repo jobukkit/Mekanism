@@ -1,7 +1,8 @@
 package mekanism.common.inventory;
 
+import java.util.UUID;
 import mekanism.common.lib.inventory.HashedItem;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public interface ISlotClickHandler {
 
@@ -10,6 +11,8 @@ public interface ISlotClickHandler {
     interface IScrollableSlot {
 
         HashedItem getItem();
+
+        UUID getItemUUID();
 
         long getCount();
 

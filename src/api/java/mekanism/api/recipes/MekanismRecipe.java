@@ -1,20 +1,26 @@
 package mekanism.api.recipes;
 
-import javax.annotation.Nonnull;
+import java.util.Objects;
 import mekanism.api.inventory.IgnoredIInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
-//TODO: Make implementations override equals and hashcode?
-public abstract class MekanismRecipe implements IRecipe<IgnoredIInventory> {
+/**
+ * Base class for helping wrap our recipes into IRecipes.
+ */
+public abstract class MekanismRecipe implements Recipe<IgnoredIInventory> {//TODO: Should we make implementations override equals and hashcode?
 
     private final ResourceLocation id;
 
+    /**
+     * @param id Recipe name.
+     */
     protected MekanismRecipe(ResourceLocation id) {
-        this.id = id;
+        this.id = Objects.requireNonNull(id, "Recipe name cannot be null.");
     }
 
     /**
@@ -22,40 +28,46 @@ public abstract class MekanismRecipe implements IRecipe<IgnoredIInventory> {
      *
      * @param buffer The buffer to write to.
      */
-    public abstract void write(PacketBuffer buffer);
+    public abstract void write(FriendlyByteBuf buffer);
 
-    @Nonnull
+    @NotNull
     @Override
     public ResourceLocation getId() {
         return id;
     }
 
     @Override
-    public boolean matches(@Nonnull IgnoredIInventory inv, @Nonnull World world) {
-        return true;
+    public boolean matches(@NotNull IgnoredIInventory inv, @NotNull Level world) {
+        //TODO: Decide if we ever want to make use of this method
+        //Default to not being able to match incomplete recipes though
+        return !isIncomplete();
     }
 
     @Override
-    public boolean isDynamic() {
-        //Note: If we make this non dynamic, we can make it show in vanilla's crafting book and also then obey the recipe locking.
+    public boolean isSpecial() {
+        //Note: If we make this non-dynamic, we can make it show in vanilla's crafting book and also then obey the recipe locking.
         // For now none of that works/makes sense in our concept so don't lock it
         return true;
     }
 
-    @Nonnull
+    //Force implementation of this method as our ingredients is always empty so the super implementation would have all ours as incomplete
     @Override
-    public ItemStack getCraftingResult(@Nonnull IgnoredIInventory inv) {
+    public abstract boolean isIncomplete();
+
+    @NotNull
+    @Override
+    public ItemStack assemble(@NotNull IgnoredIInventory inv) {
         return ItemStack.EMPTY;
     }
 
     @Override
-    public boolean canFit(int width, int height) {
+    public boolean canCraftInDimensions(int width, int height) {
         return true;
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public ItemStack getRecipeOutput() {
+    public ItemStack getResultItem() {
         return ItemStack.EMPTY;
     }
 }

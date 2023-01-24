@@ -1,11 +1,13 @@
 package mekanism.api;
 
 import java.util.function.Predicate;
-import javax.annotation.Nonnull;
+import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.functions.ConstantPredicates;
 
 /**
  * Interface for enum's to make them easily incremental
  */
+@NothingNullByDefault
 public interface IIncrementalEnum<TYPE extends Enum<TYPE> & IIncrementalEnum<TYPE>> {
 
     /**
@@ -15,8 +17,7 @@ public interface IIncrementalEnum<TYPE extends Enum<TYPE> & IIncrementalEnum<TYP
      *
      * @return The next "valid" element
      */
-    @Nonnull
-    default TYPE getNext(@Nonnull Predicate<TYPE> isValid) {
+    default TYPE getNext(Predicate<TYPE> isValid) {
         TYPE next = byIndex(ordinal() + 1);
         while (!isValid.test(next)) {
             if (next == this) {
@@ -36,8 +37,7 @@ public interface IIncrementalEnum<TYPE extends Enum<TYPE> & IIncrementalEnum<TYP
      *
      * @return The previous "valid" element
      */
-    @Nonnull
-    default TYPE getPrevious(@Nonnull Predicate<TYPE> isValid) {
+    default TYPE getPrevious(Predicate<TYPE> isValid) {
         TYPE previous = byIndex(ordinal() - 1);
         while (!isValid.test(previous)) {
             if (previous == this) {
@@ -53,7 +53,6 @@ public interface IIncrementalEnum<TYPE extends Enum<TYPE> & IIncrementalEnum<TYP
     /**
      * Helper method to get a value by index rather than having to duplicate all the previous/next logic.
      */
-    @Nonnull
     TYPE byIndex(int index);
 
     /**
@@ -66,9 +65,8 @@ public interface IIncrementalEnum<TYPE extends Enum<TYPE> & IIncrementalEnum<TYP
      *
      * @return The next "valid" element
      */
-    @Nonnull
     default TYPE getNext() {
-        return getNext(type -> true);
+        return getNext(ConstantPredicates.alwaysTrue());
     }
 
     /**
@@ -76,9 +74,8 @@ public interface IIncrementalEnum<TYPE extends Enum<TYPE> & IIncrementalEnum<TYP
      *
      * @return The previous "valid" element
      */
-    @Nonnull
     default TYPE getPrevious() {
-        return getPrevious(type -> true);
+        return getPrevious(ConstantPredicates.alwaysTrue());
     }
 
     /**
@@ -90,8 +87,28 @@ public interface IIncrementalEnum<TYPE extends Enum<TYPE> & IIncrementalEnum<TYP
      *
      * @implNote Default implementation assumes all elements are "valid", override this if that is not the case.
      */
-    @Nonnull
     default TYPE adjust(int shift) {
         return shift == 0 ? (TYPE) this : byIndex(ordinal() + shift);
+    }
+
+    /**
+     * Gets the "valid" element that is offset by the given shift with the given validity predicate.
+     *
+     * @param shift   Shift to perform, may be negative to indicate going backwards
+     * @param isValid Predicate defining if an element is valid
+     *
+     * @return The "valid" element that is offset by the given shift. If no elements are "valid" returns the current element.
+     */
+    default TYPE adjust(int shift, Predicate<TYPE> isValid) {
+        TYPE result = (TYPE) this;
+        while (shift < 0) {
+            shift++;
+            result = result.getPrevious(isValid);
+        }
+        while (shift > 0) {
+            shift--;
+            result = result.getNext(isValid);
+        }
+        return result;
     }
 }

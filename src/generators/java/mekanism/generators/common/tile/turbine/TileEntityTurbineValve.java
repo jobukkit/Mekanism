@@ -1,6 +1,6 @@
 package mekanism.generators.common.tile.turbine;
 
-import javax.annotation.Nonnull;
+import mekanism.api.IContentsListener;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.gas.IGasTank;
@@ -8,32 +8,37 @@ import mekanism.common.capabilities.holder.chemical.IChemicalTankHolder;
 import mekanism.common.capabilities.holder.energy.IEnergyContainerHolder;
 import mekanism.common.tile.base.SubstanceType;
 import mekanism.common.util.CableUtils;
+import mekanism.generators.common.content.turbine.TurbineMultiblockData;
 import mekanism.generators.common.registries.GeneratorsBlocks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
 public class TileEntityTurbineValve extends TileEntityTurbineCasing {
 
-    public TileEntityTurbineValve() {
-        super(GeneratorsBlocks.TURBINE_VALVE);
+    public TileEntityTurbineValve(BlockPos pos, BlockState state) {
+        super(GeneratorsBlocks.TURBINE_VALVE, pos, state);
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public IChemicalTankHolder<Gas, GasStack, IGasTank> getInitialGasTanks() {
+    public IChemicalTankHolder<Gas, GasStack, IGasTank> getInitialGasTanks(IContentsListener listener) {
         return side -> getMultiblock().getGasTanks(side);
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    protected IEnergyContainerHolder getInitialEnergyContainers() {
+    protected IEnergyContainerHolder getInitialEnergyContainers(IContentsListener listener) {
         return side -> getMultiblock().getEnergyContainers(side);
     }
 
     @Override
-    protected void onUpdateServer() {
-        super.onUpdateServer();
-        if (getMultiblock().isFormed()) {
-            CableUtils.emit(getMultiblock().getDirectionsToEmit(getPos()), getMultiblock().energyContainer, this);
+    protected boolean onUpdateServer(TurbineMultiblockData multiblock) {
+        boolean needsPacket = super.onUpdateServer(multiblock);
+        if (multiblock.isFormed()) {
+            CableUtils.emit(multiblock.getDirectionsToEmit(getBlockPos()), multiblock.energyContainer, this);
         }
+        return needsPacket;
     }
 
     @Override

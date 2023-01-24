@@ -4,13 +4,14 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectFunction;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import java.util.function.IntSupplier;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
+import mekanism.api.annotations.NothingNullByDefault;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public class FloatingLongTransferUtils {
+
+    private FloatingLongTransferUtils() {
+    }
 
     /**
      * Util method for a generic insert implementation for various handlers. Mainly for internal use only
@@ -77,7 +78,7 @@ public class FloatingLongTransferUtils {
                     //If we are done extracting break and return the amount extracted
                     break;
                 }
-                //Otherwise keep looking and attempt to extract more from the handler
+                //Otherwise, keep looking and attempt to extract more from the handler
             }
         }
         return extracted;

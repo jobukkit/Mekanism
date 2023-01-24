@@ -11,8 +11,8 @@ import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Stream;
-import mekanism.common.Mekanism;
 
 //TODO: JavaDoc - contains client side methods to help convert models to VoxelShapes
 public class ModelToVoxelShapeUtil {
@@ -48,36 +48,77 @@ public class ModelToVoxelShapeUtil {
         printoutModelFile("/Users/aidancbrady/Documents/Mekanism/src/main/resources/assets/mekanism/models/block/digital_miner.json");
     }
 
-    public static void printoutModelFile(String path) {
+    private static void printoutModelFile(String path) {
         StringBuilder builder = new StringBuilder();
         try (Stream<String> stream = Files.lines(Paths.get(path), StandardCharsets.UTF_8)) {
-            stream.forEach(s -> builder.append(s).append("\n"));
+            stream.forEach(s -> builder.append(s).append('\n'));
         } catch (IOException e) {
             e.printStackTrace();
+            return;
         }
-        JsonObject obj = new JsonParser().parse(builder.toString()).getAsJsonObject();
+        DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.US);
+        DecimalFormat df = new DecimalFormat("#.####", otherSymbols);
+        JsonObject obj = JsonParser.parseString(builder.toString()).getAsJsonObject();
         if (obj.has("elements")) {
-            printoutObject(obj);
-        } else if (obj.has("layers")) {
-            obj.get("layers").getAsJsonObject().entrySet().forEach(e -> printoutObject(e.getValue().getAsJsonObject()));
+            JsonArray elements = obj.getAsJsonArray("elements");
+            printoutObject(elements, df, 0, elements.size());
+        } else if (obj.has("children")) {//Forge composite model
+            JsonObject children = obj.getAsJsonObject("children");
+            JsonArray[] childElements = new JsonArray[children.size()];
+            int index = 0;
+            for (Map.Entry<String, JsonElement> e : children.entrySet()) {
+                JsonObject child = e.getValue().getAsJsonObject();
+                JsonArray array;
+                if (child.has("elements")) {
+                    array = child.getAsJsonArray("elements");
+                } else {
+                    System.err.println("Unable to parse child: " + e.getKey());
+                    array = new JsonArray();
+                }
+                childElements[index++] = array;
+            }
+            ChildData childData = ChildData.from(childElements);
+            int soFar = 0;
+            for (JsonArray childElement : childData.childElements) {
+                soFar = printoutObject(childElement, df, soFar, childData.totalElements);
+            }
         } else {
-            Mekanism.logger.error("Unable to parse model file.");
+            System.err.println("Unable to parse model file.");
         }
     }
 
-    private static void printoutObject(JsonObject obj) {
-        JsonArray array = obj.get("elements").getAsJsonArray();
-        DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat df = new DecimalFormat("#.####", otherSymbols);
-        for (int i = 0; i < array.size(); i++) {
-            JsonObject element = array.get(i).getAsJsonObject();
-            JsonArray from = element.get("from").getAsJsonArray();
-            JsonArray to = element.get("to").getAsJsonArray();
-            JsonElement nameObj = element.get("name");
-            String name = nameObj != null ? " // " + nameObj.getAsString() : "";
-            String fromText = df.format(from.get(0).getAsDouble()) + ", " + df.format(from.get(1).getAsDouble()) + ", " + df.format(from.get(2).getAsDouble());
-            String toText = df.format(to.get(0).getAsDouble()) + ", " + df.format(to.get(1).getAsDouble()) + ", " + df.format(to.get(2).getAsDouble());
-            System.out.println("makeCuboidShape(" + fromText + ", " + toText + ")" + (i < array.size() - 1 ? "," : "") + name);
+    private static int printoutObject(JsonArray elementsArray, DecimalFormat df, int soFar, int totalElements) {
+        for (JsonElement jsonElement : elementsArray) {
+            JsonObject element = jsonElement.getAsJsonObject();
+            StringBuilder line = new StringBuilder("box(")
+                  .append(convertCorner(df, element.getAsJsonArray("from")))
+                  .append(", ")
+                  .append(convertCorner(df, element.getAsJsonArray("to")))
+                  .append(')');
+            if (++soFar < totalElements) {
+                //If this isn't the last element we need to make sure we have a comma at the end
+                line.append(',');
+            }
+            if (element.has("name")) {
+                line.append(" // ").append(element.get("name").getAsString());
+            }
+            System.out.println(line);
+        }
+        return soFar;
+    }
+
+    private static String convertCorner(DecimalFormat df, JsonArray corner) {
+        return df.format(corner.get(0).getAsDouble()) + ", " + df.format(corner.get(1).getAsDouble()) + ", " + df.format(corner.get(2).getAsDouble());
+    }
+
+    private record ChildData(JsonArray[] childElements, int totalElements) {
+
+        private static ChildData from(JsonArray[] childElements) {
+            int elements = 0;
+            for (JsonArray childElement : childElements) {
+                elements += childElement.size();
+            }
+            return new ChildData(childElements, elements);
         }
     }
 }

@@ -1,29 +1,49 @@
 package mekanism.common.tile.transmitter;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
+import mekanism.api.heat.IHeatCapacitor;
 import mekanism.api.heat.IMekanismHeatHandler;
 import mekanism.api.providers.IBlockProvider;
-import mekanism.api.tier.AlloyTier;
 import mekanism.api.tier.BaseTier;
 import mekanism.common.block.states.BlockStateHelper;
 import mekanism.common.block.states.TransmitterType;
 import mekanism.common.capabilities.Capabilities;
-import mekanism.common.capabilities.proxy.ProxyHeatHandler;
-import mekanism.common.capabilities.resolver.advanced.AdvancedCapabilityResolver;
+import mekanism.common.capabilities.resolver.manager.HeatHandlerManager;
 import mekanism.common.content.network.transmitter.ThermodynamicConductor;
+import mekanism.common.lib.transmitter.ConnectionType;
 import mekanism.common.registries.MekanismBlocks;
-import mekanism.common.upgrade.transmitter.ThermodynamicConductorUpgradeData;
-import mekanism.common.upgrade.transmitter.TransmitterUpgradeData;
-import net.minecraft.block.BlockState;
+import mekanism.common.util.WorldUtils;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class TileEntityThermodynamicConductor extends TileEntityTransmitter {
 
-    public TileEntityThermodynamicConductor(IBlockProvider blockProvider) {
-        super(blockProvider);
-        IMekanismHeatHandler handler = getTransmitter();
-        addCapabilityResolver(AdvancedCapabilityResolver.readOnly(Capabilities.HEAT_HANDLER_CAPABILITY, handler,
-              () -> new ProxyHeatHandler(handler, null, null)));
+    private final HeatHandlerManager heatHandlerManager;
+
+    public TileEntityThermodynamicConductor(IBlockProvider blockProvider, BlockPos pos, BlockState state) {
+        super(blockProvider, pos, state);
+        addCapabilityResolver(heatHandlerManager = new HeatHandlerManager(direction -> {
+            ThermodynamicConductor conductor = getTransmitter();
+            if (direction != null && conductor.getConnectionTypeRaw(direction) == ConnectionType.NONE) {
+                //If we actually have a side, and our connection type on that side is none, then return that we have no capacitors
+                return Collections.emptyList();
+            }
+            return conductor.getHeatCapacitors(direction);
+        }, new IMekanismHeatHandler() {
+            @NotNull
+            @Override
+            public List<IHeatCapacitor> getHeatCapacitors(@Nullable Direction side) {
+                return heatHandlerManager.getContainers(side);
+            }
+
+            @Override
+            public void onContentsChanged() {
+            }
+        }));
     }
 
     @Override
@@ -41,44 +61,28 @@ public class TileEntityThermodynamicConductor extends TileEntityTransmitter {
         return TransmitterType.THERMODYNAMIC_CONDUCTOR;
     }
 
+    @NotNull
     @Override
-    protected boolean canUpgrade(AlloyTier alloyTier) {
-        return alloyTier.getBaseTier().ordinal() == getTransmitter().getTier().getBaseTier().ordinal() + 1;
-    }
-
-    @Nonnull
-    @Override
-    protected BlockState upgradeResult(@Nonnull BlockState current, @Nonnull BaseTier tier) {
-        switch (tier) {
-            case BASIC:
-                return BlockStateHelper.copyStateData(current, MekanismBlocks.BASIC_THERMODYNAMIC_CONDUCTOR.getBlock().getDefaultState());
-            case ADVANCED:
-                return BlockStateHelper.copyStateData(current, MekanismBlocks.ADVANCED_THERMODYNAMIC_CONDUCTOR.getBlock().getDefaultState());
-            case ELITE:
-                return BlockStateHelper.copyStateData(current, MekanismBlocks.ELITE_THERMODYNAMIC_CONDUCTOR.getBlock().getDefaultState());
-            case ULTIMATE:
-                return BlockStateHelper.copyStateData(current, MekanismBlocks.ULTIMATE_THERMODYNAMIC_CONDUCTOR.getBlock().getDefaultState());
-        }
-        return current;
-    }
-
-    @Nullable
-    @Override
-    protected ThermodynamicConductorUpgradeData getUpgradeData() {
-        ThermodynamicConductor transmitter = getTransmitter();
-        return new ThermodynamicConductorUpgradeData(transmitter.redstoneReactive, transmitter.connectionTypes, transmitter.buffer.getHeat());
+    protected BlockState upgradeResult(@NotNull BlockState current, @NotNull BaseTier tier) {
+        return switch (tier) {
+            case BASIC -> BlockStateHelper.copyStateData(current, MekanismBlocks.BASIC_THERMODYNAMIC_CONDUCTOR);
+            case ADVANCED -> BlockStateHelper.copyStateData(current, MekanismBlocks.ADVANCED_THERMODYNAMIC_CONDUCTOR);
+            case ELITE -> BlockStateHelper.copyStateData(current, MekanismBlocks.ELITE_THERMODYNAMIC_CONDUCTOR);
+            case ULTIMATE -> BlockStateHelper.copyStateData(current, MekanismBlocks.ULTIMATE_THERMODYNAMIC_CONDUCTOR);
+            default -> current;
+        };
     }
 
     @Override
-    protected void parseUpgradeData(@Nonnull TransmitterUpgradeData upgradeData) {
-        if (upgradeData instanceof ThermodynamicConductorUpgradeData) {
-            ThermodynamicConductorUpgradeData data = (ThermodynamicConductorUpgradeData) upgradeData;
-            ThermodynamicConductor transmitter = getTransmitter();
-            transmitter.redstoneReactive = data.redstoneReactive;
-            transmitter.connectionTypes = data.connectionTypes;
-            transmitter.buffer.setHeat(data.heat);
-        } else {
-            super.parseUpgradeData(upgradeData);
+    public void sideChanged(@NotNull Direction side, @NotNull ConnectionType old, @NotNull ConnectionType type) {
+        super.sideChanged(side, old, type);
+        if (type == ConnectionType.NONE) {
+            invalidateCapability(Capabilities.HEAT_HANDLER, side);
+            //Notify the neighbor on that side our state changed and we no longer have a capability
+            WorldUtils.notifyNeighborOfChange(level, side, worldPosition);
+        } else if (old == ConnectionType.NONE) {
+            //Notify the neighbor on that side our state changed, and we now do have a capability
+            WorldUtils.notifyNeighborOfChange(level, side, worldPosition);
         }
     }
 }

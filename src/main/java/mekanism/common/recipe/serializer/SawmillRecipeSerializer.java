@@ -3,20 +3,20 @@ package mekanism.common.recipe.serializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import javax.annotation.Nonnull;
 import mekanism.api.JsonConstants;
 import mekanism.api.SerializerHelper;
 import mekanism.api.recipes.SawmillRecipe;
-import mekanism.api.recipes.inputs.ItemStackIngredient;
+import mekanism.api.recipes.ingredients.ItemStackIngredient;
+import mekanism.api.recipes.ingredients.creator.IngredientCreatorAccess;
 import mekanism.common.Mekanism;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistryEntry;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import org.jetbrains.annotations.NotNull;
 
-public class SawmillRecipeSerializer<RECIPE extends SawmillRecipe> extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<RECIPE> {
+public class SawmillRecipeSerializer<RECIPE extends SawmillRecipe> implements RecipeSerializer<RECIPE> {
 
     private final IFactory<RECIPE> factory;
 
@@ -24,12 +24,12 @@ public class SawmillRecipeSerializer<RECIPE extends SawmillRecipe> extends Forge
         this.factory = factory;
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public RECIPE read(@Nonnull ResourceLocation recipeId, @Nonnull JsonObject json) {
-        JsonElement input = JSONUtils.isJsonArray(json, JsonConstants.INPUT) ? JSONUtils.getJsonArray(json, JsonConstants.INPUT) :
-                            JSONUtils.getJsonObject(json, JsonConstants.INPUT);
-        ItemStackIngredient inputIngredient = ItemStackIngredient.deserialize(input);
+    public RECIPE fromJson(@NotNull ResourceLocation recipeId, @NotNull JsonObject json) {
+        JsonElement input = GsonHelper.isArrayNode(json, JsonConstants.INPUT) ? GsonHelper.getAsJsonArray(json, JsonConstants.INPUT) :
+                            GsonHelper.getAsJsonObject(json, JsonConstants.INPUT);
+        ItemStackIngredient inputIngredient = IngredientCreatorAccess.item().deserialize(input);
         ItemStack mainOutput = ItemStack.EMPTY;
         ItemStack secondaryOutput = ItemStack.EMPTY;
         double secondaryChance = 0;
@@ -43,7 +43,7 @@ public class SawmillRecipeSerializer<RECIPE extends SawmillRecipe> extends Forge
             }
             //If we have either json element for secondary information, assume we have both and fail if we can't get one of them
             JsonElement chance = json.get(JsonConstants.SECONDARY_CHANCE);
-            if (!JSONUtils.isNumber(chance)) {
+            if (!GsonHelper.isNumberValue(chance)) {
                 throw new JsonSyntaxException("Expected secondaryChance to be a number greater than zero.");
             }
             secondaryChance = chance.getAsJsonPrimitive().getAsDouble();
@@ -65,11 +65,11 @@ public class SawmillRecipeSerializer<RECIPE extends SawmillRecipe> extends Forge
     }
 
     @Override
-    public RECIPE read(@Nonnull ResourceLocation recipeId, @Nonnull PacketBuffer buffer) {
+    public RECIPE fromNetwork(@NotNull ResourceLocation recipeId, @NotNull FriendlyByteBuf buffer) {
         try {
-            ItemStackIngredient inputIngredient = ItemStackIngredient.read(buffer);
-            ItemStack mainOutput = buffer.readItemStack();
-            ItemStack secondaryOutput = buffer.readItemStack();
+            ItemStackIngredient inputIngredient = IngredientCreatorAccess.item().read(buffer);
+            ItemStack mainOutput = buffer.readItem();
+            ItemStack secondaryOutput = buffer.readItem();
             double secondaryChance = buffer.readDouble();
             return this.factory.create(recipeId, inputIngredient, mainOutput, secondaryOutput, secondaryChance);
         } catch (Exception e) {
@@ -79,7 +79,7 @@ public class SawmillRecipeSerializer<RECIPE extends SawmillRecipe> extends Forge
     }
 
     @Override
-    public void write(@Nonnull PacketBuffer buffer, @Nonnull RECIPE recipe) {
+    public void toNetwork(@NotNull FriendlyByteBuf buffer, @NotNull RECIPE recipe) {
         try {
             recipe.write(buffer);
         } catch (Exception e) {

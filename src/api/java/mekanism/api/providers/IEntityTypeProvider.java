@@ -1,27 +1,31 @@
 package mekanism.api.providers;
 
-import javax.annotation.Nonnull;
-import net.minecraft.entity.EntityType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
+import net.minecraftforge.registries.ForgeRegistries;
 
+@MethodsReturnNonnullByDefault
 public interface IEntityTypeProvider extends IBaseProvider {
 
-    @Nonnull
+    /**
+     * Gets the entity type this provider represents.
+     */
     EntityType<?> getEntityType();
 
     @Override
     default ResourceLocation getRegistryName() {
-        return getEntityType().getRegistryName();
+        return ForgeRegistries.ENTITY_TYPES.getKey(getEntityType());
     }
 
     @Override
-    default ITextComponent getTextComponent() {
-        return getEntityType().getName();
+    default Component getTextComponent() {
+        return getEntityType().getDescription();
     }
 
     @Override
     default String getTranslationKey() {
-        return getEntityType().getTranslationKey();
+        return getEntityType().getDescriptionId();
     }
 }

@@ -1,100 +1,98 @@
 package mekanism.common.item.gear;
 
 import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
+import java.util.function.Consumer;
 import mekanism.api.IIncrementalEnum;
 import mekanism.api.NBTConstants;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.math.MathUtils;
 import mekanism.api.text.EnumColor;
 import mekanism.api.text.IHasTextComponent;
 import mekanism.api.text.ILangEntry;
-import mekanism.client.render.armor.CustomArmor;
-import mekanism.client.render.armor.FreeRunnerArmor;
-import mekanism.client.render.item.ISTERProvider;
+import mekanism.client.render.RenderPropertiesProvider;
 import mekanism.common.Mekanism;
 import mekanism.common.MekanismLang;
-import mekanism.common.capabilities.ItemCapabilityWrapper;
+import mekanism.common.capabilities.ItemCapabilityWrapper.ItemCapability;
 import mekanism.common.capabilities.energy.BasicEnergyContainer;
 import mekanism.common.capabilities.energy.item.RateLimitEnergyHandler;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.item.interfaces.IItemHUDProvider;
 import mekanism.common.item.interfaces.IModeItem;
-import mekanism.common.item.interfaces.ISpecialGear;
 import mekanism.common.util.ItemDataUtils;
+import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.StorageUtils;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Rarity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStack.TooltipPart;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class ItemFreeRunners extends ArmorItem implements ISpecialGear, IItemHUDProvider, IModeItem {
+public class ItemFreeRunners extends ItemSpecialArmor implements IItemHUDProvider, IModeItem {
 
     private static final FreeRunnerMaterial FREE_RUNNER_MATERIAL = new FreeRunnerMaterial();
 
     public ItemFreeRunners(Properties properties) {
-        super(FREE_RUNNER_MATERIAL, EquipmentSlotType.FEET, properties.rarity(Rarity.RARE).setNoRepair().setISTER(ISTERProvider::freeRunners));
+        this(FREE_RUNNER_MATERIAL, properties);
+    }
+
+    public ItemFreeRunners(ArmorMaterial material, Properties properties) {
+        super(material, EquipmentSlot.FEET, properties.rarity(Rarity.RARE).setNoRepair());
     }
 
     @Override
-    public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlotType slot, String type) {
-        return "mekanism:render/null_armor.png";
-    }
-
-    @Nonnull
-    @Override
-    @OnlyIn(Dist.CLIENT)
-    public CustomArmor getGearModel() {
-        return FreeRunnerArmor.FREE_RUNNERS;
+    public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
+        consumer.accept(RenderPropertiesProvider.freeRunners());
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
-    public void addInformation(@Nonnull ItemStack stack, @Nullable World world, @Nonnull List<ITextComponent> tooltip, @Nonnull ITooltipFlag flag) {
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level world, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
         StorageUtils.addStoredEnergy(stack, tooltip, true);
         tooltip.add(MekanismLang.MODE.translateColored(EnumColor.GRAY, getMode(stack).getTextComponent()));
     }
 
     @Override
-    public void fillItemGroup(@Nonnull ItemGroup group, @Nonnull NonNullList<ItemStack> items) {
-        super.fillItemGroup(group, items);
-        if (isInGroup(group)) {
+    public void fillItemCategory(@NotNull CreativeModeTab group, @NotNull NonNullList<ItemStack> items) {
+        super.fillItemCategory(group, items);
+        if (allowedIn(group)) {
             items.add(StorageUtils.getFilledEnergyVariant(new ItemStack(this), MekanismConfig.gear.freeRunnerMaxEnergy.get()));
         }
     }
 
     @Override
-    public boolean showDurabilityBar(ItemStack stack) {
+    public boolean canWalkOnPowderedSnow(@NotNull ItemStack stack, @NotNull LivingEntity wearer) {
         return true;
     }
 
     @Override
-    public double getDurabilityForDisplay(ItemStack stack) {
-        return StorageUtils.getEnergyDurabilityForDisplay(stack);
+    public boolean isBarVisible(@NotNull ItemStack stack) {
+        return true;
     }
 
     @Override
-    public int getRGBDurabilityForDisplay(ItemStack stack) {
+    public int getBarWidth(@NotNull ItemStack stack) {
+        return StorageUtils.getEnergyBarWidth(stack);
+    }
+
+    @Override
+    public int getBarColor(@NotNull ItemStack stack) {
         return MekanismConfig.client.energyColor.get();
     }
 
     @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT nbt) {
-        return new ItemCapabilityWrapper(stack, RateLimitEnergyHandler.create(MekanismConfig.gear.freeRunnerChargeRate, MekanismConfig.gear.freeRunnerMaxEnergy,
+    protected void gatherCapabilities(List<ItemCapability> capabilities, ItemStack stack, CompoundTag nbt) {
+        super.gatherCapabilities(capabilities, stack, nbt);
+        capabilities.add(RateLimitEnergyHandler.create(MekanismConfig.gear.freeRunnerChargeRate, MekanismConfig.gear.freeRunnerMaxEnergy,
               BasicEnergyContainer.manualOnly, BasicEnergyContainer.alwaysTrue));
     }
 
@@ -107,55 +105,71 @@ public class ItemFreeRunners extends ArmorItem implements ISpecialGear, IItemHUD
     }
 
     @Override
-    public void addHUDStrings(List<ITextComponent> list, ItemStack stack, EquipmentSlotType slotType) {
-        if (slotType == getEquipmentSlot()) {
+    public void addHUDStrings(List<Component> list, Player player, ItemStack stack, EquipmentSlot slotType) {
+        if (slotType == getSlot()) {
             list.add(MekanismLang.FREE_RUNNERS_MODE.translateColored(EnumColor.GRAY, getMode(stack).getTextComponent()));
             StorageUtils.addStoredEnergy(stack, list, true, MekanismLang.FREE_RUNNERS_STORED);
         }
     }
 
     @Override
-    public void changeMode(@Nonnull PlayerEntity player, @Nonnull ItemStack stack, int shift, boolean displayChangeMessage) {
+    public void changeMode(@NotNull Player player, @NotNull ItemStack stack, int shift, boolean displayChangeMessage) {
         FreeRunnerMode mode = getMode(stack);
         FreeRunnerMode newMode = mode.adjust(shift);
         if (mode != newMode) {
             setMode(stack, newMode);
             if (displayChangeMessage) {
-                player.sendMessage(MekanismLang.LOG_FORMAT.translateColored(EnumColor.DARK_BLUE, MekanismLang.MEKANISM,
-                      MekanismLang.FREE_RUNNER_MODE_CHANGE.translateColored(EnumColor.GRAY, newMode)), Util.DUMMY_UUID);
+                player.sendSystemMessage(MekanismUtils.logFormat(MekanismLang.FREE_RUNNER_MODE_CHANGE.translate(newMode)));
             }
         }
     }
 
     @Override
-    public boolean supportsSlotType(ItemStack stack, @Nonnull EquipmentSlotType slotType) {
-        return slotType == getEquipmentSlot();
+    public boolean supportsSlotType(ItemStack stack, @NotNull EquipmentSlot slotType) {
+        return slotType == getSlot();
     }
 
     @Override
-    public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
-        return material.getEnchantability() > 0;
+    public int getDefaultTooltipHideFlags(@NotNull ItemStack stack) {
+        if (this instanceof ItemArmoredFreeRunners) {
+            return super.getDefaultTooltipHideFlags(stack);
+        }
+        return super.getDefaultTooltipHideFlags(stack) | TooltipPart.MODIFIERS.getMask();
     }
 
+    @NothingNullByDefault
     public enum FreeRunnerMode implements IIncrementalEnum<FreeRunnerMode>, IHasTextComponent {
-        NORMAL(MekanismLang.FREE_RUNNER_NORMAL, EnumColor.DARK_GREEN),
-        DISABLED(MekanismLang.FREE_RUNNER_DISABLED, EnumColor.DARK_RED);
+        NORMAL(MekanismLang.FREE_RUNNER_NORMAL, EnumColor.DARK_GREEN, true, true),
+        SAFETY(MekanismLang.FREE_RUNNER_SAFETY, EnumColor.ORANGE, true, false),
+        DISABLED(MekanismLang.FREE_RUNNER_DISABLED, EnumColor.DARK_RED, false, false);
 
         private static final FreeRunnerMode[] MODES = values();
+
+        private final boolean preventsFallDamage;
+        private final boolean providesStepBoost;
         private final ILangEntry langEntry;
         private final EnumColor color;
 
-        FreeRunnerMode(ILangEntry langEntry, EnumColor color) {
+        FreeRunnerMode(ILangEntry langEntry, EnumColor color, boolean preventsFallDamage, boolean providesStepBoost) {
+            this.preventsFallDamage = preventsFallDamage;
+            this.providesStepBoost = providesStepBoost;
             this.langEntry = langEntry;
             this.color = color;
         }
 
+        public boolean preventsFallDamage() {
+            return preventsFallDamage;
+        }
+
+        public boolean providesStepBoost() {
+            return providesStepBoost;
+        }
+
         @Override
-        public ITextComponent getTextComponent() {
+        public Component getTextComponent() {
             return langEntry.translateColored(color);
         }
 
-        @Nonnull
         @Override
         public FreeRunnerMode byIndex(int index) {
             return byIndexStatic(index);
@@ -166,23 +180,12 @@ public class ItemFreeRunners extends ArmorItem implements ISpecialGear, IItemHUD
         }
     }
 
-    @ParametersAreNonnullByDefault
-    @MethodsReturnNonnullByDefault
+    @NothingNullByDefault
     protected static class FreeRunnerMaterial extends BaseSpecialArmorMaterial {
-
-        @Override
-        public int getDamageReductionAmount(EquipmentSlotType slotType) {
-            return 0;
-        }
 
         @Override
         public String getName() {
             return Mekanism.MODID + ":free_runners";
-        }
-
-        @Override
-        public float getToughness() {
-            return 0;
         }
     }
 }

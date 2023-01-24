@@ -3,20 +3,20 @@ package mekanism.common.recipe.serializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import javax.annotation.Nonnull;
 import mekanism.api.JsonConstants;
 import mekanism.api.SerializerHelper;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.recipes.GasToGasRecipe;
-import mekanism.api.recipes.inputs.chemical.GasStackIngredient;
+import mekanism.api.recipes.ingredients.ChemicalStackIngredient.GasStackIngredient;
+import mekanism.api.recipes.ingredients.creator.IngredientCreatorAccess;
 import mekanism.common.Mekanism;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistryEntry;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import org.jetbrains.annotations.NotNull;
 
-public class GasToGasRecipeSerializer<RECIPE extends GasToGasRecipe> extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<RECIPE> {
+public class GasToGasRecipeSerializer<RECIPE extends GasToGasRecipe> implements RecipeSerializer<RECIPE> {
 
     private final IFactory<RECIPE> factory;
 
@@ -24,12 +24,12 @@ public class GasToGasRecipeSerializer<RECIPE extends GasToGasRecipe> extends For
         this.factory = factory;
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public RECIPE read(@Nonnull ResourceLocation recipeId, @Nonnull JsonObject json) {
-        JsonElement input = JSONUtils.isJsonArray(json, JsonConstants.INPUT) ? JSONUtils.getJsonArray(json, JsonConstants.INPUT) :
-                            JSONUtils.getJsonObject(json, JsonConstants.INPUT);
-        GasStackIngredient inputIngredient = GasStackIngredient.deserialize(input);
+    public RECIPE fromJson(@NotNull ResourceLocation recipeId, @NotNull JsonObject json) {
+        JsonElement input = GsonHelper.isArrayNode(json, JsonConstants.INPUT) ? GsonHelper.getAsJsonArray(json, JsonConstants.INPUT) :
+                            GsonHelper.getAsJsonObject(json, JsonConstants.INPUT);
+        GasStackIngredient inputIngredient = IngredientCreatorAccess.gas().deserialize(input);
         GasStack output = SerializerHelper.getGasStack(json, JsonConstants.OUTPUT);
         if (output.isEmpty()) {
             throw new JsonSyntaxException("Recipe output must not be empty.");
@@ -38,9 +38,9 @@ public class GasToGasRecipeSerializer<RECIPE extends GasToGasRecipe> extends For
     }
 
     @Override
-    public RECIPE read(@Nonnull ResourceLocation recipeId, @Nonnull PacketBuffer buffer) {
+    public RECIPE fromNetwork(@NotNull ResourceLocation recipeId, @NotNull FriendlyByteBuf buffer) {
         try {
-            GasStackIngredient inputIngredient = GasStackIngredient.read(buffer);
+            GasStackIngredient inputIngredient = IngredientCreatorAccess.gas().read(buffer);
             GasStack output = GasStack.readFromPacket(buffer);
             return this.factory.create(recipeId, inputIngredient, output);
         } catch (Exception e) {
@@ -50,7 +50,7 @@ public class GasToGasRecipeSerializer<RECIPE extends GasToGasRecipe> extends For
     }
 
     @Override
-    public void write(@Nonnull PacketBuffer buffer, @Nonnull RECIPE recipe) {
+    public void toNetwork(@NotNull FriendlyByteBuf buffer, @NotNull RECIPE recipe) {
         try {
             recipe.write(buffer);
         } catch (Exception e) {

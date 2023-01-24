@@ -1,21 +1,19 @@
 package mekanism.common.capabilities.fluid;
 
 import java.util.function.BooleanSupplier;
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
+import mekanism.api.AutomationType;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.fluid.IExtendedFluidTank;
-import mekanism.api.inventory.AutomationType;
 import mekanism.common.capabilities.merged.MergedTank;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.fluids.FluidStack;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Like {@link mekanism.api.chemical.merged.ChemicalTankWrapper}
  */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NothingNullByDefault
 public class FluidTankWrapper implements IExtendedFluidTank {
 
     private final IExtendedFluidTank internal;
@@ -36,6 +34,11 @@ public class FluidTankWrapper implements IExtendedFluidTank {
     @Override
     public void setStack(FluidStack stack) {
         internal.setStack(stack);
+    }
+
+    @Override
+    public void setStackUnchecked(FluidStack stack) {
+        internal.setStackUnchecked(stack);
     }
 
     @Override
@@ -90,16 +93,16 @@ public class FluidTankWrapper implements IExtendedFluidTank {
     }
 
     @Override
-    public CompoundNBT serializeNBT() {
+    public CompoundTag serializeNBT() {
         return internal.serializeNBT();
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT nbt) {
+    public void deserializeNBT(CompoundTag nbt) {
         internal.deserializeNBT(nbt);
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public FluidStack getFluid() {
         return internal.getFluid();

@@ -1,8 +1,10 @@
 package mekanism.generators.common;
 
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.text.ILangEntry;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
 
+@NothingNullByDefault
 public enum GeneratorsLang implements ILangEntry {
     PRODUCING_AMOUNT("gui", "producing.amount"),
     STORED_BIO_FUEL("gui", "bio_generator.bio_fuel"),
@@ -57,6 +59,7 @@ public enum GeneratorsLang implements ILangEntry {
     TURBINE_INVALID_ROTORS_NOT_CONTIGUOUS("turbine", "invalid_rotors_not_contiguous"),
     TURBINE_INVALID_TOO_NARROW("turbine", "invalid_too_narrow"),
     TURBINE_INVALID_VENT_BELOW_COMPLEX("turbine", "invalid_vent_below_complex"),
+    TURBINE_INVALID_MISSING_COILS("turbine", "invalid_missing_coils"),
 
     TURBINE("turbine", "industrial_turbine"),
     TURBINE_FLOW_RATE("turbine", "flow_rate"),
@@ -77,6 +80,7 @@ public enum GeneratorsLang implements ILangEntry {
     TURBINE_PRODUCTION("turbine", "stats.production"),
 
     FISSION_INVALID_BAD_CONTROL_ROD("fission", "invalid_bad_control_rod"),
+    FISSION_INVALID_MISSING_CONTROL_ROD("fission", "missing_control_rod"),
     FISSION_INVALID_BAD_FUEL_ASSEMBLY("fission", "invalid_bad_fuel_assembly"),
     FISSION_INVALID_EXTRA_CONTROL_ROD("fission", "invalid_extra_control_rod"),
     FISSION_INVALID_MALFORMED_FUEL_ASSEMBLY("fission", "invalid_malformed_fuel_assembly"),
@@ -88,6 +92,7 @@ public enum GeneratorsLang implements ILangEntry {
     FISSION_SCRAM("fission", "scram"),
     FISSION_DAMAGE("fission", "damage"),
     FISSION_HEAT_STATISTICS("fission", "heat_statistics"),
+    FISSION_FORCE_DISABLED("fission", "force_disabled"),
     FISSION_FUEL_STATISTICS("fission", "fuel_statistics"),
     FISSION_HEAT_CAPACITY("fission", "heat_capacity"),
     FISSION_SURFACE_AREA("fission", "surface_area"),
@@ -147,7 +152,7 @@ public enum GeneratorsLang implements ILangEntry {
     private final String key;
 
     GeneratorsLang(String type, String path) {
-        this(Util.makeTranslationKey(type, MekanismGenerators.rl(path)));
+        this(Util.makeDescriptionId(type, MekanismGenerators.rl(path)));
     }
 
     GeneratorsLang(String key) {

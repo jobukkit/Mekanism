@@ -1,101 +1,90 @@
 package mekanism.generators.client.render;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import javax.annotation.ParametersAreNonnullByDefault;
-import mekanism.client.render.MekanismRenderType;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import java.util.Map;
+import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.client.render.MekanismRenderer;
+import mekanism.client.render.MekanismRenderer.LazyModel;
 import mekanism.client.render.MekanismRenderer.Model3D;
 import mekanism.client.render.ModelRenderer;
+import mekanism.client.render.RenderResizableCuboid.FaceDisplay;
 import mekanism.client.render.data.FluidRenderData;
-import mekanism.client.render.data.GasRenderData;
-import mekanism.client.render.tileentity.MekanismTileEntityRenderer;
+import mekanism.client.render.data.RenderData;
+import mekanism.client.render.tileentity.MultiblockTileEntityRenderer;
 import mekanism.generators.common.GeneratorsProfilerConstants;
+import mekanism.generators.common.content.fission.FissionReactorMultiblockData;
 import mekanism.generators.common.content.fission.FissionReactorValidator.FormedAssembly;
 import mekanism.generators.common.tile.fission.TileEntityFissionReactorCasing;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.profiler.IProfiler;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraftforge.common.util.Lazy;
 
-@ParametersAreNonnullByDefault
-public class RenderFissionReactor extends MekanismTileEntityRenderer<TileEntityFissionReactorCasing> {
+@NothingNullByDefault
+public class RenderFissionReactor extends MultiblockTileEntityRenderer<FissionReactorMultiblockData, TileEntityFissionReactorCasing> {
 
-    private static Model3D glowModel;
+    private static final Map<RenderData, Model3D> cachedHeatedCoolantModels = new Object2ObjectOpenHashMap<>();
+    private static final int GLOW_ARGB = MekanismRenderer.getColorARGB(0.466F, 0.882F, 0.929F, 0.6F);
+    //TODO: Replace using a model here for the glow with using FuelAssemblyBakedModel as it should provide a performance boost
+    // The issue and reason it doesn't use it yet is because rendering the coolant hides the FuelAssemblyBakedModel due to
+    // transparency sort ordering
+    private static final MekanismRenderer.LazyModel glowModel = new LazyModel(() -> new Model3D()
+          .setTexture(MekanismRenderer.whiteIcon)
+          .xBounds(0.05F, 0.95F)
+          .yBounds(0.01F, 0.99F)
+          .zBounds(0.05F, 0.95F)
+          .setSideRender(direction -> direction.getAxis().isHorizontal())
+    );
 
-    public RenderFissionReactor(TileEntityRendererDispatcher renderer) {
-        super(renderer);
+    public static void resetCachedModels() {
+        cachedHeatedCoolantModels.clear();
+        glowModel.reset();
+    }
+
+    public RenderFissionReactor(BlockEntityRendererProvider.Context context) {
+        super(context);
     }
 
     @Override
-    protected void render(TileEntityFissionReactorCasing tile, float partialTick, MatrixStack matrix, IRenderTypeBuffer renderer, int light, int overlayLight, IProfiler profiler) {
-        if (tile.isMaster && tile.getMultiblock().isFormed() && tile.getMultiblock().renderLocation != null) {
-            BlockPos pos = tile.getPos();
-            IVertexBuilder buffer = renderer.getBuffer(MekanismRenderType.resizableCuboid());
-            if (tile.getMultiblock().isBurning()) {
-                if (glowModel == null) {
-                    glowModel = new Model3D();
-                    glowModel.minX = 0.05;
-                    glowModel.minY = 0.01;
-                    glowModel.minZ = 0.05;
-                    glowModel.maxX = 0.95;
-                    glowModel.maxY = 0.99;
-                    glowModel.maxZ = 0.95;
-                    glowModel.setTexture(MekanismRenderer.whiteIcon);
-                }
-                for (FormedAssembly assembly : tile.getMultiblock().assemblies) {
-                    matrix.push();
-                    matrix.translate(assembly.getPos().getX() - pos.getX(), assembly.getPos().getY() - pos.getY(), assembly.getPos().getZ() - pos.getZ());
-                    matrix.scale(1, assembly.getHeight(), 1);
-                    int argb = MekanismRenderer.getColorARGB(0.466F, 0.882F, 0.929F, 0.6F);
-                    MekanismRenderer.renderObject(glowModel, matrix, buffer, argb, MekanismRenderer.FULL_LIGHT);
-                    matrix.pop();
-                }
+    protected void render(TileEntityFissionReactorCasing tile, FissionReactorMultiblockData multiblock, float partialTick, PoseStack matrix, MultiBufferSource renderer,
+          int light, int overlayLight, ProfilerFiller profiler) {
+        BlockPos pos = tile.getBlockPos();
+        Lazy<VertexConsumer> buffer = Lazy.of(() -> renderer.getBuffer(Sheets.translucentCullBlockSheet()));
+        if (multiblock.isBurning()) {
+            profiler.push(GeneratorsProfilerConstants.FISSION_FUEL_ASSEMBLY);
+            Model3D model = glowModel.get();
+            Camera camera = getCamera();
+            for (FormedAssembly assembly : multiblock.assemblies) {
+                BlockPos assemblyPos = assembly.pos();
+                matrix.pushPose();
+                matrix.translate(assemblyPos.getX() - pos.getX(), assemblyPos.getY() - pos.getY(), assemblyPos.getZ() - pos.getZ());
+                //Add a bit of extra distance so that it includes the lower part of the control rod
+                matrix.scale(1, assembly.height() + 0.625F, 1);
+                MekanismRenderer.renderObject(model, matrix, buffer.get(), GLOW_ARGB, LightTexture.FULL_BRIGHT, overlayLight, FaceDisplay.FRONT, camera, assemblyPos);
+                matrix.popPose();
             }
-            if (!tile.getMultiblock().fluidCoolantTank.isEmpty()) {
-                int height = tile.getMultiblock().height() - 2;
-                if (height >= 1) {
-                    FluidRenderData data = new FluidRenderData(tile.getMultiblock().fluidCoolantTank.getFluid());
-                    data.location = tile.getMultiblock().renderLocation;
-                    data.height = height;
-                    data.length = tile.getMultiblock().length();
-                    data.width = tile.getMultiblock().width();
-                    int glow = data.calculateGlowLight(LightTexture.packLight(0, 15));
-                    matrix.push();
-                    matrix.translate(data.location.getX() - pos.getX(), data.location.getY() - pos.getY(), data.location.getZ() - pos.getZ());
-                    MekanismRenderer.renderObject(ModelRenderer.getModel(data, tile.getMultiblock().prevCoolantScale), matrix, buffer, data.getColorARGB(tile.getMultiblock().prevCoolantScale), glow);
-                    matrix.pop();
-                    MekanismRenderer.renderValves(matrix, buffer, tile.getMultiblock().valves, data, pos, glow);
-                }
-            }
-            if (!tile.getMultiblock().heatedCoolantTank.isEmpty()) {
-                int height = tile.getMultiblock().height() - 2;
-                if (height >= 1) {
-                    GasRenderData data = new GasRenderData(tile.getMultiblock().heatedCoolantTank.getStack());
-                    data.location = tile.getMultiblock().renderLocation;
-                    data.height = height;
-                    data.length = tile.getMultiblock().length();
-                    data.width = tile.getMultiblock().width();
-                    int glow = data.calculateGlowLight(LightTexture.packLight(0, 15));
-                    matrix.push();
-                    matrix.scale(0.998F, 0.998F, 0.998F);
-                    matrix.translate(data.location.getX() - pos.getX() + 0.001, data.location.getY() - pos.getY() + 0.001, data.location.getZ() - pos.getZ() + 0.001);
-                    Model3D gasModel = ModelRenderer.getModel(data, 1);
-                    MekanismRenderer.renderObject(gasModel, matrix, buffer, data.getColorARGB(tile.getMultiblock().prevHeatedCoolantScale), glow);
-                    matrix.pop();
-                }
-            }
+            profiler.pop();
+        }
+        if (!multiblock.fluidCoolantTank.isEmpty()) {
+            FluidRenderData data = RenderData.Builder.create(multiblock.fluidCoolantTank.getFluid()).of(multiblock).build();
+            renderObject(data, multiblock.valves, pos, matrix, buffer.get(), overlayLight, multiblock.prevCoolantScale);
+        }
+        if (!multiblock.heatedCoolantTank.isEmpty()) {
+            RenderData data = RenderData.Builder.create(multiblock.heatedCoolantTank.getStack()).of(multiblock).build();
+            //Create a slightly shrunken version of the model if it is missing to prevent z-fighting
+            Model3D gasModel = cachedHeatedCoolantModels.computeIfAbsent(data, d -> ModelRenderer.getModel(d, 1).copy().shrink(0.01F));
+            renderObject(data, pos, gasModel, matrix, buffer.get(), overlayLight, multiblock.prevHeatedCoolantScale);
         }
     }
 
     @Override
     protected String getProfilerSection() {
         return GeneratorsProfilerConstants.FISSION_REACTOR;
-    }
-
-    @Override
-    public boolean isGlobalRenderer(TileEntityFissionReactorCasing tile) {
-        return tile.isMaster && tile.getMultiblock().isFormed() && tile.getMultiblock().renderLocation != null;
     }
 }

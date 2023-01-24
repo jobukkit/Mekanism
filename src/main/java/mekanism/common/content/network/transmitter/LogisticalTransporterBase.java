@@ -7,8 +7,8 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.function.IntConsumer;
-import javax.annotation.Nonnull;
 import mekanism.api.NBTConstants;
 import mekanism.api.text.EnumColor;
 import mekanism.common.Mekanism;
@@ -21,31 +21,31 @@ import mekanism.common.lib.inventory.TransitRequest.TransitResponse;
 import mekanism.common.lib.transmitter.ConnectionType;
 import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.lib.transmitter.acceptor.AcceptorCache;
-import mekanism.common.network.PacketTransporterUpdate;
+import mekanism.common.network.to_client.PacketTransporterUpdate;
 import mekanism.common.tier.TransporterTier;
 import mekanism.common.tile.TileEntityLogisticalSorter;
-import mekanism.common.tile.transmitter.TileEntityLogisticalTransporterBase;
 import mekanism.common.tile.transmitter.TileEntityTransmitter;
-import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.TransporterUtils;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.items.CapabilityItemHandler;
+import mekanism.common.util.WorldUtils;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class LogisticalTransporterBase extends Transmitter<IItemHandler, InventoryNetwork, LogisticalTransporterBase> {
 
-    private final Int2ObjectMap<TransporterStack> transit = new Int2ObjectOpenHashMap<>();
-    private final Int2ObjectMap<TransporterStack> needsSync = new Int2ObjectOpenHashMap<>();
+    protected final Int2ObjectMap<TransporterStack> transit = new Int2ObjectOpenHashMap<>();
+    protected final Int2ObjectMap<TransporterStack> needsSync = new Int2ObjectOpenHashMap<>();
     public final TransporterTier tier;
-    private int nextId = 0;
-    private int delay = 0;
-    private int delayCount = 0;
+    protected int nextId = 0;
+    protected int delay = 0;
+    protected int delayCount = 0;
 
     protected LogisticalTransporterBase(TileEntityTransmitter tile, TransporterTier tier) {
         super(tile, TransmissionType.ITEM);
@@ -54,7 +54,7 @@ public abstract class LogisticalTransporterBase extends Transmitter<IItemHandler
 
     @Override
     public AcceptorCache<IItemHandler> getAcceptorCache() {
-        //Cast it here to make things a bit easier, as we know the create is by default of type AcceptorCache
+        //Cast it here to make things a bit easier, as we know createAcceptorCache by default returns an object of type AcceptorCache
         return (AcceptorCache<IItemHandler>) super.getAcceptorCache();
     }
 
@@ -76,31 +76,36 @@ public abstract class LogisticalTransporterBase extends Transmitter<IItemHandler
     }
 
     public boolean canReceiveFrom(Direction side) {
-        return canConnect(side) && getConnectionType(side) == ConnectionType.NORMAL;
+        if (canConnect(side)) {
+            ConnectionType connectionType = getConnectionType(side);
+            return connectionType == ConnectionType.NORMAL || connectionType == ConnectionType.PULL;
+        }
+        return false;
     }
 
     @Override
-    public boolean isValidTransmitter(Transmitter<?, ?, ?> transmitter) {
-        if (transmitter instanceof LogisticalTransporterBase) {
-            LogisticalTransporterBase transporter = (LogisticalTransporterBase) transmitter;
+    public boolean isValidTransmitterBasic(TileEntityTransmitter transmitter, Direction side) {
+        if (transmitter.getTransmitter() instanceof LogisticalTransporterBase transporter) {
             if (getColor() == null || transporter.getColor() == null || getColor() == transporter.getColor()) {
-                return super.isValidTransmitter(transporter);
+                return super.isValidTransmitterBasic(transmitter, side);
             }
         }
         return false;
     }
 
     @Override
-    public boolean isValidAcceptor(TileEntity tile, Direction side) {
-        return super.isValidAcceptor(tile, side) && getAcceptorCache().isAcceptorAndListen(tile, side, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+    public boolean isValidAcceptor(BlockEntity tile, Direction side) {
+        return super.isValidAcceptor(tile, side) && getAcceptorCache().isAcceptorAndListen(tile, side, ForgeCapabilities.ITEM_HANDLER);
     }
 
-    public void tick() {
-        if (isRemote()) {
-            for (TransporterStack stack : transit.values()) {
-                stack.progress = Math.min(100, stack.progress + tier.getSpeed());
-            }
-        } else if (getTransmitterNetwork() != null) {
+    public void onUpdateClient() {
+        for (TransporterStack stack : transit.values()) {
+            stack.progress = Math.min(100, stack.progress + tier.getSpeed());
+        }
+    }
+
+    public void onUpdateServer() {
+        if (getTransmitterNetwork() != null) {
             //Pull items into the transporter
             if (delay > 0) {
                 //If a delay has been imposed, wait a bit
@@ -110,7 +115,7 @@ public abstract class LogisticalTransporterBase extends Transmitter<IItemHandler
                 delay = 3;
                 //Attempt to pull
                 for (Direction side : getConnections(ConnectionType.PULL)) {
-                    TileEntity tile = MekanismUtils.getTileEntity(getTileWorld(), getTilePos().offset(side));
+                    BlockEntity tile = WorldUtils.getTileEntity(getTileWorld(), getTilePos().relative(side));
                     if (tile != null) {
                         TransitRequest request = TransitRequest.anyItem(tile, side.getOpposite(), tier.getPullAmount());
                         //There's a stack available to insert into the network...
@@ -130,101 +135,117 @@ public abstract class LogisticalTransporterBase extends Transmitter<IItemHandler
                     }
                 }
             }
-            //Update stack positions
-            IntSet deletes = new IntOpenHashSet();
-            //Note: Our calls to getTileEntity are not done with a chunkMap as we don't tend to have that many tiles we
-            // are checking at once from here and given this gets called each tick, it would cause unnecessary garbage
-            // collection to occur actually causing the tick time to go up slightly.
-            for (Int2ObjectMap.Entry<TransporterStack> entry : transit.int2ObjectEntrySet()) {
-                int stackId = entry.getIntKey();
-                TransporterStack stack = entry.getValue();
-                if (!stack.initiatedPath) {
-                    if (stack.itemStack.isEmpty() || !recalculate(stackId, stack, null)) {
-                        deletes.add(stackId);
-                        continue;
-                    }
-                }
-
-                stack.progress += tier.getSpeed();
-                if (stack.progress >= 100) {
-                    BlockPos prevSet = null;
-                    if (stack.hasPath()) {
-                        int currentIndex = stack.getPath().indexOf(getTilePos());
-                        if (currentIndex == 0) { //Necessary for transition reasons, not sure why
+            if (!transit.isEmpty()) {
+                InventoryNetwork network = getTransmitterNetwork();
+                //Update stack positions
+                IntSet deletes = new IntOpenHashSet();
+                //Note: Our calls to getTileEntity are not done with a chunkMap as we don't tend to have that many tiles we
+                // are checking at once from here and given this gets called each tick, it would cause unnecessary garbage
+                // collection to occur actually causing the tick time to go up slightly.
+                for (Int2ObjectMap.Entry<TransporterStack> entry : transit.int2ObjectEntrySet()) {
+                    int stackId = entry.getIntKey();
+                    TransporterStack stack = entry.getValue();
+                    if (!stack.initiatedPath) {
+                        if (stack.itemStack.isEmpty() || !recalculate(stackId, stack, null)) {
                             deletes.add(stackId);
                             continue;
                         }
-                        BlockPos next = stack.getPath().get(currentIndex - 1);
-                        if (next != null) {
-                            if (!stack.isFinal(this)) {
-                                TileEntityLogisticalTransporterBase tile = MekanismUtils.getTileEntity(TileEntityLogisticalTransporterBase.class, getTileWorld(), next);
-                                if (stack.canInsertToTransporter(tile, stack.getSide(this), getTransmitterTile())) {
-                                    tile.getTransmitter().entityEntering(stack, stack.progress % 100);
-                                    deletes.add(stackId);
-                                    continue;
-                                }
-                                prevSet = next;
-                            } else if (stack.getPathType() != Path.NONE) {
-                                TileEntity tile = MekanismUtils.getTileEntity(getTileWorld(), next);
-                                if (tile != null) {
-                                    TransitResponse response = TransitRequest.simple(stack.itemStack).addToInventory(tile, stack.getSide(this),
-                                          stack.getPathType() == Path.HOME);
-                                    // Nothing was rejected; remove the stack from the prediction tracker and
-                                    // schedule this stack for deletion. Continue the loop thereafter
-                                    ItemStack rejected = response.getRejected();
-                                    if (rejected.isEmpty()) {
-                                        TransporterManager.remove(getTileWorld(), stack);
+                    }
+
+                    int prevProgress = stack.progress;
+                    stack.progress += tier.getSpeed();
+                    if (stack.progress >= 100) {
+                        BlockPos prevSet = null;
+                        if (stack.hasPath()) {
+                            int currentIndex = stack.getPath().indexOf(getTilePos());
+                            if (currentIndex == 0) { //Necessary for transition reasons, not sure why
+                                deletes.add(stackId);
+                                continue;
+                            }
+                            BlockPos next = stack.getPath().get(currentIndex - 1);
+                            if (next != null) {
+                                if (!stack.isFinal(this)) {
+                                    LogisticalTransporterBase transmitter = network.getTransmitter(next);
+                                    if (stack.canInsertToTransporter(transmitter, stack.getSide(this), this)) {
+                                        transmitter.entityEntering(stack, stack.progress % 100);
                                         deletes.add(stackId);
                                         continue;
                                     }
-                                    // Some portion of the stack got rejected; save the remainder and
-                                    // let the recalculate below sort out what to do next
-                                    stack.itemStack = rejected;
                                     prevSet = next;
+                                } else if (stack.getPathType() != Path.NONE) {
+                                    BlockEntity tile = WorldUtils.getTileEntity(getTileWorld(), next);
+                                    if (tile != null) {
+                                        TransitResponse response = TransitRequest.simple(stack.itemStack).addToInventory(tile, stack.getSide(this), 0,
+                                              stack.getPathType() == Path.HOME);
+                                        if (!response.isEmpty()) {
+                                            //We were able to add at least part of the stack to the inventory
+                                            ItemStack rejected = response.getRejected();
+                                            if (rejected.isEmpty()) {
+                                                //Nothing was rejected (it was all accepted); remove the stack from the prediction
+                                                // tracker and schedule this stack for deletion. Continue the loop thereafter
+                                                TransporterManager.remove(getTileWorld(), stack);
+                                                deletes.add(stackId);
+                                                continue;
+                                            }
+                                            //Some portion of the stack got rejected; save the remainder and
+                                            // let the recalculate below sort out what to do next
+                                            stack.itemStack = rejected;
+                                        }//else the entire stack got rejected (Note: we don't need to update the stack to point to itself)
+                                        prevSet = next;
+                                    }
                                 }
                             }
                         }
-                    }
-                    if (!recalculate(stackId, stack, prevSet)) {
-                        deletes.add(stackId);
-                    } else if (prevSet == null) {
-                        stack.progress = 50;
-                    } else {
-                        stack.progress = 0;
-                    }
-                } else if (stack.progress == 50) {
-                    boolean tryRecalculate;
-                    if (stack.isFinal(this)) {
-                        Path pathType = stack.getPathType();
-                        if (pathType == Path.DEST || pathType == Path.HOME) {
-                            ConnectionType connectionType = getConnectionType(stack.getSide(this));
-                            tryRecalculate = connectionType != ConnectionType.NORMAL && connectionType != ConnectionType.PUSH ||
-                                             !TransporterUtils.canInsert(MekanismUtils.getTileEntity(getTileWorld(), stack.getDest()), stack.color, stack.itemStack,
-                                                   stack.getSide(this), pathType == Path.HOME);
+                        if (!recalculate(stackId, stack, prevSet)) {
+                            deletes.add(stackId);
+                        } else if (prevSet == null) {
+                            stack.progress = 50;
                         } else {
-                            tryRecalculate = pathType == Path.NONE;
+                            stack.progress = 0;
                         }
-                    } else {
-                        tryRecalculate = !stack.canInsertToTransporter(MekanismUtils.getTileEntity(TileEntityLogisticalTransporterBase.class, getTileWorld(),
-                              stack.getNext(this)), stack.getSide(this), getTransmitterTile());
-                    }
-                    if (tryRecalculate && !recalculate(stackId, stack, null)) {
-                        deletes.add(stackId);
+                    } else if (prevProgress < 50 && stack.progress >= 50) {
+                        boolean tryRecalculate;
+                        if (stack.isFinal(this)) {
+                            Path pathType = stack.getPathType();
+                            if (pathType == Path.DEST || pathType == Path.HOME) {
+                                Direction side = stack.getSide(this);
+                                ConnectionType connectionType = getConnectionType(side);
+                                tryRecalculate = connectionType != ConnectionType.NORMAL && connectionType != ConnectionType.PUSH ||
+                                                 !TransporterUtils.canInsert(WorldUtils.getTileEntity(getTileWorld(), stack.getDest()), stack.color, stack.itemStack,
+                                                       side, pathType == Path.HOME);
+                            } else {
+                                tryRecalculate = pathType == Path.NONE;
+                            }
+                        } else {
+                            LogisticalTransporterBase nextTransmitter = network.getTransmitter(stack.getNext(this));
+                            if (nextTransmitter == null && stack.getPathType() == Path.NONE && stack.getPath().size() == 2) {
+                                //If there is no next transmitter, and it was an idle path, assume that we are idling
+                                // in a single length transmitter, in which case we only recalculate it at 50 if it won't
+                                // be able to go into that connection type
+                                ConnectionType connectionType = getConnectionType(stack.getSide(this));
+                                tryRecalculate = connectionType != ConnectionType.NORMAL && connectionType != ConnectionType.PUSH;
+                            } else {
+                                tryRecalculate = !stack.canInsertToTransporter(nextTransmitter, stack.getSide(this), this);
+                            }
+                        }
+                        if (tryRecalculate && !recalculate(stackId, stack, null)) {
+                            deletes.add(stackId);
+                        }
                     }
                 }
-            }
 
-            if (!deletes.isEmpty() || !needsSync.isEmpty()) {
-                //Notify clients, so that we send the information before we start clearing our lists
-                Mekanism.packetHandler.sendToAllTracking(new PacketTransporterUpdate(this, needsSync, deletes), getTransmitterTile());
-                // Now remove any entries from transit that have been deleted
-                deletes.forEach((IntConsumer) (this::deleteStack));
+                if (!deletes.isEmpty() || !needsSync.isEmpty()) {
+                    //Notify clients, so that we send the information before we start clearing our lists
+                    Mekanism.packetHandler().sendToAllTracking(new PacketTransporterUpdate(this, needsSync, deletes), getTransmitterTile());
+                    // Now remove any entries from transit that have been deleted
+                    deletes.forEach((IntConsumer) (this::deleteStack));
 
-                // Clear the pending sync packets
-                needsSync.clear();
+                    // Clear the pending sync packets
+                    needsSync.clear();
 
-                // Finally, mark chunk for save
-                MekanismUtils.saveChunk(getTransmitterTile());
+                    // Finally, mark chunk for save
+                    getTransmitterTile().markForSave();
+                }
             }
         }
     }
@@ -234,14 +255,9 @@ public abstract class LogisticalTransporterBase extends Transmitter<IItemHandler
         super.remove();
         if (!isRemote()) {
             for (TransporterStack stack : getTransit()) {
-                TransporterUtils.drop(this, stack);
+                TransporterManager.remove(getTileWorld(), stack);
             }
         }
-    }
-
-    @Override
-    public InventoryNetwork createEmptyNetwork() {
-        return new InventoryNetwork();
     }
 
     @Override
@@ -254,13 +270,13 @@ public abstract class LogisticalTransporterBase extends Transmitter<IItemHandler
         return new InventoryNetwork(networks);
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public CompoundNBT getReducedUpdateTag(CompoundNBT updateTag) {
+    public CompoundTag getReducedUpdateTag(CompoundTag updateTag) {
         updateTag = super.getReducedUpdateTag(updateTag);
-        ListNBT stacks = new ListNBT();
+        ListTag stacks = new ListTag();
         for (Int2ObjectMap.Entry<TransporterStack> entry : transit.int2ObjectEntrySet()) {
-            CompoundNBT tagCompound = new CompoundNBT();
+            CompoundTag tagCompound = new CompoundTag();
             tagCompound.putInt(NBTConstants.INDEX, entry.getIntKey());
             entry.getValue().writeToUpdateTag(this, tagCompound);
             stacks.add(tagCompound);
@@ -272,13 +288,13 @@ public abstract class LogisticalTransporterBase extends Transmitter<IItemHandler
     }
 
     @Override
-    public void handleUpdateTag(@Nonnull CompoundNBT tag) {
+    public void handleUpdateTag(@NotNull CompoundTag tag) {
         super.handleUpdateTag(tag);
         transit.clear();
-        if (tag.contains(NBTConstants.ITEMS, NBT.TAG_LIST)) {
-            ListNBT tagList = tag.getList(NBTConstants.ITEMS, NBT.TAG_COMPOUND);
+        if (tag.contains(NBTConstants.ITEMS, Tag.TAG_LIST)) {
+            ListTag tagList = tag.getList(NBTConstants.ITEMS, Tag.TAG_COMPOUND);
             for (int i = 0; i < tagList.size(); i++) {
-                CompoundNBT compound = tagList.getCompound(i);
+                CompoundTag compound = tagList.getCompound(i);
                 TransporterStack stack = TransporterStack.readFromUpdate(compound);
                 addStack(compound.getInt(NBTConstants.INDEX), stack);
             }
@@ -286,47 +302,39 @@ public abstract class LogisticalTransporterBase extends Transmitter<IItemHandler
     }
 
     @Override
-    public void read(@Nonnull CompoundNBT nbtTags) {
+    public void read(@NotNull CompoundTag nbtTags) {
         super.read(nbtTags);
         readFromNBT(nbtTags);
     }
 
-    protected void readFromNBT(CompoundNBT nbtTags) {
-        if (nbtTags.contains(NBTConstants.ITEMS, NBT.TAG_LIST)) {
-            readStacksFromNBT(nbtTags.getList(NBTConstants.ITEMS, NBT.TAG_COMPOUND));
+    protected void readFromNBT(CompoundTag nbtTags) {
+        if (nbtTags.contains(NBTConstants.ITEMS, Tag.TAG_LIST)) {
+            ListTag tagList = nbtTags.getList(NBTConstants.ITEMS, Tag.TAG_COMPOUND);
+            for (int i = 0; i < tagList.size(); i++) {
+                addStack(nextId++, TransporterStack.readFromNBT(tagList.getCompound(i)));
+            }
         }
     }
 
-    public void readStacksFromNBT(ListNBT tagList) {
-        for (int i = 0; i < tagList.size(); i++) {
-            TransporterStack stack = TransporterStack.readFromNBT(tagList.getCompound(i));
-            addStack(nextId++, stack);
-        }
-    }
-
-    @Nonnull
+    @NotNull
     @Override
-    public CompoundNBT write(@Nonnull CompoundNBT nbtTags) {
+    public CompoundTag write(@NotNull CompoundTag nbtTags) {
         super.write(nbtTags);
         writeToNBT(nbtTags);
         return nbtTags;
     }
 
-    public void writeToNBT(CompoundNBT nbtTags) {
-        ListNBT stacks = writeStackToNBT();
-        if (!stacks.isEmpty()) {
+    public void writeToNBT(CompoundTag nbtTags) {
+        Collection<TransporterStack> transit = getTransit();
+        if (!transit.isEmpty()) {
+            ListTag stacks = new ListTag();
+            for (TransporterStack stack : transit) {
+                CompoundTag tagCompound = new CompoundTag();
+                stack.write(tagCompound);
+                stacks.add(tagCompound);
+            }
             nbtTags.put(NBTConstants.ITEMS, stacks);
         }
-    }
-
-    public ListNBT writeStackToNBT() {
-        ListNBT stacks = new ListNBT();
-        for (TransporterStack stack : getTransit()) {
-            CompoundNBT tagCompound = new CompoundNBT();
-            stack.write(tagCompound);
-            stacks.add(tagCompound);
-        }
-        return stacks;
     }
 
     @Override
@@ -350,10 +358,7 @@ public abstract class LogisticalTransporterBase extends Transmitter<IItemHandler
     }
 
     private boolean recalculate(int stackId, TransporterStack stack, BlockPos from) {
-        boolean noPath = stack.getPathType() == Path.NONE;
-        if (!noPath) {
-            noPath = stack.recalculatePath(TransitRequest.simple(stack.itemStack), this, 0).isEmpty();
-        }
+        boolean noPath = stack.getPathType() == Path.NONE || stack.recalculatePath(TransitRequest.simple(stack.itemStack), this, 0).isEmpty();
         if (noPath && !stack.calculateIdle(this)) {
             TransporterUtils.drop(this, stack);
             return false;
@@ -367,24 +372,25 @@ public abstract class LogisticalTransporterBase extends Transmitter<IItemHandler
         return true;
     }
 
-    public TransitResponse insert(TileEntity outputter, TransitRequest request, EnumColor color, boolean doEmit, int min) {
-        BlockPos outputterPos = outputter.getPos();
-        Direction from = MekanismUtils.sideDifference(getTilePos(), outputterPos);
-        TransporterStack stack = insertStack(outputterPos, color);
-        if (!stack.canInsertToTransporterNN(this, from, outputter)) {
-            return request.getEmptyResponse();
-        }
-        return updateTransit(doEmit, stack, stack.recalculatePath(request, this, min));
+    public TransitResponse insert(BlockEntity outputter, TransitRequest request, EnumColor color, boolean doEmit, int min) {
+        return insert(outputter, request, color, doEmit, stack -> stack.recalculatePath(request, this, min));
     }
 
     public TransitResponse insertRR(TileEntityLogisticalSorter outputter, TransitRequest request, EnumColor color, boolean doEmit, int min) {
-        BlockPos outputterPos = outputter.getPos();
-        Direction from = MekanismUtils.sideDifference(getTilePos(), outputterPos);
-        TransporterStack stack = insertStack(outputterPos, color);
-        if (!canReceiveFrom(from.getOpposite()) || !stack.canInsertToTransporterNN(this, from, outputter)) {
-            return request.getEmptyResponse();
+        return insert(outputter, request, color, doEmit, stack -> stack.recalculateRRPath(request, outputter, this, min));
+    }
+
+    private TransitResponse insert(BlockEntity outputter, TransitRequest request, EnumColor color, boolean doEmit,
+          Function<TransporterStack, TransitResponse> pathCalculator) {
+        BlockPos outputterPos = outputter.getBlockPos();
+        Direction from = WorldUtils.sideDifference(getTilePos(), outputterPos);
+        if (from != null && canReceiveFrom(from.getOpposite())) {
+            TransporterStack stack = insertStack(outputterPos, color);
+            if (stack.canInsertToTransporterNN(this, from, outputter)) {
+                return updateTransit(doEmit, stack, pathCalculator.apply(stack));
+            }
         }
-        return updateTransit(doEmit, stack, stack.recalculateRRPath(request, outputter, this, min));
+        return request.getEmptyResponse();
     }
 
     private TransporterStack insertStack(BlockPos outputterCoord, EnumColor color) {
@@ -395,15 +401,15 @@ public abstract class LogisticalTransporterBase extends Transmitter<IItemHandler
         return stack;
     }
 
-    @Nonnull
+    @NotNull
     private TransitResponse updateTransit(boolean doEmit, TransporterStack stack, TransitResponse response) {
         if (!response.isEmpty()) {
             stack.itemStack = response.getStack();
             if (doEmit) {
                 int stackId = nextId++;
                 addStack(stackId, stack);
-                Mekanism.packetHandler.sendToAllTracking(new PacketTransporterUpdate(this, stackId, stack), getTransmitterTile());
-                MekanismUtils.saveChunk(getTransmitterTile());
+                Mekanism.packetHandler().sendToAllTracking(new PacketTransporterUpdate(this, stackId, stack), getTransmitterTile());
+                getTransmitterTile().markForSave();
             }
         }
         return response;
@@ -423,7 +429,7 @@ public abstract class LogisticalTransporterBase extends Transmitter<IItemHandler
 
         // N.B. We are not marking the chunk as dirty here! I don't believe it's needed, since
         // the next tick will generate the necessary save and if we crash before the next tick,
-        // it's unlikely the data will be save anyways (since chunks aren't saved until the end of
+        // it's unlikely the data will be saved anyway (since chunks aren't saved until the end of
         // a tick).
     }
 }
