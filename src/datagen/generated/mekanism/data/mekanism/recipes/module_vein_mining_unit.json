@@ -16,13 +16,13 @@
       "item": "mekanism:module_base"
     },
     "#": {
-      "item": "minecraft:diamond_pickaxe"
+      "item": "botania:terrasteel_pickaxe"
     },
     "x": {
-      "item": "minecraft:diamond_axe"
+      "item": "botania:terrasteel_axe"
     },
     "s": {
-      "item": "minecraft:diamond_shovel"
+      "item": "botania:terrasteel_shovel"
     },
     "P": {
       "tag": "forge:pellets/polonium"

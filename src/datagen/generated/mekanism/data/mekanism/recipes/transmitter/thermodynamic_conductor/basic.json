@@ -12,7 +12,7 @@
       "tag": "forge:ingots/steel"
     },
     "#": {
-      "tag": "forge:ingots/copper"
+      "tag": "forge:plates/copper"
     }
   }
 }

@@ -22,7 +22,7 @@
       "tag": "forge:pellets/polonium"
     },
     "W": {
-      "item": "minecraft:diamond_pickaxe"
+      "item": "botania:terrasteel_pickaxe"
     }
   }
 }

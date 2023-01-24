@@ -13,7 +13,7 @@
       "tag": "forge:circuits/ultimate"
     },
     "#": {
-      "item": "minecraft:diamond_chestplate"
+      "item": "botania:terrasteel_chestplate"
     },
     "E": {
       "item": "mekanism:basic_induction_cell"

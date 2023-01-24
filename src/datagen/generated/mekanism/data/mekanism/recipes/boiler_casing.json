@@ -14,7 +14,7 @@
       "tag": "forge:ingots/steel"
     },
     "I": {
-      "tag": "forge:ingots/iron"
+      "tag": "forge:plates/iron"
     }
   }
 }

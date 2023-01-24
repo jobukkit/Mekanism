@@ -10,7 +10,7 @@
   ],
   "key": {
     "I": {
-      "tag": "forge:ingots/iron"
+      "tag": "forge:plates/iron"
     },
     "C": {
       "tag": "forge:circuits/basic"

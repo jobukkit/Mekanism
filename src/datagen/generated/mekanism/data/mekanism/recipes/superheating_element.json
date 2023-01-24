@@ -10,7 +10,7 @@
   ],
   "key": {
     "I": {
-      "tag": "forge:ingots/copper"
+      "tag": "forge:plates/copper"
     },
     "A": {
       "tag": "mekanism:alloys/basic"

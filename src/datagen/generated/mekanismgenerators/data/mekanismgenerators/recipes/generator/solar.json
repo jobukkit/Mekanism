@@ -16,7 +16,7 @@
       "tag": "mekanism:alloys/infused"
     },
     "I": {
-      "tag": "forge:ingots/iron"
+      "tag": "forge:plates/iron"
     },
     "E": {
       "item": "mekanism:energy_tablet"
