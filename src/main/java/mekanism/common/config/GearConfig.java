@@ -1,11 +1,7 @@
 package mekanism.common.config;
 
 import mekanism.api.math.FloatingLong;
-import mekanism.common.config.value.CachedBooleanValue;
-import mekanism.common.config.value.CachedFloatValue;
-import mekanism.common.config.value.CachedFloatingLongValue;
-import mekanism.common.config.value.CachedIntValue;
-import mekanism.common.config.value.CachedLongValue;
+import mekanism.common.config.value.*;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig.Type;
 

@@ -1,8 +1,5 @@
 package mekanism.common.recipe;
 
-import java.util.function.Consumer;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.api.datagen.recipe.MekanismRecipeBuilder;
 import mekanism.api.datagen.recipe.RecipeCriterion;
 import mekanism.api.datagen.recipe.builder.SawmillRecipeBuilder;
@@ -15,10 +12,14 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.crafting.conditions.ICondition;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.Consumer;
 
 /**
  * Class for helpers that are also used by some of our recipe compat providers for convenience
@@ -40,12 +41,12 @@ public class RecipeProviderUtil {
     }
 
     public static void addPrecisionSawmillWoodTypeRecipes(Consumer<IFinishedRecipe> consumer, String basePath, IItemProvider planks, @Nullable IItemProvider boat,
-          IItemProvider door, IItemProvider fenceGate, ITag<Item> log, IItemProvider pressurePlate, IItemProvider trapdoor, String name) {
+          IItemProvider door, IItemProvider fenceGate, Tag<Item> log, IItemProvider pressurePlate, IItemProvider trapdoor, String name) {
         addPrecisionSawmillWoodTypeRecipes(consumer, basePath, planks, boat, door, fenceGate, log, pressurePlate, trapdoor, name, null);
     }
 
     public static void addPrecisionSawmillWoodTypeRecipes(Consumer<IFinishedRecipe> consumer, String basePath, IItemProvider planks, @Nullable IItemProvider boat,
-          IItemProvider door, IItemProvider fenceGate, ITag<Item> log, IItemProvider pressurePlate, IItemProvider trapdoor, String name, @Nullable ICondition condition) {
+          IItemProvider door, IItemProvider fenceGate, Tag<Item> log, IItemProvider pressurePlate, IItemProvider trapdoor, String name, @Nullable ICondition condition) {
         if (boat != null) {
             //Boat
             build(consumer, SawmillRecipeBuilder.sawing(

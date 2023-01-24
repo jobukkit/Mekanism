@@ -1,6 +1,5 @@
 package mekanism.common.tile.multiblock;
 
-import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
@@ -20,6 +19,8 @@ import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tile.base.SubstanceType;
 import net.minecraft.util.Direction;
 import net.minecraftforge.fluids.FluidStack;
+
+import javax.annotation.Nonnull;
 
 public class TileEntityDynamicValve extends TileEntityDynamicTank {
 

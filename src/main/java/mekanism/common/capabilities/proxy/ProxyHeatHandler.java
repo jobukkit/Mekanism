@@ -1,13 +1,14 @@
 package mekanism.common.capabilities.proxy;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.annotations.FieldsAreNonnullByDefault;
 import mekanism.api.heat.IHeatHandler;
 import mekanism.api.heat.ISidedHeatHandler;
 import mekanism.common.capabilities.holder.IHolder;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault

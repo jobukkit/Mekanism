@@ -1,6 +1,5 @@
 package mekanism.common.tile.laser;
 
-import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.api.inventory.AutomationType;
 import mekanism.api.lasers.ILaserReceptor;
@@ -9,6 +8,8 @@ import mekanism.api.providers.IBlockProvider;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.resolver.basic.BasicCapabilityResolver;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nonnull;
 
 public abstract class TileEntityLaserReceptor extends TileEntityBasicLaser implements ILaserReceptor {
 

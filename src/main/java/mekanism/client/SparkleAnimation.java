@@ -1,13 +1,13 @@
 package mekanism.client;
 
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
-
 import mekanism.api.backport.Vector3d;
 import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class SparkleAnimation {
 

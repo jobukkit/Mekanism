@@ -1,7 +1,5 @@
 package mekanism.common.content.gear.mekatool;
 
-import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.api.IIncrementalEnum;
 import mekanism.api.math.MathUtils;
 import mekanism.api.text.EnumColor;
@@ -13,6 +11,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+
+import javax.annotation.Nonnull;
+import java.util.List;
 
 public class ModuleExcavationEscalationUnit extends ModuleMekaTool {
 

@@ -1,12 +1,13 @@
 package mekanism.common.recipe.serializer;
 
 import com.google.gson.JsonObject;
-import javax.annotation.Nonnull;
 import mekanism.api.SerializerHelper;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.recipes.ItemStackToGasRecipe;
 import net.minecraft.network.PacketBuffer;
+
+import javax.annotation.Nonnull;
 
 public class ItemStackToGasRecipeSerializer<RECIPE extends ItemStackToGasRecipe> extends ItemStackToChemicalRecipeSerializer<Gas, GasStack, RECIPE> {
 

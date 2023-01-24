@@ -1,6 +1,5 @@
 package mekanism.common.tile;
 
-import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.api.IConfigurable;
 import mekanism.api.NBTConstants;
@@ -20,7 +19,6 @@ import mekanism.common.upgrade.BinUpgradeData;
 import mekanism.common.upgrade.IUpgradeData;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
@@ -29,6 +27,8 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
 
 public class TileEntityBin extends TileEntityMekanism implements IConfigurable {
 

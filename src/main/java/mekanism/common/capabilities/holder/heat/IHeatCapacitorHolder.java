@@ -1,11 +1,12 @@
 package mekanism.common.capabilities.holder.heat;
 
-import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.heat.IHeatCapacitor;
 import mekanism.common.capabilities.holder.IHolder;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
 
 public interface IHeatCapacitorHolder extends IHolder {
 

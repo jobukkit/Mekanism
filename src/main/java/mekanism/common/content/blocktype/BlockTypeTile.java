@@ -1,8 +1,5 @@
 package mekanism.common.content.blocktype;
 
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Supplier;
 import mekanism.api.Upgrade;
 import mekanism.api.math.FloatingLongSupplier;
 import mekanism.api.text.ILangEntry;
@@ -24,6 +21,10 @@ import net.minecraft.inventory.container.IContainerProvider;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.SoundEvent;
+
+import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class BlockTypeTile<TILE extends TileEntityMekanism> extends BlockType {
 

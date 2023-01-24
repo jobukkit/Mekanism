@@ -1,10 +1,5 @@
 package mekanism.client.jei;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import javax.annotation.Nullable;
 import mekanism.client.gui.GuiMekanism;
 import mekanism.client.gui.element.GuiRelativeElement;
 import mekanism.client.gui.element.GuiWindow;
@@ -16,6 +11,12 @@ import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class GuiElementHandler implements IGuiContainerHandler<GuiMekanism> {
 

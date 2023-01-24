@@ -1,10 +1,11 @@
 package mekanism.client.model.data;
 
-import java.util.EnumMap;
-import java.util.Map;
 import mekanism.common.lib.transmitter.ConnectionType;
 import mekanism.common.util.EnumUtils;
 import net.minecraft.util.Direction;
+
+import java.util.EnumMap;
+import java.util.Map;
 
 public class TransmitterModelData {
 

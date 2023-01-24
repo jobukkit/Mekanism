@@ -1,6 +1,5 @@
 package mekanism.common.content.transporter;
 
-import javax.annotation.Nonnull;
 import mekanism.common.content.filter.FilterType;
 import mekanism.common.content.filter.IMaterialFilter;
 import mekanism.common.lib.inventory.Finder;
@@ -9,6 +8,8 @@ import net.minecraft.block.material.Material;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
+
+import javax.annotation.Nonnull;
 
 public class SorterMaterialFilter extends SorterFilter<SorterMaterialFilter> implements IMaterialFilter<SorterMaterialFilter> {
 

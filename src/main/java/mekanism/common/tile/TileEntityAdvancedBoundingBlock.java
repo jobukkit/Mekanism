@@ -1,7 +1,5 @@
 package mekanism.common.tile;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.IConfigCardAccess.ISpecialConfigData;
 import mekanism.api.Upgrade;
 import mekanism.api.backport.Vector3i;
@@ -15,6 +13,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 //TODO: Comparator handling?
 public class TileEntityAdvancedBoundingBlock extends TileEntityBoundingBlock implements ISpecialConfigData, IUpgradeTile {

@@ -2,7 +2,6 @@ package mekanism.client.render.tileentity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.common.base.ProfilerConstants;
 import mekanism.common.tile.TileEntityPersonalChest;
 import mekanism.common.util.MekanismUtils;
@@ -14,6 +13,8 @@ import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 public class RenderPersonalChest extends MekanismTileEntityRenderer<TileEntityPersonalChest> {

@@ -1,8 +1,5 @@
 package mekanism.common.content.matrix;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import mekanism.common.content.blocktype.BlockTypeTile;
 import mekanism.common.lib.multiblock.CuboidStructureValidator;
 import mekanism.common.lib.multiblock.FormationProtocol.CasingType;
@@ -15,6 +12,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class MatrixValidator extends CuboidStructureValidator<MatrixMultiblockData> {
 

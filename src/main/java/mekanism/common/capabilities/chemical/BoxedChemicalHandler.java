@@ -1,10 +1,5 @@
 package mekanism.common.capabilities.chemical;
 
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Optional;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.ChemicalType;
@@ -17,6 +12,12 @@ import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.MekanismUtils;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 public class BoxedChemicalHandler {

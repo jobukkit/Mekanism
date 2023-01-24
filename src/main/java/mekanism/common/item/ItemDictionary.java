@@ -1,20 +1,12 @@
 package mekanism.common.item;
 
-import java.util.List;
-import java.util.Set;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.text.EnumColor;
-import mekanism.client.MekKeyHandler;
-import mekanism.client.MekanismKeyHandler;
 import mekanism.common.MekanismLang;
 import mekanism.common.inventory.container.ContainerProvider;
 import mekanism.common.inventory.container.item.DictionaryContainer;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.FlowingFluidBlock;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
@@ -25,15 +17,14 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceContext.FluidMode;
 import net.minecraft.util.math.RayTraceResult.Type;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkHooks;
+
+import javax.annotation.Nonnull;
+import java.util.Set;
 
 public class ItemDictionary extends Item {
 

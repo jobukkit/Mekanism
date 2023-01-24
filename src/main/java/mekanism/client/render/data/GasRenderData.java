@@ -1,7 +1,8 @@
 package mekanism.client.render.data;
 
-import javax.annotation.Nonnull;
 import mekanism.api.chemical.gas.GasStack;
+
+import javax.annotation.Nonnull;
 
 public class GasRenderData extends ChemicalRenderData<GasStack> {
 

@@ -1,11 +1,12 @@
 package mekanism.common.content.qio.filter;
 
-import javax.annotation.Nonnull;
 import mekanism.common.content.filter.FilterType;
 import mekanism.common.content.filter.IItemStackFilter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
+
+import javax.annotation.Nonnull;
 
 public class QIOItemStackFilter extends QIOFilter<QIOItemStackFilter> implements IItemStackFilter<QIOItemStackFilter> {
 

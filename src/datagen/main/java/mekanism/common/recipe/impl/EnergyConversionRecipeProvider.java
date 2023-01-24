@@ -1,6 +1,5 @@
 package mekanism.common.recipe.impl;
 
-import java.util.function.Consumer;
 import mekanism.api.datagen.recipe.builder.ItemStackToEnergyRecipeBuilder;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.recipes.inputs.ItemStackIngredient;
@@ -8,8 +7,10 @@ import mekanism.common.Mekanism;
 import mekanism.common.recipe.ISubRecipeProvider;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.item.Item;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
 import net.minecraftforge.common.Tags;
+
+import java.util.function.Consumer;
 
 class EnergyConversionRecipeProvider implements ISubRecipeProvider {
 
@@ -21,7 +22,7 @@ class EnergyConversionRecipeProvider implements ISubRecipeProvider {
         addEnergyConversionRecipe(consumer, basePath, "redstone_block", Tags.Items.STORAGE_BLOCKS_REDSTONE, redstoneEnergy.multiply(9));
     }
 
-    private void addEnergyConversionRecipe(Consumer<IFinishedRecipe> consumer, String basePath, String name, ITag<Item> inputTag, FloatingLong output) {
+    private void addEnergyConversionRecipe(Consumer<IFinishedRecipe> consumer, String basePath, String name, Tag<Item> inputTag, FloatingLong output) {
         ItemStackToEnergyRecipeBuilder.energyConversion(
               ItemStackIngredient.from(inputTag),
               output

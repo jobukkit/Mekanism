@@ -1,9 +1,5 @@
 package mekanism.common.network;
 
-import java.util.UUID;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import mekanism.api.chemical.merged.BoxedChemical;
 import mekanism.common.content.network.BoxedChemicalNetwork;
 import mekanism.common.content.network.EnergyNetwork;
@@ -15,6 +11,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
+
+import javax.annotation.Nonnull;
+import java.util.UUID;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class PacketTransmitterUpdate {
 

@@ -1,10 +1,6 @@
 package mekanism.common.block.attribute;
 
 import com.google.common.collect.Lists;
-import java.util.Collection;
-import java.util.function.Consumer;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.tier.BaseTier;
 import mekanism.api.tier.ITier;
 import mekanism.common.block.interfaces.ITypeBlock;
@@ -12,6 +8,11 @@ import mekanism.common.tile.base.TileEntityMekanism;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.function.Consumer;
 
 public interface Attribute {
 

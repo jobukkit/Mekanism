@@ -1,7 +1,5 @@
 package mekanism.common.item.block.machine;
 
-import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.api.text.EnumColor;
 import mekanism.common.MekanismLang;
 import mekanism.common.block.prefab.BlockTile;
@@ -18,6 +16,9 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+import javax.annotation.Nonnull;
+import java.util.List;
 
 public class ItemBlockFuelwoodHeater extends ItemBlockTooltip<BlockTile<?, ?>> implements IItemSustainedInventory, ISecurityItem {
 

@@ -1,29 +1,12 @@
 package mekanism.common.network.container.property;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 import mekanism.api.chemical.ChemicalUtils;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.infuse.InfusionStack;
 import mekanism.api.chemical.pigment.PigmentStack;
 import mekanism.api.chemical.slurry.SlurryStack;
 import mekanism.api.math.FloatingLong;
-import mekanism.common.inventory.container.sync.ISyncableData;
-import mekanism.common.inventory.container.sync.SyncableBlockPos;
-import mekanism.common.inventory.container.sync.SyncableBoolean;
-import mekanism.common.inventory.container.sync.SyncableByte;
-import mekanism.common.inventory.container.sync.SyncableDouble;
-import mekanism.common.inventory.container.sync.SyncableFloat;
-import mekanism.common.inventory.container.sync.SyncableFloatingLong;
-import mekanism.common.inventory.container.sync.SyncableFluidStack;
-import mekanism.common.inventory.container.sync.SyncableFrequency;
-import mekanism.common.inventory.container.sync.SyncableInt;
-import mekanism.common.inventory.container.sync.SyncableItemStack;
-import mekanism.common.inventory.container.sync.SyncableLong;
-import mekanism.common.inventory.container.sync.SyncableShort;
+import mekanism.common.inventory.container.sync.*;
 import mekanism.common.inventory.container.sync.chemical.SyncableGasStack;
 import mekanism.common.inventory.container.sync.chemical.SyncableInfusionStack;
 import mekanism.common.inventory.container.sync.chemical.SyncablePigmentStack;
@@ -38,6 +21,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fluids.FluidStack;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public enum PropertyType {
     BOOLEAN(Boolean.TYPE, false, (getter, setter) -> SyncableBoolean.create(() -> (boolean) getter.get(), setter::accept),

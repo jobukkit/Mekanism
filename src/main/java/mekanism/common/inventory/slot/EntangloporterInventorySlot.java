@@ -1,9 +1,10 @@
 package mekanism.common.inventory.slot;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.IContentsListener;
 import mekanism.common.inventory.container.slot.InventoryContainerSlot;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class EntangloporterInventorySlot extends BasicInventorySlot {
 

@@ -1,8 +1,9 @@
 package mekanism.common.inventory.container.sync;
 
+import mekanism.common.network.container.property.LongPropertyData;
+
 import java.util.function.LongConsumer;
 import java.util.function.LongSupplier;
-import mekanism.common.network.container.property.LongPropertyData;
 
 /**
  * Version of {@link net.minecraft.util.IntReferenceHolder} for handling longs

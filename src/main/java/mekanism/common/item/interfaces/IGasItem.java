@@ -1,7 +1,5 @@
 package mekanism.common.item.interfaces;
 
-import java.util.Optional;
-import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.gas.IGasHandler;
@@ -11,6 +9,9 @@ import mekanism.api.inventory.AutomationType;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nonnull;
+import java.util.Optional;
 
 public interface IGasItem {
 

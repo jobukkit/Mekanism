@@ -1,6 +1,5 @@
 package mekanism.common.recipe.impl;
 
-import java.util.function.Consumer;
 import mekanism.api.providers.IItemProvider;
 import mekanism.common.Mekanism;
 import mekanism.common.block.attribute.Attribute;
@@ -16,8 +15,10 @@ import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tags.MekanismTags;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.item.Item;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
 import net.minecraftforge.common.Tags;
+
+import java.util.function.Consumer;
 
 class FluidTankRecipeProvider implements ISubRecipeProvider {
 
@@ -44,7 +45,7 @@ class FluidTankRecipeProvider implements ISubRecipeProvider {
     }
 
     private void addTieredFluidTank(Consumer<IFinishedRecipe> consumer, String basePath, BlockRegistryObject<BlockFluidTank, ?> tank, IItemProvider previousTank,
-          ITag<Item> alloyTag) {
+          Tag<Item> alloyTag) {
         String tierName = Attribute.getBaseTier(tank.getBlock()).getLowerName();
         MekDataShapedRecipeBuilder.shapedRecipe(tank)
               .pattern(FLUID_TANK_PATTERN)

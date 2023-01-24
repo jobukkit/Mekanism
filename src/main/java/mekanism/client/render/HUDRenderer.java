@@ -1,9 +1,6 @@
 package mekanism.client.render;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import java.util.ArrayList;
-import java.util.List;
 import mekanism.api.text.ILangEntry;
 import mekanism.common.MekanismLang;
 import mekanism.common.config.MekanismConfig;
@@ -22,6 +19,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HUDRenderer {
 

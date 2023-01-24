@@ -1,7 +1,5 @@
 package mekanism.common.lib.transmitter.acceptor;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.annotations.FieldsAreNonnullByDefault;
 import mekanism.api.energy.IStrictEnergyHandler;
@@ -14,6 +12,9 @@ import mekanism.common.util.CapabilityUtils;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.util.LazyOptional;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault

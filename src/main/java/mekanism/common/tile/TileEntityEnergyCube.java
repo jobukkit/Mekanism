@@ -1,6 +1,5 @@
 package mekanism.common.tile;
 
-import javax.annotation.Nonnull;
 import mekanism.api.IConfigCardAccess;
 import mekanism.api.NBTConstants;
 import mekanism.api.RelativeSide;
@@ -28,9 +27,10 @@ import mekanism.common.upgrade.IUpgradeData;
 import mekanism.common.util.CableUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
-import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nonnull;
 
 public class TileEntityEnergyCube extends TileEntityMekanism implements ISideConfiguration, IConfigCardAccess {
 

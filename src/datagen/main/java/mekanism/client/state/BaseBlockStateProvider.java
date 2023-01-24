@@ -1,8 +1,5 @@
 package mekanism.client.state;
 
-import java.util.List;
-import java.util.function.BiFunction;
-import javax.annotation.Nonnull;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.client.model.BaseBlockModelProvider;
 import mekanism.common.DataGenJsonConstants;
@@ -12,6 +9,10 @@ import net.minecraft.data.DataGenerator;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ExistingFileHelper;
 import net.minecraftforge.client.model.generators.VariantBlockStateBuilder;
+
+import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.function.BiFunction;
 
 public abstract class BaseBlockStateProvider<PROVIDER extends BaseBlockModelProvider> extends BlockStateProvider {
 

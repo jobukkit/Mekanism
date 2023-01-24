@@ -1,8 +1,5 @@
 package mekanism.common.capabilities.resolver.manager;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalHandler;
@@ -34,6 +31,10 @@ import mekanism.common.capabilities.proxy.ProxyChemicalHandler.ProxyInfusionHand
 import mekanism.common.capabilities.proxy.ProxyChemicalHandler.ProxyPigmentHandler;
 import mekanism.common.capabilities.proxy.ProxyChemicalHandler.ProxySlurryHandler;
 import net.minecraftforge.common.capabilities.Capability;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Helper class to make reading instead of having as messy generics

@@ -2,13 +2,6 @@ package mekanism.common.tile.machine;
 
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.api.IConfigCardAccess;
 import mekanism.api.NBTConstants;
@@ -30,11 +23,7 @@ import mekanism.common.inventory.container.MekanismContainer;
 import mekanism.common.inventory.container.sync.SyncableBoolean;
 import mekanism.common.inventory.container.sync.SyncableInt;
 import mekanism.common.inventory.container.sync.SyncableItemStack;
-import mekanism.common.inventory.slot.EnergyInventorySlot;
-import mekanism.common.inventory.slot.FormulaInventorySlot;
-import mekanism.common.inventory.slot.FormulaicCraftingSlot;
-import mekanism.common.inventory.slot.InputInventorySlot;
-import mekanism.common.inventory.slot.OutputInventorySlot;
+import mekanism.common.inventory.slot.*;
 import mekanism.common.item.ItemCraftingFormula;
 import mekanism.common.lib.inventory.HashedItem;
 import mekanism.common.lib.transmitter.TransmissionType;
@@ -46,7 +35,6 @@ import mekanism.common.tile.interfaces.IHasMode;
 import mekanism.common.tile.interfaces.ISideConfiguration;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.StackUtils;
-import net.minecraft.block.BlockState;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.ICraftingRecipe;
@@ -55,6 +43,9 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.items.ItemHandlerHelper;
+
+import javax.annotation.Nonnull;
+import java.util.*;
 
 public class TileEntityFormulaicAssemblicator extends TileEntityMekanism implements ISideConfiguration, IConfigCardAccess, IHasMode {
 

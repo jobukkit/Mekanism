@@ -1,7 +1,5 @@
 package mekanism.common.item.block.machine;
 
-import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.block.attribute.Attribute;
 import mekanism.common.block.attribute.AttributeEnergy;
@@ -18,6 +16,9 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+
+import javax.annotation.Nonnull;
+import java.util.List;
 
 public class ItemBlockChargepad extends ItemBlockTooltip<BlockTileModel<?, ?>> {
 

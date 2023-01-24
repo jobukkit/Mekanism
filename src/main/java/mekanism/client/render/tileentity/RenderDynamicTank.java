@@ -2,17 +2,10 @@ package mekanism.client.render.tileentity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.client.render.MekanismRenderer;
 import mekanism.client.render.MekanismRenderer.Model3D;
 import mekanism.client.render.ModelRenderer;
-import mekanism.client.render.data.FluidRenderData;
-import mekanism.client.render.data.GasRenderData;
-import mekanism.client.render.data.InfusionRenderData;
-import mekanism.client.render.data.PigmentRenderData;
-import mekanism.client.render.data.RenderData;
-import mekanism.client.render.data.SlurryRenderData;
+import mekanism.client.render.data.*;
 import mekanism.common.base.ProfilerConstants;
 import mekanism.common.content.tank.TankMultiblockData;
 import mekanism.common.tile.multiblock.TileEntityDynamicTank;
@@ -22,6 +15,9 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.util.math.BlockPos;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 public class RenderDynamicTank extends MekanismTileEntityRenderer<TileEntityDynamicTank> {

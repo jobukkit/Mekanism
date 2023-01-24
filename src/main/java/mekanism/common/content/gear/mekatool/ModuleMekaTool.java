@@ -1,6 +1,5 @@
 package mekanism.common.content.gear.mekatool;
 
-import java.util.List;
 import mekanism.api.text.EnumColor;
 import mekanism.api.text.IHasTextComponent;
 import mekanism.common.MekanismLang;
@@ -11,6 +10,8 @@ import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+
+import java.util.List;
 
 public class ModuleMekaTool extends Module {
 

@@ -1,8 +1,5 @@
 package mekanism.common.block.basic;
 
-import java.util.UUID;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.common.block.attribute.Attribute;
 import mekanism.common.block.attribute.AttributeGui;
 import mekanism.common.block.prefab.BlockTile.BlockTileModel;
@@ -23,6 +20,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.UUID;
 
 public class BlockSecurityDesk extends BlockTileModel<TileEntitySecurityDesk, BlockTypeTile<TileEntitySecurityDesk>> {
 

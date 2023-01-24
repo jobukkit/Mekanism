@@ -1,8 +1,6 @@
 package mekanism.common.tile.qio;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import java.util.Map;
-import javax.annotation.Nonnull;
 import mekanism.api.IConfigCardAccess.ISpecialConfigData;
 import mekanism.api.NBTConstants;
 import mekanism.api.Upgrade;
@@ -17,11 +15,13 @@ import mekanism.common.tile.interfaces.IHasSortableFilters;
 import mekanism.common.tile.interfaces.ISustainedData;
 import mekanism.common.tile.interfaces.ITileFilterHolder;
 import mekanism.common.util.ItemDataUtils;
-import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraftforge.common.util.Constants.NBT;
+
+import javax.annotation.Nonnull;
+import java.util.Map;
 
 public class TileEntityQIOFilterHandler extends TileEntityQIOComponent implements ISpecialConfigData, ISustainedData, ITileFilterHolder<QIOFilter<?>>,
       IHasSortableFilters {

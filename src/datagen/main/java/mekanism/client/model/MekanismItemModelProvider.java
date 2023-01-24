@@ -1,7 +1,6 @@
 package mekanism.client.model;
 
 import com.google.common.collect.Table.Cell;
-import java.util.Map;
 import mekanism.common.Mekanism;
 import mekanism.common.content.gear.Modules.ModuleData;
 import mekanism.common.item.ItemModule;
@@ -14,6 +13,8 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.generators.ExistingFileHelper;
+
+import java.util.Map;
 
 public class MekanismItemModelProvider extends BaseItemModelProvider {
 

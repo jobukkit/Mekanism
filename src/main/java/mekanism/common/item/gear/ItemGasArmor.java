@@ -1,9 +1,5 @@
 package mekanism.common.item.gear;
 
-import java.util.List;
-import java.util.function.LongSupplier;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.chemical.ChemicalTankBuilder;
 import mekanism.api.inventory.AutomationType;
 import mekanism.api.providers.IGasProvider;
@@ -18,11 +14,7 @@ import mekanism.common.util.StorageUtils;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.IArmorMaterial;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Rarity;
+import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
@@ -30,6 +22,11 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.function.LongSupplier;
 
 public abstract class ItemGasArmor extends ArmorItem implements ISpecialGear, IGasItem {
 

@@ -1,13 +1,14 @@
 package mekanism.common.capabilities.resolver.manager;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.fluid.ISidedFluidHandler;
 import mekanism.common.capabilities.holder.fluid.IFluidTankHolder;
 import mekanism.common.capabilities.proxy.ProxyFluidHandler;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Helper class to make reading instead of having as messy generics

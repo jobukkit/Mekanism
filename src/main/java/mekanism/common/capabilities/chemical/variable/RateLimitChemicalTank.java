@@ -1,10 +1,5 @@
 package mekanism.common.capabilities.chemical.variable;
 
-import java.util.function.BiPredicate;
-import java.util.function.LongSupplier;
-import java.util.function.Predicate;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.IContentsListener;
 import mekanism.api.annotations.FieldsAreNonnullByDefault;
@@ -29,6 +24,12 @@ import mekanism.api.chemical.slurry.ISlurryTank;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
 import mekanism.api.inventory.AutomationType;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.BiPredicate;
+import java.util.function.LongSupplier;
+import java.util.function.Predicate;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault

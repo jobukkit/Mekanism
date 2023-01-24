@@ -1,8 +1,9 @@
 package mekanism.client.gui.element.filter;
 
-import javax.annotation.Nullable;
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.common.tile.base.TileEntityMekanism;
+
+import javax.annotation.Nullable;
 
 public interface GuiFilterHelper<TILE extends TileEntityMekanism> {
 

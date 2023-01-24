@@ -1,12 +1,13 @@
 package mekanism.client.model;
 
-import javax.annotation.Nonnull;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourcePackType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.client.model.generators.BlockModelProvider;
 import net.minecraftforge.client.model.generators.ExistingFileHelper;
+
+import javax.annotation.Nonnull;
 
 public abstract class BaseBlockModelProvider extends BlockModelProvider {
 

@@ -1,15 +1,16 @@
 package mekanism.common.inventory;
 
-import java.util.Collections;
-import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.inventory.IInventorySlot;
 import mekanism.common.block.attribute.Attribute;
 import mekanism.common.inventory.slot.BinInventorySlot;
 import mekanism.common.item.block.ItemBlockBin;
 import mekanism.common.tier.BinTier;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
 
 public class BinMekanismInventory extends ItemStackMekanismInventory {
 

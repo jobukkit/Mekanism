@@ -3,10 +3,11 @@ package mekanism.client.render;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import java.util.Map;
 import mekanism.client.render.MekanismRenderer.Model3D;
 import mekanism.client.render.data.RenderData;
 import mekanism.client.render.data.ValveRenderData;
+
+import java.util.Map;
 
 public final class ModelRenderer {
 

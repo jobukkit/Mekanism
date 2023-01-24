@@ -1,6 +1,5 @@
 package mekanism.common.recipe.impl;
 
-import java.util.function.Consumer;
 import mekanism.api.datagen.recipe.builder.CombinerRecipeBuilder;
 import mekanism.api.recipes.inputs.ItemStackIngredient;
 import mekanism.common.Mekanism;
@@ -10,6 +9,8 @@ import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraftforge.common.Tags;
+
+import java.util.function.Consumer;
 
 class CombinerRecipeProvider implements ISubRecipeProvider {
 

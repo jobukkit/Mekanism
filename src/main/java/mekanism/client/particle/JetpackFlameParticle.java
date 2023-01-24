@@ -1,7 +1,6 @@
 package mekanism.client.particle;
 
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.FlameParticle;
 import net.minecraft.client.particle.IAnimatedSprite;
@@ -10,6 +9,8 @@ import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.particles.BasicParticleType;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
 
 public class JetpackFlameParticle extends FlameParticle {
 

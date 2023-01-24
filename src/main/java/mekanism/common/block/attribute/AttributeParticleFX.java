@@ -1,11 +1,12 @@
 package mekanism.common.block.attribute;
 
+import mekanism.common.lib.math.Pos3D;
+import net.minecraft.particles.IParticleData;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
-import mekanism.common.lib.math.Pos3D;
-import net.minecraft.particles.IParticleData;
 
 public class AttributeParticleFX implements Attribute {
 

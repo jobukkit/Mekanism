@@ -1,13 +1,7 @@
 package mekanism.generators.common;
 
-import java.util.function.Consumer;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.api.chemical.gas.Gas;
-import mekanism.api.datagen.recipe.builder.ChemicalInfuserRecipeBuilder;
-import mekanism.api.datagen.recipe.builder.ElectrolysisRecipeBuilder;
-import mekanism.api.datagen.recipe.builder.GasToGasRecipeBuilder;
-import mekanism.api.datagen.recipe.builder.MetallurgicInfuserRecipeBuilder;
-import mekanism.api.datagen.recipe.builder.RotaryRecipeBuilder;
+import mekanism.api.datagen.recipe.builder.*;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.providers.IFluidProvider;
 import mekanism.api.providers.IGasProvider;
@@ -36,9 +30,12 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Items;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
 import net.minecraft.tags.ItemTags;
 import net.minecraftforge.common.Tags;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 public class GeneratorsRecipeProvider extends BaseRecipeProvider {
@@ -88,7 +85,7 @@ public class GeneratorsRecipeProvider extends BaseRecipeProvider {
     }
 
     private void addRotaryCondensentratorRecipe(Consumer<IFinishedRecipe> consumer, String basePath, IGasProvider gas, IFluidProvider fluidOutput,
-          ITag<Fluid> fluidInput, ITag<Gas> gasInput) {
+          Tag<Fluid> fluidInput, Tag<Gas> gasInput) {
         RotaryRecipeBuilder.rotary(
               FluidStackIngredient.from(fluidInput, 1),
               GasStackIngredient.from(gasInput, 1),

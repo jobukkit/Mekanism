@@ -6,19 +6,19 @@ import it.unimi.dsi.fastutil.chars.Char2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
 import it.unimi.dsi.fastutil.chars.CharOpenHashSet;
 import it.unimi.dsi.fastutil.chars.CharSet;
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
-import mekanism.api.backport.ITag;
 import mekanism.common.DataGenJsonConstants;
 import mekanism.common.recipe.pattern.RecipePattern;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
+import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -57,8 +57,8 @@ public class ExtendedShapedRecipeBuilder extends BaseRecipeBuilder<ExtendedShape
         return this;
     }
 
-    public ExtendedShapedRecipeBuilder key(char symbol, ITag<Item> tag) {
-        return key(symbol, Ingredient.fromTag(tag.toTag()));
+    public ExtendedShapedRecipeBuilder key(char symbol, Tag<Item> tag) {
+        return key(symbol, Ingredient.fromTag(tag));
     }
 
     public ExtendedShapedRecipeBuilder key(char symbol, IItemProvider item) {

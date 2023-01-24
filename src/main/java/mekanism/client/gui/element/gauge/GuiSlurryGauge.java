@@ -1,7 +1,5 @@
 package mekanism.client.gui.element.gauge;
 
-import java.util.List;
-import java.util.function.Supplier;
 import mekanism.api.chemical.slurry.ISlurryTank;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
@@ -9,6 +7,9 @@ import mekanism.client.gui.IGuiWrapper;
 import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.network.PacketDropperUse.TankType;
 import net.minecraft.util.text.ITextComponent;
+
+import java.util.List;
+import java.util.function.Supplier;
 
 public class GuiSlurryGauge extends GuiChemicalGauge<Slurry, SlurryStack, ISlurryTank> {
 

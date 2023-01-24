@@ -1,8 +1,6 @@
 package mekanism.common.content.sps;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import java.util.EnumSet;
-import java.util.Set;
 import mekanism.common.MekanismLang;
 import mekanism.common.content.blocktype.BlockType;
 import mekanism.common.content.blocktype.BlockTypeTile;
@@ -20,6 +18,9 @@ import mekanism.common.registries.MekanismBlockTypes;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.EnumSet;
+import java.util.Set;
 
 public class SPSValidator extends CuboidStructureValidator<SPSMultiblockData> {
 

@@ -1,6 +1,5 @@
 package mekanism.common.lib.frequency;
 
-import java.util.UUID;
 import mekanism.api.NBTConstants;
 import mekanism.common.network.BasePacketHandler;
 import mekanism.common.util.MekanismUtils;
@@ -8,6 +7,8 @@ import mekanism.common.util.NBTUtils;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
+
+import java.util.UUID;
 
 public abstract class Frequency {
 

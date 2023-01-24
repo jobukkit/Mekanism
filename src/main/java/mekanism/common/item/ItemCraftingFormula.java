@@ -1,8 +1,5 @@
 package mekanism.common.item;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.api.NBTConstants;
 import mekanism.api.text.EnumColor;
 import mekanism.api.text.TextComponentUtil;
@@ -25,6 +22,10 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
+
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ItemCraftingFormula extends Item {
 

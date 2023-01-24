@@ -1,22 +1,9 @@
 package mekanism.common.content.network;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.UUID;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.Action;
 import mekanism.api.Coord4D;
-import mekanism.api.chemical.Chemical;
-import mekanism.api.chemical.ChemicalStack;
-import mekanism.api.chemical.ChemicalType;
-import mekanism.api.chemical.IChemicalHandler;
-import mekanism.api.chemical.IChemicalTank;
+import mekanism.api.chemical.*;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.gas.IGasTank;
 import mekanism.api.chemical.gas.attribute.GasAttributes;
@@ -48,6 +35,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * A DynamicNetwork extension created specifically for the transfer of Chemicals.

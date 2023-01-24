@@ -1,9 +1,10 @@
 package mekanism.common.block.attribute;
 
-import javax.annotation.Nonnull;
 import mekanism.common.base.HolidayManager;
 import mekanism.common.registration.impl.SoundEventRegistryObject;
 import net.minecraft.util.SoundEvent;
+
+import javax.annotation.Nonnull;
 
 public class AttributeSound implements Attribute {
 

@@ -1,10 +1,5 @@
 package mekanism.common.content.entangloporter;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.NBTConstants;
 import mekanism.api.chemical.ChemicalTankBuilder;
 import mekanism.api.chemical.ChemicalUtils;
@@ -35,6 +30,12 @@ import mekanism.common.lib.frequency.FrequencyType;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 public class InventoryFrequency extends Frequency implements IMekanismInventory, IMekanismFluidHandler, IMekanismStrictEnergyHandler, ITileHeatHandler, IGasTracker,
       IInfusionTracker, IPigmentTracker, ISlurryTracker {

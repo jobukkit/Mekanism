@@ -1,10 +1,11 @@
 package mekanism.common.tile.prefab;
 
-import javax.annotation.Nullable;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.api.recipes.MekanismRecipe;
 import mekanism.api.recipes.cache.CachedRecipe;
 import mekanism.common.tile.interfaces.ITileCachedRecipeHolder;
+
+import javax.annotation.Nullable;
 
 public abstract class TileEntityRecipeMachine<RECIPE extends MekanismRecipe> extends TileEntityConfigurableMachine implements ITileCachedRecipeHolder<RECIPE> {
 

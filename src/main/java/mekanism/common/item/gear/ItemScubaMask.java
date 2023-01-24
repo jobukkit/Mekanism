@@ -1,8 +1,5 @@
 package mekanism.common.item.gear;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.client.render.armor.CustomArmor;
 import mekanism.client.render.armor.ScubaMaskArmor;
@@ -18,6 +15,10 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 public class ItemScubaMask extends ArmorItem implements ISpecialGear {
 

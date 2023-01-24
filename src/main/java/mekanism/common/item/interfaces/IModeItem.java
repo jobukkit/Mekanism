@@ -1,11 +1,12 @@
 package mekanism.common.item.interfaces;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public interface IModeItem {
 

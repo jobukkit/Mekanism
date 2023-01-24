@@ -1,6 +1,5 @@
 package mekanism.common.network;
 
-import java.util.function.Supplier;
 import mekanism.common.item.interfaces.IRadialModeItem;
 import mekanism.common.item.interfaces.IRadialSelectorEnum;
 import net.minecraft.entity.player.PlayerEntity;
@@ -8,6 +7,8 @@ import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
+
+import java.util.function.Supplier;
 
 public class PacketRadialModeChange {
 

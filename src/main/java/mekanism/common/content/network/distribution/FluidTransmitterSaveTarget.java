@@ -1,6 +1,5 @@
 package mekanism.common.content.network.distribution;
 
-import javax.annotation.Nonnull;
 import mekanism.api.annotations.NonNull;
 import mekanism.api.math.MathUtils;
 import mekanism.common.content.network.transmitter.MechanicalPipe;
@@ -8,6 +7,8 @@ import mekanism.common.lib.distribution.SplitInfo;
 import mekanism.common.lib.distribution.Target;
 import net.minecraft.util.Direction;
 import net.minecraftforge.fluids.FluidStack;
+
+import javax.annotation.Nonnull;
 
 //TODO: Improve handling for fluid storage as longs
 public class FluidTransmitterSaveTarget extends Target<MechanicalPipe, Integer, @NonNull FluidStack> {

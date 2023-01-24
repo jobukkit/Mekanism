@@ -1,6 +1,5 @@
 package mekanism.common.recipe.impl;
 
-import java.util.function.Consumer;
 import mekanism.api.datagen.recipe.builder.ChemicalCrystallizerRecipeBuilder;
 import mekanism.api.recipes.inputs.chemical.GasStackIngredient;
 import mekanism.common.Mekanism;
@@ -8,6 +7,8 @@ import mekanism.common.recipe.ISubRecipeProvider;
 import mekanism.common.registries.MekanismGases;
 import mekanism.common.registries.MekanismItems;
 import net.minecraft.data.IFinishedRecipe;
+
+import java.util.function.Consumer;
 
 class ChemicalCrystallizerRecipeProvider implements ISubRecipeProvider {
 

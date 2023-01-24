@@ -1,12 +1,13 @@
 package mekanism.common.content.gear;
 
-import java.util.List;
 import mekanism.api.NBTConstants;
 import mekanism.common.content.gear.Modules.ModuleData;
 import mekanism.common.util.ItemDataUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.Constants.NBT;
+
+import java.util.List;
 
 public interface IModuleContainerItem {
 

@@ -1,7 +1,5 @@
 package mekanism.client.jei.machine;
 
-import java.util.Collections;
-import javax.annotation.Nonnull;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.recipes.GasToGasRecipe;
 import mekanism.client.gui.element.GuiInnerScreen;
@@ -23,6 +21,9 @@ import mezz.jei.api.gui.ingredient.IGuiIngredientGroup;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import net.minecraft.util.text.ITextComponent;
+
+import javax.annotation.Nonnull;
+import java.util.Collections;
 
 public class SPSRecipeCategory extends BaseRecipeCategory<GasToGasRecipe> {
 

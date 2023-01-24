@@ -1,6 +1,5 @@
 package mekanism.common.lib.multiblock;
 
-import java.util.Collection;
 import mekanism.api.NBTConstants;
 import mekanism.common.util.NBTUtils;
 import net.minecraft.nbt.CompoundNBT;
@@ -9,6 +8,8 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants.NBT;
+
+import java.util.Collection;
 
 public interface IValveHandler {
 

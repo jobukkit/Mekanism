@@ -1,8 +1,9 @@
 package mekanism.common.config.value;
 
-import java.util.function.LongSupplier;
 import mekanism.common.config.IMekanismConfig;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+
+import java.util.function.LongSupplier;
 
 public class CachedLongValue extends CachedPrimitiveValue<Long> implements LongSupplier {
 

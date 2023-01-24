@@ -16,7 +16,6 @@ import net.minecraft.network.play.client.CRenameItemPacket;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nonnull;

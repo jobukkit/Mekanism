@@ -1,7 +1,5 @@
 package mekanism.common.capabilities.chemical.item;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
 import mekanism.api.IContentsListener;
@@ -28,6 +26,9 @@ import mekanism.api.chemical.slurry.SlurryStack;
 import mekanism.api.inventory.AutomationType;
 import mekanism.common.capabilities.chemical.variable.RateLimitChemicalTank;
 import mekanism.common.tier.ChemicalTankTier;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

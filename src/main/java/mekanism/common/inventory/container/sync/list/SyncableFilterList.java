@@ -1,12 +1,13 @@
 package mekanism.common.inventory.container.sync.list;
 
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 import mekanism.api.annotations.NonNull;
 import mekanism.common.content.filter.IFilter;
 import mekanism.common.network.container.property.list.FilterListPropertyData;
 import mekanism.common.network.container.property.list.ListPropertyData;
+
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Version of {@link net.minecraft.util.IntReferenceHolder} for handling filter lists

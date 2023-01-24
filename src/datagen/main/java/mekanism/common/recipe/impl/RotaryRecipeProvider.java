@@ -1,7 +1,5 @@
 package mekanism.common.recipe.impl;
 
-import java.util.function.Consumer;
-import javax.annotation.Nonnull;
 import mekanism.api.datagen.recipe.builder.RotaryRecipeBuilder;
 import mekanism.api.providers.IFluidProvider;
 import mekanism.api.providers.IGasProvider;
@@ -16,7 +14,10 @@ import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
+
+import javax.annotation.Nonnull;
+import java.util.function.Consumer;
 
 class RotaryRecipeProvider implements ISubRecipeProvider {
 
@@ -45,7 +46,7 @@ class RotaryRecipeProvider implements ISubRecipeProvider {
         }, FluidTags.WATER);
     }
 
-    private void addRotaryCondensentratorRecipe(Consumer<IFinishedRecipe> consumer, String basePath, IGasProvider gas, IFluidProvider fluidOutput, ITag<Fluid> fluidInput) {
+    private void addRotaryCondensentratorRecipe(Consumer<IFinishedRecipe> consumer, String basePath, IGasProvider gas, IFluidProvider fluidOutput, Tag<Fluid> fluidInput) {
         RotaryRecipeBuilder.rotary(
               FluidStackIngredient.from(fluidInput, 1),
               GasStackIngredient.from(gas, 1),

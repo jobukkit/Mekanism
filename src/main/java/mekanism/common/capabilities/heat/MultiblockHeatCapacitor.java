@@ -1,13 +1,14 @@
 package mekanism.common.capabilities.heat;
 
-import java.util.Objects;
-import java.util.function.DoubleSupplier;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.annotations.FieldsAreNonnullByDefault;
 import mekanism.api.heat.HeatAPI;
 import mekanism.common.lib.multiblock.MultiblockData;
 import mekanism.common.tile.prefab.TileEntityMultiblock;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Objects;
+import java.util.function.DoubleSupplier;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault

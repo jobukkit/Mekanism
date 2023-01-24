@@ -1,8 +1,6 @@
 package mekanism.client;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import java.util.Map;
-import java.util.UUID;
 import mekanism.client.render.RenderTickHandler;
 import mekanism.client.render.tileentity.RenderSPS;
 import mekanism.client.sound.SoundHandler;
@@ -13,6 +11,9 @@ import mekanism.common.lib.transmitter.TransmitterNetworkRegistry;
 import mekanism.common.network.PacketKey;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
+
+import java.util.Map;
+import java.util.UUID;
 
 public class MekanismClient {
 

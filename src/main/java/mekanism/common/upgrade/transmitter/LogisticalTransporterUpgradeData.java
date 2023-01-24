@@ -1,9 +1,10 @@
 package mekanism.common.upgrade.transmitter;
 
-import javax.annotation.Nullable;
 import mekanism.api.text.EnumColor;
 import mekanism.common.lib.transmitter.ConnectionType;
 import net.minecraft.nbt.ListNBT;
+
+import javax.annotation.Nullable;
 
 public class LogisticalTransporterUpgradeData extends TransmitterUpgradeData {
 

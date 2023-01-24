@@ -6,7 +6,7 @@ import javax.annotation.Nonnull;
 import mekanism.api.providers.IEntityTypeProvider;
 import net.minecraft.data.loot.EntityLootTables;
 import net.minecraft.entity.EntityType;
-import net.minecraft.loot.LootTable;
+import net.minecraft.world.storage.loot.LootTable;
 
 public abstract class BaseEntityLootTables extends EntityLootTables {
 

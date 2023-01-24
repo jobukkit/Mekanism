@@ -1,13 +1,14 @@
 package mekanism.common.capabilities.resolver.manager;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.heat.IHeatCapacitor;
 import mekanism.api.heat.IHeatHandler;
 import mekanism.api.heat.ISidedHeatHandler;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.holder.heat.IHeatCapacitorHolder;
 import mekanism.common.capabilities.proxy.ProxyHeatHandler;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Helper class to make reading instead of having as messy generics

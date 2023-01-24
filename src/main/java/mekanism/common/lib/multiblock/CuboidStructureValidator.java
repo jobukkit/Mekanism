@@ -1,7 +1,5 @@
 package mekanism.common.lib.multiblock;
 
-import java.util.Set;
-import java.util.UUID;
 import mekanism.common.MekanismLang;
 import mekanism.common.lib.math.voxel.IShape;
 import mekanism.common.lib.math.voxel.VoxelCuboid;
@@ -15,6 +13,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
+import java.util.Set;
+import java.util.UUID;
 
 public abstract class CuboidStructureValidator<T extends MultiblockData> implements IStructureValidator<T> {
 

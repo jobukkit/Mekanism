@@ -1,6 +1,5 @@
 package mekanism.common.integration.lookingat.theoneprobe;
 
-import mcjty.theoneprobe.api.IElement;
 import mcjty.theoneprobe.api.IElementNew;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.integration.lookingat.EnergyElement;

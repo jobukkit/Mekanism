@@ -1,13 +1,14 @@
 package mekanism.common.lib.transmitter;
 
-import java.util.Locale;
-import javax.annotation.Nonnull;
 import mekanism.api.IIncrementalEnum;
 import mekanism.api.math.MathUtils;
 import mekanism.api.text.IHasTranslationKey;
 import mekanism.api.text.ILangEntry;
 import mekanism.common.MekanismLang;
 import net.minecraft.util.IStringSerializable;
+
+import javax.annotation.Nonnull;
+import java.util.Locale;
 
 public enum ConnectionType implements IIncrementalEnum<ConnectionType>, IStringSerializable, IHasTranslationKey {
     NORMAL(MekanismLang.CONNECTION_NORMAL),

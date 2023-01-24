@@ -1,6 +1,5 @@
 package mekanism.common.item;
 
-import javax.annotation.Nonnull;
 import mekanism.api.text.EnumColor;
 import mekanism.common.Mekanism;
 import mekanism.common.MekanismLang;
@@ -14,8 +13,9 @@ import net.minecraft.item.Rarity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
 
 public class ItemGeigerCounter extends Item {
 

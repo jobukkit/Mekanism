@@ -1,8 +1,5 @@
 package mekanism.common.item.block;
 
-import java.util.List;
-import java.util.function.BooleanSupplier;
-import javax.annotation.Nonnull;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.text.EnumColor;
@@ -37,6 +34,10 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.registries.IForgeRegistry;
+
+import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.function.BooleanSupplier;
 
 public class ItemBlockChemicalTank extends ItemBlockTooltip<BlockTileModel<TileEntityChemicalTank, Machine<TileEntityChemicalTank>>> implements IItemSustainedInventory, ISecurityItem {
 

@@ -1,7 +1,6 @@
 package mekanism.client.render.item.block;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.Nonnull;
 import mekanism.client.MekanismClient;
 import mekanism.client.model.ModelEnergyCube;
 import mekanism.client.model.ModelEnergyCube.ModelEnergyCore;
@@ -12,9 +11,10 @@ import mekanism.common.tier.EnergyCubeTier;
 import mekanism.common.util.StorageUtils;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Vector3f;
-import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.tileentity.ItemStackTileEntityRenderer;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nonnull;
 
 public class RenderEnergyCubeItem extends ItemStackTileEntityRenderer {
 

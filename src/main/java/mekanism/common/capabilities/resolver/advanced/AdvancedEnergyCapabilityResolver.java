@@ -1,9 +1,5 @@
 package mekanism.common.capabilities.resolver.advanced;
 
-import java.util.HashMap;
-import java.util.Map;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.energy.ISidedStrictEnergyHandler;
 import mekanism.api.energy.IStrictEnergyHandler;
@@ -12,6 +8,11 @@ import mekanism.common.capabilities.resolver.basic.EnergyCapabilityResolver;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.HashMap;
+import java.util.Map;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

@@ -1,12 +1,12 @@
 package mekanism.common.registration.impl;
 
-import java.util.function.UnaryOperator;
-
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryBuilder;
 import mekanism.common.registration.WrappedDeferredRegister;
 import mekanism.common.resource.PrimaryResource;
+
+import java.util.function.UnaryOperator;
 
 public class SlurryDeferredRegister extends WrappedDeferredRegister<Slurry> {
 

@@ -1,14 +1,18 @@
 package mekanism.common.block.states;
 
-import javax.annotation.Nonnull;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.IBucketPickupHandler;
 import net.minecraft.block.ILiquidContainer;
-import net.minecraft.fluid.*;
+import net.minecraft.fluid.FlowingFluid;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.Fluids;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraftforge.common.util.Constants.BlockFlags;
+
+import javax.annotation.Nonnull;
 
 //TODO: The below TODOs go off an assumption of there being some form of forge patch first to support position information for fluid states
 public interface IStateFluidLoggable extends IBucketPickupHandler, ILiquidContainer {

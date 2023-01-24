@@ -1,13 +1,14 @@
 package mekanism.common.config;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import java.nio.file.Path;
-import java.util.function.Function;
 import mekanism.common.Mekanism;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.config.ConfigFileTypeHandler;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
+
+import java.nio.file.Path;
+import java.util.function.Function;
 
 /**
  * Custom {@link ModConfig} implementation that allows for rerouting the server config from being in the worlds folder to being in the normal config folder. This allows

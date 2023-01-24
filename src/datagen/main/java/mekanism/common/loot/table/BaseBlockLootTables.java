@@ -1,12 +1,6 @@
 package mekanism.common.loot.table;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.function.Function;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.NBTConstants;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.common.block.BlockCardboardBox;
@@ -26,13 +20,21 @@ import net.minecraft.data.loot.BlockLootTables;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IItemProvider;
 import net.minecraft.world.storage.loot.*;
+import net.minecraft.world.storage.loot.LootTable.Builder;
+import net.minecraft.util.IItemProvider;
 import net.minecraft.world.storage.loot.functions.ApplyBonus;
 import net.minecraft.world.storage.loot.functions.CopyNbt;
 import net.minecraft.world.storage.loot.functions.SetCount;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.items.IItemHandler;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.function.Function;
 
 public abstract class BaseBlockLootTables extends BlockLootTables {
 

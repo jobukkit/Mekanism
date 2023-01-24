@@ -1,6 +1,5 @@
 package mekanism.common.content.filter;
 
-import javax.annotation.Nullable;
 import mekanism.api.NBTConstants;
 import mekanism.common.content.miner.MinerItemStackFilter;
 import mekanism.common.content.miner.MinerMaterialFilter;
@@ -16,6 +15,8 @@ import mekanism.common.tile.machine.TileEntityOredictionificator.Oredictionifica
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.util.Constants.NBT;
+
+import javax.annotation.Nullable;
 
 public abstract class BaseFilter<FILTER extends BaseFilter<FILTER>> implements IFilter<FILTER> {
 

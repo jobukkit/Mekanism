@@ -1,9 +1,5 @@
 package mekanism.common.capabilities.resolver.advanced;
 
-import java.util.Collections;
-import java.util.List;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.common.capabilities.resolver.ICapabilityResolver;
 import net.minecraft.util.Direction;
@@ -11,6 +7,11 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullLazy;
 import net.minecraftforge.common.util.NonNullSupplier;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Capability resolver for handling a read only variant, a generic unsided implementation variant.

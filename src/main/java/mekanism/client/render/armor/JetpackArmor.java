@@ -1,12 +1,13 @@
 package mekanism.client.render.armor;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.Nonnull;
 import mekanism.client.model.ModelArmoredJetpack;
 import mekanism.client.model.ModelJetpack;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nonnull;
 
 public class JetpackArmor extends CustomArmor {
 

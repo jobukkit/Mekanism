@@ -1,10 +1,5 @@
 package mekanism.common.inventory.container.item;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.client.MekanismClient;
 import mekanism.common.Mekanism;
 import mekanism.common.lib.frequency.Frequency;
@@ -15,6 +10,12 @@ import mekanism.common.registration.impl.ContainerTypeRegistryObject;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public abstract class FrequencyItemContainer<FREQ extends Frequency> extends MekanismItemContainer {
 

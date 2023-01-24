@@ -1,6 +1,5 @@
 package mekanism.common.content.network.transmitter;
 
-import javax.annotation.Nonnull;
 import mekanism.api.NBTConstants;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.api.text.EnumColor;
@@ -15,7 +14,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Util;
+
+import javax.annotation.Nonnull;
 
 public class LogisticalTransporter extends LogisticalTransporterBase {
 

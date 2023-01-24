@@ -1,10 +1,5 @@
 package mekanism.common.capabilities.merged;
 
-import java.util.Collections;
-import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.DataHandlerUtils;
 import mekanism.api.NBTConstants;
@@ -12,11 +7,7 @@ import mekanism.api.chemical.ChemicalTankBuilder;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.fluid.IMekanismFluidHandler;
 import mekanism.common.capabilities.CapabilityCache;
-import mekanism.common.capabilities.chemical.dynamic.DynamicChemicalHandler.DynamicGasHandler;
-import mekanism.common.capabilities.chemical.dynamic.DynamicChemicalHandler.DynamicInfusionHandler;
-import mekanism.common.capabilities.chemical.dynamic.DynamicChemicalHandler.DynamicPigmentHandler;
-import mekanism.common.capabilities.chemical.dynamic.DynamicChemicalHandler.DynamicSlurryHandler;
-import mekanism.common.capabilities.chemical.dynamic.DynamicChemicalHandler.InteractPredicate;
+import mekanism.common.capabilities.chemical.dynamic.DynamicChemicalHandler.*;
 import mekanism.common.capabilities.chemical.variable.RateLimitChemicalTank.RateLimitGasTank;
 import mekanism.common.capabilities.chemical.variable.RateLimitChemicalTank.RateLimitInfusionTank;
 import mekanism.common.capabilities.chemical.variable.RateLimitChemicalTank.RateLimitPigmentTank;
@@ -29,6 +20,12 @@ import net.minecraft.util.Direction;
 import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Collections;
+import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

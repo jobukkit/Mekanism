@@ -1,11 +1,5 @@
 package mekanism.common.item.gear;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.function.LongSupplier;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.NBTConstants;
 import mekanism.api.chemical.gas.GasStack;
@@ -31,12 +25,18 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Util;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.LongSupplier;
 
 public class ItemScubaTank extends ItemGasArmor implements IItemHUDProvider, IModeItem {
 

@@ -1,22 +1,12 @@
 package mekanism.common.recipe.upgrade.chemical;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
 import mekanism.api.DataHandlerUtils;
 import mekanism.api.NBTConstants;
 import mekanism.api.annotations.FieldsAreNonnullByDefault;
 import mekanism.api.annotations.NonNull;
-import mekanism.api.chemical.Chemical;
-import mekanism.api.chemical.ChemicalStack;
-import mekanism.api.chemical.ChemicalTankBuilder;
-import mekanism.api.chemical.IChemicalHandler;
-import mekanism.api.chemical.IChemicalTank;
+import mekanism.api.chemical.*;
 import mekanism.common.block.interfaces.IHasTileEntity;
 import mekanism.common.recipe.upgrade.RecipeUpgradeData;
 import mekanism.common.tile.base.SubstanceType;
@@ -29,6 +19,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.capabilities.Capability;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault

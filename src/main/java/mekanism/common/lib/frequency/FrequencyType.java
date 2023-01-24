@@ -1,10 +1,5 @@
 package mekanism.common.lib.frequency;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.function.BiFunction;
-import java.util.function.Supplier;
 import mekanism.api.NBTConstants;
 import mekanism.common.content.entangloporter.InventoryFrequency;
 import mekanism.common.content.qio.QIOFrequency;
@@ -14,6 +9,12 @@ import mekanism.common.lib.security.SecurityFrequency;
 import mekanism.common.network.BasePacketHandler;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 public class FrequencyType<FREQ extends Frequency> {
 

@@ -1,8 +1,5 @@
 package mekanism.common.item;
 
-import java.util.List;
-import java.util.Optional;
-import javax.annotation.Nonnull;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalHandler;
@@ -34,6 +31,10 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+
+import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.Optional;
 
 public class ItemGaugeDropper extends Item {
 

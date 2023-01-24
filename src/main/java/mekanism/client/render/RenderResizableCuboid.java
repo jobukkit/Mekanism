@@ -2,9 +2,6 @@ package mekanism.client.render;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import java.util.Arrays;
-
-import mekanism.api.backport.Vector3i;
 import mekanism.client.render.MekanismRenderer.Model3D;
 import mekanism.common.util.EnumUtils;
 import net.minecraft.client.Minecraft;
@@ -18,6 +15,8 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.Direction.AxisDirection;
 import net.minecraft.util.math.Vec3i;
+
+import java.util.Arrays;
 
 
 /**

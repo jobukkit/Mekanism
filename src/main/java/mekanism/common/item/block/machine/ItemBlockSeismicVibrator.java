@@ -1,7 +1,5 @@
 package mekanism.common.item.block.machine;
 
-import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.text.EnumColor;
 import mekanism.client.render.item.ISTERProvider;
@@ -31,6 +29,9 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+
+import javax.annotation.Nonnull;
+import java.util.List;
 
 public class ItemBlockSeismicVibrator extends ItemBlockTooltip<BlockTile<?, ?>> implements IItemSustainedInventory, ISecurityItem {
 

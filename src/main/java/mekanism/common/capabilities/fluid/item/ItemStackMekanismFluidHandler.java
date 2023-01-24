@@ -1,9 +1,5 @@
 package mekanism.common.capabilities.fluid.item;
 
-import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.DataHandlerUtils;
 import mekanism.api.NBTConstants;
@@ -17,6 +13,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 
 /**
  * Helper class for implementing fluid handlers for items

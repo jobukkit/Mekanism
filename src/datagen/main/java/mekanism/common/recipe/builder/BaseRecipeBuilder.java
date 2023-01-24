@@ -1,8 +1,6 @@
 package mekanism.common.recipe.builder;
 
 import com.google.gson.JsonObject;
-import java.util.function.Consumer;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.JsonConstants;
 import mekanism.api.datagen.recipe.MekanismRecipeBuilder;
@@ -12,6 +10,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

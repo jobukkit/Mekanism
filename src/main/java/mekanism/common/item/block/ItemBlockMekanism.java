@@ -1,6 +1,5 @@
 package mekanism.common.item.block;
 
-import javax.annotation.Nonnull;
 import mekanism.api.text.EnumColor;
 import mekanism.api.text.TextComponentUtil;
 import mekanism.api.tier.ITier;
@@ -9,6 +8,8 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
+
+import javax.annotation.Nonnull;
 
 public class ItemBlockMekanism<BLOCK extends Block> extends BlockItem {
 

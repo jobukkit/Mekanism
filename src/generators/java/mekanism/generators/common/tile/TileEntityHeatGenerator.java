@@ -23,6 +23,7 @@ import mekanism.common.inventory.container.MekanismContainer;
 import mekanism.common.inventory.container.sync.SyncableDouble;
 import mekanism.common.inventory.container.sync.SyncableFloatingLong;
 import mekanism.common.inventory.slot.EnergyInventorySlot;
+import mekanism.common.tags.MekanismTags;
 import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.EnumUtils;
 import mekanism.common.util.MekanismUtils;
@@ -48,7 +49,6 @@ public class TileEntityHeatGenerator extends TileEntityGenerator {
     private static final double THERMAL_EFFICIENCY = 0.5;
     private static final FloatingLong MAX_PRODUCTION = FloatingLong.createConst(500);
 
-    public static final Tag<Block> GLASS_GLOWING = new BlockTags.Wrapper(new ResourceLocation("forge", "glass/glowing"));
     /**
      * The FluidTank for this generator.
      */
@@ -121,7 +121,7 @@ public class TileEntityHeatGenerator extends TileEntityGenerator {
         }
         //Lava boost
         FloatingLong boost = MekanismGeneratorsConfig.generators.heatGenerationLava.get().multiply(Arrays.stream(EnumUtils.DIRECTIONS)
-              .filter(side -> world.getBlockState(pos.offset(side)).isIn(GLASS_GLOWING)).count());
+              .filter(side -> world.getBlockState(pos.offset(side)).isIn(MekanismTags.Blocks.DOME_TAG)).count());
         if (world.getDimension().getType() == DimensionType.THE_NETHER) {
             boost = boost.plusEqual(MekanismGeneratorsConfig.generators.heatGenerationNether.get());
         }

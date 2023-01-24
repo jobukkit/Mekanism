@@ -1,8 +1,5 @@
 package mekanism.common.lib.transmitter.acceptor;
 
-import java.util.Objects;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.annotations.FieldsAreNonnullByDefault;
 import mekanism.common.content.network.transmitter.Transmitter;
@@ -14,6 +11,10 @@ import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Objects;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault

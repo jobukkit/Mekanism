@@ -1,16 +1,13 @@
 package mekanism.common.capabilities.holder.energy;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.RelativeSide;
 import mekanism.api.energy.IEnergyContainer;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.function.Supplier;
 
 public class EnergyContainerHolder implements IEnergyContainerHolder {
 

@@ -1,11 +1,5 @@
 package mekanism.common.capabilities.fluid;
 
-import java.util.Objects;
-import java.util.function.BiPredicate;
-import java.util.function.Predicate;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
 import mekanism.api.IContentsListener;
@@ -17,6 +11,13 @@ import mekanism.api.inventory.AutomationType;
 import mekanism.common.util.NBTUtils;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fluids.FluidStack;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Objects;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault

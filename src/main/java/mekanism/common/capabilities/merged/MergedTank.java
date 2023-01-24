@@ -1,8 +1,5 @@
 package mekanism.common.capabilities.merged;
 
-import java.util.Arrays;
-import java.util.Objects;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.NBTConstants;
 import mekanism.api.annotations.FieldsAreNonnullByDefault;
@@ -16,6 +13,10 @@ import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.common.capabilities.fluid.FluidTankWrapper;
 import mekanism.common.util.NBTUtils;
 import net.minecraft.nbt.CompoundNBT;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Arrays;
+import java.util.Objects;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault

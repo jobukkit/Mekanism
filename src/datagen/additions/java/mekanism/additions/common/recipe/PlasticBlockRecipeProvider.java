@@ -1,6 +1,5 @@
 package mekanism.additions.common.recipe;
 
-import java.util.function.Consumer;
 import mekanism.additions.common.AdditionsTags;
 import mekanism.additions.common.MekanismAdditions;
 import mekanism.additions.common.registries.AdditionsBlocks;
@@ -22,8 +21,10 @@ import mekanism.common.resource.ResourceType;
 import mekanism.common.tags.MekanismTags;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.item.Item;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
 import net.minecraftforge.common.Tags;
+
+import java.util.function.Consumer;
 
 public class PlasticBlockRecipeProvider implements ISubRecipeProvider {
 
@@ -82,7 +83,7 @@ public class PlasticBlockRecipeProvider implements ISubRecipeProvider {
     private void registerPlasticBlock(Consumer<IFinishedRecipe> consumer, BlockRegistryObject<? extends IColoredBlock, ?> result, String basePath) {
         EnumColor color = result.getBlock().getColor();
         String colorString = color.getRegistryPrefix();
-        ITag<Item> dye = color.getDyeTag();
+        Tag<Item> dye = color.getDyeTag();
         ExtendedShapedRecipeBuilder.shapedRecipe(result, 4)
               .pattern(PLASTIC)
               .key(Pattern.CONSTANT, MekanismItems.HDPE_SHEET)
@@ -114,7 +115,7 @@ public class PlasticBlockRecipeProvider implements ISubRecipeProvider {
     private void registerPlasticTransparent(Consumer<IFinishedRecipe> consumer, BlockRegistryObject<? extends IColoredBlock, ?> result, String basePath) {
         EnumColor color = result.getBlock().getColor();
         String colorString = color.getRegistryPrefix();
-        ITag<Item> dye = color.getDyeTag();
+        Tag<Item> dye = color.getDyeTag();
         ExtendedShapedRecipeBuilder.shapedRecipe(result, 8)
               .pattern(PLASTIC_TRANSPARENT)
               .key(Pattern.CONSTANT, MekanismItems.HDPE_SHEET)
@@ -252,7 +253,7 @@ public class PlasticBlockRecipeProvider implements ISubRecipeProvider {
         registerRecolor(consumer, result, AdditionsTags.Items.PLASTIC_BLOCKS_SLICK, color.getDyeTag(), basePath, colorString);
     }
 
-    public static void registerRecolor(Consumer<IFinishedRecipe> consumer, IItemProvider result, ITag<Item> blockType, ITag<Item> dye, String basePath, String colorString) {
+    public static void registerRecolor(Consumer<IFinishedRecipe> consumer, IItemProvider result, Tag<Item> blockType, Tag<Item> dye, String basePath, String colorString) {
         ExtendedShapedRecipeBuilder.shapedRecipe(result, 4)
               .pattern(PLASTIC)
               .key(Pattern.CONSTANT, blockType)
@@ -260,7 +261,7 @@ public class PlasticBlockRecipeProvider implements ISubRecipeProvider {
               .build(consumer, MekanismAdditions.rl(basePath + "recolor/" + colorString));
     }
 
-    public static void registerTransparentRecolor(Consumer<IFinishedRecipe> consumer, IItemProvider result, ITag<Item> blockType, ITag<Item> dye, String basePath,
+    public static void registerTransparentRecolor(Consumer<IFinishedRecipe> consumer, IItemProvider result, Tag<Item> blockType, Tag<Item> dye, String basePath,
           String colorString) {
         ExtendedShapedRecipeBuilder.shapedRecipe(result, 8)
               .pattern(PLASTIC_TRANSPARENT)

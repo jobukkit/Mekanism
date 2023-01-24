@@ -1,9 +1,5 @@
 package mekanism.common.inventory.slot;
 
-import java.util.Objects;
-import java.util.function.Predicate;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
 import mekanism.api.IContentsListener;
@@ -14,6 +10,11 @@ import mekanism.common.item.block.ItemBlockBin;
 import mekanism.common.tier.BinTier;
 import mekanism.common.util.StackUtils;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Objects;
+import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

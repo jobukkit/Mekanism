@@ -1,6 +1,5 @@
 package mekanism.common.recipe.impl;
 
-import java.util.function.Consumer;
 import mekanism.api.providers.IItemProvider;
 import mekanism.common.Mekanism;
 import mekanism.common.block.basic.BlockResource;
@@ -17,7 +16,9 @@ import mekanism.common.tags.MekanismTags;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
+
+import java.util.function.Consumer;
 
 class StorageRecipeProvider implements ISubRecipeProvider {
 
@@ -35,7 +36,7 @@ class StorageRecipeProvider implements ISubRecipeProvider {
         addNuggetRecipe(consumer, MekanismItems.STEEL_NUGGET, MekanismTags.Items.INGOTS_STEEL, basePath, "steel");
     }
 
-    private void addNuggetRecipe(Consumer<IFinishedRecipe> consumer, IItemProvider nugget, ITag<Item> ingotTag, String basePath, String name) {
+    private void addNuggetRecipe(Consumer<IFinishedRecipe> consumer, IItemProvider nugget, Tag<Item> ingotTag, String basePath, String name) {
         ExtendedShapelessRecipeBuilder.shapelessRecipe(nugget, 9)
               .addIngredient(ingotTag)
               .build(consumer, Mekanism.rl(basePath + name));
@@ -47,6 +48,7 @@ class StorageRecipeProvider implements ISubRecipeProvider {
         addStorageBlockRecipe(consumer, MekanismBlocks.REFINED_GLOWSTONE_BLOCK, MekanismTags.Items.INGOTS_REFINED_GLOWSTONE, basePath);
         addStorageBlockRecipe(consumer, MekanismBlocks.REFINED_OBSIDIAN_BLOCK, MekanismTags.Items.INGOTS_REFINED_OBSIDIAN, basePath);
         addStorageBlockRecipe(consumer, MekanismBlocks.STEEL_BLOCK, MekanismTags.Items.INGOTS_STEEL, basePath);
+        addStorageBlockRecipe(consumer, MekanismBlocks.FLUORITE_BLOCK, MekanismTags.Items.GEMS_FLUORITE, basePath);
         //Charcoal
         ExtendedShapedRecipeBuilder.shapedRecipe(MekanismBlocks.CHARCOAL_BLOCK)
               .pattern(MekanismRecipeProvider.STORAGE_PATTERN)
@@ -61,7 +63,7 @@ class StorageRecipeProvider implements ISubRecipeProvider {
               .build(consumer, Mekanism.rl(basePath + "salt"));
     }
 
-    private void addStorageBlockRecipe(Consumer<IFinishedRecipe> consumer, BlockRegistryObject<BlockResource, ?> block, ITag<Item> ingotTag, String basePath) {
+    private void addStorageBlockRecipe(Consumer<IFinishedRecipe> consumer, BlockRegistryObject<BlockResource, ?> block, Tag<Item> ingotTag, String basePath) {
         ExtendedShapedRecipeBuilder.shapedRecipe(block)
               .pattern(MekanismRecipeProvider.STORAGE_PATTERN)
               .key(Pattern.CONSTANT, ingotTag)

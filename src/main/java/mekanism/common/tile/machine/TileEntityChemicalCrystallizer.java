@@ -1,7 +1,5 @@
 package mekanism.common.tile.machine;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.annotations.NonNull;
 import mekanism.api.chemical.ChemicalTankBuilder;
 import mekanism.api.chemical.gas.Gas;
@@ -22,11 +20,7 @@ import mekanism.api.recipes.ChemicalCrystallizerRecipe;
 import mekanism.api.recipes.cache.CachedRecipe;
 import mekanism.api.recipes.cache.ChemicalCrystallizerCachedRecipe;
 import mekanism.api.recipes.inputs.BoxedChemicalInputHandler;
-import mekanism.api.recipes.inputs.chemical.GasStackIngredient;
-import mekanism.api.recipes.inputs.chemical.IChemicalStackIngredient;
-import mekanism.api.recipes.inputs.chemical.InfusionStackIngredient;
-import mekanism.api.recipes.inputs.chemical.PigmentStackIngredient;
-import mekanism.api.recipes.inputs.chemical.SlurryStackIngredient;
+import mekanism.api.recipes.inputs.chemical.*;
 import mekanism.api.recipes.outputs.IOutputHandler;
 import mekanism.api.recipes.outputs.OutputHelper;
 import mekanism.common.capabilities.energy.MachineEnergyContainer;
@@ -48,6 +42,9 @@ import mekanism.common.tile.component.TileComponentEjector;
 import mekanism.common.tile.prefab.TileEntityProgressMachine;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class TileEntityChemicalCrystallizer extends TileEntityProgressMachine<ChemicalCrystallizerRecipe> {
 

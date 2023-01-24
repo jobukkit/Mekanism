@@ -1,7 +1,5 @@
 package mekanism.common.item.block;
 
-import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.api.text.EnumColor;
 import mekanism.api.text.TextComponentUtil;
 import mekanism.common.MekanismLang;
@@ -16,6 +14,9 @@ import mekanism.common.util.text.TextUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
+import java.util.List;
 
 public class ItemBlockBin extends ItemBlockTooltip<BlockBin> implements IItemSustainedInventory {
 

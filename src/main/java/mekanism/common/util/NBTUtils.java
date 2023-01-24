@@ -5,12 +5,6 @@ import it.unimi.dsi.fastutil.bytes.ByteConsumer;
 import it.unimi.dsi.fastutil.floats.FloatConsumer;
 import it.unimi.dsi.fastutil.ints.Int2ObjectFunction;
 import it.unimi.dsi.fastutil.shorts.ShortConsumer;
-import java.util.UUID;
-import java.util.function.Consumer;
-import java.util.function.DoubleConsumer;
-import java.util.function.IntConsumer;
-import java.util.function.LongConsumer;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.api.Coord4D;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
@@ -31,6 +25,13 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fluids.FluidStack;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.DoubleConsumer;
+import java.util.function.IntConsumer;
+import java.util.function.LongConsumer;
 
 @ParametersAreNonnullByDefault
 public class NBTUtils {

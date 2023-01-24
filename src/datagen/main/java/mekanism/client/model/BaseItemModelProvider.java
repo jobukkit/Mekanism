@@ -1,6 +1,5 @@
 package mekanism.client.model;
 
-import javax.annotation.Nonnull;
 import mekanism.api.providers.IItemProvider;
 import mekanism.client.model.builder.BucketModelBuilder;
 import mekanism.common.registration.impl.FluidRegistryObject;
@@ -12,6 +11,8 @@ import net.minecraftforge.client.model.generators.ExistingFileHelper;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelFile.UncheckedModelFile;
+
+import javax.annotation.Nonnull;
 
 public abstract class BaseItemModelProvider extends ItemModelProvider {
 

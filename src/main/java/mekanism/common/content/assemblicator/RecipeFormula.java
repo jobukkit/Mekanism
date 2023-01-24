@@ -2,8 +2,6 @@ package mekanism.common.content.assemblicator;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import java.util.List;
-import javax.annotation.Nullable;
 import mekanism.api.inventory.IInventorySlot;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.StackUtils;
@@ -13,6 +11,9 @@ import net.minecraft.item.crafting.ICraftingRecipe;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 public class RecipeFormula {
 

@@ -1,8 +1,5 @@
 package mekanism.common.block;
 
-import java.text.NumberFormat;
-import java.util.Random;
-import javax.annotation.Nonnull;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.text.EnumColor;
 import mekanism.common.MekanismLang;
@@ -18,12 +15,15 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particles.BasicParticleType;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
+import java.text.NumberFormat;
+import java.util.Random;
 
 public class BlockRadioactiveWasteBarrel extends BlockTileModel<TileEntityRadioactiveWasteBarrel, BlockTypeTile<TileEntityRadioactiveWasteBarrel>> {
 

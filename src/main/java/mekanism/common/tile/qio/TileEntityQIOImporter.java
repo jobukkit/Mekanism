@@ -1,9 +1,5 @@
 package mekanism.common.tile.qio;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 import mekanism.api.NBTConstants;
 import mekanism.common.Mekanism;
 import mekanism.common.content.qio.QIOFrequency;
@@ -16,16 +12,17 @@ import mekanism.common.inventory.container.sync.SyncableBoolean;
 import mekanism.common.lib.inventory.Finder;
 import mekanism.common.lib.inventory.HashedItem;
 import mekanism.common.registries.MekanismBlocks;
-import mekanism.common.util.CapabilityUtils;
-import mekanism.common.util.InventoryUtils;
-import mekanism.common.util.ItemDataUtils;
-import mekanism.common.util.MekanismUtils;
-import mekanism.common.util.NBTUtils;
+import mekanism.common.util.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 public class TileEntityQIOImporter extends TileEntityQIOFilterHandler {
 

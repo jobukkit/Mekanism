@@ -107,6 +107,7 @@ public class MekanismTags {
         public static final Tag<Item> STORAGE_BLOCKS_REFINED_GLOWSTONE = forgeTag("storage_blocks/refined_glowstone");
         public static final Tag<Item> STORAGE_BLOCKS_REFINED_OBSIDIAN = forgeTag("storage_blocks/refined_obsidian");
         public static final Tag<Item> STORAGE_BLOCKS_STEEL = forgeTag("storage_blocks/steel");
+        public static final Tag<Item> STORAGE_BLOCKS_FLUORITE = forgeTag("storage_blocks/fluorite");
 
         public static final Tag<Item> CIRCUITS = forgeTag("circuits");
         public static final Tag<Item> CIRCUITS_BASIC = forgeTag("circuits/basic");
@@ -177,6 +178,9 @@ public class MekanismTags {
         public static final Tag<Block> STORAGE_BLOCKS_REFINED_GLOWSTONE = forgeTag("storage_blocks/refined_glowstone");
         public static final Tag<Block> STORAGE_BLOCKS_REFINED_OBSIDIAN = forgeTag("storage_blocks/refined_obsidian");
         public static final Tag<Block> STORAGE_BLOCKS_STEEL = forgeTag("storage_blocks/steel");
+        public static final Tag<Block> STORAGE_BLOCKS_FLUORITE = forgeTag("storage_blocks/fluorite");
+
+        public static final Tag<Block> DOME_TAG = new BlockTags.Wrapper(new ResourceLocation("koepelcraft", "dome"));
 
         private static Tag<Block> forgeTag(String name) {
             return new BlockTags.Wrapper(new ResourceLocation("forge", name));

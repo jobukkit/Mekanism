@@ -1,6 +1,5 @@
 package mekanism.common.recipe.impl;
 
-import java.util.function.Consumer;
 import mekanism.api.datagen.recipe.builder.NucleosynthesizingRecipeBuilder;
 import mekanism.api.recipes.inputs.ItemStackIngredient;
 import mekanism.api.recipes.inputs.chemical.GasStackIngredient;
@@ -13,6 +12,8 @@ import mekanism.common.tags.MekanismTags;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+
+import java.util.function.Consumer;
 
 class NucleosynthesizingRecipeProvider implements ISubRecipeProvider {
 

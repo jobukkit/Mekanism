@@ -1,7 +1,5 @@
 package mekanism.common.lib.radiation.capability;
 
-import java.util.Random;
-import javax.annotation.Nonnull;
 import mekanism.api.NBTConstants;
 import mekanism.common.Mekanism;
 import mekanism.common.capabilities.Capabilities;
@@ -24,6 +22,9 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
+
+import javax.annotation.Nonnull;
+import java.util.Random;
 
 public class DefaultRadiationEntity implements IRadiationEntity {
 

@@ -1,8 +1,5 @@
 package mekanism.common.tile.machine;
 
-import java.util.EnumSet;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.RelativeSide;
 import mekanism.api.annotations.NonNull;
 import mekanism.api.chemical.ChemicalTankBuilder;
@@ -37,6 +34,10 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.RainType;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.EnumSet;
 
 public class TileEntitySolarNeutronActivator extends TileEntityMekanism implements IBoundingBlock, ITileCachedRecipeHolder<GasToGasRecipe> {
 

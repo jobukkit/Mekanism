@@ -1,9 +1,10 @@
 package mekanism.client.render.data;
 
-import javax.annotation.Nonnull;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.client.render.MekanismRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+
+import javax.annotation.Nonnull;
 
 public abstract class ChemicalRenderData<STACK extends ChemicalStack<?>> extends RenderData {
 

@@ -1,9 +1,10 @@
 package mekanism.common.network.container.property;
 
-import javax.annotation.Nullable;
 import mekanism.common.inventory.container.MekanismContainer;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
+
+import javax.annotation.Nullable;
 
 public class BlockPosPropertyData extends PropertyData {
 

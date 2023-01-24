@@ -1,7 +1,5 @@
 package mekanism.common.item;
 
-import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.api.Upgrade;
 import mekanism.api.text.EnumColor;
 import mekanism.client.MekKeyHandler;
@@ -23,6 +21,9 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+import javax.annotation.Nonnull;
+import java.util.List;
 
 public class ItemUpgrade extends Item implements IUpgradeItem {
 

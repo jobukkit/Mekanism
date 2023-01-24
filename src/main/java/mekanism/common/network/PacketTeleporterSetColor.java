@@ -1,6 +1,5 @@
 package mekanism.common.network;
 
-import java.util.function.Supplier;
 import mekanism.common.Mekanism;
 import mekanism.common.content.teleporter.TeleporterFrequency;
 import mekanism.common.lib.frequency.Frequency.FrequencyIdentity;
@@ -11,6 +10,8 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
+
+import java.util.function.Supplier;
 
 public class PacketTeleporterSetColor {
 

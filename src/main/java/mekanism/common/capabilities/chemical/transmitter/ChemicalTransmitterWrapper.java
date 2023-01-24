@@ -1,9 +1,5 @@
 package mekanism.common.capabilities.chemical.transmitter;
 
-import java.util.List;
-import java.util.function.Function;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.Action;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
@@ -29,6 +25,11 @@ import mekanism.api.inventory.AutomationType;
 import mekanism.common.content.network.transmitter.BoxedPressurizedTube;
 import mekanism.common.lib.transmitter.ConnectionType;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.function.Function;
 
 public abstract class ChemicalTransmitterWrapper<CHEMICAL extends Chemical<CHEMICAL>, STACK extends ChemicalStack<CHEMICAL>, TANK extends IChemicalTank<CHEMICAL, STACK>>
       implements IMekanismChemicalHandler<CHEMICAL, STACK, TANK> {

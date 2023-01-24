@@ -1,12 +1,13 @@
 package mekanism.common.item.block.machine;
 
-import javax.annotation.Nonnull;
 import mekanism.common.block.prefab.BlockTile;
 import mekanism.common.content.blocktype.Machine;
 import mekanism.common.tile.machine.TileEntityIsotopicCentrifuge;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.BlockItemUseContext;
+
+import javax.annotation.Nonnull;
 
 public class ItemBlockIsotopicCentrifuge extends ItemBlockMachine {
 

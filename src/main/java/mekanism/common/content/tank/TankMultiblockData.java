@@ -1,7 +1,5 @@
 package mekanism.common.content.tank;
 
-import java.util.ArrayList;
-import java.util.List;
 import mekanism.api.NBTConstants;
 import mekanism.api.chemical.ChemicalTankBuilder;
 import mekanism.api.chemical.gas.IGasTank;
@@ -26,6 +24,9 @@ import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.world.World;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TankMultiblockData extends MultiblockData implements IValveHandler {
 

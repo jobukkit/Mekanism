@@ -1,6 +1,5 @@
 package mekanism.common.recipe.impl;
 
-import java.util.function.Consumer;
 import mekanism.api.datagen.recipe.builder.SawmillRecipeBuilder;
 import mekanism.api.recipes.inputs.ItemStackIngredient;
 import mekanism.common.Mekanism;
@@ -14,8 +13,10 @@ import net.minecraft.item.Items;
 import net.minecraft.tags.ItemTags;
 import net.minecraftforge.common.Tags;
 
-class SawingRecipeProvider implements ISubRecipeProvider {
+import java.util.function.Consumer;
 
+class SawingRecipeProvider implements ISubRecipeProvider {
+    // TODO Maybe add Extended Nether Backport or FutureMC?
     @Override
     public void addRecipes(Consumer<IFinishedRecipe> consumer) {
         String basePath = "sawing/";
@@ -133,12 +134,12 @@ class SawingRecipeProvider implements ISubRecipeProvider {
               1
         ).build(consumer, Mekanism.rl(basePath + "torch"));
         //Soul Torch
-        SawmillRecipeBuilder.sawing(
-              ItemStackIngredient.from(Items.SOUL_TORCH, 4),
-              new ItemStack(Items.TORCH, 4),
-              new ItemStack(Blocks.SOUL_SOIL),
-              1
-        ).build(consumer, Mekanism.rl(basePath + "soul_torch"));
+//        SawmillRecipeBuilder.sawing(
+//              ItemStackIngredient.from(Items.SOUL_TORCH, 4),
+//              new ItemStack(Items.TORCH, 4),
+//              new ItemStack(Blocks.SOUL_SOIL),
+//              1
+//        ).build(consumer, Mekanism.rl(basePath + "soul_torch"));
         //Trapped chest
         SawmillRecipeBuilder.sawing(
               ItemStackIngredient.from(Items.TRAPPED_CHEST),

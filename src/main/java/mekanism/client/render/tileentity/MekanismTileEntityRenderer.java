@@ -1,12 +1,13 @@
 package mekanism.client.render.tileentity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.tileentity.TileEntity;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 public abstract class MekanismTileEntityRenderer<TILE extends TileEntity> extends TileEntityRenderer<TILE> {

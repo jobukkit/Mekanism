@@ -3,12 +3,6 @@ package mekanism.client.sound;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
-import javax.annotation.Nonnull;
 import mekanism.api.Upgrade;
 import mekanism.client.sound.PlayerSound.SoundType;
 import mekanism.common.Mekanism;
@@ -34,6 +28,13 @@ import net.minecraftforge.client.event.sound.PlaySoundEvent;
 import net.minecraftforge.client.event.sound.SoundSetupEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+
+import javax.annotation.Nonnull;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 // SoundHandler is the central point for sounds on Mek client side. There are roughly three classes of sounds to deal
 // with:

@@ -1,11 +1,12 @@
 package mekanism.common.block.attribute;
 
-import java.util.List;
-import javax.annotation.Nonnull;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.Property;
+
+import javax.annotation.Nonnull;
+import java.util.List;
 
 public class AttributeStateActive extends AttributeState {
 

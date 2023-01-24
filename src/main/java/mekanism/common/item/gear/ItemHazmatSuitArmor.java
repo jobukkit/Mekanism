@@ -1,6 +1,5 @@
 package mekanism.common.item.gear;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.common.Mekanism;
 import mekanism.common.capabilities.ItemCapabilityWrapper;
@@ -11,6 +10,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Rarity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 public class ItemHazmatSuitArmor extends ArmorItem {
 

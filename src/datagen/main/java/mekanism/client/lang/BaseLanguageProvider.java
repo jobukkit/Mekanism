@@ -1,8 +1,5 @@
 package mekanism.client.lang;
 
-import java.io.IOException;
-import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.api.text.IHasTranslationKey;
 import mekanism.client.lang.FormatSplitter.Component;
@@ -18,6 +15,10 @@ import net.minecraft.util.Util;
 import net.minecraftforge.common.data.LanguageProvider;
 import net.minecraftforge.fluids.ForgeFlowingFluid.Flowing;
 import net.minecraftforge.fluids.ForgeFlowingFluid.Source;
+
+import javax.annotation.Nonnull;
+import java.io.IOException;
+import java.util.List;
 
 public abstract class BaseLanguageProvider extends LanguageProvider {
 

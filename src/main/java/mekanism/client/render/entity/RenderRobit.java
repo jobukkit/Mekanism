@@ -1,6 +1,5 @@
 package mekanism.client.render.entity;
 
-import javax.annotation.Nonnull;
 import mekanism.client.model.ModelRobit;
 import mekanism.common.entity.EntityRobit;
 import mekanism.common.util.MekanismUtils;
@@ -8,6 +7,8 @@ import mekanism.common.util.MekanismUtils.ResourceType;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.Nonnull;
 
 public class RenderRobit extends MobRenderer<EntityRobit, ModelRobit> {
 

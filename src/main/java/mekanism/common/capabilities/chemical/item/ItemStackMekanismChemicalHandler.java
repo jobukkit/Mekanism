@@ -1,9 +1,5 @@
 package mekanism.common.capabilities.chemical.item;
 
-import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.DataHandlerUtils;
 import mekanism.api.chemical.Chemical;
@@ -14,6 +10,11 @@ import mekanism.common.capabilities.ItemCapabilityWrapper.ItemCapability;
 import mekanism.common.util.ItemDataUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 
 /**
  * Helper class for implementing chemical handlers for items

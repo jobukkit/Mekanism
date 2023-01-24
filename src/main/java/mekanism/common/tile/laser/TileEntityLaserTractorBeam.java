@@ -1,7 +1,5 @@
 package mekanism.common.tile.laser;
 
-import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.api.inventory.AutomationType;
 import mekanism.api.inventory.IInventorySlot;
@@ -20,6 +18,9 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.server.ServerWorld;
+
+import javax.annotation.Nonnull;
+import java.util.List;
 
 public class TileEntityLaserTractorBeam extends TileEntityLaserReceptor {
 

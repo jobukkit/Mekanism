@@ -1,5 +1,21 @@
 package mekanism.common.recipe;
 
+import mekanism.api.inventory.IgnoredIInventory;
+import mekanism.api.recipes.*;
+import mekanism.api.recipes.inputs.ItemStackIngredient;
+import mekanism.common.Mekanism;
+import mekanism.common.recipe.impl.SmeltingIRecipe;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.*;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
+import net.minecraftforge.registries.IForgeRegistry;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -7,43 +23,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import mekanism.api.inventory.IgnoredIInventory;
-import mekanism.api.recipes.ChemicalCrystallizerRecipe;
-import mekanism.api.recipes.ChemicalDissolutionRecipe;
-import mekanism.api.recipes.ChemicalInfuserRecipe;
-import mekanism.api.recipes.CombinerRecipe;
-import mekanism.api.recipes.ElectrolysisRecipe;
-import mekanism.api.recipes.FluidSlurryToSlurryRecipe;
-import mekanism.api.recipes.FluidToFluidRecipe;
-import mekanism.api.recipes.GasToGasRecipe;
-import mekanism.api.recipes.ItemStackGasToItemStackRecipe;
-import mekanism.api.recipes.ItemStackToEnergyRecipe;
-import mekanism.api.recipes.ItemStackToGasRecipe;
-import mekanism.api.recipes.ItemStackToInfuseTypeRecipe;
-import mekanism.api.recipes.ItemStackToItemStackRecipe;
-import mekanism.api.recipes.MekanismRecipe;
-import mekanism.api.recipes.MetallurgicInfuserRecipe;
-import mekanism.api.recipes.NucleosynthesizingRecipe;
-import mekanism.api.recipes.PressurizedReactionRecipe;
-import mekanism.api.recipes.RotaryRecipe;
-import mekanism.api.recipes.SawmillRecipe;
-import mekanism.api.recipes.inputs.ItemStackIngredient;
-import mekanism.common.Mekanism;
-import mekanism.common.recipe.impl.SmeltingIRecipe;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.RecipeManager;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
-import net.minecraftforge.registries.IForgeRegistry;
 
 public class MekanismRecipeType<RECIPE_TYPE extends MekanismRecipe> implements IRecipeType<RECIPE_TYPE> {
 

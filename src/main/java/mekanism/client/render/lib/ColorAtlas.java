@@ -1,16 +1,17 @@
 package mekanism.client.render.lib;
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Supplier;
-import javax.imageio.ImageIO;
 import mekanism.common.Mekanism;
 import mekanism.common.lib.Color;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.IResource;
 import net.minecraft.util.ResourceLocation;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
 
 public class ColorAtlas {
 

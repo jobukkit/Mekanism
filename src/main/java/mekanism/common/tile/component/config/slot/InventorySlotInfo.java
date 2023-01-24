@@ -1,8 +1,9 @@
 package mekanism.common.tile.component.config.slot;
 
+import mekanism.api.inventory.IInventorySlot;
+
 import java.util.Arrays;
 import java.util.List;
-import mekanism.api.inventory.IInventorySlot;
 
 /**
  * @implNote DataTypes that are not strictly input or output we set as being able to both input and output and allow the slots to determine if something can be

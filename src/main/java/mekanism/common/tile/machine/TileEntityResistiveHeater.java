@@ -1,6 +1,5 @@
 package mekanism.common.tile.machine;
 
-import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.api.NBTConstants;
 import mekanism.api.RelativeSide;
@@ -24,8 +23,9 @@ import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
-import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
+
+import javax.annotation.Nonnull;
 
 public class TileEntityResistiveHeater extends TileEntityMekanism {
 

@@ -1,11 +1,12 @@
 package mekanism.client.gui.element.gauge;
 
-import javax.annotation.Nullable;
 import mekanism.api.text.EnumColor;
 import mekanism.common.tile.component.config.DataType;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.MekanismUtils.ResourceType;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.Nullable;
 
 public enum GaugeInfo {
     STANDARD("normal.png", 2, 2, null),

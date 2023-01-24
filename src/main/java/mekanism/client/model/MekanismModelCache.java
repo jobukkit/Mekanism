@@ -1,10 +1,11 @@
 package mekanism.client.model;
 
-import java.util.HashSet;
-import java.util.Set;
 import mekanism.common.Mekanism;
 import mekanism.common.tile.qio.TileEntityQIODriveArray.DriveStatus;
 import net.minecraftforge.client.event.ModelBakeEvent;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class MekanismModelCache extends BaseModelCache {
 

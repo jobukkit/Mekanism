@@ -2,8 +2,9 @@ package mekanism.client.gui.element.text;
 
 import it.unimi.dsi.fastutil.chars.CharOpenHashSet;
 import it.unimi.dsi.fastutil.chars.CharSet;
-import java.util.Arrays;
 import mekanism.api.functions.CharPredicate;
+
+import java.util.Arrays;
 
 public class InputValidator {
 

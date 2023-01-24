@@ -1,7 +1,5 @@
 package mekanism.client.jei.machine;
 
-import java.util.Collections;
-import java.util.List;
 import mekanism.api.recipes.FluidToFluidRecipe;
 import mekanism.client.gui.element.GuiDownArrow;
 import mekanism.client.gui.element.GuiInnerScreen;
@@ -18,6 +16,9 @@ import mezz.jei.api.gui.ingredient.IGuiFluidStackGroup;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import net.minecraftforge.fluids.FluidStack;
+
+import java.util.Collections;
+import java.util.List;
 
 public class FluidToFluidRecipeCategory extends BaseRecipeCategory<FluidToFluidRecipe> {
 

@@ -1,16 +1,7 @@
 package mekanism.common.config;
 
-import java.util.ArrayList;
-import java.util.List;
 import mekanism.api.math.FloatingLong;
-import mekanism.common.config.value.CachedBooleanValue;
-import mekanism.common.config.value.CachedConfigValue;
-import mekanism.common.config.value.CachedDoubleValue;
-import mekanism.common.config.value.CachedEnumValue;
-import mekanism.common.config.value.CachedFloatValue;
-import mekanism.common.config.value.CachedFloatingLongValue;
-import mekanism.common.config.value.CachedIntValue;
-import mekanism.common.config.value.CachedLongValue;
+import mekanism.common.config.value.*;
 import mekanism.common.tier.ChemicalTankTier;
 import mekanism.common.tier.EnergyCubeTier;
 import mekanism.common.tier.FluidTankTier;
@@ -18,6 +9,9 @@ import mekanism.common.util.UnitDisplayUtils.EnergyType;
 import mekanism.common.util.UnitDisplayUtils.TempType;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig.Type;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GeneralConfig extends BaseMekanismConfig {
 

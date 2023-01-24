@@ -1,32 +1,27 @@
 package mekanism.common.tile.prefab;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import javax.annotation.Nonnull;
 import mekanism.api.IConfigurable;
 import mekanism.api.NBTConstants;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.resolver.basic.BasicCapabilityResolver;
 import mekanism.common.lib.multiblock.FormationProtocol.FormationResult;
-import mekanism.common.lib.multiblock.IMultiblock;
-import mekanism.common.lib.multiblock.IStructuralMultiblock;
-import mekanism.common.lib.multiblock.MultiblockData;
-import mekanism.common.lib.multiblock.MultiblockManager;
-import mekanism.common.lib.multiblock.Structure;
+import mekanism.common.lib.multiblock.*;
 import mekanism.common.tile.base.TileEntityMekanism;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
+
+import javax.annotation.Nonnull;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 
 public abstract class TileEntityStructuralMultiblock extends TileEntityMekanism implements IStructuralMultiblock, IConfigurable {
 

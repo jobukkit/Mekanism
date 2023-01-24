@@ -1,7 +1,8 @@
 package mekanism.common.block.interfaces;
 
-import javax.annotation.Nonnull;
 import mekanism.api.text.ILangEntry;
+
+import javax.annotation.Nonnull;
 
 public interface IHasDescription {
 

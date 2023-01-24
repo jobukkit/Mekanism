@@ -1,8 +1,6 @@
 package mekanism.common.base;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import java.util.Calendar;
-import java.util.Set;
 import mekanism.api.math.MathUtils;
 import mekanism.api.text.EnumColor;
 import mekanism.common.Mekanism;
@@ -12,7 +10,9 @@ import mekanism.common.registration.impl.SoundEventRegistryObject;
 import mekanism.common.registries.MekanismSounds;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.util.Util;
+
+import java.util.Calendar;
+import java.util.Set;
 
 public final class HolidayManager {
 

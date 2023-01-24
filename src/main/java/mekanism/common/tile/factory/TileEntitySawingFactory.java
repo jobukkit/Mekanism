@@ -1,7 +1,5 @@
 package mekanism.common.tile.factory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.annotations.NonNull;
 import mekanism.api.inventory.IInventorySlot;
 import mekanism.api.providers.IBlockProvider;
@@ -25,6 +23,9 @@ import mekanism.common.upgrade.SawmillUpgradeData;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.ItemHandlerHelper;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class TileEntitySawingFactory extends TileEntityFactory<SawmillRecipe> {
 

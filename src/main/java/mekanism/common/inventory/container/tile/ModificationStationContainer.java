@@ -1,6 +1,5 @@
 package mekanism.common.inventory.container.tile;
 
-import javax.annotation.Nonnull;
 import mekanism.common.inventory.container.slot.ArmorSlot;
 import mekanism.common.inventory.container.slot.OffhandSlot;
 import mekanism.common.registries.MekanismContainerTypes;
@@ -9,6 +8,8 @@ import mekanism.common.util.EnumUtils;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.network.PacketBuffer;
+
+import javax.annotation.Nonnull;
 
 public class ModificationStationContainer extends MekanismTileContainer<TileEntityModificationStation> {
 

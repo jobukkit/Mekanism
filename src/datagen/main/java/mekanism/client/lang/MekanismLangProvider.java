@@ -1,8 +1,6 @@
 package mekanism.client.lang;
 
 import com.google.common.collect.Table.Cell;
-import java.util.Locale;
-import java.util.Map;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.providers.IItemProvider;
@@ -10,6 +8,7 @@ import mekanism.api.text.APILang;
 import mekanism.api.text.EnumColor;
 import mekanism.common.Mekanism;
 import mekanism.common.MekanismLang;
+import mekanism.common.block.BlockOre;
 import mekanism.common.content.blocktype.FactoryType;
 import mekanism.common.registration.impl.BlockRegistryObject;
 import mekanism.common.registration.impl.ItemRegistryObject;
@@ -30,6 +29,9 @@ import mekanism.common.tier.FactoryTier;
 import mekanism.common.util.EnumUtils;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.item.Item;
+
+import java.util.Locale;
+import java.util.Map;
 
 public class MekanismLangProvider extends BaseLanguageProvider {
 
@@ -273,15 +275,19 @@ public class MekanismLangProvider extends BaseLanguageProvider {
         add(MekanismBlocks.BOUNDING_BLOCK, "Bounding Block");
         add(MekanismBlocks.ADVANCED_BOUNDING_BLOCK, "Advanced Bounding Block");
         //Ores
-        for (OreType ore : EnumUtils.ORE_TYPES) {
-            add(MekanismBlocks.ORES.get(ore), formatAndCapitalize(ore.getResource().getRegistrySuffix()) + " Ore");
-        }
+        addOre(OreType.OSMIUM, "A strong mineral that can be found at nearly any height in the world. It is known to have many uses in the construction of machinery.");
+        addOre(OreType.COPPER, "A common, conductive material that can be used in the production of wires. Its ability to withstand high heats also makes it essential to advanced machinery.");
+        addOre(OreType.TIN, "A lightweight, yet sturdy, conductive material that is found slightly less commonly than Copper.");
+        addOre(OreType.FLUORITE, "A mineral found relatively deep under the world's surface. The crystals can be processed into Hydrofluoric Acid, an essential chemical for Uranium processing.");
+        addOre(OreType.URANIUM, "A common, heavy metal, which can yield massive amounts of energy when properly processed. In its naturally-occurring form, it is not radioactive enough to cause harm.");
+        addOre(OreType.LEAD, "A somewhat rare metal that is excellent at resisting radioactive particles, spawning slightly less frequently than iron.");
         //Storage blocks
         add(MekanismBlocks.BRONZE_BLOCK, "Bronze Block");
         add(MekanismBlocks.REFINED_OBSIDIAN_BLOCK, "Refined Obsidian");
         add(MekanismBlocks.CHARCOAL_BLOCK, "Charcoal Block");
         add(MekanismBlocks.REFINED_GLOWSTONE_BLOCK, "Refined Glowstone");
         add(MekanismBlocks.STEEL_BLOCK, "Steel Block");
+        add(MekanismBlocks.FLUORITE_BLOCK, "Fluorite Block");
         //Dynamic storage blocks
         for (Map.Entry<PrimaryResource, BlockRegistryObject<?, ?>> entry : MekanismBlocks.PROCESSED_RESOURCE_BLOCKS.entrySet()) {
             add(entry.getValue(), formatAndCapitalize(entry.getKey().getName()) + " Block");
@@ -390,8 +396,13 @@ public class MekanismLangProvider extends BaseLanguageProvider {
     }
 
     private void addDamageSources() {
-        add(MekanismDamageSource.LASER, "%s was incinerated.");
-        add(MekanismDamageSource.RADIATION, "%s was killed by radiation poisoning.");
+        add(MekanismDamageSource.LASER, "%s was incinerated.", "%s was incinerated whilst trying to escape %s.");
+        add(MekanismDamageSource.RADIATION, "%s was killed by radiation poisoning.", "%s was killed by radiation poisoning whilst trying to escape %s.");
+    }
+
+    private void add(MekanismDamageSource damageSource, String value, String valueEscaping) {
+        add(damageSource, value);
+        add(damageSource.getTranslationKey() + ".player", valueEscaping);
     }
 
     private void addSubtitles() {
@@ -1246,6 +1257,12 @@ public class MekanismLangProvider extends BaseLanguageProvider {
         add("description.mekanism.fluorite_ore", "A mineral found relatively deep under the world's surface. The crystals can be processed into Hydrofluoric Acid, an essential chemical for Uranium processing.");
         add("description.mekanism.uranium_ore", "A common, heavy metal, which can yield massive amounts of energy when properly processed. In its naturally-occurring form, it is not radioactive enough to cause harm.");
         add("description.mekanism.lead_ore", "A somewhat rare metal that is excellent at resisting radioactive particles, spawning slightly less frequently than iron.");
+    }
+
+    private void addOre(OreType type, String description) {
+        BlockRegistryObject<BlockOre, ?> oreRO = MekanismBlocks.ORES.get(type);
+        add(oreRO, formatAndCapitalize(type.getResource().getRegistrySuffix()) + " Ore");
+        add(oreRO.getBlock().getDescription().getTranslationKey(), description);
     }
 
     private void addTiered(IItemProvider basic, IItemProvider advanced, IItemProvider elite, IItemProvider ultimate, String name) {

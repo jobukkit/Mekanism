@@ -1,7 +1,5 @@
 package mekanism.common.content.evaporation;
 
-import java.util.EnumSet;
-import java.util.Set;
 import mekanism.common.MekanismLang;
 import mekanism.common.content.blocktype.BlockTypeTile;
 import mekanism.common.lib.math.voxel.VoxelCuboid;
@@ -18,6 +16,9 @@ import mekanism.common.tile.multiblock.TileEntityThermalEvaporationController;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.EnumSet;
+import java.util.Set;
 
 public class EvaporationValidator extends CuboidStructureValidator<EvaporationMultiblockData> {
 

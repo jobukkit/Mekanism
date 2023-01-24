@@ -1,6 +1,5 @@
 package mekanism.common.tile.multiblock;
 
-import javax.annotation.Nonnull;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.common.block.attribute.Attribute;
 import mekanism.common.capabilities.energy.MachineEnergyContainer;
@@ -9,6 +8,8 @@ import mekanism.common.capabilities.holder.energy.IEnergyContainerHolder;
 import mekanism.common.integration.energy.EnergyCompatUtils;
 import mekanism.common.tier.InductionCellTier;
 import mekanism.common.tile.base.TileEntityMekanism;
+
+import javax.annotation.Nonnull;
 
 public class TileEntityInductionCell extends TileEntityMekanism {
 

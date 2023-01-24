@@ -1,7 +1,5 @@
 package mekanism.common.tile.transmitter;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.api.tier.AlloyTier;
 import mekanism.api.tier.BaseTier;
@@ -13,6 +11,9 @@ import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.upgrade.transmitter.LogisticalTransporterUpgradeData;
 import mekanism.common.upgrade.transmitter.TransmitterUpgradeData;
 import net.minecraft.block.BlockState;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class TileEntityLogisticalTransporter extends TileEntityLogisticalTransporterBase {
 

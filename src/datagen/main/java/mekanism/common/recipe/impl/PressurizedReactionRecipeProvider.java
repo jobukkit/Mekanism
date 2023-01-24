@@ -1,6 +1,5 @@
 package mekanism.common.recipe.impl;
 
-import java.util.function.Consumer;
 import mekanism.api.datagen.recipe.builder.PressurizedReactionRecipeBuilder;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.recipes.inputs.FluidStackIngredient;
@@ -15,6 +14,8 @@ import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraftforge.common.Tags;
+
+import java.util.function.Consumer;
 
 class PressurizedReactionRecipeProvider implements ISubRecipeProvider {
 

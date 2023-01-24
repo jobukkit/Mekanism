@@ -1,10 +1,11 @@
 package mekanism.common.registration.impl;
 
-import javax.annotation.Nonnull;
 import mekanism.common.registration.WrappedRegistryObject;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraftforge.fml.RegistryObject;
+
+import javax.annotation.Nonnull;
 
 public class ContainerTypeRegistryObject<CONTAINER extends Container> extends WrappedRegistryObject<ContainerType<CONTAINER>> {
 

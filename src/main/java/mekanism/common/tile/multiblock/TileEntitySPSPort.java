@@ -1,6 +1,5 @@
 package mekanism.common.tile.multiblock;
 
-import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
@@ -20,7 +19,8 @@ import mekanism.common.util.text.BooleanStateDisplay.InputOutput;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Util;
+
+import javax.annotation.Nonnull;
 
 public class TileEntitySPSPort extends TileEntitySPSCasing {
 

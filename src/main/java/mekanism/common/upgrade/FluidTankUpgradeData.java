@@ -1,12 +1,13 @@
 package mekanism.common.upgrade;
 
-import java.util.List;
 import mekanism.common.inventory.slot.FluidInventorySlot;
 import mekanism.common.inventory.slot.OutputInventorySlot;
 import mekanism.common.tile.component.ITileComponent;
 import mekanism.common.tile.interfaces.IFluidContainerManager.ContainerEditMode;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fluids.FluidStack;
+
+import java.util.List;
 
 public class FluidTankUpgradeData implements IUpgradeData {
 

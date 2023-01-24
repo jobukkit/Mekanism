@@ -1,7 +1,8 @@
 package mekanism.client.render.data;
 
-import javax.annotation.Nonnull;
 import mekanism.api.chemical.infuse.InfusionStack;
+
+import javax.annotation.Nonnull;
 
 public class InfusionRenderData extends ChemicalRenderData<InfusionStack> {
 

@@ -1,8 +1,6 @@
 package mekanism.common.content.sps;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import java.util.List;
-import java.util.Map;
 import mekanism.api.Action;
 import mekanism.api.NBTConstants;
 import mekanism.api.chemical.attribute.ChemicalAttributeValidator;
@@ -29,6 +27,9 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
+
+import java.util.List;
+import java.util.Map;
 
 public class SPSMultiblockData extends MultiblockData implements IValveHandler {
 

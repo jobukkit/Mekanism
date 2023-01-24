@@ -1,9 +1,5 @@
 package mekanism.common.tile.laser;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.api.NBTConstants;
 import mekanism.api.inventory.AutomationType;
@@ -51,6 +47,11 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.Constants.WorldEvents;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
+
+import javax.annotation.Nonnull;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
 //TODO - V11: Make the laser "shrink" the further distance it goes, If above a certain energy level and in water makes it make a bubble stream
 public abstract class TileEntityBasicLaser extends TileEntityMekanism {

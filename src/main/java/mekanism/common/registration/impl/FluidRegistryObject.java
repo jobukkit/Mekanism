@@ -1,8 +1,5 @@
 package mekanism.common.registration.impl;
 
-import java.util.Objects;
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.api.providers.IFluidProvider;
 import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.fluid.Fluid;
@@ -10,6 +7,10 @@ import net.minecraft.item.BucketItem;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Objects;
 
 @ParametersAreNonnullByDefault
 public class FluidRegistryObject<STILL extends Fluid, FLOWING extends Fluid, BLOCK extends FlowingFluidBlock, BUCKET extends BucketItem> implements IFluidProvider {

@@ -1,13 +1,14 @@
 package mekanism.common.capabilities.holder.fluid;
 
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.common.capabilities.holder.ProxiedHolder;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class ProxiedFluidTankHolder extends ProxiedHolder implements IFluidTankHolder {
 

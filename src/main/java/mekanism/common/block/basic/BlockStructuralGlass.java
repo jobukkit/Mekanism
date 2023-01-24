@@ -1,6 +1,5 @@
 package mekanism.common.block.basic;
 
-import javax.annotation.Nonnull;
 import mekanism.common.block.prefab.BlockTileGlass;
 import mekanism.common.content.blocktype.BlockTypeTile;
 import mekanism.common.tile.prefab.TileEntityStructuralMultiblock;
@@ -16,6 +15,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
 
 public class BlockStructuralGlass<TILE extends TileEntityStructuralMultiblock> extends BlockTileGlass<TILE, BlockTypeTile<TILE>> {
 

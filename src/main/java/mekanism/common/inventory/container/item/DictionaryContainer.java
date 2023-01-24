@@ -1,6 +1,5 @@
 package mekanism.common.inventory.container.item;
 
-import javax.annotation.Nonnull;
 import mekanism.common.item.ItemDictionary;
 import mekanism.common.registries.MekanismContainerTypes;
 import net.minecraft.entity.player.PlayerEntity;
@@ -9,6 +8,8 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.Hand;
+
+import javax.annotation.Nonnull;
 
 public class DictionaryContainer extends MekanismItemContainer {
 

@@ -1,7 +1,5 @@
 package mekanism.common.capabilities.proxy;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
 import mekanism.api.annotations.FieldsAreNonnullByDefault;
@@ -10,6 +8,9 @@ import mekanism.common.capabilities.holder.IHolder;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraftforge.items.IItemHandlerModifiable;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault

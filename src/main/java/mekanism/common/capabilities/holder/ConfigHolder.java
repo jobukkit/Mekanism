@@ -1,13 +1,14 @@
 package mekanism.common.capabilities.holder;
 
-import java.util.function.Supplier;
-import javax.annotation.Nullable;
 import mekanism.api.RelativeSide;
 import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.tile.component.TileComponentConfig;
 import mekanism.common.tile.component.config.ConfigInfo;
 import mekanism.common.tile.component.config.slot.ISlotInfo;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nullable;
+import java.util.function.Supplier;
 
 public abstract class ConfigHolder implements IHolder {
 

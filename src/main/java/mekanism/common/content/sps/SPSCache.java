@@ -1,11 +1,12 @@
 package mekanism.common.content.sps;
 
-import java.util.List;
 import mekanism.api.NBTConstants;
 import mekanism.common.lib.multiblock.MultiblockCache;
 import mekanism.common.util.NBTUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+
+import java.util.List;
 
 public class SPSCache extends MultiblockCache<SPSMultiblockData> {
 

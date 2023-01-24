@@ -1,8 +1,6 @@
 package mekanism.common.tile;
 
 import com.mojang.authlib.GameProfile;
-import java.util.UUID;
-import javax.annotation.Nonnull;
 import mekanism.api.NBTConstants;
 import mekanism.common.Mekanism;
 import mekanism.common.capabilities.holder.slot.IInventorySlotHolder;
@@ -23,6 +21,9 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import net.minecraftforge.items.CapabilityItemHandler;
+
+import javax.annotation.Nonnull;
+import java.util.UUID;
 
 public class TileEntitySecurityDesk extends TileEntityMekanism implements IBoundingBlock {
 

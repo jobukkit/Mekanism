@@ -1,6 +1,5 @@
 package mekanism.common.network;
 
-import java.util.function.Supplier;
 import mekanism.common.Mekanism;
 import mekanism.common.content.qio.QIOFrequency;
 import mekanism.common.item.ItemPortableQIODashboard;
@@ -14,6 +13,8 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
+
+import java.util.function.Supplier;
 
 public class PacketQIOSetColor {
 

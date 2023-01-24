@@ -1,6 +1,5 @@
 package mekanism.common.item.block.machine;
 
-import javax.annotation.Nonnull;
 import mekanism.common.block.prefab.BlockTile;
 import mekanism.common.content.blocktype.Machine;
 import mekanism.common.item.interfaces.IItemSustainedInventory;
@@ -11,6 +10,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
 
 public class ItemBlockDigitalMiner extends ItemBlockMachine implements IItemSustainedInventory, ISecurityItem {
 

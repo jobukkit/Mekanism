@@ -1,7 +1,5 @@
 package mekanism.common.block.attribute;
 
-import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.api.IIncrementalEnum;
 import mekanism.api.math.MathUtils;
 import mekanism.api.text.EnumColor;
@@ -14,6 +12,9 @@ import net.minecraft.state.EnumProperty;
 import net.minecraft.state.Property;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.text.ITextComponent;
+
+import javax.annotation.Nonnull;
+import java.util.List;
 
 public class AttributeStateBoilerValveMode extends AttributeState {
 

@@ -1,6 +1,5 @@
 package mekanism.common.tile.machine;
 
-import javax.annotation.Nonnull;
 import mekanism.api.NBTConstants;
 import mekanism.api.heat.HeatAPI.HeatTransfer;
 import mekanism.common.capabilities.heat.BasicHeatCapacitor;
@@ -15,9 +14,10 @@ import mekanism.common.inventory.container.sync.SyncableInt;
 import mekanism.common.inventory.slot.FuelInventorySlot;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tile.base.TileEntityMekanism;
-import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.ForgeHooks;
+
+import javax.annotation.Nonnull;
 
 public class TileEntityFuelwoodHeater extends TileEntityMekanism {
 

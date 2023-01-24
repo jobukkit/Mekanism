@@ -1,8 +1,5 @@
 package mekanism.common.inventory.container.sync.chemical;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import mekanism.api.annotations.NonNull;
 import mekanism.api.chemical.pigment.IEmptyPigmentProvider;
 import mekanism.api.chemical.pigment.IPigmentTank;
@@ -11,6 +8,10 @@ import mekanism.api.chemical.pigment.PigmentStack;
 import mekanism.common.network.container.property.LongPropertyData;
 import mekanism.common.network.container.property.PropertyData;
 import mekanism.common.network.container.property.chemical.PigmentStackPropertyData;
+
+import javax.annotation.Nonnull;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Version of {@link net.minecraft.util.IntReferenceHolder} for handling pigment stacks

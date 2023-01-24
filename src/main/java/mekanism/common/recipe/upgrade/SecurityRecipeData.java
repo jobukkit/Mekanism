@@ -1,12 +1,13 @@
 package mekanism.common.recipe.upgrade;
 
-import java.util.UUID;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.api.annotations.FieldsAreNonnullByDefault;
 import mekanism.common.lib.security.ISecurityItem;
 import mekanism.common.lib.security.ISecurityTile.SecurityMode;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.UUID;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault

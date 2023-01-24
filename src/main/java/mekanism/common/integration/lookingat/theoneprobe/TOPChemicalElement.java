@@ -1,8 +1,5 @@
 package mekanism.common.integration.lookingat.theoneprobe;
 
-import javax.annotation.Nonnull;
-
-import io.netty.buffer.ByteBuf;
 import mcjty.theoneprobe.api.IElementNew;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.ChemicalUtils;
@@ -12,6 +9,8 @@ import mekanism.api.chemical.pigment.PigmentStack;
 import mekanism.api.chemical.slurry.SlurryStack;
 import mekanism.common.integration.lookingat.ChemicalElement;
 import net.minecraft.network.PacketBuffer;
+
+import javax.annotation.Nonnull;
 
 public abstract class TOPChemicalElement extends ChemicalElement implements IElementNew {
 

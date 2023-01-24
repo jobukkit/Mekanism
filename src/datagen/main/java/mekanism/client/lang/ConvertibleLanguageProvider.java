@@ -1,9 +1,10 @@
 package mekanism.client.lang;
 
-import java.util.List;
 import mekanism.client.lang.FormatSplitter.Component;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.common.data.LanguageProvider;
+
+import java.util.List;
 
 public abstract class ConvertibleLanguageProvider extends LanguageProvider {
 

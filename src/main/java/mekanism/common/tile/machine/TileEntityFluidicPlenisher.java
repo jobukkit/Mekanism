@@ -2,14 +2,7 @@ package mekanism.common.tile.machine;
 
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import java.util.EnumSet;
-import java.util.Set;
-import javax.annotation.Nonnull;
-import mekanism.api.Action;
-import mekanism.api.IConfigurable;
-import mekanism.api.NBTConstants;
-import mekanism.api.RelativeSide;
-import mekanism.api.Upgrade;
+import mekanism.api.*;
 import mekanism.api.inventory.AutomationType;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.text.EnumColor;
@@ -37,18 +30,20 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.ILiquidContainer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.IFluidState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.FluidStack;
+
+import javax.annotation.Nonnull;
+import java.util.EnumSet;
+import java.util.Set;
 
 public class TileEntityFluidicPlenisher extends TileEntityMekanism implements IConfigurable {
 

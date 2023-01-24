@@ -1,6 +1,5 @@
 package mekanism.client.gui.element.gauge;
 
-import javax.annotation.Nullable;
 import mekanism.client.gui.GuiMekanismTile;
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.GuiTexturedElement;
@@ -12,6 +11,8 @@ import mekanism.common.network.PacketDropperUse.DropperAction;
 import mekanism.common.network.PacketDropperUse.TankType;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nullable;
 
 public abstract class GuiTankGauge<T, TANK> extends GuiGauge<T> implements IJEIIngredientHelper {
 

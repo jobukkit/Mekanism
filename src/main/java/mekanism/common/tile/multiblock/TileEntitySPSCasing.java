@@ -1,8 +1,5 @@
 package mekanism.common.tile.multiblock;
 
-import java.util.LinkedList;
-import java.util.Queue;
-import javax.annotation.Nonnull;
 import mekanism.api.NBTConstants;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.common.Mekanism;
@@ -12,8 +9,11 @@ import mekanism.common.particle.SPSOrbitEffect;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tile.prefab.TileEntityMultiblock;
 import mekanism.common.util.NBTUtils;
-import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
+
+import javax.annotation.Nonnull;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class TileEntitySPSCasing extends TileEntityMultiblock<SPSMultiblockData> {
 

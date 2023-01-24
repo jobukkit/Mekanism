@@ -1,12 +1,13 @@
 package mekanism.common.tile.component.config;
 
-import javax.annotation.Nonnull;
 import mekanism.api.IIncrementalEnum;
 import mekanism.api.math.MathUtils;
 import mekanism.api.text.EnumColor;
 import mekanism.api.text.IHasTranslationKey;
 import mekanism.api.text.ILangEntry;
 import mekanism.common.MekanismLang;
+
+import javax.annotation.Nonnull;
 
 //TODO: Re-evaluate how we do colors, given for say energy as the transmission type it makes more sense to have input be green?
 // Maybe we should make some way to specify a color override?

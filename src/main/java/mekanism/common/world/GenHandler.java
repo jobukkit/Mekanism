@@ -1,10 +1,6 @@
 package mekanism.common.world;
 
 import com.google.common.collect.Lists;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Random;
-import javax.annotation.Nullable;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.config.WorldConfig.OreConfig;
@@ -30,6 +26,11 @@ import net.minecraft.world.gen.placement.FrequencyConfig;
 import net.minecraft.world.gen.placement.Placement;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import javax.annotation.Nullable;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Random;
 
 public class GenHandler {
 

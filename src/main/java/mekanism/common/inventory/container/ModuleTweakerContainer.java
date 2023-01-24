@@ -1,6 +1,5 @@
 package mekanism.common.inventory.container;
 
-import javax.annotation.Nonnull;
 import mekanism.common.content.gear.IModuleContainerItem;
 import mekanism.common.inventory.container.slot.ArmorSlot;
 import mekanism.common.inventory.container.slot.HotBarSlot;
@@ -12,6 +11,8 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
+
+import javax.annotation.Nonnull;
 
 public class ModuleTweakerContainer extends MekanismContainer {
 

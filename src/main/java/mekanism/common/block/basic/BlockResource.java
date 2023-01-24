@@ -1,6 +1,5 @@
 package mekanism.common.block.basic;
 
-import javax.annotation.Nonnull;
 import mekanism.common.block.BlockMekanism;
 import mekanism.common.resource.BlockResourceInfo;
 import net.minecraft.block.Block;
@@ -10,6 +9,8 @@ import net.minecraft.block.material.PushReaction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldReader;
 import net.minecraftforge.common.ToolType;
+
+import javax.annotation.Nonnull;
 
 public class BlockResource extends BlockMekanism {
 

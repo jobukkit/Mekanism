@@ -3,9 +3,6 @@ package mekanism.common.content.miner;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import java.util.BitSet;
-import java.util.List;
-import java.util.Map;
 import mekanism.api.math.MathUtils;
 import mekanism.api.text.IHasTextComponent;
 import mekanism.api.text.ILangEntry;
@@ -22,6 +19,10 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.Region;
 import net.minecraftforge.fluids.IFluidBlock;
+
+import java.util.BitSet;
+import java.util.List;
+import java.util.Map;
 
 public class ThreadMinerSearch extends Thread {
 

@@ -1,15 +1,6 @@
 package mekanism.common.content.network;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 import mekanism.api.Coord4D;
 import mekanism.api.RelativeSide;
 import mekanism.api.text.EnumColor;
@@ -30,6 +21,9 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 public class InventoryNetwork extends DynamicNetwork<IItemHandler, InventoryNetwork, LogisticalTransporterBase> {
 

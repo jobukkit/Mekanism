@@ -1,10 +1,11 @@
 package mekanism.common.registration.impl;
 
-import java.util.function.Supplier;
 import mekanism.common.registration.WrappedDeferredRegister;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import java.util.function.Supplier;
 
 public class FeatureDeferredRegister extends WrappedDeferredRegister<Feature<?>> {
 

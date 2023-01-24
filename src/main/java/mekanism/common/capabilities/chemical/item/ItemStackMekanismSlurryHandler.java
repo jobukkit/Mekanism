@@ -1,6 +1,5 @@
 package mekanism.common.capabilities.chemical.item;
 
-import javax.annotation.Nonnull;
 import mekanism.api.NBTConstants;
 import mekanism.api.chemical.slurry.ISlurryHandler.IMekanismSlurryHandler;
 import mekanism.api.chemical.slurry.ISlurryTank;
@@ -9,6 +8,8 @@ import mekanism.api.chemical.slurry.SlurryStack;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.CapabilityCache;
 import mekanism.common.capabilities.resolver.basic.BasicCapabilityResolver;
+
+import javax.annotation.Nonnull;
 
 /**
  * Helper class for implementing slurry handlers for items

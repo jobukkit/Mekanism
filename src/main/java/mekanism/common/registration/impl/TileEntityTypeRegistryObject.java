@@ -1,10 +1,11 @@
 package mekanism.common.registration.impl;
 
-import javax.annotation.Nonnull;
 import mekanism.common.registration.WrappedRegistryObject;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.fml.RegistryObject;
+
+import javax.annotation.Nonnull;
 
 public class TileEntityTypeRegistryObject<TILE extends TileEntity> extends WrappedRegistryObject<TileEntityType<TILE>> {
 

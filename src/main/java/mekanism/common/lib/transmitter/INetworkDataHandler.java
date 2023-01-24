@@ -1,7 +1,8 @@
 package mekanism.common.lib.transmitter;
 
-import javax.annotation.Nullable;
 import net.minecraft.util.text.ITextComponent;
+
+import javax.annotation.Nullable;
 
 public interface INetworkDataHandler {
 

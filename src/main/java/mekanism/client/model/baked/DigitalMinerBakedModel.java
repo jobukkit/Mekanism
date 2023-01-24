@@ -1,6 +1,5 @@
 package mekanism.client.model.baked;
 
-import java.util.List;
 import mekanism.client.render.lib.QuadTransformation;
 import mekanism.client.render.lib.QuadTransformation.TextureFilteredTransformation;
 import mekanism.client.render.lib.QuadUtils;
@@ -10,6 +9,8 @@ import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraftforge.client.event.TextureStitchEvent;
+
+import java.util.List;
 
 public class DigitalMinerBakedModel extends ExtensionBakedModel<Void> {
 

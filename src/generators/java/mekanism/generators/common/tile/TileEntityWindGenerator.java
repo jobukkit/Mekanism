@@ -1,6 +1,5 @@
 package mekanism.generators.common.tile;
 
-import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.api.inventory.AutomationType;
 import mekanism.api.math.FloatingLong;
@@ -10,14 +9,18 @@ import mekanism.common.inventory.container.MekanismContainer;
 import mekanism.common.inventory.container.sync.SyncableBoolean;
 import mekanism.common.inventory.container.sync.SyncableFloatingLong;
 import mekanism.common.inventory.slot.EnergyInventorySlot;
+import mekanism.common.tags.MekanismTags;
 import mekanism.common.tile.interfaces.IBoundingBlock;
 import mekanism.common.util.MekanismUtils;
+import mekanism.generators.common.config.GeneratorsConfig;
 import mekanism.generators.common.config.MekanismGeneratorsConfig;
 import mekanism.generators.common.registries.GeneratorsBlocks;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+
+import javax.annotation.Nonnull;
 
 public class TileEntityWindGenerator extends TileEntityGenerator implements IBoundingBlock {
 
@@ -81,13 +84,23 @@ public class TileEntityWindGenerator extends TileEntityGenerator implements IBou
         }
     }
 
+    private boolean isOutdoors(BlockPos pos, int maxY) {
+        if (world == null || !world.canSeeSky(pos))
+            return false;
+        for (BlockPos wind = new BlockPos(pos.getX(), maxY, pos.getZ()); wind.getY() > pos.getY(); wind = wind.down()) {
+            if (!world.isAirBlock(wind))
+                return false;
+        }
+        return true;
+    }
+
     /**
      * Determines the current output multiplier, taking sky visibility and height into account.
      **/
     private FloatingLong getMultiplier() {
-        if (world != null && world.canBlockSeeSky(getPos().up(4))) {
-            int minY = MekanismGeneratorsConfig.generators.windGenerationMinY.get();
-            int maxY = MekanismGeneratorsConfig.generators.windGenerationMaxY.get();
+        int minY = MekanismGeneratorsConfig.generators.windGenerationMinY.get();
+        int maxY = MekanismGeneratorsConfig.generators.windGenerationMaxY.get();
+        if (isOutdoors(getPos().up(4), maxY)) {
             float clampedY = Math.min(maxY, Math.max(minY, getPos().getY() + 4));
             FloatingLong minG = MekanismGeneratorsConfig.generators.windGenerationMin.get();
             FloatingLong maxG = MekanismGeneratorsConfig.generators.windGenerationMax.get();

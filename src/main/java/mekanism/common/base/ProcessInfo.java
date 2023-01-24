@@ -1,8 +1,9 @@
 package mekanism.common.base;
 
+import mekanism.api.inventory.IInventorySlot;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import mekanism.api.inventory.IInventorySlot;
 
 public class ProcessInfo {
 

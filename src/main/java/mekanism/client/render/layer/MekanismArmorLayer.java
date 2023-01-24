@@ -1,7 +1,6 @@
 package mekanism.client.render.layer;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.client.render.armor.CustomArmor;
 import mekanism.common.item.interfaces.ISpecialGear;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -14,6 +13,8 @@ import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 public class MekanismArmorLayer<T extends LivingEntity, M extends BipedModel<T>, A extends BipedModel<T>> extends BipedArmorLayer<T, M, A> {

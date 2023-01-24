@@ -1,8 +1,5 @@
 package mekanism.client.jei.machine;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.Collections;
-import java.util.List;
 import mekanism.api.recipes.ItemStackToEnergyRecipe;
 import mekanism.client.gui.element.gauge.GaugeType;
 import mekanism.client.gui.element.gauge.GuiEnergyGauge;
@@ -21,7 +18,9 @@ import mezz.jei.api.gui.ingredient.IGuiItemStackGroup;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+
+import java.util.Collections;
+import java.util.List;
 
 public class ItemStackToEnergyRecipeCategory extends BaseRecipeCategory<ItemStackToEnergyRecipe> {
 

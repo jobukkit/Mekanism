@@ -1,9 +1,5 @@
 package mekanism.common.inventory.slot;
 
-import java.util.Objects;
-import java.util.Set;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.IContentsListener;
 import mekanism.api.Upgrade;
@@ -11,6 +7,11 @@ import mekanism.api.annotations.FieldsAreNonnullByDefault;
 import mekanism.common.inventory.container.slot.SlotOverlay;
 import mekanism.common.item.interfaces.IUpgradeItem;
 import net.minecraft.item.Item;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Objects;
+import java.util.Set;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault

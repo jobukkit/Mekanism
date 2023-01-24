@@ -1,8 +1,9 @@
 package mekanism.common.lib.frequency;
 
-import java.util.List;
 import mekanism.common.lib.frequency.Frequency.FrequencyIdentity;
 import mekanism.common.lib.security.ISecurityTile;
+
+import java.util.List;
 
 public interface IFrequencyHandler extends ISecurityTile {
 

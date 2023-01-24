@@ -4,11 +4,6 @@ import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import javax.annotation.Nonnull;
 import mekanism.api.text.ILangEntry;
 import mekanism.common.registration.impl.SoundEventRegistryObject;
 import net.minecraft.data.DataGenerator;
@@ -17,6 +12,12 @@ import net.minecraft.data.IDataProvider;
 import net.minecraft.resources.ResourcePackType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.generators.ExistingFileHelper;
+
+import javax.annotation.Nonnull;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public abstract class BaseSoundProvider implements IDataProvider {
 

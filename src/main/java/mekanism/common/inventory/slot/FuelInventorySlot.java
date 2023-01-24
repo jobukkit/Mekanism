@@ -1,10 +1,5 @@
 package mekanism.common.inventory.slot;
 
-import java.util.Objects;
-import java.util.function.Predicate;
-import java.util.function.ToIntFunction;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
 import mekanism.api.IContentsListener;
@@ -13,6 +8,12 @@ import mekanism.api.inventory.AutomationType;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.ForgeHooks;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.function.ToIntFunction;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

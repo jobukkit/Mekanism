@@ -1,7 +1,5 @@
 package mekanism.common.tile.factory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.Upgrade;
 import mekanism.api.annotations.NonNull;
 import mekanism.api.chemical.ChemicalTankBuilder;
@@ -31,6 +29,9 @@ import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.StatUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.ItemHandlerHelper;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 //Compressing, injecting, purifying
 public class TileEntityItemStackGasToItemStackFactory extends TileEntityItemToItemFactory<ItemStackGasToItemStackRecipe> implements IHasDumpButton {

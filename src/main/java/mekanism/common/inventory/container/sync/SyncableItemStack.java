@@ -1,13 +1,14 @@
 package mekanism.common.inventory.container.sync;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import mekanism.api.annotations.NonNull;
 import mekanism.common.network.container.property.IntPropertyData;
 import mekanism.common.network.container.property.ItemStackPropertyData;
 import mekanism.common.network.container.property.PropertyData;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nonnull;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Version of {@link net.minecraft.util.IntReferenceHolder} for handling item stacks

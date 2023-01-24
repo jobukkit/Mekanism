@@ -1,11 +1,5 @@
 package mekanism.common.inventory.slot;
 
-import java.util.Objects;
-import java.util.UUID;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.IContentsListener;
 import mekanism.api.annotations.NonNull;
@@ -14,6 +8,13 @@ import mekanism.common.lib.security.ISecurityItem;
 import mekanism.common.lib.security.ISecurityTile.SecurityMode;
 import mekanism.common.lib.security.SecurityFrequency;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

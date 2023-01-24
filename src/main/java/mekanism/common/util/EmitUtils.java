@@ -1,17 +1,14 @@
 package mekanism.common.util;
 
-import java.util.Set;
-import java.util.function.BiConsumer;
 import mekanism.api.math.FloatingLong;
-import mekanism.common.lib.distribution.FloatingLongSplitInfo;
-import mekanism.common.lib.distribution.IntegerSplitInfo;
-import mekanism.common.lib.distribution.LongSplitInfo;
-import mekanism.common.lib.distribution.SplitInfo;
-import mekanism.common.lib.distribution.Target;
+import mekanism.common.lib.distribution.*;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
+import java.util.Set;
+import java.util.function.BiConsumer;
 
 public class EmitUtils {
 

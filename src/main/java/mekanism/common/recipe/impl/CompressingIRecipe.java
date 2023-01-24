@@ -1,6 +1,5 @@
 package mekanism.common.recipe.impl;
 
-import javax.annotation.Nonnull;
 import mekanism.api.recipes.ItemStackGasToItemStackRecipe;
 import mekanism.api.recipes.inputs.ItemStackIngredient;
 import mekanism.api.recipes.inputs.chemical.GasStackIngredient;
@@ -11,6 +10,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.Nonnull;
 
 public class CompressingIRecipe extends ItemStackGasToItemStackRecipe {
 

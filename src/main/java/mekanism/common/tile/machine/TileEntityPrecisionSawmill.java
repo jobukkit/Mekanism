@@ -1,9 +1,5 @@
 package mekanism.common.tile.machine;
 
-import java.util.Arrays;
-import java.util.Collections;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.annotations.NonNull;
 import mekanism.api.recipes.SawmillRecipe;
 import mekanism.api.recipes.SawmillRecipe.ChanceOutput;
@@ -30,6 +26,11 @@ import mekanism.common.tile.prefab.TileEntityProgressMachine;
 import mekanism.common.upgrade.SawmillUpgradeData;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.Collections;
 
 public class TileEntityPrecisionSawmill extends TileEntityProgressMachine<SawmillRecipe> {
 

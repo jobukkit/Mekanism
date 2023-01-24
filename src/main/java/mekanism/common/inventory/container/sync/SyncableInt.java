@@ -1,8 +1,9 @@
 package mekanism.common.inventory.container.sync;
 
+import mekanism.common.network.container.property.IntPropertyData;
+
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
-import mekanism.common.network.container.property.IntPropertyData;
 
 /**
  * Slightly modified version of {@link net.minecraft.util.IntReferenceHolder}

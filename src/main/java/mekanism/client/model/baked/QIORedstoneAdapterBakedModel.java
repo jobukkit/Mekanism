@@ -1,6 +1,5 @@
 package mekanism.client.model.baked;
 
-import java.util.List;
 import mekanism.client.render.MekanismRenderer;
 import mekanism.client.render.lib.QuadTransformation;
 import mekanism.client.render.lib.QuadTransformation.TextureFilteredTransformation;
@@ -9,6 +8,8 @@ import mekanism.common.tile.qio.TileEntityQIORedstoneAdapter;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraftforge.client.model.data.IModelData;
+
+import java.util.List;
 
 public class QIORedstoneAdapterBakedModel extends ExtensionBakedModel<Boolean> {
 

@@ -1,9 +1,10 @@
 package mekanism.common;
 
-import javax.annotation.Nonnull;
 import mekanism.common.registries.MekanismItems;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nonnull;
 
 public class CreativeTabMekanism extends ItemGroup {
 

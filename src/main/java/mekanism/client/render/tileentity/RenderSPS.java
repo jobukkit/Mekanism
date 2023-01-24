@@ -2,13 +2,6 @@ package mekanism.client.render.tileentity;
 
 import com.google.common.base.Objects;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
-import javax.annotation.ParametersAreNonnullByDefault;
-
-import com.mojang.blaze3d.systems.RenderSystem;
 import mekanism.api.backport.Vector3d;
 import mekanism.client.render.lib.effect.BillboardingEffectRenderer;
 import mekanism.client.render.lib.effect.BoltRenderer;
@@ -31,6 +24,12 @@ import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.util.math.BlockPos;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 
 @ParametersAreNonnullByDefault
 public class RenderSPS extends MekanismTileEntityRenderer<TileEntitySPSCasing> {

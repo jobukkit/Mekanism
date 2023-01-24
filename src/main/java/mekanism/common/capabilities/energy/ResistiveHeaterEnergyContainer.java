@@ -1,7 +1,5 @@
 package mekanism.common.capabilities.energy;
 
-import java.util.function.Predicate;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.NBTConstants;
 import mekanism.api.annotations.FieldsAreNonnullByDefault;
@@ -12,6 +10,9 @@ import mekanism.common.block.attribute.AttributeEnergy;
 import mekanism.common.tile.machine.TileEntityResistiveHeater;
 import mekanism.common.util.NBTUtils;
 import net.minecraft.nbt.CompoundNBT;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.Predicate;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault

@@ -2,13 +2,14 @@ package mekanism.client.render.obj;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
-import javax.annotation.Nonnull;
 import mekanism.api.JsonConstants;
 import net.minecraft.resources.IResourceManager;
 import net.minecraftforge.client.model.IModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.client.model.obj.OBJModel;
+
+import javax.annotation.Nonnull;
 
 public class TransmitterLoader implements IModelLoader<TransmitterModel> {
 

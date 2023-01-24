@@ -1,14 +1,15 @@
 package mekanism.common.content.transporter;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 import mekanism.common.content.network.InventoryNetwork;
 import mekanism.common.content.network.transmitter.LogisticalTransporterBase;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 public class PathfinderCache {
 

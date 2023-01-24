@@ -1,8 +1,5 @@
 package mekanism.common.inventory.container.tile;
 
-import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.inventory.IInventorySlot;
 import mekanism.common.inventory.container.IEmptyContainer;
 import mekanism.common.inventory.container.MekanismContainer;
@@ -18,6 +15,10 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
 
 public class MekanismTileContainer<TILE extends TileEntityMekanism> extends MekanismContainer {
 

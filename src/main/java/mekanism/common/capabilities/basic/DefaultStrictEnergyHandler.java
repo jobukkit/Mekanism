@@ -1,12 +1,13 @@
 package mekanism.common.capabilities.basic;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
 import mekanism.api.energy.IStrictEnergyHandler;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.capabilities.basic.DefaultStorageHelper.DefaultStorage;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

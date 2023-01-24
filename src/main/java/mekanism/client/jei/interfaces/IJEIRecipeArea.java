@@ -1,12 +1,13 @@
 package mekanism.client.jei.interfaces;
 
-import javax.annotation.Nullable;
 import mekanism.client.gui.element.GuiElement;
 import mekanism.common.Mekanism;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mezz.jei.api.constants.VanillaRecipeCategoryUid;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.Nullable;
 
 public interface IJEIRecipeArea<ELEMENT extends GuiElement> extends IGuiEventListener {
 

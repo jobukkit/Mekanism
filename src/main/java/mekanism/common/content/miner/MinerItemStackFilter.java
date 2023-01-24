@@ -1,12 +1,13 @@
 package mekanism.common.content.miner;
 
-import javax.annotation.Nonnull;
 import mekanism.common.content.filter.FilterType;
 import mekanism.common.content.filter.IItemStackFilter;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
+
+import javax.annotation.Nonnull;
 
 public class MinerItemStackFilter extends MinerFilter<MinerItemStackFilter> implements IItemStackFilter<MinerItemStackFilter> {
 

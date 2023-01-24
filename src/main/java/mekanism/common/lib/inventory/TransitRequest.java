@@ -1,10 +1,5 @@
 package mekanism.common.lib.inventory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import javax.annotation.Nonnull;
 import mekanism.common.Mekanism;
 import mekanism.common.content.transporter.TransporterManager;
 import mekanism.common.tile.TileEntityLogisticalSorter;
@@ -17,6 +12,12 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 public abstract class TransitRequest {
 

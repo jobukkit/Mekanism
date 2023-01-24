@@ -1,6 +1,5 @@
 package mekanism.common.tile.qio;
 
-import javax.annotation.Nonnull;
 import mekanism.api.NBTConstants;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.api.text.EnumColor;
@@ -8,8 +7,9 @@ import mekanism.common.content.qio.IQIOFrequencyHolder;
 import mekanism.common.lib.frequency.FrequencyType;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.util.MekanismUtils;
-import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
+
+import javax.annotation.Nonnull;
 
 public class TileEntityQIOComponent extends TileEntityMekanism implements IQIOFrequencyHolder {
 

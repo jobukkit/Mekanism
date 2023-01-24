@@ -1,7 +1,5 @@
 package mekanism.common.tile.prefab;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.Upgrade;
 import mekanism.api.annotations.NonNull;
 import mekanism.api.chemical.ChemicalTankBuilder;
@@ -36,6 +34,9 @@ import mekanism.common.upgrade.AdvancedMachineUpgradeData;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.StatUtils;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public abstract class TileEntityAdvancedElectricMachine extends TileEntityProgressMachine<ItemStackGasToItemStackRecipe> {
 

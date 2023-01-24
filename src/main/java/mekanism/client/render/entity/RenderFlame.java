@@ -2,7 +2,6 @@ package mekanism.client.render.entity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import javax.annotation.Nonnull;
 import mekanism.client.render.MekanismRenderType;
 import mekanism.common.entity.EntityFlame;
 import mekanism.common.util.MekanismUtils;
@@ -14,6 +13,8 @@ import net.minecraft.client.renderer.culling.ClippingHelperImpl;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.Nonnull;
 
 public class RenderFlame extends EntityRenderer<EntityFlame> {
 

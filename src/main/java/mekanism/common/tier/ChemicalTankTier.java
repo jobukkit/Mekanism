@@ -1,10 +1,11 @@
 package mekanism.common.tier;
 
-import java.util.Locale;
 import mekanism.api.tier.BaseTier;
 import mekanism.api.tier.ITier;
 import mekanism.common.config.value.CachedLongValue;
 import net.minecraft.util.IStringSerializable;
+
+import java.util.Locale;
 
 public enum ChemicalTankTier implements ITier, IStringSerializable {
     BASIC(BaseTier.BASIC, 64_000, 256),

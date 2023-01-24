@@ -1,6 +1,5 @@
 package mekanism.common.content.transporter;
 
-import javax.annotation.Nonnull;
 import mekanism.api.NBTConstants;
 import mekanism.common.content.filter.FilterType;
 import mekanism.common.content.filter.IItemStackFilter;
@@ -11,6 +10,8 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nonnull;
 
 public class SorterItemStackFilter extends SorterFilter<SorterItemStackFilter> implements IItemStackFilter<SorterItemStackFilter> {
 

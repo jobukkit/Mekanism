@@ -1,13 +1,14 @@
 package mekanism.common.tier;
 
-import java.util.Locale;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.tier.BaseTier;
 import mekanism.api.tier.ITier;
 import mekanism.common.config.value.CachedFloatingLongValue;
 import net.minecraft.util.IStringSerializable;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Locale;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

@@ -1,14 +1,7 @@
 package mekanism.common.content.blocktype;
 
-import java.util.function.Supplier;
 import mekanism.common.MekanismLang;
-import mekanism.common.block.attribute.AttributeEnergy;
-import mekanism.common.block.attribute.AttributeFactoryType;
-import mekanism.common.block.attribute.AttributeGui;
-import mekanism.common.block.attribute.AttributeSound;
-import mekanism.common.block.attribute.AttributeTier;
-import mekanism.common.block.attribute.AttributeUpgradeSupport;
-import mekanism.common.block.attribute.AttributeUpgradeable;
+import mekanism.common.block.attribute.*;
 import mekanism.common.content.blocktype.Machine.FactoryMachine;
 import mekanism.common.inventory.container.MekanismContainer;
 import mekanism.common.registration.impl.ContainerTypeRegistryObject;
@@ -17,6 +10,8 @@ import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tier.FactoryTier;
 import mekanism.common.tile.factory.TileEntityFactory;
 import mekanism.common.util.EnumUtils;
+
+import java.util.function.Supplier;
 
 public class Factory<TILE extends TileEntityFactory<?>> extends FactoryMachine<TILE> {
 

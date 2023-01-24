@@ -1,9 +1,5 @@
 package mekanism.client.gui.element.gauge;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Supplier;
-import javax.annotation.Nullable;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.text.TextComponentUtil;
 import mekanism.client.gui.GuiMekanismTile;
@@ -19,6 +15,11 @@ import mekanism.common.tile.interfaces.ISideConfiguration;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.fluids.FluidStack;
+
+import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Supplier;
 
 public class GuiFluidGauge extends GuiTankGauge<FluidStack, IExtendedFluidTank> {
 

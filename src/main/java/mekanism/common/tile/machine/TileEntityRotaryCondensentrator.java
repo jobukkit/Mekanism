@@ -1,9 +1,5 @@
 package mekanism.common.tile.machine;
 
-import java.util.Arrays;
-import java.util.function.BooleanSupplier;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.NBTConstants;
 import mekanism.api.RelativeSide;
 import mekanism.api.Upgrade;
@@ -53,9 +49,13 @@ import mekanism.common.tile.prefab.TileEntityRecipeMachine;
 import mekanism.common.util.ChemicalUtil;
 import mekanism.common.util.FluidUtils;
 import mekanism.common.util.MekanismUtils;
-import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fluids.FluidStack;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.function.BooleanSupplier;
 
 public class TileEntityRotaryCondensentrator extends TileEntityRecipeMachine<RotaryRecipe> implements IHasMode {
 

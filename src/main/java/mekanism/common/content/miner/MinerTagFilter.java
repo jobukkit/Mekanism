@@ -1,6 +1,5 @@
 package mekanism.common.content.miner;
 
-import java.util.Set;
 import mekanism.api.NBTConstants;
 import mekanism.common.content.filter.FilterType;
 import mekanism.common.content.filter.ITagFilter;
@@ -9,6 +8,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
+
+import java.util.Set;
 
 public class MinerTagFilter extends MinerFilter<MinerTagFilter> implements ITagFilter<MinerTagFilter> {
 

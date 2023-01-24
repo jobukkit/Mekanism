@@ -1,13 +1,8 @@
 package mekanism.common.network;
 
-import java.util.function.Supplier;
 import mekanism.common.Mekanism;
-import mekanism.common.lib.frequency.Frequency;
+import mekanism.common.lib.frequency.*;
 import mekanism.common.lib.frequency.Frequency.FrequencyIdentity;
-import mekanism.common.lib.frequency.FrequencyManager;
-import mekanism.common.lib.frequency.FrequencyType;
-import mekanism.common.lib.frequency.IFrequencyHandler;
-import mekanism.common.lib.frequency.IFrequencyItem;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -17,6 +12,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
+
+import java.util.function.Supplier;
 
 public class PacketGuiSetFrequency<FREQ extends Frequency> {
 

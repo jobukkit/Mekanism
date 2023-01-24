@@ -1,7 +1,6 @@
 package mekanism.common.content.boiler;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import java.util.Set;
 import mekanism.common.MekanismLang;
 import mekanism.common.content.blocktype.BlockType;
 import mekanism.common.content.blocktype.BlockTypeTile;
@@ -17,6 +16,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.Set;
 
 public class BoilerValidator extends CuboidStructureValidator<BoilerMultiblockData> {
 

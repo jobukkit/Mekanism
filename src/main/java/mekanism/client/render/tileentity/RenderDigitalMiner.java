@@ -1,7 +1,6 @@
 package mekanism.client.render.tileentity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.client.render.MekanismRenderer;
 import mekanism.client.render.MekanismRenderer.Model3D;
 import mekanism.common.base.ProfilerConstants;
@@ -10,6 +9,8 @@ import net.minecraft.client.renderer.Atlases;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.profiler.IProfiler;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 public class RenderDigitalMiner extends MekanismTileEntityRenderer<TileEntityDigitalMiner> {

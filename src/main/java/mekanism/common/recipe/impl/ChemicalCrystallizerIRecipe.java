@@ -1,6 +1,5 @@
 package mekanism.common.recipe.impl;
 
-import javax.annotation.Nonnull;
 import mekanism.api.recipes.ChemicalCrystallizerRecipe;
 import mekanism.api.recipes.inputs.chemical.ChemicalStackIngredient;
 import mekanism.common.recipe.MekanismRecipeType;
@@ -10,6 +9,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.Nonnull;
 
 public class ChemicalCrystallizerIRecipe extends ChemicalCrystallizerRecipe {
 

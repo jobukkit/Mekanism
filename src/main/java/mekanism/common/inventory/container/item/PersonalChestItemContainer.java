@@ -1,7 +1,5 @@
 package mekanism.common.inventory.container.item;
 
-import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.api.inventory.IInventorySlot;
 import mekanism.common.inventory.InventoryPersonalChest;
 import mekanism.common.item.block.ItemBlockPersonalChest;
@@ -14,6 +12,9 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.Hand;
+
+import javax.annotation.Nonnull;
+import java.util.List;
 
 public class PersonalChestItemContainer extends MekanismItemContainer {
 

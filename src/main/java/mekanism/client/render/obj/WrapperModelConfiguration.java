@@ -1,13 +1,14 @@
 package mekanism.client.render.obj;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import net.minecraft.client.renderer.model.IModelTransform;
 import net.minecraft.client.renderer.model.IUnbakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.model.Material;
 import net.minecraftforge.client.model.IModelConfiguration;
 import net.minecraftforge.client.model.geometry.IModelGeometryPart;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class WrapperModelConfiguration implements IModelConfiguration {
 

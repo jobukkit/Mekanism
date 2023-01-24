@@ -1,7 +1,8 @@
 package mekanism.common.tile.interfaces;
 
-import javax.annotation.Nullable;
 import mekanism.common.upgrade.IUpgradeData;
+
+import javax.annotation.Nullable;
 
 public interface ITierUpgradable {
 

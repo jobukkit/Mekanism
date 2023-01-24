@@ -1,10 +1,11 @@
 package mekanism.common.capabilities.proxy;
 
-import java.util.function.BooleanSupplier;
-import javax.annotation.Nullable;
 import mekanism.api.annotations.FieldsAreNonnullByDefault;
 import mekanism.common.capabilities.holder.IHolder;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nullable;
+import java.util.function.BooleanSupplier;
 
 @FieldsAreNonnullByDefault
 public class ProxyHandler {

@@ -1,25 +1,13 @@
 package mekanism.common.network;
 
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Supplier;
 import mekanism.common.MekanismLang;
 import mekanism.common.block.attribute.Attribute;
 import mekanism.common.block.attribute.AttributeGui;
 import mekanism.common.entity.EntityRobit;
 import mekanism.common.inventory.container.ContainerProvider;
-import mekanism.common.inventory.container.entity.robit.CraftingRobitContainer;
-import mekanism.common.inventory.container.entity.robit.InventoryRobitContainer;
-import mekanism.common.inventory.container.entity.robit.MainRobitContainer;
-import mekanism.common.inventory.container.entity.robit.RepairRobitContainer;
-import mekanism.common.inventory.container.entity.robit.SmeltingRobitContainer;
+import mekanism.common.inventory.container.entity.robit.*;
 import mekanism.common.inventory.container.item.QIOFrequencySelectItemContainer;
-import mekanism.common.inventory.container.tile.DigitalMinerConfigContainer;
-import mekanism.common.inventory.container.tile.EmptyTileContainer;
-import mekanism.common.inventory.container.tile.MatrixStatsTabContainer;
-import mekanism.common.inventory.container.tile.MekanismTileContainer;
-import mekanism.common.inventory.container.tile.QIOFrequencySelectTileContainer;
-import mekanism.common.inventory.container.tile.UpgradeManagementContainer;
+import mekanism.common.inventory.container.tile.*;
 import mekanism.common.item.interfaces.IGuiItem;
 import mekanism.common.registries.MekanismContainerTypes;
 import mekanism.common.tile.base.TileEntityMekanism;
@@ -39,6 +27,10 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 import net.minecraftforge.fml.network.NetworkHooks;
+
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Used for informing the server that a click happened in a GUI and the gui window needs to change

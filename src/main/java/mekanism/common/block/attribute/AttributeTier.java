@@ -1,11 +1,12 @@
 package mekanism.common.block.attribute;
 
-import java.util.HashMap;
-import java.util.Map;
 import mekanism.api.tier.ITier;
 import mekanism.common.MekanismLang;
 import mekanism.common.content.blocktype.BlockType;
 import mekanism.common.content.blocktype.BlockType.BlockTypeBuilder;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class AttributeTier<TIER extends ITier> implements Attribute {
 

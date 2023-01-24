@@ -1,8 +1,9 @@
 package mekanism.common.config.value;
 
-import java.util.function.DoubleSupplier;
 import mekanism.common.config.IMekanismConfig;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+
+import java.util.function.DoubleSupplier;
 
 public class CachedDoubleValue extends CachedPrimitiveValue<Double> implements DoubleSupplier {
 

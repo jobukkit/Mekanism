@@ -1,9 +1,10 @@
 package mekanism.common.network;
 
-import java.util.function.Supplier;
 import mekanism.common.tags.MekanismTagManager;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
+
+import java.util.function.Supplier;
 
 public class PacketMekanismTags {
 

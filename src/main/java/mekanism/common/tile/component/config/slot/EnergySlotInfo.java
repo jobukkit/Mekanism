@@ -1,8 +1,9 @@
 package mekanism.common.tile.component.config.slot;
 
+import mekanism.api.energy.IEnergyContainer;
+
 import java.util.Arrays;
 import java.util.List;
-import mekanism.api.energy.IEnergyContainer;
 
 public class EnergySlotInfo extends BaseSlotInfo {
 

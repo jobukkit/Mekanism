@@ -1,9 +1,5 @@
 package mekanism.additions.common.recipe;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Consumer;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.additions.common.AdditionsTags;
 import mekanism.additions.common.MekanismAdditions;
 import mekanism.additions.common.item.ItemBalloon;
@@ -28,8 +24,13 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
 import net.minecraftforge.common.Tags;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 public class AdditionsRecipeProvider extends BaseRecipeProvider {
@@ -109,7 +110,7 @@ public class AdditionsRecipeProvider extends BaseRecipeProvider {
     private void registerBalloon(Consumer<IFinishedRecipe> consumer, ItemRegistryObject<ItemBalloon> result, String basePath) {
         EnumColor color = result.getItem().getColor();
         String colorString = color.getRegistryPrefix();
-        ITag<Item> dye = color.getDyeTag();
+        Tag<Item> dye = color.getDyeTag();
         ExtendedShapelessRecipeBuilder.shapelessRecipe(result, 2)
               .addIngredient(Tags.Items.LEATHER)
               .addIngredient(Tags.Items.STRING)
@@ -144,7 +145,7 @@ public class AdditionsRecipeProvider extends BaseRecipeProvider {
     private void registerGlowPanel(Consumer<IFinishedRecipe> consumer, BlockRegistryObject<? extends IColoredBlock, ?> result, String basePath) {
         EnumColor color = result.getBlock().getColor();
         String colorString = color.getRegistryPrefix();
-        ITag<Item> dye = color.getDyeTag();
+        Tag<Item> dye = color.getDyeTag();
         ExtendedShapedRecipeBuilder.shapedRecipe(result, 2)
               .pattern(GLOW_PANEL)
               .key(PLASTIC_SHEET_CHAR, MekanismItems.HDPE_SHEET)

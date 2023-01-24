@@ -1,6 +1,5 @@
 package mekanism.common.recipe.impl;
 
-import javax.annotation.Nonnull;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.recipes.RotaryRecipe;
 import mekanism.api.recipes.inputs.FluidStackIngredient;
@@ -14,6 +13,8 @@ import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
+
+import javax.annotation.Nonnull;
 
 public class RotaryIRecipe extends RotaryRecipe {
 

@@ -1,9 +1,10 @@
 package mekanism.common.block.attribute;
 
-import java.util.function.ToIntFunction;
 import mekanism.common.block.attribute.Attribute.TileAttribute;
 import mekanism.common.tile.base.TileEntityMekanism;
 import net.minecraft.block.Block;
+
+import java.util.function.ToIntFunction;
 
 public class Attributes {
 

@@ -2,12 +2,6 @@ package mekanism.common.lib.transmitter;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import javax.annotation.Nullable;
 import mekanism.api.Coord4D;
 import mekanism.api.MekanismAPI;
 import mekanism.common.Mekanism;
@@ -22,6 +16,9 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+
+import javax.annotation.Nullable;
+import java.util.*;
 
 public class TransmitterNetworkRegistry {
 

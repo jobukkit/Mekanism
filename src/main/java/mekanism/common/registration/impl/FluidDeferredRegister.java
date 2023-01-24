@@ -1,8 +1,5 @@
 package mekanism.common.registration.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.UnaryOperator;
 import mekanism.common.Mekanism;
 import mekanism.common.base.IChemicalConstant;
 import net.minecraft.block.Block;
@@ -21,6 +18,10 @@ import net.minecraftforge.fluids.ForgeFlowingFluid.Flowing;
 import net.minecraftforge.fluids.ForgeFlowingFluid.Source;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.UnaryOperator;
 
 public class FluidDeferredRegister {
 

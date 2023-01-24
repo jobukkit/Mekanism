@@ -1,7 +1,6 @@
 package mekanism.common.content.gear.mekasuit;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import java.util.Set;
 import mekanism.api.Action;
 import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.energy.IStrictEnergyHandler;
@@ -17,6 +16,8 @@ import mekanism.common.util.StorageUtils;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
+
+import java.util.Set;
 
 public class ModuleChargeDistributionUnit extends ModuleMekaSuit {
 

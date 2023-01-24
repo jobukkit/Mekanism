@@ -1,7 +1,5 @@
 package mekanism.common.tile.transmitter;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.Action;
 import mekanism.api.NBTConstants;
 import mekanism.api.chemical.gas.IGasHandler.IMekanismGasHandler;
@@ -30,6 +28,9 @@ import mekanism.common.upgrade.transmitter.PressurizedTubeUpgradeData;
 import mekanism.common.upgrade.transmitter.TransmitterUpgradeData;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class TileEntityPressurizedTube extends TileEntityTransmitter {
 

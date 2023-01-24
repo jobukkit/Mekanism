@@ -1,7 +1,5 @@
 package mekanism.common.item.block;
 
-import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.api.text.EnumColor;
 import mekanism.client.render.item.ISTERProvider;
 import mekanism.common.MekanismLang;
@@ -30,6 +28,9 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+
+import javax.annotation.Nonnull;
+import java.util.List;
 
 public class ItemBlockEnergyCube extends ItemBlockTooltip<BlockEnergyCube> implements IItemSustainedInventory, ISecurityItem {
 

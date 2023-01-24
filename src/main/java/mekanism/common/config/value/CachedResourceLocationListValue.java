@@ -1,13 +1,14 @@
 package mekanism.common.config.value;
 
+import mekanism.common.config.IMekanismConfig;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import mekanism.common.config.IMekanismConfig;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
 public class CachedResourceLocationListValue extends CachedResolvableConfigValue<List<ResourceLocation>, List<? extends String>> {
 

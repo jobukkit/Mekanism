@@ -3,18 +3,19 @@ package mekanism.client.sound;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.annotations.FieldsAreNonnullByDefault;
 import mekanism.api.text.ILangEntry;
 import mekanism.common.DataGenJsonConstants;
 import mekanism.common.registration.impl.SoundEventRegistryObject;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault

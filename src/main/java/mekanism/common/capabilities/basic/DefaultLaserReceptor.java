@@ -1,11 +1,12 @@
 package mekanism.common.capabilities.basic;
 
-import javax.annotation.Nonnull;
 import mekanism.api.lasers.ILaserReceptor;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.capabilities.basic.DefaultStorageHelper.NullStorage;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+
+import javax.annotation.Nonnull;
 
 public class DefaultLaserReceptor implements ILaserReceptor {
 

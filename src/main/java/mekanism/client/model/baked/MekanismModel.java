@@ -9,12 +9,6 @@ import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import javax.annotation.Nonnull;
 import mekanism.client.render.lib.Quad;
 import mekanism.client.render.lib.QuadTransformation;
 import net.minecraft.client.renderer.model.*;
@@ -29,6 +23,13 @@ import net.minecraftforge.client.model.IModelConfiguration;
 import net.minecraftforge.client.model.IModelLoader;
 import net.minecraftforge.client.model.geometry.IModelGeometryPart;
 import net.minecraftforge.client.model.geometry.IMultipartModelGeometry;
+
+import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 
 public class MekanismModel implements IMultipartModelGeometry<MekanismModel> {
 

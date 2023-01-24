@@ -1,13 +1,13 @@
 package mekanism.common.tile.prefab;
 
-import java.util.UUID;
-import javax.annotation.Nonnull;
 import mekanism.api.NBTConstants;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.util.NBTUtils;
-import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
+
+import javax.annotation.Nonnull;
+import java.util.UUID;
 
 //TODO - V11: Evaluate making neighbor updates to this (and other "non internal" internal multiblocks like induction cells) cause the multiblock to unform
 public class TileEntityInternalMultiblock extends TileEntityMekanism {

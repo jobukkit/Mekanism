@@ -1,14 +1,15 @@
 package mekanism.common.tile.interfaces;
 
-import java.util.function.Predicate;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.recipes.MekanismRecipe;
 import mekanism.api.recipes.cache.ICachedRecipeHolder;
 import mekanism.common.CommonWorldTickHandler;
 import mekanism.common.recipe.MekanismRecipeType;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.function.Predicate;
 
 public interface ITileCachedRecipeHolder<RECIPE extends MekanismRecipe> extends ICachedRecipeHolder<RECIPE> {
 

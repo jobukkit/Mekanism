@@ -1,9 +1,5 @@
 package mekanism.common.recipe.impl;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Consumer;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.api.datagen.recipe.builder.ChemicalCrystallizerRecipeBuilder;
 import mekanism.api.datagen.recipe.builder.GasToGasRecipeBuilder;
 import mekanism.api.datagen.recipe.builder.ItemStackToChemicalRecipeBuilder;
@@ -18,7 +14,7 @@ import mekanism.common.recipe.ISubRecipeProvider;
 import mekanism.common.recipe.builder.ExtendedShapedRecipeBuilder;
 import mekanism.common.recipe.builder.ExtendedShapelessRecipeBuilder;
 import mekanism.common.recipe.builder.MekDataShapedRecipeBuilder;
-import mekanism.common.recipe.compat.BiomesOPlentyRecipeProvider;
+//import mekanism.common.recipe.compat.BiomesOPlentyRecipeProvider;
 import mekanism.common.recipe.pattern.Pattern;
 import mekanism.common.recipe.pattern.RecipePattern;
 import mekanism.common.recipe.pattern.RecipePattern.DoubleLine;
@@ -36,8 +32,14 @@ import net.minecraft.item.Items;
 import net.minecraft.tags.FluidTags;
 import net.minecraftforge.common.Tags;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
+
 @ParametersAreNonnullByDefault
 public class MekanismRecipeProvider extends BaseRecipeProvider {
+    // TODO Integrate with Extended Nether Backport or FutureMC?
 
     static final char DIAMOND_CHAR = 'D';
     static final char GLASS_CHAR = 'G';
@@ -100,9 +102,9 @@ public class MekanismRecipeProvider extends BaseRecipeProvider {
               new ThermalEvaporationRecipeProvider(),
               new TierInstallerRecipeProvider(),
               new TransmitterRecipeProvider(),
-              new UpgradeRecipeProvider(),
+              new UpgradeRecipeProvider()
               //Mod Compat Recipe providers
-              new BiomesOPlentyRecipeProvider()
+//              new BiomesOPlentyRecipeProvider()
               //new ILikeWoodRecipeProvider()//TODO - ILikeWood
         );
     }
@@ -162,7 +164,8 @@ public class MekanismRecipeProvider extends BaseRecipeProvider {
               .pattern(RecipePattern.createPattern(
                     TripleLine.of(Pattern.CONSTANT, Pattern.CONSTANT, Pattern.CONSTANT),
                     TripleLine.of(Pattern.STEEL, Pattern.ENERGY, Pattern.STEEL))
-              ).key(Pattern.CONSTANT, Blocks.POLISHED_BLACKSTONE_PRESSURE_PLATE)
+              )
+//                .key(Pattern.CONSTANT, Blocks.POLISHED_BLACKSTONE_PRESSURE_PLATE)
               .key(Pattern.STEEL, MekanismTags.Items.INGOTS_STEEL)
               .key(Pattern.ENERGY, MekanismItems.ENERGY_TABLET)
               .build(consumer);
@@ -1040,7 +1043,7 @@ public class MekanismRecipeProvider extends BaseRecipeProvider {
                     TripleLine.of(Pattern.PLASTIC, Pattern.CONSTANT, Pattern.PLASTIC),
                     TripleLine.of(Pattern.ALLOY, Pattern.ENERGY, Pattern.ALLOY))
               ).key(Pattern.CIRCUIT, MekanismTags.Items.CIRCUITS_ULTIMATE)
-              .key(Pattern.CONSTANT, Items.NETHERITE_HELMET)
+//              .key(Pattern.CONSTANT, Items.NETHERITE_HELMET)
               .key(Pattern.ENERGY, MekanismBlocks.BASIC_INDUCTION_CELL)
               .key(Pattern.PLASTIC, MekanismItems.HDPE_SHEET)
               .key(Pattern.ALLOY, MekanismItems.POLONIUM_PELLET)
@@ -1052,7 +1055,7 @@ public class MekanismRecipeProvider extends BaseRecipeProvider {
                     TripleLine.of(Pattern.PLASTIC, Pattern.CONSTANT, Pattern.PLASTIC),
                     TripleLine.of(Pattern.ALLOY, Pattern.ENERGY, Pattern.ALLOY))
               ).key(Pattern.CIRCUIT, MekanismTags.Items.CIRCUITS_ULTIMATE)
-              .key(Pattern.CONSTANT, Items.NETHERITE_CHESTPLATE)
+//              .key(Pattern.CONSTANT, Items.NETHERITE_CHESTPLATE)
               .key(Pattern.ENERGY, MekanismBlocks.BASIC_INDUCTION_CELL)
               .key(Pattern.PLASTIC, MekanismItems.HDPE_SHEET)
               .key(Pattern.ALLOY, MekanismItems.POLONIUM_PELLET)
@@ -1064,7 +1067,7 @@ public class MekanismRecipeProvider extends BaseRecipeProvider {
                     TripleLine.of(Pattern.PLASTIC, Pattern.CONSTANT, Pattern.PLASTIC),
                     TripleLine.of(Pattern.ALLOY, Pattern.ENERGY, Pattern.ALLOY))
               ).key(Pattern.CIRCUIT, MekanismTags.Items.CIRCUITS_ULTIMATE)
-              .key(Pattern.CONSTANT, Items.NETHERITE_LEGGINGS)
+//              .key(Pattern.CONSTANT, Items.NETHERITE_LEGGINGS)
               .key(Pattern.ENERGY, MekanismBlocks.BASIC_INDUCTION_CELL)
               .key(Pattern.PLASTIC, MekanismItems.HDPE_SHEET)
               .key(Pattern.ALLOY, MekanismItems.POLONIUM_PELLET)
@@ -1076,7 +1079,7 @@ public class MekanismRecipeProvider extends BaseRecipeProvider {
                     TripleLine.of(Pattern.PLASTIC, Pattern.CONSTANT, Pattern.PLASTIC),
                     TripleLine.of(Pattern.ALLOY, Pattern.ENERGY, Pattern.ALLOY))
               ).key(Pattern.CIRCUIT, MekanismTags.Items.CIRCUITS_ULTIMATE)
-              .key(Pattern.CONSTANT, Items.NETHERITE_BOOTS)
+//              .key(Pattern.CONSTANT, Items.NETHERITE_BOOTS)
               .key(Pattern.ENERGY, MekanismBlocks.BASIC_INDUCTION_CELL)
               .key(Pattern.PLASTIC, MekanismItems.HDPE_SHEET)
               .key(Pattern.ALLOY, MekanismTags.Items.PELLETS_POLONIUM)

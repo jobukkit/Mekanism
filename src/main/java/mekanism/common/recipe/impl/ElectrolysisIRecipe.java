@@ -1,6 +1,5 @@
 package mekanism.common.recipe.impl;
 
-import javax.annotation.Nonnull;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.recipes.ElectrolysisRecipe;
@@ -12,6 +11,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.Nonnull;
 
 public class ElectrolysisIRecipe extends ElectrolysisRecipe {
 

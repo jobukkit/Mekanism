@@ -1,10 +1,5 @@
 package mekanism.common.registration.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import mekanism.api.providers.IItemProvider;
 import mekanism.api.text.EnumColor;
 import mekanism.api.text.TextComponentUtil;
@@ -15,6 +10,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Rarity;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class ItemDeferredRegister extends WrappedDeferredRegister<Item> {
 

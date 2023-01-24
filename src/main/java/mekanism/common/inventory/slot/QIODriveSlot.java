@@ -1,6 +1,5 @@
 package mekanism.common.inventory.slot;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
 import mekanism.api.annotations.FieldsAreNonnullByDefault;
@@ -11,6 +10,8 @@ import mekanism.common.content.qio.IQIODriveItem;
 import mekanism.common.content.qio.QIODriveData.QIODriveKey;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault

@@ -1,12 +1,13 @@
 package mekanism.common.block;
 
-import javax.annotation.Nonnull;
 import mekanism.api.text.ILangEntry;
 import mekanism.common.block.interfaces.IHasDescription;
 import mekanism.common.resource.OreType;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraftforge.common.ToolType;
+
+import javax.annotation.Nonnull;
 
 public class BlockOre extends Block implements IHasDescription {
 

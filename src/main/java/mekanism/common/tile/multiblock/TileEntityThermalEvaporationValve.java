@@ -1,6 +1,5 @@
 package mekanism.common.tile.multiblock;
 
-import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.common.capabilities.holder.fluid.IFluidTankHolder;
 import mekanism.common.capabilities.holder.heat.IHeatCapacitorHolder;
@@ -9,6 +8,8 @@ import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tile.base.SubstanceType;
 import net.minecraft.util.Direction;
 import net.minecraftforge.fluids.FluidStack;
+
+import javax.annotation.Nonnull;
 
 public class TileEntityThermalEvaporationValve extends TileEntityThermalEvaporationBlock {
 

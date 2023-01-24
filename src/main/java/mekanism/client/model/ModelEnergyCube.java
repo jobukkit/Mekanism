@@ -2,9 +2,6 @@ package mekanism.client.model;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import java.util.EnumSet;
-import java.util.Set;
-import javax.annotation.Nonnull;
 import mekanism.api.NBTConstants;
 import mekanism.api.RelativeSide;
 import mekanism.api.text.EnumColor;
@@ -27,6 +24,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.Constants.NBT;
+
+import javax.annotation.Nonnull;
+import java.util.EnumSet;
+import java.util.Set;
 
 public class ModelEnergyCube extends MekanismJavaModel {
 

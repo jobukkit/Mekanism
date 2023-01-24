@@ -1,6 +1,5 @@
 package mekanism.common.recipe.impl;
 
-import javax.annotation.Nonnull;
 import mekanism.api.chemical.slurry.SlurryStack;
 import mekanism.api.recipes.FluidSlurryToSlurryRecipe;
 import mekanism.api.recipes.inputs.FluidStackIngredient;
@@ -12,6 +11,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.Nonnull;
 
 public class FluidSlurryToSlurryIRecipe extends FluidSlurryToSlurryRecipe {
 

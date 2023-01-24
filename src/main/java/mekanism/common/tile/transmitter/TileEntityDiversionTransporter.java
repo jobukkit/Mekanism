@@ -1,11 +1,12 @@
 package mekanism.common.tile.transmitter;
 
-import javax.annotation.Nonnull;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.client.model.data.TransmitterModelData;
 import mekanism.common.block.states.TransmitterType;
 import mekanism.common.content.network.transmitter.DiversionTransporter;
 import mekanism.common.registries.MekanismBlocks;
+
+import javax.annotation.Nonnull;
 
 public class TileEntityDiversionTransporter extends TileEntityLogisticalTransporterBase {
 

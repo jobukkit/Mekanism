@@ -1,13 +1,13 @@
 package mekanism.client.render.obj;
 
-import javax.annotation.Nonnull;
-
 import mekanism.api.backport.Vector3d;
 import net.minecraft.client.renderer.Quaternion;
 import net.minecraft.client.renderer.TransformationMatrix;
 import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.model.IModelTransform;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nonnull;
 
 public class TransmitterModelTransform implements IModelTransform {
 

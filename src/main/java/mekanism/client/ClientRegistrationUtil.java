@@ -1,18 +1,11 @@
 package mekanism.client;
 
-import java.util.function.Function;
-import java.util.function.Predicate;
-import javax.annotation.Nonnull;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.api.providers.IItemProvider;
 import mekanism.client.gui.machine.GuiAdvancedElectricMachine;
 import mekanism.client.gui.machine.GuiElectricMachine;
 import mekanism.common.inventory.container.tile.MekanismTileContainer;
-import mekanism.common.registration.impl.ContainerTypeRegistryObject;
-import mekanism.common.registration.impl.EntityTypeRegistryObject;
-import mekanism.common.registration.impl.FluidRegistryObject;
-import mekanism.common.registration.impl.ParticleTypeRegistryObject;
-import mekanism.common.registration.impl.TileEntityTypeRegistryObject;
+import mekanism.common.registration.impl.*;
 import mekanism.common.tile.prefab.TileEntityAdvancedElectricMachine;
 import mekanism.common.tile.prefab.TileEntityElectricMachine;
 import net.minecraft.client.Minecraft;
@@ -40,6 +33,10 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
+
+import javax.annotation.Nonnull;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class ClientRegistrationUtil {
 

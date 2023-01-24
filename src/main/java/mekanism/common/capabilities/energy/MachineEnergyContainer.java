@@ -1,9 +1,5 @@
 package mekanism.common.capabilities.energy;
 
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.Predicate;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Upgrade;
 import mekanism.api.annotations.FieldsAreNonnullByDefault;
@@ -15,6 +11,11 @@ import mekanism.common.block.attribute.AttributeEnergy;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.block.Block;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Predicate;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault

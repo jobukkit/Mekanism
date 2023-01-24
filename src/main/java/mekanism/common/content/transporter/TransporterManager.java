@@ -4,8 +4,6 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import java.util.Map;
-import java.util.Set;
 import mekanism.api.Coord4D;
 import mekanism.common.content.transporter.TransporterStack.Path;
 import mekanism.common.lib.inventory.TransitRequest;
@@ -17,6 +15,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
+
+import java.util.Map;
+import java.util.Set;
 
 public class TransporterManager {
 

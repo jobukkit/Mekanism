@@ -1,8 +1,5 @@
 package mekanism.common.capabilities.fluid;
 
-import java.util.function.BooleanSupplier;
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
 import mekanism.api.fluid.IExtendedFluidTank;
@@ -10,6 +7,10 @@ import mekanism.api.inventory.AutomationType;
 import mekanism.common.capabilities.merged.MergedTank;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fluids.FluidStack;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.BooleanSupplier;
 
 /**
  * Like {@link mekanism.api.chemical.merged.ChemicalTankWrapper}

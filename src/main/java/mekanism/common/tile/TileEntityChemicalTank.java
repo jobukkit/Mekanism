@@ -1,8 +1,6 @@
 package mekanism.common.tile;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import java.util.Map;
-import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.api.IIncrementalEnum;
 import mekanism.api.NBTConstants;
@@ -54,11 +52,13 @@ import mekanism.common.util.ChemicalUtil;
 import mekanism.common.util.ItemDataUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
-import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.text.ITextComponent;
+
+import javax.annotation.Nonnull;
+import java.util.Map;
 
 public class TileEntityChemicalTank extends TileEntityMekanism implements ISideConfiguration, ISustainedData, IHasGasMode {
 

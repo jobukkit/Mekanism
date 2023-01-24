@@ -1,13 +1,14 @@
 package mekanism.common.inventory.container.sync.chemical;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import mekanism.api.annotations.NonNull;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IEmptyStackProvider;
 import mekanism.common.inventory.container.sync.ISyncableData;
+
+import javax.annotation.Nonnull;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Version of {@link net.minecraft.util.IntReferenceHolder} for handling chemical stacks

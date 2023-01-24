@@ -1,8 +1,5 @@
 package mekanism.client.jei.machine;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import java.util.Arrays;
-import java.util.Collections;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.api.recipes.SawmillRecipe;
 import mekanism.client.gui.element.GuiUpArrow;
@@ -18,6 +15,9 @@ import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.gui.ingredient.IGuiItemStackGroup;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 public class SawmillRecipeCategory extends BaseRecipeCategory<SawmillRecipe> {
 

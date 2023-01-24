@@ -1,9 +1,10 @@
 package mekanism.common.tile.multiblock;
 
-import java.util.UUID;
 import mekanism.common.content.boiler.BoilerMultiblockData;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tile.prefab.TileEntityInternalMultiblock;
+
+import java.util.UUID;
 
 public class TileEntitySuperheatingElement extends TileEntityInternalMultiblock {
 

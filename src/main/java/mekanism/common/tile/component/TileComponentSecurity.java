@@ -1,6 +1,5 @@
 package mekanism.common.tile.component;
 
-import java.util.UUID;
 import mekanism.api.NBTConstants;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.inventory.container.MekanismContainer;
@@ -14,6 +13,8 @@ import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.Constants.NBT;
+
+import java.util.UUID;
 
 public class TileComponentSecurity implements ITileComponent {
 

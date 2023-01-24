@@ -1,7 +1,8 @@
 package mekanism.common.block.attribute;
 
-import javax.annotation.Nonnull;
 import mekanism.common.content.blocktype.FactoryType;
+
+import javax.annotation.Nonnull;
 
 public class AttributeFactoryType implements Attribute {
 

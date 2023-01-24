@@ -1,16 +1,17 @@
 package mekanism.common.registration.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Supplier;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.common.registration.DoubleDeferredRegister;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class BlockDeferredRegister extends DoubleDeferredRegister<Block, Item> {
 

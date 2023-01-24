@@ -1,11 +1,12 @@
 package mekanism.common.inventory.container.sync;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import javax.annotation.Nullable;
 import mekanism.common.network.container.property.BlockPosPropertyData;
 import mekanism.common.network.container.property.PropertyData;
 import net.minecraft.util.math.BlockPos;
+
+import javax.annotation.Nullable;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class SyncableBlockPos implements ISyncableData {
 

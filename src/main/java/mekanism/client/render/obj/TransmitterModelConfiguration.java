@@ -1,9 +1,5 @@
 package mekanism.client.render.obj;
 
-import java.util.List;
-import java.util.function.Predicate;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.client.model.data.TransmitterModelData;
 import mekanism.client.model.data.TransmitterModelData.Diversion;
 import mekanism.common.config.MekanismConfig;
@@ -13,6 +9,11 @@ import net.minecraft.client.renderer.model.Material;
 import net.minecraft.util.Direction;
 import net.minecraftforge.client.model.IModelConfiguration;
 import net.minecraftforge.client.model.data.IModelData;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.function.Predicate;
 
 public class TransmitterModelConfiguration extends VisibleModelConfiguration {
 

@@ -1,11 +1,11 @@
 package mekanism.common.lib;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class HashList<T> extends AbstractList<T> {
 

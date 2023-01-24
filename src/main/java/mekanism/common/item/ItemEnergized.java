@@ -1,8 +1,5 @@
 package mekanism.common.item;
 
-import java.util.List;
-import java.util.function.Predicate;
-import javax.annotation.Nonnull;
 import mekanism.api.annotations.NonNull;
 import mekanism.api.inventory.AutomationType;
 import mekanism.api.math.FloatingLong;
@@ -23,6 +20,10 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+
+import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.function.Predicate;
 
 public class ItemEnergized extends Item {
 

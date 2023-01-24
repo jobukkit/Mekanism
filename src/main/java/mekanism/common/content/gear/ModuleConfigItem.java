@@ -1,12 +1,13 @@
 package mekanism.common.content.gear;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
 import mekanism.api.math.MathUtils;
 import mekanism.api.text.IHasTextComponent;
 import mekanism.api.text.ILangEntry;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 
 public class ModuleConfigItem<TYPE> {
 

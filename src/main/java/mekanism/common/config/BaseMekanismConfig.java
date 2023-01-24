@@ -1,9 +1,10 @@
 package mekanism.common.config;
 
-import java.util.ArrayList;
-import java.util.List;
 import mekanism.common.config.value.CachedPrimitiveValue;
 import mekanism.common.config.value.CachedResolvableConfigValue;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class BaseMekanismConfig implements IMekanismConfig {
 

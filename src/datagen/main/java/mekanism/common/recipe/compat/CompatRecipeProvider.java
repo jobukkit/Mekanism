@@ -1,12 +1,13 @@
 package mekanism.common.recipe.compat;
 
-import java.util.function.Consumer;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.common.recipe.ISubRecipeProvider;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.common.crafting.conditions.ModLoadedCondition;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.Consumer;
 
 //TODO: Decide if we should have compat recipes go into their own data packs
 @ParametersAreNonnullByDefault

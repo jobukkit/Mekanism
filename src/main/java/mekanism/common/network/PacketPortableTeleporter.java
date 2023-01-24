@@ -1,11 +1,12 @@
 package mekanism.common.network;
 
-import java.util.function.Supplier;
 import mekanism.client.gui.item.GuiPortableTeleporter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
+
+import java.util.function.Supplier;
 
 public class PacketPortableTeleporter {
 

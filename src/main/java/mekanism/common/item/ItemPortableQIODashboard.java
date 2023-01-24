@@ -1,6 +1,5 @@
 package mekanism.common.item;
 
-import javax.annotation.Nonnull;
 import mekanism.api.NBTConstants;
 import mekanism.api.text.EnumColor;
 import mekanism.common.Mekanism;
@@ -23,10 +22,11 @@ import net.minecraft.item.Rarity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.network.NetworkHooks;
+
+import javax.annotation.Nonnull;
 
 public class ItemPortableQIODashboard extends Item implements IFrequencyItem, IGuiItem {
 

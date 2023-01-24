@@ -1,6 +1,5 @@
 package mekanism.common.lib.security;
 
-import javax.annotation.Nonnull;
 import mekanism.api.IIncrementalEnum;
 import mekanism.api.math.MathUtils;
 import mekanism.api.text.EnumColor;
@@ -9,6 +8,8 @@ import mekanism.api.text.ILangEntry;
 import mekanism.common.MekanismLang;
 import mekanism.common.tile.component.TileComponentSecurity;
 import net.minecraft.util.text.ITextComponent;
+
+import javax.annotation.Nonnull;
 
 public interface ISecurityTile {
 

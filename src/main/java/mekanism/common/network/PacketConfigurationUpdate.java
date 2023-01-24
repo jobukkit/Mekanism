@@ -1,7 +1,5 @@
 package mekanism.common.network;
 
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import mekanism.api.RelativeSide;
 import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.tile.component.TileComponentConfig;
@@ -16,6 +14,9 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
+
+import javax.annotation.Nonnull;
+import java.util.function.Supplier;
 
 public class PacketConfigurationUpdate {
 

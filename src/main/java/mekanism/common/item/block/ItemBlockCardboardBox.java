@@ -1,7 +1,5 @@
 package mekanism.common.item.block;
 
-import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.api.NBTConstants;
 import mekanism.api.text.EnumColor;
 import mekanism.common.CommonPlayerTracker;
@@ -32,6 +30,9 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
+
+import javax.annotation.Nonnull;
+import java.util.List;
 
 public class ItemBlockCardboardBox extends ItemBlockMekanism<BlockCardboardBox> {
 

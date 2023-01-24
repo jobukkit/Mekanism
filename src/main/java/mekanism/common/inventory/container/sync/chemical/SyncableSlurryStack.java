@@ -1,8 +1,5 @@
 package mekanism.common.inventory.container.sync.chemical;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import mekanism.api.annotations.NonNull;
 import mekanism.api.chemical.slurry.IEmptySlurryProvider;
 import mekanism.api.chemical.slurry.ISlurryTank;
@@ -11,6 +8,10 @@ import mekanism.api.chemical.slurry.SlurryStack;
 import mekanism.common.network.container.property.LongPropertyData;
 import mekanism.common.network.container.property.PropertyData;
 import mekanism.common.network.container.property.chemical.SlurryStackPropertyData;
+
+import javax.annotation.Nonnull;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Version of {@link net.minecraft.util.IntReferenceHolder} for handling slurry stacks

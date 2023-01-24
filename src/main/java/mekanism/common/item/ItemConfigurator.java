@@ -1,17 +1,7 @@
 package mekanism.common.item;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
-import mekanism.api.Action;
-import mekanism.api.IConfigurable;
-import mekanism.api.IMekWrench;
-import mekanism.api.NBTConstants;
-import mekanism.api.RelativeSide;
+import mekanism.api.*;
 import mekanism.api.annotations.FieldsAreNonnullByDefault;
 import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.inventory.AutomationType;
@@ -37,12 +27,8 @@ import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.tile.component.config.ConfigInfo;
 import mekanism.common.tile.component.config.DataType;
 import mekanism.common.tile.interfaces.ISideConfiguration;
-import mekanism.common.util.CapabilityUtils;
-import mekanism.common.util.ItemDataUtils;
-import mekanism.common.util.MekanismUtils;
+import mekanism.common.util.*;
 import mekanism.common.util.MekanismUtils.ResourceType;
-import mekanism.common.util.SecurityUtils;
-import mekanism.common.util.StorageUtils;
 import net.minecraft.block.Block;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
@@ -55,13 +41,19 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class ItemConfigurator extends ItemEnergized implements IMekWrench, IRadialModeItem<ConfiguratorMode>, IItemHUDProvider {
 

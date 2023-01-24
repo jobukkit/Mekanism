@@ -1,7 +1,5 @@
 package mekanism.common.tile;
 
-import java.util.EnumSet;
-import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.api.IConfigurable;
 import mekanism.api.NBTConstants;
@@ -19,7 +17,6 @@ import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.util.ChemicalUtil;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResultType;
@@ -27,6 +24,9 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
+import java.util.EnumSet;
 
 public class TileEntityRadioactiveWasteBarrel extends TileEntityMekanism implements IConfigurable {
 

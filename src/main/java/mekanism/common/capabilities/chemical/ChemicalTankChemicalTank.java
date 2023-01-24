@@ -1,9 +1,5 @@
 package mekanism.common.capabilities.chemical;
 
-import java.util.Objects;
-import java.util.function.LongSupplier;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
 import mekanism.api.IContentsListener;
@@ -32,6 +28,11 @@ import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
 import mekanism.api.inventory.AutomationType;
 import mekanism.common.tier.ChemicalTankTier;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Objects;
+import java.util.function.LongSupplier;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault

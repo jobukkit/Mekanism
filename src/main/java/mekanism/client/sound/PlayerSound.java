@@ -1,14 +1,15 @@
 package mekanism.client.sound;
 
-import java.lang.ref.WeakReference;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.common.config.MekanismConfig;
 import net.minecraft.client.audio.ITickableSound;
 import net.minecraft.client.audio.LocatableSound;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
 
 public abstract class PlayerSound extends LocatableSound implements ITickableSound {
 

@@ -1,9 +1,10 @@
 package mekanism.client.sound;
 
-import javax.annotation.Nonnull;
 import mekanism.common.Mekanism;
 import mekanism.common.lib.radiation.RadiationManager.RadiationScale;
 import net.minecraft.entity.player.PlayerEntity;
+
+import javax.annotation.Nonnull;
 
 public class GeigerSound extends PlayerSound {
 

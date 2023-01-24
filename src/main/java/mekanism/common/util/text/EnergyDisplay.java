@@ -1,12 +1,13 @@
 package mekanism.common.util.text;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.text.IHasTextComponent;
 import mekanism.common.MekanismLang;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.util.text.ITextComponent;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

@@ -1,11 +1,5 @@
 package mekanism.common.item.block.machine;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.Callable;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import mekanism.api.NBTConstants;
 import mekanism.api.Upgrade;
 import mekanism.api.math.FloatingLong;
@@ -42,6 +36,13 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fluids.FluidStack;
+
+import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 
 public class ItemBlockMachine extends ItemBlockTooltip<BlockTile<?, ?>> implements IItemSustainedInventory, ISecurityItem {
 

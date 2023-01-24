@@ -1,6 +1,5 @@
 package mekanism.common.tile.qio;
 
-import javax.annotation.Nonnull;
 import mekanism.api.NBTConstants;
 import mekanism.common.content.qio.QIOFrequency;
 import mekanism.common.inventory.container.MekanismContainer;
@@ -10,13 +9,14 @@ import mekanism.common.lib.inventory.HashedItem;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
-import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelDataMap;
 import net.minecraftforge.client.model.data.ModelProperty;
+
+import javax.annotation.Nonnull;
 
 public class TileEntityQIORedstoneAdapter extends TileEntityQIOComponent {
 

@@ -1,7 +1,5 @@
 package mekanism.common.block;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.NBTConstants;
 import mekanism.common.block.interfaces.IHasTileEntity;
 import mekanism.common.block.states.IStateStorage;
@@ -27,6 +25,9 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class BlockCardboardBox extends BlockMekanism implements IStateStorage, IHasTileEntity<TileEntityCardboardBox> {
 

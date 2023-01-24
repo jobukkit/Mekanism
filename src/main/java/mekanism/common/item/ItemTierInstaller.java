@@ -1,7 +1,5 @@
 package mekanism.common.item;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.text.TextComponentUtil;
 import mekanism.api.tier.BaseTier;
 import mekanism.common.Mekanism;
@@ -23,6 +21,9 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class ItemTierInstaller extends Item {
 

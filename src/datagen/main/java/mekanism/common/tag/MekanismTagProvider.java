@@ -1,21 +1,14 @@
 package mekanism.common.tag;
 
 import com.google.common.collect.Table.Cell;
-import java.util.Map;
 import mekanism.api.chemical.slurry.Slurry;
-import mekanism.api.datagen.tag.ForgeRegistryTagBuilder;
 import mekanism.api.providers.IItemProvider;
 import mekanism.common.Mekanism;
+import mekanism.common.block.BlockOre;
 import mekanism.common.registration.impl.BlockRegistryObject;
 import mekanism.common.registration.impl.ItemRegistryObject;
 import mekanism.common.registration.impl.SlurryRegistryObject;
-import mekanism.common.registries.MekanismBlocks;
-import mekanism.common.registries.MekanismEntityTypes;
-import mekanism.common.registries.MekanismFluids;
-import mekanism.common.registries.MekanismGases;
-import mekanism.common.registries.MekanismInfuseTypes;
-import mekanism.common.registries.MekanismItems;
-import mekanism.common.registries.MekanismSlurries;
+import mekanism.common.registries.*;
 import mekanism.common.resource.OreType;
 import mekanism.common.resource.PrimaryResource;
 import mekanism.common.resource.ResourceType;
@@ -29,6 +22,8 @@ import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
 import net.minecraftforge.common.Tags;
+
+import java.util.Map;
 
 public class MekanismTagProvider extends BaseTagProvider {
 
@@ -62,10 +57,10 @@ public class MekanismTagProvider extends BaseTagProvider {
         addInfuseTags();
         addPellets();
         getBlockBuilder(MekanismTags.Blocks.ATOMIC_DISASSEMBLER_ORE).add(Tags.Blocks.ORES, BlockTags.LOGS);
-        addToTag(BlockTags.GUARDED_BY_PIGLINS, MekanismBlocks.REFINED_GLOWSTONE_BLOCK, MekanismBlocks.PERSONAL_CHEST);
-        addToTag(BlockTags.HOGLIN_REPELLENTS, MekanismBlocks.TELEPORTER, MekanismBlocks.QUANTUM_ENTANGLOPORTER);
-        addToTag(ItemTags.field_232903_N_, MekanismBlocks.REFINED_GLOWSTONE_BLOCK, MekanismItems.REFINED_GLOWSTONE_INGOT);
-        addToTag(EntityTypeTags.field_232893_e_, MekanismEntityTypes.FLAME);
+//        addToTag(BlockTags.GUARDED_BY_PIGLINS, MekanismBlocks.REFINED_GLOWSTONE_BLOCK, MekanismBlocks.PERSONAL_CHEST);
+//        addToTag(BlockTags.HOGLIN_REPELLENTS, MekanismBlocks.TELEPORTER, MekanismBlocks.QUANTUM_ENTANGLOPORTER);
+//        addToTag(ItemTags.field_232903_N_, MekanismBlocks.REFINED_GLOWSTONE_BLOCK, MekanismItems.REFINED_GLOWSTONE_INGOT);
+//        addToTag(EntityTypeTags.field_232893_e_, MekanismEntityTypes.FLAME);
     }
 
     private void addProcessedResources() {
@@ -105,29 +100,29 @@ public class MekanismTagProvider extends BaseTagProvider {
 
     private void addBeaconTags() {
         //Beacon bases
-        addToTag(BlockTags.BEACON_BASE_BLOCKS,
-              MekanismBlocks.PROCESSED_RESOURCE_BLOCKS.get(PrimaryResource.OSMIUM),
-              MekanismBlocks.PROCESSED_RESOURCE_BLOCKS.get(PrimaryResource.COPPER),
-              MekanismBlocks.PROCESSED_RESOURCE_BLOCKS.get(PrimaryResource.TIN),
-              MekanismBlocks.PROCESSED_RESOURCE_BLOCKS.get(PrimaryResource.LEAD),
-              MekanismBlocks.PROCESSED_RESOURCE_BLOCKS.get(PrimaryResource.URANIUM),
-              MekanismBlocks.BRONZE_BLOCK,
-              MekanismBlocks.REFINED_OBSIDIAN_BLOCK,
-              MekanismBlocks.REFINED_GLOWSTONE_BLOCK,
-              MekanismBlocks.STEEL_BLOCK
-        );
-        //Beacon payment items
-        addToTag(ItemTags.field_232908_Z_,
-              MekanismItems.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.OSMIUM),
-              MekanismItems.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.COPPER),
-              MekanismItems.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.TIN),
-              MekanismItems.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.LEAD),
-              MekanismItems.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.URANIUM),
-              MekanismItems.BRONZE_INGOT,
-              MekanismItems.REFINED_OBSIDIAN_INGOT,
-              MekanismItems.REFINED_GLOWSTONE_INGOT,
-              MekanismItems.STEEL_INGOT
-        );
+//        addToTag(BlockTags.BEACON_BASE_BLOCKS,
+//              MekanismBlocks.PROCESSED_RESOURCE_BLOCKS.get(PrimaryResource.OSMIUM),
+//              MekanismBlocks.PROCESSED_RESOURCE_BLOCKS.get(PrimaryResource.COPPER),
+//              MekanismBlocks.PROCESSED_RESOURCE_BLOCKS.get(PrimaryResource.TIN),
+//              MekanismBlocks.PROCESSED_RESOURCE_BLOCKS.get(PrimaryResource.LEAD),
+//              MekanismBlocks.PROCESSED_RESOURCE_BLOCKS.get(PrimaryResource.URANIUM),
+//              MekanismBlocks.BRONZE_BLOCK,
+//              MekanismBlocks.REFINED_OBSIDIAN_BLOCK,
+//              MekanismBlocks.REFINED_GLOWSTONE_BLOCK,
+//              MekanismBlocks.STEEL_BLOCK
+//        );
+//        //Beacon payment items
+//        addToTag(ItemTags.field_232908_Z_,
+//              MekanismItems.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.OSMIUM),
+//              MekanismItems.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.COPPER),
+//              MekanismItems.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.TIN),
+//              MekanismItems.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.LEAD),
+//              MekanismItems.PROCESSED_RESOURCES.get(ResourceType.INGOT, PrimaryResource.URANIUM),
+//              MekanismItems.BRONZE_INGOT,
+//              MekanismItems.REFINED_OBSIDIAN_INGOT,
+//              MekanismItems.REFINED_GLOWSTONE_INGOT,
+//              MekanismItems.STEEL_INGOT
+//        );
     }
 
     private void addBoxBlacklist() {
@@ -141,11 +136,20 @@ public class MekanismTagProvider extends BaseTagProvider {
               MekanismBlocks.SOLAR_NEUTRON_ACTIVATOR,
               MekanismBlocks.MODIFICATION_STATION,
               MekanismBlocks.ISOTOPIC_CENTRIFUGE,
-              MekanismBlocks.RADIOACTIVE_WASTE_BARREL // closing all the loopholes!
+              //Don't allow blocks that may have a radioactive substance in them to be picked up as it
+              // will effectively dupe the radiation and also leak out into the atmosphere which is not
+              // what people want, and means that it is likely someone miss-clicked.
+              MekanismBlocks.RADIOACTIVE_WASTE_BARREL,
+              MekanismBlocks.PRESSURIZED_REACTION_CHAMBER,
+              MekanismBlocks.BASIC_PRESSURIZED_TUBE,
+              MekanismBlocks.ADVANCED_PRESSURIZED_TUBE,
+              MekanismBlocks.ELITE_PRESSURIZED_TUBE,
+              MekanismBlocks.ULTIMATE_PRESSURIZED_TUBE
         );
         getBlockBuilder(MekanismTags.Blocks.CARDBOARD_BLACKLIST)
-              .add(MekanismTags.Blocks.RELOCATION_NOT_SUPPORTED)
-              .add(Blocks.WHITE_BED,
+                .add(MekanismTags.Blocks.DOME_TAG)
+                .add(MekanismTags.Blocks.RELOCATION_NOT_SUPPORTED)
+                .add(Blocks.WHITE_BED,
                     Blocks.ORANGE_BED,
                     Blocks.MAGENTA_BED,
                     Blocks.LIGHT_BLUE_BED,
@@ -167,8 +171,8 @@ public class MekanismTagProvider extends BaseTagProvider {
                     Blocks.JUNGLE_DOOR,
                     Blocks.ACACIA_DOOR,
                     Blocks.DARK_OAK_DOOR,
-                    Blocks.CRIMSON_DOOR,
-                    Blocks.WARPED_DOOR,
+//                    Blocks.CRIMSON_DOOR,
+//                    Blocks.WARPED_DOOR,
                     Blocks.IRON_DOOR
               );
     }
@@ -233,7 +237,7 @@ public class MekanismTagProvider extends BaseTagProvider {
     }
 
     private void addOres() {
-        for (Map.Entry<OreType, BlockRegistryObject<?, ?>> entry : MekanismBlocks.ORES.entrySet()) {
+        for (Map.Entry<OreType, BlockRegistryObject<BlockOre, ?>> entry : MekanismBlocks.ORES.entrySet()) {
             addToTags(MekanismTags.Items.ORES.get(entry.getKey()), MekanismTags.Blocks.ORES.get(entry.getKey()), entry.getValue());
             getItemBuilder(Tags.Items.ORES).add(MekanismTags.Items.ORES.get(entry.getKey()));
             getBlockBuilder(Tags.Blocks.ORES).add(MekanismTags.Blocks.ORES.get(entry.getKey()));
@@ -246,10 +250,13 @@ public class MekanismTagProvider extends BaseTagProvider {
         addToTags(MekanismTags.Items.STORAGE_BLOCKS_REFINED_GLOWSTONE, MekanismTags.Blocks.STORAGE_BLOCKS_REFINED_GLOWSTONE, MekanismBlocks.REFINED_GLOWSTONE_BLOCK);
         addToTags(MekanismTags.Items.STORAGE_BLOCKS_REFINED_OBSIDIAN, MekanismTags.Blocks.STORAGE_BLOCKS_REFINED_OBSIDIAN, MekanismBlocks.REFINED_OBSIDIAN_BLOCK);
         addToTags(MekanismTags.Items.STORAGE_BLOCKS_STEEL, MekanismTags.Blocks.STORAGE_BLOCKS_STEEL, MekanismBlocks.STEEL_BLOCK);
+        addToTags(MekanismTags.Items.STORAGE_BLOCKS_FLUORITE, MekanismTags.Blocks.STORAGE_BLOCKS_FLUORITE, MekanismBlocks.FLUORITE_BLOCK);
         getItemBuilder(Tags.Items.STORAGE_BLOCKS).add(MekanismTags.Items.STORAGE_BLOCKS_BRONZE, MekanismTags.Items.STORAGE_BLOCKS_CHARCOAL,
-              MekanismTags.Items.STORAGE_BLOCKS_REFINED_GLOWSTONE, MekanismTags.Items.STORAGE_BLOCKS_REFINED_OBSIDIAN, MekanismTags.Items.STORAGE_BLOCKS_STEEL);
+              MekanismTags.Items.STORAGE_BLOCKS_REFINED_GLOWSTONE, MekanismTags.Items.STORAGE_BLOCKS_REFINED_OBSIDIAN, MekanismTags.Items.STORAGE_BLOCKS_STEEL,
+              MekanismTags.Items.STORAGE_BLOCKS_FLUORITE);
         getBlockBuilder(Tags.Blocks.STORAGE_BLOCKS).add(MekanismTags.Blocks.STORAGE_BLOCKS_BRONZE, MekanismTags.Blocks.STORAGE_BLOCKS_CHARCOAL,
-              MekanismTags.Blocks.STORAGE_BLOCKS_REFINED_GLOWSTONE, MekanismTags.Blocks.STORAGE_BLOCKS_REFINED_OBSIDIAN, MekanismTags.Blocks.STORAGE_BLOCKS_STEEL);
+              MekanismTags.Blocks.STORAGE_BLOCKS_REFINED_GLOWSTONE, MekanismTags.Blocks.STORAGE_BLOCKS_REFINED_OBSIDIAN, MekanismTags.Blocks.STORAGE_BLOCKS_STEEL,
+              MekanismTags.Blocks.STORAGE_BLOCKS_FLUORITE);
         // Dynamic storage blocks
         for (Map.Entry<PrimaryResource, BlockRegistryObject<?, ?>> entry : MekanismBlocks.PROCESSED_RESOURCE_BLOCKS.entrySet()) {
             addToTags(MekanismTags.Items.PROCESSED_RESOURCE_BLOCKS.get(entry.getKey()), MekanismTags.Blocks.RESOURCE_STORAGE_BLOCKS.get(entry.getKey()), entry.getValue());

@@ -1,9 +1,5 @@
 package mekanism.common.tile.qio;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.api.NBTConstants;
 import mekanism.api.inventory.IInventorySlot;
 import mekanism.common.Mekanism;
@@ -16,12 +12,16 @@ import mekanism.common.inventory.slot.QIODriveSlot;
 import mekanism.common.lib.frequency.FrequencyType;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.util.MekanismUtils;
-import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelDataMap;
 import net.minecraftforge.client.model.data.ModelProperty;
+
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class TileEntityQIODriveArray extends TileEntityQIOComponent implements IQIODriveHolder {
 

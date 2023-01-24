@@ -6,9 +6,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import mekanism.api.JsonConstants;
 import mekanism.api.annotations.NonNull;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.tags.Tag;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.util.JSONUtils;
 import net.minecraftforge.common.crafting.NBTIngredient;
@@ -42,13 +44,13 @@ public abstract class ItemStackIngredient implements InputIngredient<@NonNull It
         return from(new ItemStack(item), amount);
     }
 
-    /*public static ItemStackIngredient from(@Nonnull ITag<Item> itemTag) {
+    public static ItemStackIngredient from(@Nonnull Tag<Item> itemTag) {
         return from(itemTag, 1);
     }
 
-    public static ItemStackIngredient from(@Nonnull ITag<Item> itemTag, int amount) {
+    public static ItemStackIngredient from(@Nonnull Tag<Item> itemTag, int amount) {
         return from(Ingredient.fromTag(itemTag), amount);
-    }*/
+    }
 
     public static ItemStackIngredient from(@Nonnull Ingredient ingredient) {
         return from(ingredient, 1);

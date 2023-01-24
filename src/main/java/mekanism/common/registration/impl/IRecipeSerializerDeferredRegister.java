@@ -1,10 +1,11 @@
 package mekanism.common.registration.impl;
 
-import java.util.function.Supplier;
 import mekanism.common.registration.WrappedDeferredRegister;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import java.util.function.Supplier;
 
 public class IRecipeSerializerDeferredRegister extends WrappedDeferredRegister<IRecipeSerializer<?>> {
 

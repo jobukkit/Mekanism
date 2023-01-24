@@ -1,12 +1,10 @@
 package mekanism.client.gui.element.text;
 
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import mekanism.client.gui.GuiUtils;
 import mekanism.client.gui.element.GuiElementHolder;
 import mekanism.client.gui.element.GuiInnerScreen;
 
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public enum BackgroundType {

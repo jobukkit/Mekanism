@@ -1,10 +1,5 @@
 package mekanism.common.lib.transmitter.acceptor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.annotations.FieldsAreNonnullByDefault;
 import mekanism.api.chemical.gas.IGasHandler;
@@ -20,6 +15,12 @@ import mekanism.common.util.CapabilityUtils;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.util.LazyOptional;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 //TODO - V11: Improve this so it only invalidates the types needed instead of doing all chemical types at once
 @FieldsAreNonnullByDefault

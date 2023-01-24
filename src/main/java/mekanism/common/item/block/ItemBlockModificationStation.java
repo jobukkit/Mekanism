@@ -1,8 +1,5 @@
 package mekanism.common.item.block;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.common.block.attribute.Attribute;
 import mekanism.common.block.prefab.BlockTile.BlockTileModel;
 import mekanism.common.content.blocktype.BlockTypeTile;
@@ -13,6 +10,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ItemBlockModificationStation extends ItemBlockMachine {
 

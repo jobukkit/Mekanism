@@ -1,6 +1,5 @@
 package mekanism.common.network;
 
-import java.util.function.Supplier;
 import mekanism.common.Mekanism;
 import mekanism.common.content.qio.QIOFrequency;
 import mekanism.common.inventory.container.QIOItemViewerContainer;
@@ -15,6 +14,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.Hand;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
+
+import java.util.function.Supplier;
 
 public class PacketGuiItemDataRequest {
 

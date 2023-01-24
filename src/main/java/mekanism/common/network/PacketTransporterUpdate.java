@@ -4,7 +4,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import java.util.function.Supplier;
 import mekanism.common.content.network.transmitter.DiversionTransporter;
 import mekanism.common.content.network.transmitter.DiversionTransporter.DiversionControl;
 import mekanism.common.content.network.transmitter.LogisticalTransporterBase;
@@ -16,6 +15,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
+
+import java.util.function.Supplier;
 
 public class PacketTransporterUpdate {
 

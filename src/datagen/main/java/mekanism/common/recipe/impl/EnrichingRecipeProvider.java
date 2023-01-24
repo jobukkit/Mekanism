@@ -1,6 +1,5 @@
 package mekanism.common.recipe.impl;
 
-import java.util.function.Consumer;
 import mekanism.api.datagen.recipe.builder.ItemStackToItemStackRecipeBuilder;
 import mekanism.api.recipes.inputs.ItemStackIngredient;
 import mekanism.common.Mekanism;
@@ -17,8 +16,10 @@ import net.minecraft.item.Items;
 import net.minecraft.tags.ItemTags;
 import net.minecraftforge.common.Tags;
 
-class EnrichingRecipeProvider implements ISubRecipeProvider {
+import java.util.function.Consumer;
 
+class EnrichingRecipeProvider implements ISubRecipeProvider {
+    // TODO Maybe add Extended Nether Backport or FutureMC?
     @Override
     public void addRecipes(Consumer<IFinishedRecipe> consumer) {
         String basePath = "enriching/";
@@ -78,10 +79,10 @@ class EnrichingRecipeProvider implements ISubRecipeProvider {
               new ItemStack(Items.GRAVEL)
         ).build(consumer, Mekanism.rl(basePath + "sand_to_gravel"));
         //Soul Sand -> soul soil
-        ItemStackToItemStackRecipeBuilder.enriching(
-              ItemStackIngredient.from(Blocks.SOUL_SAND),
-              new ItemStack(Blocks.SOUL_SOIL)
-        ).build(consumer, Mekanism.rl(basePath + "soul_sand_to_soul_soil"));
+//        ItemStackToItemStackRecipeBuilder.enriching(
+//              ItemStackIngredient.from(Blocks.SOUL_SAND),
+//              new ItemStack(Blocks.SOUL_SOIL)
+//        ).build(consumer, Mekanism.rl(basePath + "soul_sand_to_soul_soil"));
         //Sulfur -> gunpowder
         ItemStackToItemStackRecipeBuilder.enriching(
               ItemStackIngredient.from(MekanismTags.Items.DUSTS_SULFUR),
@@ -93,20 +94,20 @@ class EnrichingRecipeProvider implements ISubRecipeProvider {
               MekanismItems.OBSIDIAN_DUST.getItemStack(4)
         ).build(consumer, Mekanism.rl(basePath + "obsidian_to_obsidian_dust"));
         //Basalt -> polished basalt
-        ItemStackToItemStackRecipeBuilder.enriching(
-              ItemStackIngredient.from(Blocks.BASALT),
-              new ItemStack(Blocks.POLISHED_BASALT)
-        ).build(consumer, Mekanism.rl(basePath + "basalt_to_polished_basalt"));
-        //Cracked nether bricks -> nether bricks
-        ItemStackToItemStackRecipeBuilder.enriching(
-              ItemStackIngredient.from(Blocks.CRACKED_NETHER_BRICKS),
-              new ItemStack(Blocks.NETHER_BRICKS)
-        ).build(consumer, Mekanism.rl(basePath + "cracked_nether_bricks_to_nether_bricks"));
-        //Nether bricks -> chiseled nether bricks
-        ItemStackToItemStackRecipeBuilder.enriching(
-              ItemStackIngredient.from(Blocks.NETHER_BRICKS),
-              new ItemStack(Blocks.CHISELED_NETHER_BRICKS)
-        ).build(consumer, Mekanism.rl(basePath + "nether_bricks_to_chiseled_nether_bricks"));
+//        ItemStackToItemStackRecipeBuilder.enriching(
+//              ItemStackIngredient.from(Blocks.BASALT),
+//              new ItemStack(Blocks.POLISHED_BASALT)
+//        ).build(consumer, Mekanism.rl(basePath + "basalt_to_polished_basalt"));
+//        //Cracked nether bricks -> nether bricks
+//        ItemStackToItemStackRecipeBuilder.enriching(
+//              ItemStackIngredient.from(Blocks.CRACKED_NETHER_BRICKS),
+//              new ItemStack(Blocks.NETHER_BRICKS)
+//        ).build(consumer, Mekanism.rl(basePath + "cracked_nether_bricks_to_nether_bricks"));
+//        //Nether bricks -> chiseled nether bricks
+//        ItemStackToItemStackRecipeBuilder.enriching(
+//              ItemStackIngredient.from(Blocks.NETHER_BRICKS),
+//              new ItemStack(Blocks.CHISELED_NETHER_BRICKS)
+//        ).build(consumer, Mekanism.rl(basePath + "nether_bricks_to_chiseled_nether_bricks"));
     }
 
     private void addEnrichingStoneConversionRecipes(Consumer<IFinishedRecipe> consumer, String basePath) {
@@ -129,20 +130,20 @@ class EnrichingRecipeProvider implements ISubRecipeProvider {
 
     private void addEnrichingBlackstoneConversionRecipes(Consumer<IFinishedRecipe> consumer, String basePath) {
         //Polished blackstone -> cracked polished blackstone bricks
-        ItemStackToItemStackRecipeBuilder.enriching(
-              ItemStackIngredient.from(Blocks.POLISHED_BLACKSTONE),
-              new ItemStack(Blocks.CRACKED_POLISHED_BLACKSTONE_BRICKS)
-        ).build(consumer, Mekanism.rl(basePath + "to_cracked_bricks"));
-        //Cracked polished blackstone bricks -> polished blackstone bricks
-        ItemStackToItemStackRecipeBuilder.enriching(
-              ItemStackIngredient.from(Blocks.CRACKED_POLISHED_BLACKSTONE_BRICKS),
-              new ItemStack(Blocks.POLISHED_BLACKSTONE_BRICKS)
-        ).build(consumer, Mekanism.rl(basePath + "cracked_bricks_to_bricks"));
-        //Polished blackstone bricks -> chiseled polished blackstone bricks
-        ItemStackToItemStackRecipeBuilder.enriching(
-              ItemStackIngredient.from(Blocks.POLISHED_BLACKSTONE_BRICKS),
-              new ItemStack(Blocks.CHISELED_POLISHED_BLACKSTONE)
-        ).build(consumer, Mekanism.rl(basePath + "bricks_to_chiseled_bricks"));
+//        ItemStackToItemStackRecipeBuilder.enriching(
+//              ItemStackIngredient.from(Blocks.POLISHED_BLACKSTONE),
+//              new ItemStack(Blocks.CRACKED_POLISHED_BLACKSTONE_BRICKS)
+//        ).build(consumer, Mekanism.rl(basePath + "to_cracked_bricks"));
+//        //Cracked polished blackstone bricks -> polished blackstone bricks
+//        ItemStackToItemStackRecipeBuilder.enriching(
+//              ItemStackIngredient.from(Blocks.CRACKED_POLISHED_BLACKSTONE_BRICKS),
+//              new ItemStack(Blocks.POLISHED_BLACKSTONE_BRICKS)
+//        ).build(consumer, Mekanism.rl(basePath + "cracked_bricks_to_bricks"));
+//        //Polished blackstone bricks -> chiseled polished blackstone bricks
+//        ItemStackToItemStackRecipeBuilder.enriching(
+//              ItemStackIngredient.from(Blocks.POLISHED_BLACKSTONE_BRICKS),
+//              new ItemStack(Blocks.CHISELED_POLISHED_BLACKSTONE)
+//        ).build(consumer, Mekanism.rl(basePath + "bricks_to_chiseled_bricks"));
     }
 
     private void addEnrichingQuartzRecipes(Consumer<IFinishedRecipe> consumer, String basePath) {
@@ -150,7 +151,7 @@ class EnrichingRecipeProvider implements ISubRecipeProvider {
         ItemStackToItemStackRecipeBuilder.enriching(
               ItemStackIngredient.createMulti(
                     ItemStackIngredient.from(Tags.Items.STORAGE_BLOCKS_QUARTZ),
-                    ItemStackIngredient.from(Blocks.QUARTZ_BRICKS),
+//                    ItemStackIngredient.from(Blocks.QUARTZ_BRICKS),
                     ItemStackIngredient.from(Blocks.CHISELED_QUARTZ_BLOCK),
                     ItemStackIngredient.from(Blocks.QUARTZ_PILLAR)
               ),

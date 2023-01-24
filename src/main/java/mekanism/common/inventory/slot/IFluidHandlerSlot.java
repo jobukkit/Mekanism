@@ -1,8 +1,6 @@
 package mekanism.common.inventory.slot;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import java.util.Map;
-import java.util.Optional;
 import mekanism.api.Action;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.inventory.AutomationType;
@@ -17,6 +15,9 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.items.ItemHandlerHelper;
+
+import java.util.Map;
+import java.util.Optional;
 
 public interface IFluidHandlerSlot extends IInventorySlot {
 

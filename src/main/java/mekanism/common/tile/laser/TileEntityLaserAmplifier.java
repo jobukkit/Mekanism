@@ -1,6 +1,5 @@
 package mekanism.common.tile.laser;
 
-import javax.annotation.Nonnull;
 import mekanism.api.IIncrementalEnum;
 import mekanism.api.NBTConstants;
 import mekanism.api.math.FloatingLong;
@@ -19,8 +18,9 @@ import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tile.interfaces.IHasMode;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
-import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
+
+import javax.annotation.Nonnull;
 
 public class TileEntityLaserAmplifier extends TileEntityLaserReceptor implements IHasMode {
 

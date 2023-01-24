@@ -1,6 +1,5 @@
 package mekanism.common.inventory.container.entity.robit;
 
-import javax.annotation.Nonnull;
 import mekanism.common.entity.EntityRobit;
 import mekanism.common.inventory.container.entity.IEntityContainer;
 import mekanism.common.inventory.container.entity.MekanismEntityContainer;
@@ -10,6 +9,8 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.WorkbenchContainer;
 import net.minecraft.network.PacketBuffer;
+
+import javax.annotation.Nonnull;
 
 public class CraftingRobitContainer extends WorkbenchContainer implements IEntityContainer<EntityRobit> {
 

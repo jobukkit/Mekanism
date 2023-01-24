@@ -1,10 +1,6 @@
 package mekanism.common.tags;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
 import mekanism.api.MekanismAPI;
-import mekanism.api.chemical.ChemicalTags;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasTags;
 import mekanism.api.chemical.infuse.InfuseType;
@@ -17,6 +13,10 @@ import net.minecraft.tags.TagCollection;
 import net.minecraftforge.common.util.NonNullLazy;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Information pertaining to the tags that get managed by the {@link MekanismTagManager}

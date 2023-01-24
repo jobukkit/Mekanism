@@ -1,17 +1,17 @@
 package mekanism.client.render.lib;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Predicate;
-
 import mekanism.api.backport.Vector3d;
 import mekanism.common.lib.Color;
 import mekanism.common.lib.math.Quaternion;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
 
 public interface QuadTransformation {
 

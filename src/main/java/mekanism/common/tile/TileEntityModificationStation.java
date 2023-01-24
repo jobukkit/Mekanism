@@ -1,6 +1,5 @@
 package mekanism.common.tile;
 
-import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.api.NBTConstants;
 import mekanism.api.RelativeSide;
@@ -32,6 +31,8 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
 
 public class TileEntityModificationStation extends TileEntityMekanism implements IBoundingBlock {
 

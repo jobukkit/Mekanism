@@ -1,12 +1,13 @@
 package mekanism.common.util;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public final class CapabilityUtils {
 

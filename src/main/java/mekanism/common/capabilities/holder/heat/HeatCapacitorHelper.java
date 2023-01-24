@@ -1,11 +1,12 @@
 package mekanism.common.capabilities.holder.heat;
 
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import mekanism.api.RelativeSide;
 import mekanism.api.heat.IHeatCapacitor;
 import mekanism.common.tile.component.TileComponentConfig;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nonnull;
+import java.util.function.Supplier;
 
 public class HeatCapacitorHelper {
 

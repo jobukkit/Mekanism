@@ -1,9 +1,6 @@
 package mekanism.common.item;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import java.util.Optional;
-import java.util.Set;
-import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.api.MekanismAPI;
 import mekanism.api.energy.IEnergyContainer;
@@ -31,10 +28,13 @@ import net.minecraft.item.Rarity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
+import java.util.Optional;
+import java.util.Set;
 
 public class ItemNetworkReader extends ItemEnergized {
 

@@ -1,16 +1,6 @@
 package mekanism.common.integration.lookingat;
 
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.function.Function;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import mekanism.api.chemical.Chemical;
-import mekanism.api.chemical.ChemicalStack;
-import mekanism.api.chemical.IChemicalHandler;
-import mekanism.api.chemical.IChemicalTank;
-import mekanism.api.chemical.IMekanismChemicalHandler;
+import mekanism.api.chemical.*;
 import mekanism.api.chemical.merged.ChemicalTankWrapper;
 import mekanism.api.chemical.merged.MergedChemicalTank;
 import mekanism.api.chemical.merged.MergedChemicalTank.Current;
@@ -23,17 +13,20 @@ import mekanism.common.capabilities.fluid.FluidTankWrapper;
 import mekanism.common.capabilities.merged.MergedTank;
 import mekanism.common.capabilities.merged.MergedTank.CurrentType;
 import mekanism.common.capabilities.proxy.ProxyChemicalHandler;
-import mekanism.common.lib.multiblock.IMultiblock;
-import mekanism.common.lib.multiblock.IStructuralMultiblock;
-import mekanism.common.lib.multiblock.MultiblockData;
-import mekanism.common.lib.multiblock.MultiblockManager;
-import mekanism.common.lib.multiblock.Structure;
+import mekanism.common.lib.multiblock.*;
 import mekanism.common.util.CapabilityUtils;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Utils for simplifying the code for interacting with various mods that you look at things for (TOP, and Hwyla)

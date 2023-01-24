@@ -1,24 +1,15 @@
 package mekanism.common.config;
 
-import java.util.Locale;
 import mekanism.common.config.value.CachedDoubleValue;
 import mekanism.common.config.value.CachedFloatingLongValue;
 import mekanism.common.config.value.CachedIntValue;
 import mekanism.common.config.value.CachedLongValue;
-import mekanism.common.tier.BinTier;
-import mekanism.common.tier.CableTier;
-import mekanism.common.tier.ChemicalTankTier;
-import mekanism.common.tier.ConductorTier;
-import mekanism.common.tier.EnergyCubeTier;
-import mekanism.common.tier.FluidTankTier;
-import mekanism.common.tier.InductionCellTier;
-import mekanism.common.tier.InductionProviderTier;
-import mekanism.common.tier.PipeTier;
-import mekanism.common.tier.TransporterTier;
-import mekanism.common.tier.TubeTier;
+import mekanism.common.tier.*;
 import mekanism.common.util.EnumUtils;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig.Type;
+
+import java.util.Locale;
 
 public class TierConfig extends BaseMekanismConfig {
 

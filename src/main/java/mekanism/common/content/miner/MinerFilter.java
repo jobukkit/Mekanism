@@ -1,6 +1,5 @@
 package mekanism.common.content.miner;
 
-import javax.annotation.Nonnull;
 import mekanism.api.NBTConstants;
 import mekanism.common.content.filter.BaseFilter;
 import mekanism.common.util.NBTUtils;
@@ -8,6 +7,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
+
+import javax.annotation.Nonnull;
 
 public abstract class MinerFilter<FILTER extends MinerFilter<FILTER>> extends BaseFilter<FILTER> {
 

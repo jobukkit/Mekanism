@@ -1,11 +1,11 @@
 package mekanism.common.integration.lookingat.theoneprobe;
 
-import javax.annotation.Nonnull;
-import mcjty.theoneprobe.api.IElement;
 import mcjty.theoneprobe.api.IElementNew;
 import mekanism.common.integration.lookingat.FluidElement;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fluids.FluidStack;
+
+import javax.annotation.Nonnull;
 
 public class TOPFluidElement extends FluidElement implements IElementNew {
 

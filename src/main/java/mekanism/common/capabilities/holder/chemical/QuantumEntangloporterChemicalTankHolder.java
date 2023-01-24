@@ -1,10 +1,5 @@
 package mekanism.common.capabilities.holder.chemical;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.function.BiFunction;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalTank;
@@ -13,6 +8,12 @@ import mekanism.common.content.entangloporter.InventoryFrequency;
 import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.tile.TileEntityQuantumEntangloporter;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.BiFunction;
 
 public class QuantumEntangloporterChemicalTankHolder<CHEMICAL extends Chemical<CHEMICAL>, STACK extends ChemicalStack<CHEMICAL>,
       TANK extends IChemicalTank<CHEMICAL, STACK>> extends QuantumEntangloporterConfigHolder implements IChemicalTankHolder<CHEMICAL, STACK, TANK> {

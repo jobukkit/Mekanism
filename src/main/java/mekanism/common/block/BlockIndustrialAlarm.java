@@ -1,6 +1,5 @@
 package mekanism.common.block;
 
-import javax.annotation.Nonnull;
 import mekanism.common.block.attribute.Attribute;
 import mekanism.common.block.attribute.AttributeStateFacing;
 import mekanism.common.block.prefab.BlockTile;
@@ -21,6 +20,8 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
+
+import javax.annotation.Nonnull;
 
 public class BlockIndustrialAlarm extends BlockTile<TileEntityIndustrialAlarm, BlockTypeTile<TileEntityIndustrialAlarm>> {
 

@@ -1,9 +1,7 @@
-package mekanism.common.recipe.compat;
+/*package mekanism.common.recipe.compat;
 
 import biomesoplenty.api.block.BOPBlocks;
 import biomesoplenty.api.item.BOPItems;
-import java.util.function.Consumer;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.api.datagen.recipe.builder.ItemStackGasToItemStackRecipeBuilder;
 import mekanism.api.datagen.recipe.builder.ItemStackToItemStackRecipeBuilder;
 import mekanism.api.recipes.inputs.ItemStackIngredient;
@@ -16,6 +14,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.IItemProvider;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 public class BiomesOPlentyRecipeProvider extends CompatRecipeProvider {
@@ -156,4 +157,4 @@ public class BiomesOPlentyRecipeProvider extends CompatRecipeProvider {
         ).addCondition(modLoaded)
               .build(consumer, Mekanism.rl(basePath + "yellow"));
     }
-}
+}*/

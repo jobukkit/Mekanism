@@ -1,21 +1,10 @@
 package mekanism.client.render.item;
 
-import java.util.concurrent.Callable;
-import mekanism.client.render.item.block.RenderChemicalDissolutionChamberItem;
-import mekanism.client.render.item.block.RenderEnergyCubeItem;
-import mekanism.client.render.item.block.RenderFluidTankItem;
-import mekanism.client.render.item.block.RenderIndustrialAlarmItem;
-import mekanism.client.render.item.block.RenderQuantumEntangloporterItem;
-import mekanism.client.render.item.block.RenderSeismicVibratorItem;
-import mekanism.client.render.item.block.RenderSolarNeutronActivatorItem;
-import mekanism.client.render.item.gear.RenderArmoredJetpack;
-import mekanism.client.render.item.gear.RenderAtomicDisassembler;
-import mekanism.client.render.item.gear.RenderFlameThrower;
-import mekanism.client.render.item.gear.RenderFreeRunners;
-import mekanism.client.render.item.gear.RenderJetpack;
-import mekanism.client.render.item.gear.RenderScubaMask;
-import mekanism.client.render.item.gear.RenderScubaTank;
+import mekanism.client.render.item.block.*;
+import mekanism.client.render.item.gear.*;
 import net.minecraft.client.renderer.tileentity.ItemStackTileEntityRenderer;
+
+import java.util.concurrent.Callable;
 
 //This class is used to prevent class loading issues on the server without having to use OnlyIn hacks
 public class ISTERProvider {

@@ -1,7 +1,5 @@
 package mekanism.common.inventory.container.item;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.common.inventory.container.MekanismContainer;
 import mekanism.common.registration.impl.ContainerTypeRegistryObject;
 import net.minecraft.entity.player.PlayerInventory;
@@ -11,6 +9,9 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.Hand;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public abstract class MekanismItemContainer extends MekanismContainer {
 

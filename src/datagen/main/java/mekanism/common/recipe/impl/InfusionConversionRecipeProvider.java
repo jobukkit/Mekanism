@@ -1,6 +1,5 @@
 package mekanism.common.recipe.impl;
 
-import java.util.function.Consumer;
 import mekanism.api.datagen.recipe.builder.ItemStackToChemicalRecipeBuilder;
 import mekanism.api.recipes.inputs.ItemStackIngredient;
 import mekanism.common.Mekanism;
@@ -13,6 +12,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.item.Items;
 import net.minecraftforge.common.Tags;
+
+import java.util.function.Consumer;
 
 //TODO: Try to cleanup some of the duplicate code in this class?
 class InfusionConversionRecipeProvider implements ISubRecipeProvider {
@@ -91,10 +92,7 @@ class InfusionConversionRecipeProvider implements ISubRecipeProvider {
         //Mushrooms
         ItemStackToChemicalRecipeBuilder.infusionConversion(
               ItemStackIngredient.createMulti(
-                    ItemStackIngredient.from(Tags.Items.MUSHROOMS),
-                    //TODO: If these get added to the mushroom tag then we can remove them from here
-                    ItemStackIngredient.from(Blocks.WARPED_FUNGUS),
-                    ItemStackIngredient.from(Blocks.CRIMSON_FUNGUS)
+                    ItemStackIngredient.from(Tags.Items.MUSHROOMS)
               ),
               MekanismInfuseTypes.FUNGI.getStack(10)
         ).build(consumer, Mekanism.rl(basePath + "from_mushrooms"));

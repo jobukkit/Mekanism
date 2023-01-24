@@ -1,10 +1,11 @@
 package mekanism.common.entity.ai;
 
-import java.util.Iterator;
-import java.util.List;
 import mekanism.common.entity.EntityRobit;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.util.math.AxisAlignedBB;
+
+import java.util.Iterator;
+import java.util.List;
 
 public class RobitAIPickup extends RobitAIBase {
 

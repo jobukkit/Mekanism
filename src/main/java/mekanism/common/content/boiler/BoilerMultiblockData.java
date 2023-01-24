@@ -2,9 +2,6 @@ package mekanism.common.content.boiler;
 
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
-import java.util.Arrays;
-import java.util.UUID;
-import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.api.NBTConstants;
 import mekanism.api.chemical.gas.GasStack;
@@ -32,6 +29,10 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
+import java.util.Arrays;
+import java.util.UUID;
 
 public class BoilerMultiblockData extends MultiblockData implements IValveHandler {
 

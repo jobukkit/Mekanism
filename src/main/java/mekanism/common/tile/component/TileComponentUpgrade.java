@@ -1,10 +1,5 @@
 package mekanism.common.tile.component;
 
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.Set;
-import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.api.NBTConstants;
 import mekanism.api.Upgrade;
@@ -20,6 +15,12 @@ import mekanism.common.util.NBTUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.Constants.NBT;
+
+import javax.annotation.Nonnull;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Set;
 
 //TODO: Clean this up as a lot of the code can probably be reduced due to the slot knowing some of that information
 public class TileComponentUpgrade implements ITileComponent, ITrackableContainer {

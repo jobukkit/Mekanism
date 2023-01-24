@@ -1,12 +1,13 @@
 package mekanism.common.block.basic;
 
-import javax.annotation.Nonnull;
 import mekanism.api.text.ILangEntry;
 import mekanism.common.MekanismLang;
 import mekanism.common.block.BlockMekanism;
 import mekanism.common.block.interfaces.IHasDescription;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+
+import javax.annotation.Nonnull;
 
 public class BlockTeleporterFrame extends BlockMekanism implements IHasDescription {
 

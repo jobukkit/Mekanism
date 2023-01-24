@@ -1,9 +1,10 @@
 package mekanism.common.network.container.property;
 
-import javax.annotation.Nullable;
 import mekanism.common.inventory.container.MekanismContainer;
 import mekanism.common.lib.frequency.Frequency;
 import net.minecraft.network.PacketBuffer;
+
+import javax.annotation.Nullable;
 
 public class FrequencyPropertyData<FREQUENCY extends Frequency> extends PropertyData {
 

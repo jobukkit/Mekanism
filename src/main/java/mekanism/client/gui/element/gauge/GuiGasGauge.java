@@ -1,13 +1,14 @@
 package mekanism.client.gui.element.gauge;
 
-import java.util.List;
-import java.util.function.Supplier;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.gas.IGasTank;
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.network.PacketDropperUse.TankType;
+
+import java.util.List;
+import java.util.function.Supplier;
 
 public class GuiGasGauge extends GuiChemicalGauge<Gas, GasStack, IGasTank> {
 

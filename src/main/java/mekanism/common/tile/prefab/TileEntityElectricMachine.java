@@ -1,7 +1,5 @@
 package mekanism.common.tile.prefab;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.annotations.NonNull;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.api.recipes.ItemStackToItemStackRecipe;
@@ -25,6 +23,9 @@ import mekanism.common.tile.component.TileComponentEjector;
 import mekanism.common.upgrade.MachineUpgradeData;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public abstract class TileEntityElectricMachine extends TileEntityProgressMachine<ItemStackToItemStackRecipe> {
 

@@ -1,8 +1,6 @@
 package mekanism.client.render.tileentity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.api.text.EnumColor;
 import mekanism.api.text.TextComponentUtil;
 import mekanism.client.render.MekanismRenderer;
@@ -21,6 +19,9 @@ import net.minecraft.profiler.IProfiler;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 public class RenderBin extends MekanismTileEntityRenderer<TileEntityBin> {

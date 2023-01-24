@@ -1,15 +1,16 @@
 package mekanism.common.tag;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import net.minecraft.tags.Tag;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-import mekanism.api.datagen.tag.ForgeRegistryTagBuilder;
-import mekanism.common.network.PacketGuiButtonPress;
-import net.minecraft.tags.Tag;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 
 public class TagTypeMap<TYPE extends IForgeRegistryEntry<TYPE>> {
 
@@ -25,8 +26,8 @@ public class TagTypeMap<TYPE extends IForgeRegistryEntry<TYPE>> {
         return tagType;
     }
 
-    public ForgeRegistryTagBuilder<TYPE> getBuilder(Tag<TYPE> tag, String modid) {
-        return new ForgeRegistryTagBuilder<>(tagToBuilder.computeIfAbsent(tag, ignored -> Tag.Builder.create()), modid);
+    public Tag.Builder<TYPE> getBuilder(Tag<TYPE> tag) {
+        return tagToBuilder.computeIfAbsent(tag, ignored -> Tag.Builder.create());
     }
 
     public boolean isEmpty() {

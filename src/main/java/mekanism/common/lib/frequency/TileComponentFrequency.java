@@ -1,9 +1,5 @@
 package mekanism.common.lib.frequency;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import mekanism.common.inventory.container.MekanismContainer;
 import mekanism.common.inventory.container.sync.SyncableFrequency;
 import mekanism.common.inventory.container.sync.list.SyncableFrequencyList;
@@ -13,6 +9,11 @@ import mekanism.common.tile.component.ITileComponent;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.Constants.NBT;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TileComponentFrequency implements ITileComponent {
 

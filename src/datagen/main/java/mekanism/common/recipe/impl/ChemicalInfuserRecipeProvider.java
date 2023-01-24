@@ -1,12 +1,13 @@
 package mekanism.common.recipe.impl;
 
-import java.util.function.Consumer;
 import mekanism.api.datagen.recipe.builder.ChemicalInfuserRecipeBuilder;
 import mekanism.api.recipes.inputs.chemical.GasStackIngredient;
 import mekanism.common.Mekanism;
 import mekanism.common.recipe.ISubRecipeProvider;
 import mekanism.common.registries.MekanismGases;
 import net.minecraft.data.IFinishedRecipe;
+
+import java.util.function.Consumer;
 
 class ChemicalInfuserRecipeProvider implements ISubRecipeProvider {
 

@@ -1,8 +1,9 @@
 package mekanism.common.block.attribute;
 
-import javax.annotation.Nonnull;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.math.FloatingLongSupplier;
+
+import javax.annotation.Nonnull;
 
 public class AttributeEnergy implements Attribute {
 

@@ -1,11 +1,12 @@
 package mekanism.common.lib.security;
 
-import java.util.UUID;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.NBTConstants;
 import mekanism.common.util.ItemDataUtils;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.UUID;
 
 //TODO - V11: Convert this into being a capability and accessible from the API
 public interface IOwnerItem {

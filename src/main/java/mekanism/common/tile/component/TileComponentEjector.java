@@ -1,11 +1,5 @@
 package mekanism.common.tile.component;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import mekanism.api.Action;
 import mekanism.api.NBTConstants;
 import mekanism.api.RelativeSide;
@@ -30,17 +24,14 @@ import mekanism.common.tile.component.config.slot.FluidSlotInfo;
 import mekanism.common.tile.component.config.slot.ISlotInfo;
 import mekanism.common.tile.component.config.slot.InventorySlotInfo;
 import mekanism.common.tile.transmitter.TileEntityLogisticalTransporterBase;
-import mekanism.common.util.ChemicalUtil;
-import mekanism.common.util.EnumUtils;
-import mekanism.common.util.FluidUtils;
-import mekanism.common.util.MekanismUtils;
-import mekanism.common.util.NBTUtils;
-import mekanism.common.util.TransporterUtils;
+import mekanism.common.util.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.util.Constants.NBT;
+
+import java.util.*;
 
 public class TileComponentEjector implements ITileComponent, ISpecificContainerTracker {
 

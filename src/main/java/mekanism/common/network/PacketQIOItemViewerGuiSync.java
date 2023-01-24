@@ -2,12 +2,13 @@ package mekanism.common.network;
 
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
-import java.util.function.Supplier;
 import mekanism.common.inventory.container.QIOItemViewerContainer;
 import mekanism.common.lib.inventory.HashedItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
+
+import java.util.function.Supplier;
 
 public class PacketQIOItemViewerGuiSync {
 

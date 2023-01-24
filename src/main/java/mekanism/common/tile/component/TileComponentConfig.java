@@ -1,14 +1,5 @@
 package mekanism.common.tile.component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.NBTConstants;
 import mekanism.api.RelativeSide;
 import mekanism.api.chemical.gas.IGasTank;
@@ -29,16 +20,11 @@ import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.tile.component.config.ConfigInfo;
 import mekanism.common.tile.component.config.DataType;
-import mekanism.common.tile.component.config.slot.BaseSlotInfo;
+import mekanism.common.tile.component.config.slot.*;
 import mekanism.common.tile.component.config.slot.ChemicalSlotInfo.GasSlotInfo;
 import mekanism.common.tile.component.config.slot.ChemicalSlotInfo.InfusionSlotInfo;
 import mekanism.common.tile.component.config.slot.ChemicalSlotInfo.PigmentSlotInfo;
 import mekanism.common.tile.component.config.slot.ChemicalSlotInfo.SlurrySlotInfo;
-import mekanism.common.tile.component.config.slot.EnergySlotInfo;
-import mekanism.common.tile.component.config.slot.FluidSlotInfo;
-import mekanism.common.tile.component.config.slot.HeatSlotInfo;
-import mekanism.common.tile.component.config.slot.ISlotInfo;
-import mekanism.common.tile.component.config.slot.InventorySlotInfo;
 import mekanism.common.util.EnumUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
@@ -48,6 +34,11 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class TileComponentConfig implements ITileComponent, ISpecificContainerTracker {
 

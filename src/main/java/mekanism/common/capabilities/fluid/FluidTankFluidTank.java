@@ -1,9 +1,5 @@
 package mekanism.common.capabilities.fluid;
 
-import java.util.Objects;
-import java.util.function.IntSupplier;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
 import mekanism.api.inventory.AutomationType;
@@ -11,6 +7,11 @@ import mekanism.common.tier.FluidTankTier;
 import mekanism.common.tile.TileEntityFluidTank;
 import mekanism.common.util.MekanismUtils;
 import net.minecraftforge.fluids.FluidStack;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Objects;
+import java.util.function.IntSupplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

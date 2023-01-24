@@ -1,12 +1,5 @@
 package mekanism.common.recipe.upgrade;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.common.registries.MekanismRecipeSerializers;
 import net.minecraft.inventory.CraftingInventory;
@@ -19,6 +12,10 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.crafting.IShapedRecipe;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.*;
+import java.util.Map.Entry;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

@@ -1,13 +1,6 @@
 package mekanism.common.tile;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.NBTConstants;
 import mekanism.api.RelativeSide;
 import mekanism.api.chemical.gas.Gas;
@@ -53,15 +46,7 @@ import mekanism.common.tile.component.TileComponentConfig;
 import mekanism.common.tile.component.TileComponentEjector;
 import mekanism.common.tile.component.config.ConfigInfo;
 import mekanism.common.tile.component.config.DataType;
-import mekanism.common.tile.component.config.slot.IProxiedSlotInfo.EnergyProxy;
-import mekanism.common.tile.component.config.slot.IProxiedSlotInfo.FluidProxy;
-import mekanism.common.tile.component.config.slot.IProxiedSlotInfo.GasProxy;
-import mekanism.common.tile.component.config.slot.IProxiedSlotInfo.HeatProxy;
-import mekanism.common.tile.component.config.slot.IProxiedSlotInfo.InfusionProxy;
-import mekanism.common.tile.component.config.slot.IProxiedSlotInfo.InventoryProxy;
-import mekanism.common.tile.component.config.slot.IProxiedSlotInfo.PigmentProxy;
-import mekanism.common.tile.component.config.slot.IProxiedSlotInfo.ProxySlotInfoCreator;
-import mekanism.common.tile.component.config.slot.IProxiedSlotInfo.SlurryProxy;
+import mekanism.common.tile.component.config.slot.IProxiedSlotInfo.*;
 import mekanism.common.tile.component.config.slot.ISlotInfo;
 import mekanism.common.tile.interfaces.ISideConfiguration;
 import mekanism.common.tile.interfaces.ISustainedData;
@@ -73,6 +58,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.ChunkPos;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Supplier;
 
 public class TileEntityQuantumEntangloporter extends TileEntityMekanism implements ISideConfiguration, IFrequencyHandler, ISustainedData, IChunkLoader {
 

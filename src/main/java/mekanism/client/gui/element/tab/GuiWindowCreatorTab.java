@@ -1,12 +1,13 @@
 package mekanism.client.gui.element.tab;
 
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.client.gui.element.GuiInsetElement;
 import mekanism.client.gui.element.GuiWindow;
 import mekanism.common.tile.base.TileEntityMekanism;
 import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.Nonnull;
+import java.util.function.Supplier;
 
 public abstract class GuiWindowCreatorTab<ELEMENT extends GuiWindowCreatorTab<ELEMENT>> extends GuiInsetElement<TileEntityMekanism> {
 

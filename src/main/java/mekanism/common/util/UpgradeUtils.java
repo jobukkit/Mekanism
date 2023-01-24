@@ -1,7 +1,5 @@
 package mekanism.common.util;
 
-import java.util.ArrayList;
-import java.util.List;
 import mekanism.api.Upgrade;
 import mekanism.api.Upgrade.IUpgradeInfoHandler;
 import mekanism.common.MekanismLang;
@@ -11,6 +9,9 @@ import mekanism.common.tile.interfaces.IUpgradeTile;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.text.ITextComponent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UpgradeUtils {
 

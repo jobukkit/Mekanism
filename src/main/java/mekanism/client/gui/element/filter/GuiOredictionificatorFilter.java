@@ -1,9 +1,5 @@
 package mekanism.client.gui.element.filter;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import javax.annotation.Nonnull;
 import mekanism.api.functions.CharPredicate;
 import mekanism.api.text.ILangEntry;
 import mekanism.api.text.TextComponentUtil;
@@ -17,6 +13,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+
+import javax.annotation.Nonnull;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 
 public class GuiOredictionificatorFilter extends GuiTextFilter<OredictionificatorFilter, TileEntityOredictionificator> {
 

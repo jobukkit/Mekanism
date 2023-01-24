@@ -1,10 +1,5 @@
 package mekanism.common.tile.base;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.function.BooleanSupplier;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.common.capabilities.CapabilityCache;
 import mekanism.common.capabilities.resolver.ICapabilityResolver;
 import mekanism.common.capabilities.resolver.manager.ICapabilityHandlerManager;
@@ -13,6 +8,12 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.BooleanSupplier;
 
 public abstract class CapabilityTileEntity extends TileEntityUpdateable {
 

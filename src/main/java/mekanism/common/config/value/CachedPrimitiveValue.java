@@ -1,9 +1,10 @@
 package mekanism.common.config.value;
 
-import java.util.ArrayList;
-import java.util.List;
 import mekanism.common.config.IMekanismConfig;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CachedPrimitiveValue<T> {
 

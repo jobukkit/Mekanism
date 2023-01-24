@@ -1,7 +1,6 @@
 package mekanism.client.render.tileentity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.client.MekanismClient;
 import mekanism.client.model.ModelEnergyCube;
 import mekanism.client.model.ModelEnergyCube.ModelEnergyCore;
@@ -13,6 +12,8 @@ import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.profiler.IProfiler;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 public class RenderEnergyCube extends MekanismTileEntityRenderer<TileEntityEnergyCube> {

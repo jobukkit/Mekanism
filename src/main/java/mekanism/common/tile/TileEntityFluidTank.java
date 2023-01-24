@@ -1,8 +1,5 @@
 package mekanism.common.tile;
 
-import java.util.EnumSet;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.Action;
 import mekanism.api.IConfigurable;
 import mekanism.api.NBTConstants;
@@ -30,7 +27,6 @@ import mekanism.common.upgrade.IUpgradeData;
 import mekanism.common.util.FluidUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResultType;
@@ -39,6 +35,10 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.EnumSet;
 
 public class TileEntityFluidTank extends TileEntityMekanism implements IConfigurable, IFluidContainerManager {
 

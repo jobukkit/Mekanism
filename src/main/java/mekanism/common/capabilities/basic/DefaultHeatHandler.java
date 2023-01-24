@@ -1,11 +1,12 @@
 package mekanism.common.capabilities.basic;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.heat.HeatAPI;
 import mekanism.api.heat.IHeatHandler;
 import mekanism.common.capabilities.basic.DefaultStorageHelper.NullStorage;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

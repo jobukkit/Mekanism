@@ -2,12 +2,6 @@ package mekanism.client.render.obj;
 
 import com.google.common.collect.Sets;
 import com.mojang.datafixers.util.Pair;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import javax.annotation.Nullable;
-
 import net.minecraft.client.renderer.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
@@ -15,6 +9,12 @@ import net.minecraftforge.client.model.IModelConfiguration;
 import net.minecraftforge.client.model.geometry.IModelGeometryPart;
 import net.minecraftforge.client.model.geometry.IMultipartModelGeometry;
 import net.minecraftforge.client.model.obj.OBJModel;
+
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 
 public class TransmitterModel implements IMultipartModelGeometry<TransmitterModel> {
 

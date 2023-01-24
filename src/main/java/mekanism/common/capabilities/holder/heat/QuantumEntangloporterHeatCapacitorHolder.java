@@ -1,14 +1,15 @@
 package mekanism.common.capabilities.holder.heat;
 
-import java.util.Collections;
-import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.heat.IHeatCapacitor;
 import mekanism.common.capabilities.holder.QuantumEntangloporterConfigHolder;
 import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.tile.TileEntityQuantumEntangloporter;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
 
 public class QuantumEntangloporterHeatCapacitorHolder extends QuantumEntangloporterConfigHolder implements IHeatCapacitorHolder {
 

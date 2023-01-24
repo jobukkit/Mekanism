@@ -1,6 +1,5 @@
 package mekanism.common.inventory.container.item;
 
-import javax.annotation.Nonnull;
 import mekanism.common.content.qio.QIOFrequency;
 import mekanism.common.inventory.container.QIOItemViewerContainer;
 import mekanism.common.inventory.container.slot.HotBarSlot;
@@ -15,6 +14,8 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.Hand;
+
+import javax.annotation.Nonnull;
 
 public class PortableQIODashboardContainer extends QIOItemViewerContainer {
 

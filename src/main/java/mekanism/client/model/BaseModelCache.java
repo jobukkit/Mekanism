@@ -1,7 +1,6 @@
 package mekanism.client.model;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import java.util.Map;
 import net.minecraft.client.renderer.model.BlockModel;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.IUnbakedModel;
@@ -14,6 +13,8 @@ import net.minecraftforge.client.model.SimpleModelTransform;
 import net.minecraftforge.client.model.geometry.IModelGeometry;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.client.model.obj.OBJModel.ModelSettings;
+
+import java.util.Map;
 
 public class BaseModelCache {
 

@@ -1,6 +1,5 @@
 package mekanism.common.item.block;
 
-import javax.annotation.Nonnull;
 import mekanism.common.registration.impl.ItemDeferredRegister;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.block.Block;
@@ -14,6 +13,8 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
 
 /**
  * Created by Thiakil on 19/11/2017.

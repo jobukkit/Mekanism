@@ -1,13 +1,14 @@
 package mekanism.common.recipe;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Consumer;
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.data.RecipeProvider;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 public abstract class BaseRecipeProvider extends RecipeProvider {

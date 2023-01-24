@@ -1,6 +1,5 @@
 package mekanism.common.content.network.distribution;
 
-import javax.annotation.Nonnull;
 import mekanism.api.annotations.NonNull;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
@@ -11,6 +10,8 @@ import mekanism.common.lib.distribution.SplitInfo;
 import mekanism.common.lib.distribution.Target;
 import mekanism.common.util.ChemicalUtil;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nonnull;
 
 public class BoxedChemicalTransmitterSaveTarget<CHEMICAL extends Chemical<CHEMICAL>, STACK extends ChemicalStack<CHEMICAL>>
       extends Target<BoxedPressurizedTube, Long, @NonNull STACK> {

@@ -1,11 +1,12 @@
 package mekanism.common.block.attribute;
 
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import mekanism.api.tier.BaseTier;
 import mekanism.common.block.states.BlockStateHelper;
 import mekanism.common.registration.impl.BlockRegistryObject;
 import net.minecraft.block.BlockState;
+
+import javax.annotation.Nonnull;
+import java.util.function.Supplier;
 
 public class AttributeUpgradeable implements Attribute {
 

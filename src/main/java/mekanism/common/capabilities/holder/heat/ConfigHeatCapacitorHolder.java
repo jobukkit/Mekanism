@@ -1,11 +1,5 @@
 package mekanism.common.capabilities.holder.heat;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.RelativeSide;
 import mekanism.api.heat.IHeatCapacitor;
 import mekanism.common.capabilities.holder.ConfigHolder;
@@ -15,6 +9,13 @@ import mekanism.common.tile.component.config.ConfigInfo;
 import mekanism.common.tile.component.config.slot.HeatSlotInfo;
 import mekanism.common.tile.component.config.slot.ISlotInfo;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Supplier;
 
 public class ConfigHeatCapacitorHolder extends ConfigHolder implements IHeatCapacitorHolder {
 

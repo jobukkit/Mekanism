@@ -1,12 +1,13 @@
 package mekanism.common.network.container.property.chemical;
 
-import javax.annotation.Nonnull;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.ChemicalUtils;
 import mekanism.common.inventory.container.MekanismContainer;
 import mekanism.common.network.container.property.PropertyData;
 import mekanism.common.network.container.property.PropertyType;
 import net.minecraft.network.PacketBuffer;
+
+import javax.annotation.Nonnull;
 
 public abstract class ChemicalStackPropertyData<STACK extends ChemicalStack<?>> extends PropertyData {
 

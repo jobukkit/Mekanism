@@ -1,12 +1,13 @@
 package mekanism.common.util.text;
 
-import java.util.UUID;
 import mekanism.api.text.EnumColor;
 import mekanism.api.text.IHasTextComponent;
 import mekanism.client.MekanismClient;
 import mekanism.common.MekanismLang;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.text.ITextComponent;
+
+import java.util.UUID;
 
 public class OwnerDisplay implements IHasTextComponent {
 

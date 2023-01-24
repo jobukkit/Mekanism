@@ -1,9 +1,5 @@
 package mekanism.client.jei;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
@@ -26,25 +22,7 @@ import mekanism.client.jei.ChemicalStackHelper.GasStackHelper;
 import mekanism.client.jei.ChemicalStackHelper.InfusionStackHelper;
 import mekanism.client.jei.ChemicalStackHelper.PigmentStackHelper;
 import mekanism.client.jei.ChemicalStackHelper.SlurryStackHelper;
-import mekanism.client.jei.machine.ChemicalCrystallizerRecipeCategory;
-import mekanism.client.jei.machine.ChemicalDissolutionRecipeCategory;
-import mekanism.client.jei.machine.ChemicalInfuserRecipeCategory;
-import mekanism.client.jei.machine.CombinerRecipeCategory;
-import mekanism.client.jei.machine.ElectrolysisRecipeCategory;
-import mekanism.client.jei.machine.FluidSlurryToSlurryRecipeCategory;
-import mekanism.client.jei.machine.FluidToFluidRecipeCategory;
-import mekanism.client.jei.machine.GasToGasRecipeCategory;
-import mekanism.client.jei.machine.ItemStackGasToItemStackRecipeCategory;
-import mekanism.client.jei.machine.ItemStackToEnergyRecipeCategory;
-import mekanism.client.jei.machine.ItemStackToGasRecipeCategory;
-import mekanism.client.jei.machine.ItemStackToInfuseTypeRecipeCategory;
-import mekanism.client.jei.machine.ItemStackToItemStackRecipeCategory;
-import mekanism.client.jei.machine.MetallurgicInfuserRecipeCategory;
-import mekanism.client.jei.machine.NucleosynthesizingRecipeCategory;
-import mekanism.client.jei.machine.PressurizedReactionRecipeCategory;
-import mekanism.client.jei.machine.RotaryCondensentratorRecipeCategory;
-import mekanism.client.jei.machine.SPSRecipeCategory;
-import mekanism.client.jei.machine.SawmillRecipeCategory;
+import mekanism.client.jei.machine.*;
 import mekanism.common.Mekanism;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.inventory.container.entity.robit.CraftingRobitContainer;
@@ -59,18 +37,17 @@ import mezz.jei.api.constants.VanillaRecipeCategoryUid;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.subtypes.ISubtypeInterpreter;
-import mezz.jei.api.registration.IGuiHandlerRegistration;
-import mezz.jei.api.registration.IModIngredientRegistration;
-import mezz.jei.api.registration.IRecipeCatalystRegistration;
-import mezz.jei.api.registration.IRecipeCategoryRegistration;
-import mezz.jei.api.registration.IRecipeRegistration;
-import mezz.jei.api.registration.IRecipeTransferRegistration;
-import mezz.jei.api.registration.ISubtypeRegistration;
+import mezz.jei.api.registration.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.registries.IForgeRegistry;
+
+import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @JeiPlugin
 public class MekanismJEI implements IModPlugin {

@@ -1,7 +1,6 @@
 package mekanism.common.recipe.impl;
 
 import it.unimi.dsi.fastutil.objects.Object2FloatMap.Entry;
-import java.util.function.Consumer;
 import mekanism.api.datagen.recipe.builder.ItemStackToItemStackRecipeBuilder;
 import mekanism.api.recipes.inputs.ItemStackIngredient;
 import mekanism.common.Mekanism;
@@ -16,8 +15,10 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.util.IItemProvider;
 import net.minecraftforge.common.Tags;
 
-class CrusherRecipeProvider implements ISubRecipeProvider {
+import java.util.function.Consumer;
 
+class CrusherRecipeProvider implements ISubRecipeProvider {
+    // TODO Maybe add Extended Nether Backport or FutureMC?
     @Override
     public void addRecipes(Consumer<IFinishedRecipe> consumer) {
         String basePath = "crushing/";
@@ -72,25 +73,25 @@ class CrusherRecipeProvider implements ISubRecipeProvider {
               new ItemStack(Items.STRING, 4)
         ).build(consumer, Mekanism.rl(basePath + "wool_to_string"));
         //Soul Soil -> Soul Sand
-        ItemStackToItemStackRecipeBuilder.crushing(
-              ItemStackIngredient.from(Blocks.SOUL_SOIL),
-              new ItemStack(Blocks.SOUL_SAND)
-        ).build(consumer, Mekanism.rl(basePath + "soul_soil_to_soul_sand"));
-        //Polished Basalt -> Basalt
-        ItemStackToItemStackRecipeBuilder.crushing(
-              ItemStackIngredient.from(Blocks.POLISHED_BASALT),
-              new ItemStack(Blocks.BASALT)
-        ).build(consumer, Mekanism.rl(basePath + "polished_basalt_to_basalt"));
-        //Chiseled Nether Bricks -> Nether Bricks Bricks
-        ItemStackToItemStackRecipeBuilder.crushing(
-              ItemStackIngredient.from(Blocks.CHISELED_NETHER_BRICKS),
-              new ItemStack(Blocks.NETHER_BRICKS)
-        ).build(consumer, Mekanism.rl(basePath + "chiseled_nether_bricks_to_nether_bricks"));
-        //Nether Bricks Bricks -> Cracked Nether Bricks Bricks
-        ItemStackToItemStackRecipeBuilder.crushing(
-              ItemStackIngredient.from(Blocks.NETHER_BRICKS),
-              new ItemStack(Blocks.CRACKED_NETHER_BRICKS)
-        ).build(consumer, Mekanism.rl(basePath + "nether_bricks_to_cracked_nether_bricks"));
+//        ItemStackToItemStackRecipeBuilder.crushing(
+//              ItemStackIngredient.from(Blocks.SOUL_SOIL),
+//              new ItemStack(Blocks.SOUL_SAND)
+//        ).build(consumer, Mekanism.rl(basePath + "soul_soil_to_soul_sand"));
+//        //Polished Basalt -> Basalt
+//        ItemStackToItemStackRecipeBuilder.crushing(
+//              ItemStackIngredient.from(Blocks.POLISHED_BASALT),
+//              new ItemStack(Blocks.BASALT)
+//        ).build(consumer, Mekanism.rl(basePath + "polished_basalt_to_basalt"));
+//        //Chiseled Nether Bricks -> Nether Bricks Bricks
+//        ItemStackToItemStackRecipeBuilder.crushing(
+//              ItemStackIngredient.from(Blocks.CHISELED_NETHER_BRICKS),
+//              new ItemStack(Blocks.NETHER_BRICKS)
+//        ).build(consumer, Mekanism.rl(basePath + "chiseled_nether_bricks_to_nether_bricks"));
+//        //Nether Bricks Bricks -> Cracked Nether Bricks Bricks
+//        ItemStackToItemStackRecipeBuilder.crushing(
+//              ItemStackIngredient.from(Blocks.NETHER_BRICKS),
+//              new ItemStack(Blocks.CRACKED_NETHER_BRICKS)
+//        ).build(consumer, Mekanism.rl(basePath + "nether_bricks_to_cracked_nether_bricks"));
     }
 
     private void addCrusherStoneRecipes(Consumer<IFinishedRecipe> consumer, String basePath) {
@@ -128,40 +129,40 @@ class CrusherRecipeProvider implements ISubRecipeProvider {
 
     private void addCrusherBlackstoneRecipes(Consumer<IFinishedRecipe> consumer, String basePath) {
         //Polished Blackstone -> Blackstone
-        ItemStackToItemStackRecipeBuilder.crushing(
-              ItemStackIngredient.from(Blocks.POLISHED_BLACKSTONE),
-              new ItemStack(Blocks.BLACKSTONE)
-        ).build(consumer, Mekanism.rl(basePath + "from_polished"));
-        //Polished Blackstone Wall -> Blackstone Wall
-        ItemStackToItemStackRecipeBuilder.crushing(
-              ItemStackIngredient.from(Blocks.POLISHED_BLACKSTONE_WALL),
-              new ItemStack(Blocks.BLACKSTONE_WALL)
-        ).build(consumer, Mekanism.rl(basePath + "polished_wall_to_wall"));
-        //Polished Blackstone Stairs -> Blackstone Stairs
-        ItemStackToItemStackRecipeBuilder.crushing(
-              ItemStackIngredient.from(Blocks.POLISHED_BLACKSTONE_STAIRS),
-              new ItemStack(Blocks.BLACKSTONE_STAIRS)
-        ).build(consumer, Mekanism.rl(basePath + "polished_stairs_to_stairs"));
-        //Polished Blackstone Slabs -> Blackstone Slabs
-        ItemStackToItemStackRecipeBuilder.crushing(
-              ItemStackIngredient.from(Blocks.POLISHED_BLACKSTONE_SLAB),
-              new ItemStack(Blocks.BLACKSTONE_SLAB)
-        ).build(consumer, Mekanism.rl(basePath + "polished_slabs_to_slabs"));
-        //Chiseled Polished Blackstone Bricks -> Polished Blackstone Bricks
-        ItemStackToItemStackRecipeBuilder.crushing(
-              ItemStackIngredient.from(Blocks.CHISELED_POLISHED_BLACKSTONE),
-              new ItemStack(Blocks.POLISHED_BLACKSTONE_BRICKS)
-        ).build(consumer, Mekanism.rl(basePath + "chiseled_bricks_to_bricks"));
-        //Polished Blackstone Bricks -> Cracked Polished Blackstone Bricks
-        ItemStackToItemStackRecipeBuilder.crushing(
-              ItemStackIngredient.from(Blocks.POLISHED_BLACKSTONE_BRICKS),
-              new ItemStack(Blocks.CRACKED_POLISHED_BLACKSTONE_BRICKS)
-        ).build(consumer, Mekanism.rl(basePath + "bricks_to_cracked_bricks"));
-        //Cracked Polished Blackstone Bricks -> Polished Blackstone
-        ItemStackToItemStackRecipeBuilder.crushing(
-              ItemStackIngredient.from(Blocks.CRACKED_POLISHED_BLACKSTONE_BRICKS),
-              new ItemStack(Blocks.POLISHED_BLACKSTONE)
-        ).build(consumer, Mekanism.rl(basePath + "from_cracked_bricks"));
+//        ItemStackToItemStackRecipeBuilder.crushing(
+//              ItemStackIngredient.from(Blocks.POLISHED_BLACKSTONE),
+//              new ItemStack(Blocks.BLACKSTONE)
+//        ).build(consumer, Mekanism.rl(basePath + "from_polished"));
+//        //Polished Blackstone Wall -> Blackstone Wall
+//        ItemStackToItemStackRecipeBuilder.crushing(
+//              ItemStackIngredient.from(Blocks.POLISHED_BLACKSTONE_WALL),
+//              new ItemStack(Blocks.BLACKSTONE_WALL)
+//        ).build(consumer, Mekanism.rl(basePath + "polished_wall_to_wall"));
+//        //Polished Blackstone Stairs -> Blackstone Stairs
+//        ItemStackToItemStackRecipeBuilder.crushing(
+//              ItemStackIngredient.from(Blocks.POLISHED_BLACKSTONE_STAIRS),
+//              new ItemStack(Blocks.BLACKSTONE_STAIRS)
+//        ).build(consumer, Mekanism.rl(basePath + "polished_stairs_to_stairs"));
+//        //Polished Blackstone Slabs -> Blackstone Slabs
+//        ItemStackToItemStackRecipeBuilder.crushing(
+//              ItemStackIngredient.from(Blocks.POLISHED_BLACKSTONE_SLAB),
+//              new ItemStack(Blocks.BLACKSTONE_SLAB)
+//        ).build(consumer, Mekanism.rl(basePath + "polished_slabs_to_slabs"));
+//        //Chiseled Polished Blackstone Bricks -> Polished Blackstone Bricks
+//        ItemStackToItemStackRecipeBuilder.crushing(
+//              ItemStackIngredient.from(Blocks.CHISELED_POLISHED_BLACKSTONE),
+//              new ItemStack(Blocks.POLISHED_BLACKSTONE_BRICKS)
+//        ).build(consumer, Mekanism.rl(basePath + "chiseled_bricks_to_bricks"));
+//        //Polished Blackstone Bricks -> Cracked Polished Blackstone Bricks
+//        ItemStackToItemStackRecipeBuilder.crushing(
+//              ItemStackIngredient.from(Blocks.POLISHED_BLACKSTONE_BRICKS),
+//              new ItemStack(Blocks.CRACKED_POLISHED_BLACKSTONE_BRICKS)
+//        ).build(consumer, Mekanism.rl(basePath + "bricks_to_cracked_bricks"));
+//        //Cracked Polished Blackstone Bricks -> Polished Blackstone
+//        ItemStackToItemStackRecipeBuilder.crushing(
+//              ItemStackIngredient.from(Blocks.CRACKED_POLISHED_BLACKSTONE_BRICKS),
+//              new ItemStack(Blocks.POLISHED_BLACKSTONE)
+//        ).build(consumer, Mekanism.rl(basePath + "from_cracked_bricks"));
     }
 
     private void addCrusherQuartzRecipes(Consumer<IFinishedRecipe> consumer, String basePath) {
@@ -181,15 +182,15 @@ class CrusherRecipeProvider implements ISubRecipeProvider {
               new ItemStack(Blocks.SMOOTH_QUARTZ_STAIRS)
         ).build(consumer, Mekanism.rl(basePath + "stairs_to_smooth_stairs"));
         //Smooth Quartz Block -> Quartz Bricks
-        ItemStackToItemStackRecipeBuilder.crushing(
-              ItemStackIngredient.from(Blocks.SMOOTH_QUARTZ),
-              new ItemStack(Blocks.QUARTZ_BRICKS)
-        ).build(consumer, Mekanism.rl(basePath + "smooth_to_bricks"));
-        //Quartz Bricks -> Chiseled Quartz Block
-        ItemStackToItemStackRecipeBuilder.crushing(
-              ItemStackIngredient.from(Blocks.QUARTZ_BRICKS),
-              new ItemStack(Blocks.CHISELED_QUARTZ_BLOCK)
-        ).build(consumer, Mekanism.rl(basePath + "bricks_to_chiseled"));
+//        ItemStackToItemStackRecipeBuilder.crushing(
+//              ItemStackIngredient.from(Blocks.SMOOTH_QUARTZ),
+//              new ItemStack(Blocks.QUARTZ_BRICKS)
+//        ).build(consumer, Mekanism.rl(basePath + "smooth_to_bricks"));
+//        //Quartz Bricks -> Chiseled Quartz Block
+//        ItemStackToItemStackRecipeBuilder.crushing(
+//              ItemStackIngredient.from(Blocks.QUARTZ_BRICKS),
+//              new ItemStack(Blocks.CHISELED_QUARTZ_BLOCK)
+//        ).build(consumer, Mekanism.rl(basePath + "bricks_to_chiseled"));
         //Chiseled Quartz Block -> Quartz Pillar
         ItemStackToItemStackRecipeBuilder.crushing(
               ItemStackIngredient.from(Blocks.CHISELED_QUARTZ_BLOCK),

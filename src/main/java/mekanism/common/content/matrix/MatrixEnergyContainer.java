@@ -2,9 +2,6 @@ package mekanism.common.content.matrix;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import java.util.Map;
-import java.util.Set;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
 import mekanism.api.annotations.FieldsAreNonnullByDefault;
@@ -17,6 +14,10 @@ import mekanism.common.tile.multiblock.TileEntityInductionCell;
 import mekanism.common.tile.multiblock.TileEntityInductionProvider;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Map;
+import java.util.Set;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault

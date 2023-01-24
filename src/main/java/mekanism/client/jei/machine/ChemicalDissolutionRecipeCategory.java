@@ -1,8 +1,5 @@
 package mekanism.client.jei.machine;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 import mekanism.api.annotations.NonNull;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
@@ -31,6 +28,10 @@ import mezz.jei.api.gui.ingredient.IGuiItemStackGroup;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.IIngredients;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ChemicalDissolutionRecipeCategory extends BaseRecipeCategory<ChemicalDissolutionRecipe> {
 

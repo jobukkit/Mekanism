@@ -1,14 +1,15 @@
 package mekanism.common.inventory.container.sync;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import mekanism.api.annotations.NonNull;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.common.network.container.property.FluidStackPropertyData;
 import mekanism.common.network.container.property.IntPropertyData;
 import mekanism.common.network.container.property.PropertyData;
 import net.minecraftforge.fluids.FluidStack;
+
+import javax.annotation.Nonnull;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Version of {@link net.minecraft.util.IntReferenceHolder} for handling fluid stacks

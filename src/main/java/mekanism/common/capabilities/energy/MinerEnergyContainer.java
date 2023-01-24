@@ -1,12 +1,13 @@
 package mekanism.common.capabilities.energy;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.annotations.FieldsAreNonnullByDefault;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.block.attribute.AttributeEnergy;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.tile.machine.TileEntityDigitalMiner;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault

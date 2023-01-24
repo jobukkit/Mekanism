@@ -1,12 +1,5 @@
 package mekanism.common.capabilities.resolver.manager;
 
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.annotations.FieldsAreNonnullByDefault;
 import mekanism.api.energy.IEnergyContainer;
@@ -19,6 +12,10 @@ import mekanism.common.integration.energy.EnergyCompatUtils;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.*;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault

@@ -1,7 +1,5 @@
 package mekanism.common.util;
 
-import java.util.Optional;
-import javax.annotation.Nullable;
 import mekanism.common.Mekanism;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -9,6 +7,9 @@ import net.minecraft.util.Direction;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
+
+import javax.annotation.Nullable;
+import java.util.Optional;
 
 public final class InventoryUtils {
 

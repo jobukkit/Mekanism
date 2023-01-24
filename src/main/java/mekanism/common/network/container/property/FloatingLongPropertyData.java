@@ -1,9 +1,10 @@
 package mekanism.common.network.container.property;
 
-import javax.annotation.Nonnull;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.inventory.container.MekanismContainer;
 import net.minecraft.network.PacketBuffer;
+
+import javax.annotation.Nonnull;
 
 public class FloatingLongPropertyData extends PropertyData {
 

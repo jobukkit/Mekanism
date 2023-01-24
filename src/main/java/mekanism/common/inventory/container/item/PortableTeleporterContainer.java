@@ -1,6 +1,5 @@
 package mekanism.common.inventory.container.item;
 
-import java.util.List;
 import mekanism.common.Mekanism;
 import mekanism.common.content.teleporter.TeleporterFrequency;
 import mekanism.common.inventory.container.IEmptyContainer;
@@ -13,6 +12,8 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.Hand;
+
+import java.util.List;
 
 public class PortableTeleporterContainer extends FrequencyItemContainer<TeleporterFrequency> implements IEmptyContainer {
 

@@ -1,7 +1,6 @@
 package mekanism.common.inventory.container.slot;
 
 import com.mojang.datafixers.util.Pair;
-import javax.annotation.Nonnull;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -11,6 +10,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+import javax.annotation.Nonnull;
 
 public class ArmorSlot extends InsertableSlot {
 

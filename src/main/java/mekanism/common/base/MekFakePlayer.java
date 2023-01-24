@@ -1,14 +1,15 @@
 package mekanism.common.base;
 
 import com.mojang.authlib.GameProfile;
-import java.lang.ref.WeakReference;
-import javax.annotation.Nonnull;
 import mekanism.common.Mekanism;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.FakePlayer;
+
+import javax.annotation.Nonnull;
+import java.lang.ref.WeakReference;
 
 // Global, shared FakePlayer for Mekanism-specific uses
 //

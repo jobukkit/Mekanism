@@ -1,6 +1,5 @@
 package mekanism.common.content.matrix;
 
-import javax.annotation.Nonnull;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.inventory.container.slot.SlotOverlay;
 import mekanism.common.inventory.container.sync.dynamic.ContainerSync;
@@ -12,6 +11,8 @@ import mekanism.common.tile.multiblock.TileEntityInductionCell;
 import mekanism.common.tile.multiblock.TileEntityInductionProvider;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
 
 public class MatrixMultiblockData extends MultiblockData {
 

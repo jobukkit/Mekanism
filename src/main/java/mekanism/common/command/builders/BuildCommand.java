@@ -1,9 +1,6 @@
 package mekanism.common.command.builders;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Stack;
 import mekanism.common.Mekanism;
 import mekanism.common.util.EnumUtils;
 import mekanism.common.util.MekanismUtils;
@@ -17,6 +14,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Stack;
 
 public class BuildCommand {
 

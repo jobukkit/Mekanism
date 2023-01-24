@@ -1,7 +1,5 @@
 package mekanism.client.jei.machine;
 
-import java.util.Collections;
-import java.util.List;
 import mekanism.api.annotations.NonNull;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.recipes.PressurizedReactionRecipe;
@@ -28,6 +26,9 @@ import mezz.jei.api.ingredients.IIngredients;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.Collections;
+import java.util.List;
 
 public class PressurizedReactionRecipeCategory extends BaseRecipeCategory<PressurizedReactionRecipe> {
 

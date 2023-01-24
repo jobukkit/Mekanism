@@ -1,11 +1,6 @@
 package mekanism.common.network;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.function.Supplier;
 import mekanism.client.MekanismClient;
 import mekanism.common.lib.frequency.FrequencyType;
 import mekanism.common.lib.security.SecurityData;
@@ -13,6 +8,12 @@ import mekanism.common.lib.security.SecurityFrequency;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Supplier;
 
 public class PacketSecurityUpdate {
 

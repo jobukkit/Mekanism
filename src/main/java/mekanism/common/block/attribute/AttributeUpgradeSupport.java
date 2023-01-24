@@ -1,8 +1,9 @@
 package mekanism.common.block.attribute;
 
-import java.util.Set;
-import javax.annotation.Nonnull;
 import mekanism.api.Upgrade;
+
+import javax.annotation.Nonnull;
+import java.util.Set;
 
 public class AttributeUpgradeSupport implements Attribute {
 

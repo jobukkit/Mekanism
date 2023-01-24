@@ -1,13 +1,6 @@
 package mekanism.common.lib.multiblock;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Predicate;
 import mekanism.api.text.EnumColor;
 import mekanism.api.text.ILangEntry;
 import mekanism.common.MekanismLang;
@@ -17,6 +10,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+
+import java.util.*;
+import java.util.function.Predicate;
 
 public class FormationProtocol<T extends MultiblockData> {
 

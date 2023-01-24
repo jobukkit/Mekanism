@@ -1,11 +1,12 @@
 package mekanism.common.item.block;
 
-import javax.annotation.Nonnull;
 import mekanism.common.block.basic.BlockSecurityDesk;
 import mekanism.common.registration.impl.ItemDeferredRegister;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.BlockItemUseContext;
+
+import javax.annotation.Nonnull;
 
 public class ItemBlockSecurityDesk extends ItemBlockTooltip<BlockSecurityDesk> {
 

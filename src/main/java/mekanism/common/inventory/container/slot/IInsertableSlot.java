@@ -1,10 +1,11 @@
 package mekanism.common.inventory.container.slot;
 
-import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.api.inventory.AutomationType;
 import mekanism.api.inventory.IInventorySlot;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nonnull;
 
 public interface IInsertableSlot {
 

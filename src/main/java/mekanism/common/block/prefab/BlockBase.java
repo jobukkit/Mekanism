@@ -1,7 +1,5 @@
 package mekanism.common.block.prefab;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.text.ILangEntry;
 import mekanism.common.block.BlockMekanism;
 import mekanism.common.block.attribute.AttributeCustomShape;
@@ -25,6 +23,9 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorldReader;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class BlockBase<TYPE extends BlockType> extends BlockMekanism implements IHasDescription, ITypeBlock {
 

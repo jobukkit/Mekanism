@@ -1,10 +1,6 @@
 package mekanism.common.util;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import java.util.EnumSet;
-import java.util.Optional;
-import java.util.Set;
-import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.inventory.AutomationType;
@@ -20,6 +16,11 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+
+import javax.annotation.Nonnull;
+import java.util.EnumSet;
+import java.util.Optional;
+import java.util.Set;
 
 public final class FluidUtils {
 

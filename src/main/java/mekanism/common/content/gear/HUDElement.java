@@ -1,6 +1,5 @@
 package mekanism.common.content.gear;
 
-import java.util.function.IntSupplier;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.lib.Color;
 import mekanism.common.util.StorageUtils;
@@ -10,6 +9,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+
+import java.util.function.IntSupplier;
 
 public class HUDElement {
 

@@ -1,7 +1,5 @@
 package mekanism.common.tile.prefab;
 
-import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.api.NBTConstants;
 import mekanism.api.Upgrade;
 import mekanism.api.providers.IBlockProvider;
@@ -10,9 +8,11 @@ import mekanism.common.inventory.container.MekanismContainer;
 import mekanism.common.inventory.container.sync.SyncableInt;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.UpgradeUtils;
-import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.ITextComponent;
+
+import javax.annotation.Nonnull;
+import java.util.List;
 
 public abstract class TileEntityProgressMachine<RECIPE extends MekanismRecipe> extends TileEntityRecipeMachine<RECIPE> {
 

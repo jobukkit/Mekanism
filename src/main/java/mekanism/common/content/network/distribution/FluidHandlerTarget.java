@@ -1,12 +1,13 @@
 package mekanism.common.content.network.distribution;
 
-import javax.annotation.Nonnull;
 import mekanism.api.annotations.NonNull;
 import mekanism.common.lib.distribution.SplitInfo;
 import mekanism.common.lib.distribution.Target;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
+
+import javax.annotation.Nonnull;
 
 public class FluidHandlerTarget extends Target<IFluidHandler, Integer, @NonNull FluidStack> {
 

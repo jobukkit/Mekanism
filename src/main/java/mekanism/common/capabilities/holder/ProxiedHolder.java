@@ -1,8 +1,9 @@
 package mekanism.common.capabilities.holder;
 
-import java.util.function.Predicate;
-import javax.annotation.Nullable;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nullable;
+import java.util.function.Predicate;
 
 public abstract class ProxiedHolder implements IHolder {
 

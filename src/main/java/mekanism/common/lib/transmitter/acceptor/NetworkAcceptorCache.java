@@ -1,16 +1,17 @@
 package mekanism.common.lib.transmitter.acceptor;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import mekanism.common.content.network.transmitter.Transmitter;
 import mekanism.common.lib.transmitter.TransmitterNetworkRegistry;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.LazyOptional;
+
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class NetworkAcceptorCache<ACCEPTOR> {
 

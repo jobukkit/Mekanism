@@ -1,12 +1,13 @@
 package mekanism.common.integration.lookingat;
 
-import javax.annotation.Nonnull;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.math.MathUtils;
 import mekanism.client.render.MekanismRenderer;
 import mekanism.common.MekanismLang;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.text.ITextComponent;
+
+import javax.annotation.Nonnull;
 
 public class ChemicalElement extends LookingAtElement {
 

@@ -3,11 +3,7 @@ package mekanism.generators.client;
 import mekanism.client.lang.BaseLanguageProvider;
 import mekanism.generators.common.GeneratorsLang;
 import mekanism.generators.common.MekanismGenerators;
-import mekanism.generators.common.registries.GeneratorsBlocks;
-import mekanism.generators.common.registries.GeneratorsFluids;
-import mekanism.generators.common.registries.GeneratorsGases;
-import mekanism.generators.common.registries.GeneratorsItems;
-import mekanism.generators.common.registries.GeneratorsSounds;
+import mekanism.generators.common.registries.*;
 import net.minecraft.data.DataGenerator;
 
 public class GeneratorsLangProvider extends BaseLanguageProvider {

@@ -1,6 +1,5 @@
 package mekanism.common.tile.machine;
 
-import javax.annotation.Nonnull;
 import mekanism.api.Action;
 import mekanism.api.Coord4D;
 import mekanism.api.RelativeSide;
@@ -20,6 +19,8 @@ import mekanism.common.util.MekanismUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
 
 public class TileEntitySeismicVibrator extends TileEntityMekanism implements IBoundingBlock {
 

@@ -1,10 +1,5 @@
 package mekanism.common.recipe.upgrade;
 
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Set;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.api.NBTConstants;
 import mekanism.api.Upgrade;
 import mekanism.api.annotations.FieldsAreNonnullByDefault;
@@ -15,6 +10,12 @@ import mekanism.common.util.ItemDataUtils;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Set;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault

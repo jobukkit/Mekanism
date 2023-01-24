@@ -1,7 +1,5 @@
 package mekanism.common.network;
 
-import java.util.UUID;
-import java.util.function.Supplier;
 import mekanism.api.Upgrade;
 import mekanism.api.functions.TriConsumer;
 import mekanism.common.Mekanism;
@@ -13,12 +11,8 @@ import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.tile.component.TileComponentSecurity;
 import mekanism.common.tile.component.TileComponentUpgrade;
 import mekanism.common.tile.factory.TileEntityFactory;
-import mekanism.common.tile.interfaces.IHasDumpButton;
-import mekanism.common.tile.interfaces.IHasGasMode;
-import mekanism.common.tile.interfaces.IHasMode;
-import mekanism.common.tile.interfaces.IHasSortableFilters;
+import mekanism.common.tile.interfaces.*;
 import mekanism.common.tile.interfaces.IRedstoneControl.RedstoneControl;
-import mekanism.common.tile.interfaces.ISideConfiguration;
 import mekanism.common.tile.laser.TileEntityLaserAmplifier;
 import mekanism.common.tile.machine.TileEntityDigitalMiner;
 import mekanism.common.tile.machine.TileEntityFormulaicAssemblicator;
@@ -34,6 +28,9 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
+
+import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * Used for informing the server that an action happened in a GUI

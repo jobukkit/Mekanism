@@ -1,7 +1,5 @@
 package mekanism.client.jei.machine;
 
-import java.util.Arrays;
-import java.util.Collections;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.recipes.ChemicalInfuserRecipe;
 import mekanism.client.gui.element.gauge.GaugeType;
@@ -18,6 +16,9 @@ import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.gui.ingredient.IGuiIngredientGroup;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 public class ChemicalInfuserRecipeCategory extends BaseRecipeCategory<ChemicalInfuserRecipe> {
 

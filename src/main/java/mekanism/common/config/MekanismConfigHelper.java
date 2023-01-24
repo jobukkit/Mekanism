@@ -1,9 +1,10 @@
 package mekanism.common.config;
 
-import java.nio.file.Path;
 import mekanism.common.Mekanism;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.loading.FMLPaths;
+
+import java.nio.file.Path;
 
 public class MekanismConfigHelper {
 

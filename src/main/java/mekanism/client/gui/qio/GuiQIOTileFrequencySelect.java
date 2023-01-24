@@ -1,7 +1,5 @@
 package mekanism.client.gui.qio;
 
-import java.util.List;
-import java.util.UUID;
 import mekanism.client.gui.element.button.MekanismImageButton;
 import mekanism.common.Mekanism;
 import mekanism.common.content.qio.IQIOFrequencyHolder;
@@ -17,6 +15,9 @@ import mekanism.common.network.PacketQIOSetColor;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.text.ITextComponent;
+
+import java.util.List;
+import java.util.UUID;
 
 public class GuiQIOTileFrequencySelect extends GuiQIOFrequencySelect<QIOFrequencySelectTileContainer> {
 

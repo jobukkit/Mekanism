@@ -1,9 +1,5 @@
 package mekanism.common.util;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import javax.annotation.Nullable;
 import mekanism.api.RelativeSide;
 import mekanism.api.text.EnumColor;
 import mekanism.common.content.network.transmitter.LogisticalTransporter;
@@ -21,6 +17,11 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+
+import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 public final class TransporterUtils {
 

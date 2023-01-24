@@ -1,13 +1,14 @@
 package mekanism.common.recipe.serializer;
 
 import com.google.gson.JsonObject;
-import javax.annotation.Nonnull;
 import mekanism.common.Mekanism;
 import mekanism.common.recipe.upgrade.MekanismShapedRecipe;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistryEntry;
+
+import javax.annotation.Nonnull;
 
 public class MekanismShapedRecipeSerializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<MekanismShapedRecipe> {
 

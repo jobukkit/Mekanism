@@ -1,12 +1,13 @@
 package mekanism.common.network;
 
-import java.util.function.Supplier;
 import mekanism.common.tile.TileEntitySecurityDesk;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
+
+import java.util.function.Supplier;
 
 public class PacketAddTrusted {
 

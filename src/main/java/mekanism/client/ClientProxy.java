@@ -1,7 +1,5 @@
 package mekanism.client;
 
-import java.util.function.Supplier;
-import javax.annotation.Nullable;
 import mekanism.api.text.EnumColor;
 import mekanism.client.render.RenderTickHandler;
 import mekanism.client.sound.SoundHandler;
@@ -17,6 +15,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
+
+import javax.annotation.Nullable;
+import java.util.function.Supplier;
 
 /**
  * Client proxy for the Mekanism mod.

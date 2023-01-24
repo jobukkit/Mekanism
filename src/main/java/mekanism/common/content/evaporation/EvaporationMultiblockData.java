@@ -1,7 +1,5 @@
 package mekanism.common.content.evaporation;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.IEvaporationSolar;
 import mekanism.api.NBTConstants;
 import mekanism.api.annotations.NonNull;
@@ -38,6 +36,9 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class EvaporationMultiblockData extends MultiblockData implements ITileCachedRecipeHolder<FluidToFluidRecipe>, IValveHandler {
 

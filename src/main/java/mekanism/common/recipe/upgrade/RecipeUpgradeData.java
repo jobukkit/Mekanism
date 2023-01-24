@@ -1,13 +1,5 @@
 package mekanism.common.recipe.upgrade;
 
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.api.NBTConstants;
 import mekanism.api.Upgrade;
 import mekanism.common.block.attribute.Attribute;
@@ -32,6 +24,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.*;
 
 @ParametersAreNonnullByDefault
 public interface RecipeUpgradeData<TYPE extends RecipeUpgradeData<TYPE>> {

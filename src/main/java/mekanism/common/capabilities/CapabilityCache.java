@@ -1,15 +1,5 @@
 package mekanism.common.capabilities;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BooleanSupplier;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.common.Mekanism;
 import mekanism.common.capabilities.resolver.ICapabilityResolver;
@@ -17,6 +7,11 @@ import mekanism.common.tile.component.TileComponentConfig;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.*;
+import java.util.function.BooleanSupplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

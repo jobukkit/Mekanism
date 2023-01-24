@@ -1,6 +1,8 @@
 package mekanism.client.lang;
 
 import com.google.common.collect.ImmutableList;
+
+import javax.annotation.Nullable;
 import java.text.ChoiceFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -8,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
 
 public class FormatSplitter {
 

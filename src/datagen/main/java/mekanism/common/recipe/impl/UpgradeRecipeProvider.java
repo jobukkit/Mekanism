@@ -1,9 +1,5 @@
 package mekanism.common.recipe.impl;
 
-import java.util.function.Consumer;
-
-import mekanism.api.backport.ITag;
-import mekanism.api.backport.Tags;
 import mekanism.common.Mekanism;
 import mekanism.common.item.ItemUpgrade;
 import mekanism.common.recipe.ISubRecipeProvider;
@@ -18,6 +14,10 @@ import mekanism.common.resource.ResourceType;
 import mekanism.common.tags.MekanismTags;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.item.Item;
+import net.minecraft.tags.Tag;
+import net.minecraftforge.common.Tags;
+
+import java.util.function.Consumer;
 
 class UpgradeRecipeProvider implements ISubRecipeProvider {
 
@@ -37,7 +37,7 @@ class UpgradeRecipeProvider implements ISubRecipeProvider {
         addUpgradeRecipe(consumer, MekanismItems.SPEED_UPGRADE, MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.OSMIUM), basePath);
     }
 
-    private void addUpgradeRecipe(Consumer<IFinishedRecipe> consumer, ItemRegistryObject<ItemUpgrade> upgrade, ITag<Item> dustTag, String basePath) {
+    private void addUpgradeRecipe(Consumer<IFinishedRecipe> consumer, ItemRegistryObject<ItemUpgrade> upgrade, Tag<Item> dustTag, String basePath) {
         ExtendedShapedRecipeBuilder.shapedRecipe(upgrade)
               .pattern(UPGRADE_PATTERN)
               .key(MekanismRecipeProvider.GLASS_CHAR, Tags.Items.GLASS)

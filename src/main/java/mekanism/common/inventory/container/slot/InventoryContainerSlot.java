@@ -1,7 +1,5 @@
 package mekanism.common.inventory.container.slot;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.Action;
 import mekanism.api.inventory.AutomationType;
 import mekanism.api.inventory.IInventorySlot;
@@ -11,6 +9,9 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 //Like net.minecraftforge.items.SlotItemHandler, except directly interacts with the IInventorySlot instead
 public class InventoryContainerSlot extends Slot implements IInsertableSlot {

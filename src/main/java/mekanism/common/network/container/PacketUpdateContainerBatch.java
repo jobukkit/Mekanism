@@ -1,14 +1,15 @@
 package mekanism.common.network.container;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Supplier;
 import mekanism.common.inventory.container.MekanismContainer;
 import mekanism.common.network.BasePacketHandler;
 import mekanism.common.network.container.property.PropertyData;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
 
 public class PacketUpdateContainerBatch {
 

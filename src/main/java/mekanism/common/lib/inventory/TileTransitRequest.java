@@ -3,15 +3,16 @@ package mekanism.common.lib.inventory;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import mekanism.common.Mekanism;
 import mekanism.common.util.InventoryUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraftforge.items.IItemHandler;
+
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class TileTransitRequest extends TransitRequest {
 

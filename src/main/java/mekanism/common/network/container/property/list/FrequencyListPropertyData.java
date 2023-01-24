@@ -1,10 +1,11 @@
 package mekanism.common.network.container.property.list;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.common.lib.frequency.Frequency;
 import net.minecraft.network.PacketBuffer;
+
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FrequencyListPropertyData<FREQUENCY extends Frequency> extends ListPropertyData<FREQUENCY> {
 

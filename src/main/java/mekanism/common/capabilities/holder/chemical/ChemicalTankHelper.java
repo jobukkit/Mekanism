@@ -1,7 +1,5 @@
 package mekanism.common.capabilities.holder.chemical;
 
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import mekanism.api.RelativeSide;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
@@ -24,6 +22,9 @@ import mekanism.common.capabilities.holder.chemical.ConfigChemicalTankHolder.Con
 import mekanism.common.capabilities.holder.chemical.ConfigChemicalTankHolder.ConfigSlurryTankHolder;
 import mekanism.common.tile.component.TileComponentConfig;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nonnull;
+import java.util.function.Supplier;
 
 public class ChemicalTankHelper<CHEMICAL extends Chemical<CHEMICAL>, STACK extends ChemicalStack<CHEMICAL>, TANK extends IChemicalTank<CHEMICAL, STACK>> {
 

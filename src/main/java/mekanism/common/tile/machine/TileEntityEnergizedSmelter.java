@@ -1,10 +1,11 @@
 package mekanism.common.tile.machine;
 
-import javax.annotation.Nonnull;
 import mekanism.api.recipes.ItemStackToItemStackRecipe;
 import mekanism.common.recipe.MekanismRecipeType;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tile.prefab.TileEntityElectricMachine;
+
+import javax.annotation.Nonnull;
 
 public class TileEntityEnergizedSmelter extends TileEntityElectricMachine {
 

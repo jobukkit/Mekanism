@@ -1,11 +1,12 @@
 package mekanism.common.lib.frequency;
 
-import java.util.UUID;
 import mekanism.api.NBTConstants;
 import mekanism.common.lib.frequency.Frequency.FrequencyIdentity;
 import mekanism.common.network.BasePacketHandler;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
+
+import java.util.UUID;
 
 public interface IdentitySerializer {
 

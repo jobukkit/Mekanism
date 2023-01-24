@@ -1,10 +1,11 @@
 package mekanism.common.network.container.property.list;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.common.network.BasePacketHandler;
 import net.minecraft.network.PacketBuffer;
+
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StringListPropertyData extends ListPropertyData<String> {
 

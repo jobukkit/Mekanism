@@ -3,11 +3,6 @@ package mekanism.common.inventory.container;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import javax.annotation.Nonnull;
 import mekanism.api.math.MathUtils;
 import mekanism.api.text.ILangEntry;
 import mekanism.common.Mekanism;
@@ -36,6 +31,12 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 public abstract class QIOItemViewerContainer extends MekanismContainer implements ISlotClickHandler {
 

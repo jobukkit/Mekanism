@@ -1,15 +1,8 @@
 package mekanism.common.content.blocktype;
 
-import java.util.EnumSet;
-import java.util.function.Supplier;
 import mekanism.api.Upgrade;
 import mekanism.common.MekanismLang;
-import mekanism.common.block.attribute.AttributeFactoryType;
-import mekanism.common.block.attribute.AttributeParticleFX;
-import mekanism.common.block.attribute.AttributeStateActive;
-import mekanism.common.block.attribute.AttributeStateFacing;
-import mekanism.common.block.attribute.AttributeUpgradeSupport;
-import mekanism.common.block.attribute.AttributeUpgradeable;
+import mekanism.common.block.attribute.*;
 import mekanism.common.block.attribute.Attributes.AttributeComparator;
 import mekanism.common.block.attribute.Attributes.AttributeInventory;
 import mekanism.common.block.attribute.Attributes.AttributeRedstone;
@@ -21,6 +14,9 @@ import mekanism.common.tier.FactoryTier;
 import mekanism.common.tile.base.TileEntityMekanism;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.particles.RedstoneParticleData;
+
+import java.util.EnumSet;
+import java.util.function.Supplier;
 
 public class Machine<TILE extends TileEntityMekanism> extends BlockTypeTile<TILE> {
 

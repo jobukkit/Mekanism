@@ -1,11 +1,12 @@
 package mekanism.common.registration.impl;
 
-import javax.annotation.Nonnull;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.common.registration.DoubleWrappedRegistryObject;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.RegistryObject;
+
+import javax.annotation.Nonnull;
 
 public class BlockRegistryObject<BLOCK extends Block, ITEM extends Item> extends DoubleWrappedRegistryObject<BLOCK, ITEM> implements IBlockProvider {
 

@@ -1,7 +1,5 @@
 package mekanism.common.capabilities.chemical;
 
-import java.util.Objects;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.Action;
 import mekanism.api.annotations.FieldsAreNonnullByDefault;
@@ -17,6 +15,9 @@ import mekanism.common.capabilities.chemical.variable.VariableCapacityChemicalTa
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.tile.TileEntityRadioactiveWasteBarrel;
 import mekanism.common.util.MekanismUtils;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Objects;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault

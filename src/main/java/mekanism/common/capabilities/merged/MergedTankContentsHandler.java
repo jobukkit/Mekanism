@@ -1,8 +1,5 @@
 package mekanism.common.capabilities.merged;
 
-import java.util.Collections;
-import java.util.List;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.DataHandlerUtils;
 import mekanism.api.NBTConstants;
@@ -23,6 +20,10 @@ import mekanism.common.util.ItemDataUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.INBTSerializable;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @apiNote Make sure to set the merged tank, and dynamic handlers

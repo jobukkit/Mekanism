@@ -1,8 +1,5 @@
 package mekanism.client.gui.element.filter;
 
-import java.util.Collections;
-import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.api.text.ILangEntry;
 import mekanism.client.gui.IGuiWrapper;
 import mekanism.common.MekanismLang;
@@ -12,6 +9,10 @@ import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.tile.interfaces.ITileFilterHolder;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
+
+import javax.annotation.Nonnull;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class GuiTagFilter<FILTER extends ITagFilter<FILTER>, TILE extends TileEntityMekanism & ITileFilterHolder<? super FILTER>>
       extends GuiTextFilter<FILTER, TILE> {

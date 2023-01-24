@@ -1,7 +1,5 @@
 package mekanism.common.network;
 
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.tile.laser.TileEntityLaserAmplifier;
@@ -11,6 +9,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
+
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 public class PacketGuiSetEnergy {
 

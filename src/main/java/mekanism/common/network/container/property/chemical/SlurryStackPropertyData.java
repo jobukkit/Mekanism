@@ -1,8 +1,9 @@
 package mekanism.common.network.container.property.chemical;
 
-import javax.annotation.Nonnull;
 import mekanism.api.chemical.slurry.SlurryStack;
 import mekanism.common.network.container.property.PropertyType;
+
+import javax.annotation.Nonnull;
 
 public class SlurryStackPropertyData extends ChemicalStackPropertyData<SlurryStack> {
 

@@ -1,7 +1,5 @@
 package mekanism.common.tile;
 
-import java.util.function.BiPredicate;
-import javax.annotation.Nonnull;
 import mekanism.api.annotations.NonNull;
 import mekanism.api.inventory.AutomationType;
 import mekanism.common.capabilities.holder.slot.IInventorySlotHolder;
@@ -14,6 +12,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;
+
+import javax.annotation.Nonnull;
+import java.util.function.BiPredicate;
 
 public class TileEntityPersonalChest extends TileEntityMekanism {
 

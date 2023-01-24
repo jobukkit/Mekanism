@@ -1,12 +1,13 @@
 package mekanism.common.network;
 
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import mekanism.common.entity.EntityRobit;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
+
+import javax.annotation.Nonnull;
+import java.util.function.Supplier;
 
 public class PacketRobit {
 

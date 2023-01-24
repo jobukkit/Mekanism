@@ -1,11 +1,12 @@
 package mekanism.common.inventory.container.sync;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectFunction;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import mekanism.api.annotations.NonNull;
 import mekanism.common.network.container.property.IntPropertyData;
+
+import javax.annotation.Nonnull;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Version of {@link net.minecraft.util.IntReferenceHolder} for making it easier to handle enums

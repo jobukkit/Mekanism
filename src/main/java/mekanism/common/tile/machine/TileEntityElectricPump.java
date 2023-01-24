@@ -1,17 +1,7 @@
 package mekanism.common.tile.machine;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-import javax.annotation.Nonnull;
-import mekanism.api.Action;
-import mekanism.api.IConfigurable;
-import mekanism.api.NBTConstants;
-import mekanism.api.RelativeSide;
-import mekanism.api.Upgrade;
+import mekanism.api.*;
 import mekanism.api.inventory.AutomationType;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.text.EnumColor;
@@ -34,17 +24,12 @@ import mekanism.common.inventory.slot.OutputInventorySlot;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.registries.MekanismFluids;
 import mekanism.common.tile.base.TileEntityMekanism;
-import mekanism.common.util.EnumUtils;
-import mekanism.common.util.FluidUtils;
-import mekanism.common.util.MekanismUtils;
-import mekanism.common.util.NBTUtils;
-import mekanism.common.util.UpgradeUtils;
+import mekanism.common.util.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.IBucketPickupHandler;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.fluid.IFluidState;
 import net.minecraft.nbt.CompoundNBT;
@@ -52,13 +37,15 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidBlock;
+
+import javax.annotation.Nonnull;
+import java.util.*;
 
 public class TileEntityElectricPump extends TileEntityMekanism implements IConfigurable {
 

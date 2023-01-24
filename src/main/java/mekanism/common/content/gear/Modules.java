@@ -1,14 +1,6 @@
 package mekanism.common.content.gear;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import mekanism.api.NBTConstants;
 import mekanism.api.text.IHasTranslationKey;
 import mekanism.api.text.ILangEntry;
@@ -18,15 +10,7 @@ import mekanism.common.content.gear.mekasuit.ModuleChargeDistributionUnit;
 import mekanism.common.content.gear.mekasuit.ModuleJetpackUnit;
 import mekanism.common.content.gear.mekasuit.ModuleLocomotiveBoostingUnit;
 import mekanism.common.content.gear.mekasuit.ModuleMagneticAttractionUnit;
-import mekanism.common.content.gear.mekasuit.ModuleMekaSuit.ModuleDosimeterUnit;
-import mekanism.common.content.gear.mekasuit.ModuleMekaSuit.ModuleElectrolyticBreathingUnit;
-import mekanism.common.content.gear.mekasuit.ModuleMekaSuit.ModuleGravitationalModulatingUnit;
-import mekanism.common.content.gear.mekasuit.ModuleMekaSuit.ModuleHydraulicPropulsionUnit;
-import mekanism.common.content.gear.mekasuit.ModuleMekaSuit.ModuleInhalationPurificationUnit;
-import mekanism.common.content.gear.mekasuit.ModuleMekaSuit.ModuleNutritionalInjectionUnit;
-import mekanism.common.content.gear.mekasuit.ModuleMekaSuit.ModuleRadiationShieldingUnit;
-import mekanism.common.content.gear.mekasuit.ModuleMekaSuit.ModuleSolarRechargingUnit;
-import mekanism.common.content.gear.mekasuit.ModuleMekaSuit.ModuleVisionEnhancementUnit;
+import mekanism.common.content.gear.mekasuit.ModuleMekaSuit.*;
 import mekanism.common.content.gear.mekatool.ModuleExcavationEscalationUnit;
 import mekanism.common.content.gear.mekatool.ModuleFarmingUnit;
 import mekanism.common.content.gear.mekatool.ModuleMekaTool.ModuleAttackAmplificationUnit;
@@ -41,6 +25,10 @@ import net.minecraft.item.Rarity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class Modules {
 

@@ -1,22 +1,18 @@
 package mekanism.common.util;
 
-import java.util.UUID;
 import mekanism.api.text.EnumColor;
 import mekanism.client.MekanismClient;
 import mekanism.common.MekanismLang;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.lib.frequency.FrequencyType;
-import mekanism.common.lib.security.IOwnerItem;
-import mekanism.common.lib.security.ISecurityItem;
-import mekanism.common.lib.security.ISecurityTile;
+import mekanism.common.lib.security.*;
 import mekanism.common.lib.security.ISecurityTile.SecurityMode;
-import mekanism.common.lib.security.SecurityData;
-import mekanism.common.lib.security.SecurityFrequency;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Util;
 import net.minecraftforge.api.distmarker.Dist;
+
+import java.util.UUID;
 
 public final class SecurityUtils {
 

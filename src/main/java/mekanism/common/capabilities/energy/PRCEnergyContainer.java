@@ -1,7 +1,5 @@
 package mekanism.common.capabilities.energy;
 
-import java.util.function.Predicate;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.annotations.FieldsAreNonnullByDefault;
 import mekanism.api.annotations.NonNull;
@@ -11,6 +9,9 @@ import mekanism.api.recipes.PressurizedReactionRecipe;
 import mekanism.api.recipes.cache.CachedRecipe;
 import mekanism.common.block.attribute.AttributeEnergy;
 import mekanism.common.tile.machine.TileEntityPressurizedReactionChamber;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.Predicate;
 
 @FieldsAreNonnullByDefault
 @ParametersAreNonnullByDefault

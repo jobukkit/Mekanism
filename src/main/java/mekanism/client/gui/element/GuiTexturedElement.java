@@ -1,9 +1,10 @@
 package mekanism.client.gui.element;
 
-import java.util.List;
 import mekanism.client.gui.IGuiWrapper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+
+import java.util.List;
 
 public abstract class GuiTexturedElement extends GuiRelativeElement {
 

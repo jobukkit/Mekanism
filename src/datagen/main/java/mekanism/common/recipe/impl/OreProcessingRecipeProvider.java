@@ -1,16 +1,6 @@
 package mekanism.common.recipe.impl;
 
-import java.util.function.Consumer;
-import mekanism.api.datagen.recipe.builder.ChemicalCrystallizerRecipeBuilder;
-import mekanism.api.datagen.recipe.builder.ChemicalDissolutionRecipeBuilder;
-import mekanism.api.datagen.recipe.builder.ChemicalInfuserRecipeBuilder;
-import mekanism.api.datagen.recipe.builder.CombinerRecipeBuilder;
-import mekanism.api.datagen.recipe.builder.FluidSlurryToSlurryRecipeBuilder;
-import mekanism.api.datagen.recipe.builder.GasToGasRecipeBuilder;
-import mekanism.api.datagen.recipe.builder.ItemStackGasToItemStackRecipeBuilder;
-import mekanism.api.datagen.recipe.builder.ItemStackToChemicalRecipeBuilder;
-import mekanism.api.datagen.recipe.builder.ItemStackToItemStackRecipeBuilder;
-import mekanism.api.datagen.recipe.builder.MetallurgicInfuserRecipeBuilder;
+import mekanism.api.datagen.recipe.builder.*;
 import mekanism.api.providers.IItemProvider;
 import mekanism.api.recipes.inputs.FluidStackIngredient;
 import mekanism.api.recipes.inputs.ItemStackIngredient;
@@ -40,23 +30,25 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
 import net.minecraftforge.common.Tags;
 
-class OreProcessingRecipeProvider implements ISubRecipeProvider {
+import java.util.function.Consumer;
 
+class OreProcessingRecipeProvider implements ISubRecipeProvider {
+    // TODO Maybe add Extended Nether Backport or FutureMC?
     @Override
     public void addRecipes(Consumer<IFinishedRecipe> consumer) {
         String basePath = "processing/";
         for (PrimaryResource resource : EnumUtils.PRIMARY_RESOURCES) {
             addDynamicOreProcessingIngotRecipes(consumer, basePath + resource.getRegistrySuffix() + "/", resource);
         }
-        //Gold Dust plus netherrack to nether gold ore
-        CombinerRecipeBuilder.combining(
-              ItemStackIngredient.from(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.GOLD), 8),
-              ItemStackIngredient.from(Tags.Items.NETHERRACK),
-              new ItemStack(Blocks.NETHER_GOLD_ORE)
-        ).build(consumer, Mekanism.rl(basePath + "gold/ore/nether_from_dust"));
+//        //Gold Dust plus netherrack to nether gold ore
+//        CombinerRecipeBuilder.combining(
+//              ItemStackIngredient.from(MekanismItems.PROCESSED_RESOURCES.get(ResourceType.DUST, PrimaryResource.GOLD), 8),
+//              ItemStackIngredient.from(Tags.Items.NETHERRACK),
+//              new ItemStack(Blocks.NETHER_GOLD_ORE)
+//        ).build(consumer, Mekanism.rl(basePath + "gold/ore/nether_from_dust"));
 
         //Iron -> enriched iron
         MetallurgicInfuserRecipeBuilder.metallurgicInfusing(
@@ -88,11 +80,11 @@ class OreProcessingRecipeProvider implements ISubRecipeProvider {
 
     private void addDynamicOreProcessingIngotRecipes(Consumer<IFinishedRecipe> consumer, String basePath, PrimaryResource resource) {
         net.minecraft.util.IItemProvider ingot = MekanismItems.PROCESSED_RESOURCES.get(ResourceType.INGOT, resource);
-        ITag<Item> ingotTag = MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.INGOT, resource);
+        Tag<Item> ingotTag = MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.INGOT, resource);
         net.minecraft.util.IItemProvider nugget = MekanismItems.PROCESSED_RESOURCES.get(ResourceType.NUGGET, resource);
-        ITag<Item> nuggetTag = MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.NUGGET, resource);
+        Tag<Item> nuggetTag = MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.NUGGET, resource);
         net.minecraft.util.IItemProvider block = MekanismBlocks.PROCESSED_RESOURCE_BLOCKS.get(resource);
-        ITag<Item> blockTag = MekanismTags.Items.PROCESSED_RESOURCE_BLOCKS.get(resource);
+        Tag<Item> blockTag = MekanismTags.Items.PROCESSED_RESOURCE_BLOCKS.get(resource);
         net.minecraft.util.IItemProvider ore = MekanismBlocks.ORES.get(OreType.get(resource));
 
         if (resource == PrimaryResource.IRON) {
@@ -118,11 +110,11 @@ class OreProcessingRecipeProvider implements ISubRecipeProvider {
         IItemProvider clump = MekanismItems.PROCESSED_RESOURCES.get(ResourceType.CLUMP, resource);
         IItemProvider crystal = MekanismItems.PROCESSED_RESOURCES.get(ResourceType.CRYSTAL, resource);
         IItemProvider shard = MekanismItems.PROCESSED_RESOURCES.get(ResourceType.SHARD, resource);
-        ITag<Item> dustTag = MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.DUST, resource);
-        ITag<Item> dirtyDustTag = MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.DIRTY_DUST, resource);
-        ITag<Item> clumpTag = MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.CLUMP, resource);
-        ITag<Item> shardTag = MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.SHARD, resource);
-        ITag<Item> crystalTag = MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.CRYSTAL, resource);
+        Tag<Item> dustTag = MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.DUST, resource);
+        Tag<Item> dirtyDustTag = MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.DIRTY_DUST, resource);
+        Tag<Item> clumpTag = MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.CLUMP, resource);
+        Tag<Item> shardTag = MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.SHARD, resource);
+        Tag<Item> crystalTag = MekanismTags.Items.PROCESSED_RESOURCES.get(ResourceType.CRYSTAL, resource);
 
         SlurryRegistryObject<?, ?> slurry = MekanismSlurries.PROCESSED_RESOURCES.get(resource);
 
@@ -235,8 +227,8 @@ class OreProcessingRecipeProvider implements ISubRecipeProvider {
         ).build(consumer, Mekanism.rl(basePath + "to_ore"));
     }
 
-    private void addOreProcessingGemRecipes(Consumer<IFinishedRecipe> consumer, String basePath, net.minecraft.util.IItemProvider ore, ITag<Item> oreTag,
-          IItemProvider dust, ITag<Item> dustTag, net.minecraft.util.IItemProvider gem, ITag<Item> gemTag, int fromOre, int toOre, ITag<Item> combineType) {
+    private void addOreProcessingGemRecipes(Consumer<IFinishedRecipe> consumer, String basePath, net.minecraft.util.IItemProvider ore, Tag<Item> oreTag,
+          IItemProvider dust, Tag<Item> dustTag, net.minecraft.util.IItemProvider gem, Tag<Item> gemTag, int fromOre, int toOre, Tag<Item> combineType) {
         //from dust
         ItemStackToItemStackRecipeBuilder.enriching(
               ItemStackIngredient.from(dustTag),
@@ -263,33 +255,33 @@ class OreProcessingRecipeProvider implements ISubRecipeProvider {
     //TODO: Once forge figures out default tags for netherite stuff, start using them and maybe add one for dirty netherite scram
     private void addNetheriteProcessingRecipes(Consumer<IFinishedRecipe> consumer, String basePath) {
         //Ancient Debris to Dirty Netherite Scrap
-        ItemStackToItemStackRecipeBuilder.crushing(ItemStackIngredient.from(Blocks.ANCIENT_DEBRIS), MekanismItems.DIRTY_NETHERITE_SCRAP.getItemStack(3))
-              .build(consumer, Mekanism.rl(basePath + "ancient_debris_to_dirty_scrap"));
-        //Dirty Netherite Scrap to Netherite Scrap
-        ItemStackToItemStackRecipeBuilder.enriching(ItemStackIngredient.from(MekanismItems.DIRTY_NETHERITE_SCRAP), new ItemStack(Items.NETHERITE_SCRAP))
-              .build(consumer, Mekanism.rl(basePath + "dirty_scrap_to_scrap"));
-        //Ancient Debris to Netherite Scrap
-        ItemStackToItemStackRecipeBuilder.enriching(ItemStackIngredient.from(Blocks.ANCIENT_DEBRIS), new ItemStack(Items.NETHERITE_SCRAP, 2))
-              .build(consumer, Mekanism.rl(basePath + "ancient_debris_to_scrap"));
-        //Netherite scrap to netherite dust
-        MetallurgicInfuserRecipeBuilder.metallurgicInfusing(
-              ItemStackIngredient.from(Items.NETHERITE_SCRAP, 4),
-              InfusionStackIngredient.from(MekanismTags.InfuseTypes.GOLD, 40),
-              MekanismItems.NETHERITE_DUST.getItemStack()
-        ).build(consumer, Mekanism.rl(basePath + "scrap_to_dust"));
-        //Netherite Dust to Netherite Ingot
-        RecipeProviderUtil.addSmeltingBlastingRecipes(consumer, Ingredient.fromTag(MekanismTags.Items.DUSTS_NETHERITE), Items.NETHERITE_INGOT, 2, 200,
-              Mekanism.rl(basePath + "ingot_from_dust_blasting"), Mekanism.rl(basePath + "ingot_from_dust_smelting"));
-        //Netherite Ingot to Netherite Dust
-        ItemStackToItemStackRecipeBuilder.crushing(ItemStackIngredient.from(Items.NETHERITE_INGOT), MekanismItems.NETHERITE_DUST.getItemStack())
-              .build(consumer, Mekanism.rl(basePath + "ingot_to_dust"));
-        //Netherite Dust to Ancient Debris
-        // Note: We only require two dust as that is equivalent to 8 scrap
-        CombinerRecipeBuilder.combining(
-              ItemStackIngredient.from(MekanismTags.Items.DUSTS_NETHERITE, 2),
-              ItemStackIngredient.from(Blocks.BASALT),
-              new ItemStack(Blocks.ANCIENT_DEBRIS)
-        ).build(consumer, Mekanism.rl(basePath + "dust_to_ancient_debris"));
+//        ItemStackToItemStackRecipeBuilder.crushing(ItemStackIngredient.from(Blocks.ANCIENT_DEBRIS), MekanismItems.DIRTY_NETHERITE_SCRAP.getItemStack(3))
+//              .build(consumer, Mekanism.rl(basePath + "ancient_debris_to_dirty_scrap"));
+//        //Dirty Netherite Scrap to Netherite Scrap
+//        ItemStackToItemStackRecipeBuilder.enriching(ItemStackIngredient.from(MekanismItems.DIRTY_NETHERITE_SCRAP), new ItemStack(Items.NETHERITE_SCRAP))
+//              .build(consumer, Mekanism.rl(basePath + "dirty_scrap_to_scrap"));
+//        //Ancient Debris to Netherite Scrap
+//        ItemStackToItemStackRecipeBuilder.enriching(ItemStackIngredient.from(Blocks.ANCIENT_DEBRIS), new ItemStack(Items.NETHERITE_SCRAP, 2))
+//              .build(consumer, Mekanism.rl(basePath + "ancient_debris_to_scrap"));
+//        //Netherite scrap to netherite dust
+//        MetallurgicInfuserRecipeBuilder.metallurgicInfusing(
+//              ItemStackIngredient.from(Items.NETHERITE_SCRAP, 4),
+//              InfusionStackIngredient.from(MekanismTags.InfuseTypes.GOLD, 40),
+//              MekanismItems.NETHERITE_DUST.getItemStack()
+//        ).build(consumer, Mekanism.rl(basePath + "scrap_to_dust"));
+//        //Netherite Dust to Netherite Ingot
+//        RecipeProviderUtil.addSmeltingBlastingRecipes(consumer, Ingredient.fromTag(MekanismTags.Items.DUSTS_NETHERITE), Items.NETHERITE_INGOT, 2, 200,
+//              Mekanism.rl(basePath + "ingot_from_dust_blasting"), Mekanism.rl(basePath + "ingot_from_dust_smelting"));
+//        //Netherite Ingot to Netherite Dust
+//        ItemStackToItemStackRecipeBuilder.crushing(ItemStackIngredient.from(Items.NETHERITE_INGOT), MekanismItems.NETHERITE_DUST.getItemStack())
+//              .build(consumer, Mekanism.rl(basePath + "ingot_to_dust"));
+//        //Netherite Dust to Ancient Debris
+//        // Note: We only require two dust as that is equivalent to 8 scrap
+//        CombinerRecipeBuilder.combining(
+//              ItemStackIngredient.from(MekanismTags.Items.DUSTS_NETHERITE, 2),
+//              ItemStackIngredient.from(Blocks.BASALT),
+//              new ItemStack(Blocks.ANCIENT_DEBRIS)
+//        ).build(consumer, Mekanism.rl(basePath + "dust_to_ancient_debris"));
     }
 
     private void addBronzeProcessingRecipes(Consumer<IFinishedRecipe> consumer, String basePath) {

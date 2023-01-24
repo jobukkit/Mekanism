@@ -1,7 +1,5 @@
 package mekanism.common.network;
 
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 import mekanism.common.MekanismLang;
 import mekanism.common.inventory.container.ContainerProvider;
 import mekanism.common.inventory.container.ModuleTweakerContainer;
@@ -11,6 +9,9 @@ import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 import net.minecraftforge.fml.network.NetworkHooks;
+
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class PacketOpenGui {
 

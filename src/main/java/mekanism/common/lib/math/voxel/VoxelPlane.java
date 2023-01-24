@@ -1,10 +1,11 @@
 package mekanism.common.lib.math.voxel;
 
+import mekanism.common.lib.multiblock.Structure.Axis;
+import net.minecraft.util.math.BlockPos;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import mekanism.common.lib.multiblock.Structure.Axis;
-import net.minecraft.util.math.BlockPos;
 
 public class VoxelPlane {
 

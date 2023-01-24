@@ -1,6 +1,5 @@
 package mekanism.common.recipe.impl;
 
-import java.util.function.Consumer;
 import mekanism.api.datagen.recipe.builder.ElectrolysisRecipeBuilder;
 import mekanism.api.recipes.inputs.FluidStackIngredient;
 import mekanism.common.Mekanism;
@@ -9,6 +8,8 @@ import mekanism.common.registries.MekanismGases;
 import mekanism.common.tags.MekanismTags;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.tags.FluidTags;
+
+import java.util.function.Consumer;
 
 class SeparatingRecipeProvider implements ISubRecipeProvider {
 

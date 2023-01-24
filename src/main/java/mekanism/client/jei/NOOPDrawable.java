@@ -1,6 +1,5 @@
 package mekanism.client.jei;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import mezz.jei.api.gui.drawable.IDrawable;
 
 public class NOOPDrawable implements IDrawable {

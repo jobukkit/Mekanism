@@ -4,18 +4,13 @@ import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
 import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.chars.CharSet;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiPredicate;
 import mekanism.common.base.TagCache;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.*;
+import java.util.function.BiPredicate;
 
 /**
  * Advanced pattern searching, in use by QIO Item Viewers. Only use on client-side.

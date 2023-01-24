@@ -1,7 +1,5 @@
 package mekanism.common.tile.machine;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.RelativeSide;
 import mekanism.api.annotations.NonNull;
 import mekanism.api.chemical.ChemicalTankBuilder;
@@ -36,6 +34,9 @@ import mekanism.common.tile.prefab.TileEntityProgressMachine;
 import mekanism.common.upgrade.MetallurgicInfuserUpgradeData;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class TileEntityMetallurgicInfuser extends TileEntityProgressMachine<MetallurgicInfuserRecipe> implements IHasDumpButton {
 

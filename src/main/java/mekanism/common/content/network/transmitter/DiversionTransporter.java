@@ -1,7 +1,5 @@
 package mekanism.common.content.network.transmitter;
 
-import java.util.Arrays;
-import javax.annotation.Nonnull;
 import mekanism.api.IIncrementalEnum;
 import mekanism.api.NBTConstants;
 import mekanism.api.math.MathUtils;
@@ -18,8 +16,10 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Util;
 import net.minecraft.util.text.ITextComponent;
+
+import javax.annotation.Nonnull;
+import java.util.Arrays;
 
 public class DiversionTransporter extends LogisticalTransporterBase {
 

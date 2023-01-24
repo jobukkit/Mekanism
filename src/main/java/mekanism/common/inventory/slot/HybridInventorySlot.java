@@ -1,10 +1,5 @@
 package mekanism.common.inventory.slot;
 
-import java.util.Objects;
-import java.util.function.BiPredicate;
-import java.util.function.Predicate;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.IContentsListener;
 import mekanism.api.annotations.NonNull;
 import mekanism.api.fluid.IExtendedFluidTank;
@@ -12,13 +7,15 @@ import mekanism.api.inventory.AutomationType;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.merged.MergedTank;
 import mekanism.common.capabilities.merged.MergedTank.CurrentType;
-import mekanism.common.inventory.slot.chemical.GasInventorySlot;
-import mekanism.common.inventory.slot.chemical.InfusionInventorySlot;
-import mekanism.common.inventory.slot.chemical.MergedChemicalInventorySlot;
-import mekanism.common.inventory.slot.chemical.PigmentInventorySlot;
-import mekanism.common.inventory.slot.chemical.SlurryInventorySlot;
+import mekanism.common.inventory.slot.chemical.*;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidUtil;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Objects;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 public class HybridInventorySlot extends MergedChemicalInventorySlot<MergedTank> implements IFluidHandlerSlot {
 

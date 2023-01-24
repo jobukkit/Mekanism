@@ -1,10 +1,11 @@
 package mekanism.common.capabilities.resolver.manager;
 
-import java.util.List;
-import javax.annotation.Nullable;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.common.capabilities.resolver.ICapabilityResolver;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 @MethodsReturnNonnullByDefault
 public interface ICapabilityHandlerManager<CONTAINER> extends ICapabilityResolver {

@@ -1,12 +1,13 @@
 package mekanism.common.tile.base;
 
-import java.util.List;
-import java.util.function.Function;
 import mekanism.api.DataHandlerUtils;
 import mekanism.api.NBTConstants;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.common.util.INBTSerializable;
+
+import java.util.List;
+import java.util.function.Function;
 
 public enum SubstanceType {
     ENERGY(NBTConstants.ENERGY_CONTAINERS, (tile) -> tile.getEnergyContainers(null)),

@@ -1,11 +1,12 @@
 package mekanism.common.capabilities.holder.energy;
 
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import mekanism.api.RelativeSide;
 import mekanism.api.energy.IEnergyContainer;
 import mekanism.common.tile.component.TileComponentConfig;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nonnull;
+import java.util.function.Supplier;
 
 public class EnergyContainerHelper {
 

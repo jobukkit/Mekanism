@@ -1,9 +1,5 @@
 package mekanism.common.content.blocktype;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import javax.annotation.Nonnull;
 import mekanism.api.text.ILangEntry;
 import mekanism.common.block.attribute.Attribute;
 import mekanism.common.block.attribute.AttributeCustomShape;
@@ -11,6 +7,11 @@ import mekanism.common.block.attribute.Attributes.AttributeLight;
 import mekanism.common.block.interfaces.ITypeBlock;
 import net.minecraft.block.Block;
 import net.minecraft.util.math.shapes.VoxelShape;
+
+import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BlockType {
 

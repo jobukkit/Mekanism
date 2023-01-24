@@ -1,6 +1,5 @@
 package mekanism.additions.common.recipe;
 
-import java.util.function.Consumer;
 import mekanism.additions.common.AdditionsTags;
 import mekanism.additions.common.MekanismAdditions;
 import mekanism.additions.common.registries.AdditionsBlocks;
@@ -15,6 +14,8 @@ import mekanism.common.recipe.pattern.RecipePattern.TripleLine;
 import mekanism.common.registration.impl.BlockRegistryObject;
 import mekanism.common.tags.MekanismTags;
 import net.minecraft.data.IFinishedRecipe;
+
+import java.util.function.Consumer;
 
 public class PlasticFencesRecipeProvider implements ISubRecipeProvider {
 

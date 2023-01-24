@@ -1,8 +1,5 @@
 package mekanism.common.integration.energy.forgeenergy;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import mekanism.api.energy.IStrictEnergyHandler;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.integration.energy.IEnergyCompat;
@@ -13,6 +10,10 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 public class ForgeEnergyCompat implements IEnergyCompat {

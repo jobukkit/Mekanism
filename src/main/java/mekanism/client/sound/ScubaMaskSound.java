@@ -1,9 +1,10 @@
 package mekanism.client.sound;
 
-import javax.annotation.Nonnull;
 import mekanism.client.ClientTickHandler;
 import mekanism.common.registries.MekanismSounds;
 import net.minecraft.entity.player.PlayerEntity;
+
+import javax.annotation.Nonnull;
 
 public class ScubaMaskSound extends PlayerSound {
 

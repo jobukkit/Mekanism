@@ -1,9 +1,9 @@
 package mekanism.client.render.obj;
 
-import javax.annotation.Nonnull;
-
 import net.minecraft.client.renderer.model.Material;
 import net.minecraftforge.client.model.IModelConfiguration;
+
+import javax.annotation.Nonnull;
 
 public class OpaqueModelConfiguration extends WrapperModelConfiguration {
 

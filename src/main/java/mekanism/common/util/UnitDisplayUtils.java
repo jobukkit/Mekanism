@@ -1,6 +1,5 @@
 package mekanism.common.util;
 
-import javax.annotation.Nonnull;
 import mekanism.api.IIncrementalEnum;
 import mekanism.api.math.FloatingLong;
 import mekanism.api.math.MathUtils;
@@ -9,6 +8,8 @@ import mekanism.api.text.ILangEntry;
 import mekanism.api.text.TextComponentUtil;
 import mekanism.common.MekanismLang;
 import net.minecraft.util.text.ITextComponent;
+
+import javax.annotation.Nonnull;
 
 /**
  * Code taken from UE and modified to fit Mekanism.

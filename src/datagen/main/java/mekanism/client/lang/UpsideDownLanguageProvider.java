@@ -1,12 +1,13 @@
 package mekanism.client.lang;
 
-import java.text.ChoiceFormat;
-import java.util.List;
 import mekanism.client.lang.FormatSplitter.Component;
 import mekanism.client.lang.FormatSplitter.FormatComponent;
 import mekanism.client.lang.FormatSplitter.MessageFormatComponent;
 import mekanism.common.Mekanism;
 import net.minecraft.data.DataGenerator;
+
+import java.text.ChoiceFormat;
+import java.util.List;
 
 //TODO: If at some point we make unit tests, we should add some tests for this and for FormatSplitter
 public class UpsideDownLanguageProvider extends ConvertibleLanguageProvider {

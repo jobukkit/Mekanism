@@ -1,6 +1,5 @@
 package mekanism.common.network;
 
-import java.util.function.Supplier;
 import mekanism.api.Action;
 import mekanism.api.Coord4D;
 import mekanism.api.energy.IEnergyContainer;
@@ -25,6 +24,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
+
+import java.util.function.Supplier;
 
 public class PacketPortableTeleporterGui {
 

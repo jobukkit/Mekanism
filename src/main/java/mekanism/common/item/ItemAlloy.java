@@ -1,6 +1,5 @@
 package mekanism.common.item;
 
-import javax.annotation.Nonnull;
 import mekanism.api.IAlloyInteraction;
 import mekanism.api.tier.AlloyTier;
 import mekanism.common.capabilities.Capabilities;
@@ -16,6 +15,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.LazyOptional;
+
+import javax.annotation.Nonnull;
 
 public class ItemAlloy extends Item {
 

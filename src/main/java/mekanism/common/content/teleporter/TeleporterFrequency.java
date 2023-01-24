@@ -1,8 +1,6 @@
 package mekanism.common.content.teleporter;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import java.util.Set;
-import java.util.UUID;
 import mekanism.api.Coord4D;
 import mekanism.api.NBTConstants;
 import mekanism.api.text.EnumColor;
@@ -12,6 +10,9 @@ import mekanism.common.util.NBTUtils;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
+
+import java.util.Set;
+import java.util.UUID;
 
 public class TeleporterFrequency extends Frequency {
 

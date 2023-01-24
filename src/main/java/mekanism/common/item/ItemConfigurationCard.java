@@ -1,8 +1,5 @@
 package mekanism.common.item;
 
-import java.util.List;
-import java.util.Optional;
-import javax.annotation.Nonnull;
 import mekanism.api.IConfigCardAccess.ISpecialConfigData;
 import mekanism.api.NBTConstants;
 import mekanism.api.text.EnumColor;
@@ -27,12 +24,15 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.Optional;
 
 public class ItemConfigurationCard extends Item {
 

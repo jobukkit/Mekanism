@@ -1,10 +1,5 @@
 package mekanism.common.inventory.slot.chemical;
 
-import java.util.Objects;
-import java.util.function.BiPredicate;
-import java.util.function.Predicate;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.IContentsListener;
 import mekanism.api.annotations.NonNull;
 import mekanism.api.chemical.merged.MergedChemicalTank;
@@ -14,6 +9,12 @@ import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.merged.MergedTank.CurrentType;
 import mekanism.common.inventory.slot.BasicInventorySlot;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Objects;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 public class MergedChemicalInventorySlot<MERGED extends MergedChemicalTank> extends BasicInventorySlot {
 

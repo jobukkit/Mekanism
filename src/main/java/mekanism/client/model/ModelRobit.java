@@ -2,12 +2,13 @@ package mekanism.client.model;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import javax.annotation.Nonnull;
 import mekanism.client.render.MekanismRenderer;
 import mekanism.common.entity.EntityRobit;
 import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
+
+import javax.annotation.Nonnull;
 
 public class ModelRobit extends EntityModel<EntityRobit> {
 

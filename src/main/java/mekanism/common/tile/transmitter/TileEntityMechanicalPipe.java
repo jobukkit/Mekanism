@@ -1,7 +1,5 @@
 package mekanism.common.tile.transmitter;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import mekanism.api.Action;
 import mekanism.api.NBTConstants;
 import mekanism.api.fluid.IMekanismFluidHandler;
@@ -20,6 +18,9 @@ import mekanism.common.upgrade.transmitter.TransmitterUpgradeData;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class TileEntityMechanicalPipe extends TileEntityTransmitter {
 

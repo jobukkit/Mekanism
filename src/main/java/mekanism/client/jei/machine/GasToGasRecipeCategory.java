@@ -1,6 +1,5 @@
 package mekanism.client.jei.machine;
 
-import java.util.Collections;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.providers.IBlockProvider;
 import mekanism.api.recipes.GasToGasRecipe;
@@ -17,6 +16,8 @@ import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.gui.ingredient.IGuiIngredientGroup;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
+
+import java.util.Collections;
 
 public class GasToGasRecipeCategory extends BaseRecipeCategory<GasToGasRecipe> {
 

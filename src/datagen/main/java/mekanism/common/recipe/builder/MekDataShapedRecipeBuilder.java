@@ -1,9 +1,10 @@
 package mekanism.common.recipe.builder;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.common.registries.MekanismRecipeSerializers;
 import net.minecraft.util.IItemProvider;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

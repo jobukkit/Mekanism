@@ -1,7 +1,5 @@
 package mekanism.common.content.gear.mekasuit;
 
-import java.util.List;
-import javax.annotation.Nonnull;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.common.MekanismLang;
 import mekanism.common.config.MekanismConfig;
@@ -14,6 +12,9 @@ import mekanism.common.registries.MekanismGases;
 import mekanism.common.util.StorageUtils;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nonnull;
+import java.util.List;
 
 public class ModuleJetpackUnit extends ModuleMekaSuit {
 

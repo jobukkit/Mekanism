@@ -1,6 +1,5 @@
 package mekanism.common.inventory.container.tile;
 
-import javax.annotation.Nonnull;
 import mekanism.common.content.qio.QIOFrequency;
 import mekanism.common.inventory.container.QIOItemViewerContainer;
 import mekanism.common.lib.frequency.FrequencyType;
@@ -10,6 +9,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
 
 public class QIODashboardContainer extends QIOItemViewerContainer {
 

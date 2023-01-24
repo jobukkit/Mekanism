@@ -1,7 +1,5 @@
 package mekanism.client.gui.element.gauge;
 
-import java.util.Collections;
-import java.util.List;
 import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.math.FloatingLong;
 import mekanism.client.gui.IGuiWrapper;
@@ -11,6 +9,9 @@ import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.util.text.EnergyDisplay;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.text.ITextComponent;
+
+import java.util.Collections;
+import java.util.List;
 
 public class GuiEnergyGauge extends GuiGauge<Void> {
 

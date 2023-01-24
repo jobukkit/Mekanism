@@ -1,6 +1,5 @@
 package mekanism.common.integration.lookingat;
 
-import javax.annotation.Nonnull;
 import mekanism.api.math.MathUtils;
 import mekanism.client.render.MekanismRenderer;
 import mekanism.client.render.MekanismRenderer.FluidType;
@@ -8,6 +7,8 @@ import mekanism.common.MekanismLang;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.fluids.FluidStack;
+
+import javax.annotation.Nonnull;
 
 public class FluidElement extends LookingAtElement {
 

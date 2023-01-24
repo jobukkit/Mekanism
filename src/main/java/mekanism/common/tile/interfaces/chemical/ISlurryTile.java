@@ -1,7 +1,5 @@
 package mekanism.common.tile.interfaces.chemical;
 
-import java.util.List;
-import javax.annotation.Nullable;
 import mcp.MethodsReturnNonnullByDefault;
 import mekanism.api.chemical.slurry.ISlurryTank;
 import mekanism.api.chemical.slurry.Slurry;
@@ -11,6 +9,9 @@ import mekanism.common.capabilities.chemical.dynamic.ISlurryTracker;
 import mekanism.common.capabilities.holder.chemical.IChemicalTankHolder;
 import mekanism.common.capabilities.resolver.manager.ChemicalHandlerManager.SlurryHandlerManager;
 import net.minecraft.util.Direction;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 @MethodsReturnNonnullByDefault
 public interface ISlurryTile extends ISlurryTracker {
