@@ -16,7 +16,7 @@
       "tag": "mekanism:alloys/atomic"
     },
     "I": {
-      "tag": "forge:ingots/zinc"
+      "tag": "forge:storage_blocks/zinc"
     },
     "D": {
       "tag": "forge:gems/diamond"
