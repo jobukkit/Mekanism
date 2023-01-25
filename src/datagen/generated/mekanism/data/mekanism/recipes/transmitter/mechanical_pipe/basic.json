@@ -9,10 +9,10 @@
   ],
   "key": {
     "S": {
-      "tag": "forge:ingots/steel"
+      "tag": "forge:plates/copper"
     },
     "#": {
-      "item": "minecraft:bucket"
+      "item": "forge:ingots/steel"
     }
   }
 }
