@@ -64,6 +64,10 @@ public class ItemMekaSuitArmor extends ArmorItem implements IModuleContainerItem
           DamageSource.HOT_FLOOR, DamageSource.IN_FIRE, DamageSource.IN_WALL, DamageSource.LAVA, DamageSource.LIGHTNING_BOLT,
           DamageSource.ON_FIRE, DamageSource.SWEET_BERRY_BUSH, DamageSource.WITHER));
 
+    public static Set<DamageSource> getSupportedSources() {
+        return Collections.unmodifiableSet(ALWAYS_SUPPORTED_SOURCES);
+    }
+
     private static final MekaSuitMaterial MEKASUIT_MATERIAL = new MekaSuitMaterial();
 
     private final Set<GasTankSpec> gasTankSpecs = new HashSet<>();
@@ -272,17 +276,17 @@ public class ItemMekaSuitArmor extends ArmorItem implements IModuleContainerItem
         return ret;
     }
 
-    // This is unused for the most part; toughness / damage reduction is handled manually
+    // This is unused for the most part; toughness / damage reduction is handled manually, though it can fall back to Terrasteel values
     protected static class MekaSuitMaterial extends BaseSpecialArmorMaterial {
 
         @Override
         public int getDamageReductionAmount(@Nonnull EquipmentSlotType slotType) {
-            return 0;
+            return new int[]{3, 6, 8, 3}[slotType.getIndex()];
         }
 
         @Override
         public float getToughness() {
-            return 0;
+            return 3;
         }
 
         @Nonnull
