@@ -1,8 +1,5 @@
 {
     "parent": "builtin/entity",
-    "textures": {
-        "particle": "mekanism:block/steel_casing"
-    },
     "display": {
         "gui": {
             "rotation": [ 90, 135, 270 ],
@@ -25,8 +22,8 @@
             "scale": [ 1, 1, 1 ]
         },
         "thirdperson_lefthand": {
-            "rotation": [ 85, 190, 0 ],
-            "translation": [ 2, 0, 16],
+            "rotation": [ 85, 195, 0 ],
+            "translation": [ 2, 0, 17],
             "scale": [ 0.9375, 0.9375, 0.9375 ]
         },
         "firstperson_lefthand": {
