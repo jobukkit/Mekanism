@@ -5,14 +5,11 @@
   },
   "pattern": [
     "III",
-    "IDI"
+    "I I"
   ],
   "key": {
     "I": {
-      "tag": "forge:ingots/lead"
-    },
-    "D": {
-      "tag": "forge:dyes/orange"
+      "tag": "forge:ingots/brass"
     }
   }
 }

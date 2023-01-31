@@ -10,7 +10,7 @@
   ],
   "key": {
     "I": {
-      "tag": "forge:ingots/lead"
+      "tag": "forge:ingots/manasteel"
     },
     "C": {
       "item": "mekanism:ultimate_control_circuit"

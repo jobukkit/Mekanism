@@ -15,7 +15,7 @@
   "container.mekanismgenerators.fusion_reactor_logic_adapter": "Fusion Reactor Logic Adapter",
   "description.mekanismgenerators.control_rod_assembly": "A collection of control rods used to halt a fission chain reaction. Placed on top of a tower of Fission Fuel Assemblies.",
   "description.mekanismgenerators.fission_fuel_assembly": "A cluster of fuel rods used to house fission fuel within a Fission Reactor. These can be stacked on top of each other.",
-  "description.mekanismgenerators.fission_reactor_casing": "Lead-infused steel casing used to create a Fission Reactor. Mostly heat-resistant, mostly radiation-resistant, and mostly safe!",
+  "description.mekanismgenerators.fission_reactor_casing": "Brass-infused steel casing used to create a Fission Reactor. Mostly heat-resistant, mostly radiation-resistant, and mostly safe!",
   "description.mekanismgenerators.fission_reactor_logic_adapter": "A block that can be used to monitor or control the Fission Reactor with Redstone.",
   "description.mekanismgenerators.laser_focus_matrix": "A panel of Reactor Glass that is capable of absorbing optical energy and thereby heating up the Fusion Reactor.",
   "description.mekanismgenerators.reactor.logic.activation": "Activate the reactor when powered, and deactivate when unpowered",
